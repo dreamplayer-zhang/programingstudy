@@ -238,10 +238,15 @@ namespace Root_EFEM.Module
 
         public string BeforeGet(int nID)
         {
-            if (GetInfoWafer(nID) == null)
+            InfoWafer wafer = GetInfoWafer(nID);
+            if (wafer == null)
                 return p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null";
             if (!m_diDoorOpen.p_bIn)
                 return "Door Not Opened";
+
+            MarsLogManager marsLogManager = MarsLogManager.Instance;
+            marsLogManager.ChangeMaterial(EQ.p_nRunLP, wafer.m_nSlot + 1, wafer.p_sLotID, wafer.p_sCarrierID, wafer.p_sRecipe);
+
             return IsRunOK();
         }
 
@@ -260,6 +265,7 @@ namespace Root_EFEM.Module
             wafer.p_sInspectionID = wafer.p_sLotID + wafer.p_sWaferID +DateTime.Now.ToString("yyyyMMddhhmmss");
 
             p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Run;
+
             return IsRunOK();
         }
 
@@ -916,8 +922,8 @@ namespace Root_EFEM.Module
                 
                 SSLNet.DataFormatter dataformatter = new SSLNet.DataFormatter();
                 dataformatter.AddData("MapID", m_infoCarrier.GetMapData());
-                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Load", SSLNet.STATUS.END, dataformatter, SSLNet.MATERIAL_TYPE.FOUP);
-                //m_module.m_ceidDocking.Send();
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Load", SSLNet.STATUS.END, SSLNet.MATERIAL_TYPE.FOUP, dataformatter);
+                dataformatter.ClearData();
                 return "OK";
             }
         }
@@ -1044,13 +1050,38 @@ namespace Root_EFEM.Module
                     Thread.Sleep(10);
                     if (EQ.p_bStop) return p_sInfo + "EQ Stop";
                 }
+
+                int firstIdx = -1;
+                int lastIdx = -1;
                 for (int i=0; i<m_infoCarrier.m_aGemSlot.Count; i++)
                 {
-                    if (m_infoCarrier.m_aGemSlot[i].p_eState == GemSlotBase.eState.Select) 
-                        m_infoCarrier.StartProcess(m_infoCarrier.m_aGemSlot[i].p_id);
-                }
+                    if (m_infoCarrier.m_aGemSlot[i].p_eState == GemSlotBase.eState.Select)
+                    {
+                        if (firstIdx == -1)
+                            firstIdx = i;
 
+                        CopySlotInfo(m_infoCarrier.m_aInfoWafer[i], m_infoCarrier.m_aGemSlot[i]);
+                        m_infoCarrier.StartProcess(m_infoCarrier.m_aGemSlot[i].p_id);
+                        lastIdx = i;
+                    }
+                }
+                if (firstIdx == lastIdx)
+                    m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstLastWafer;
+                else
+                {
+                    m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstWafer;
+                    m_infoCarrier.m_aInfoWafer[lastIdx].p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
+                }
                 return sResult;
+            }
+            void CopySlotInfo(InfoWafer infoWafer, GemSlotBase gemSlot)
+            {
+                infoWafer.p_sRecipe = gemSlot.p_sRecipe;
+                infoWafer.p_sCarrierID = gemSlot.p_sCarrierID;
+                infoWafer.p_sLocID = gemSlot.p_sLocID;
+                infoWafer.p_sLotID = gemSlot.p_sLotID;
+                infoWafer.p_eState = gemSlot.p_eState;
+                infoWafer.p_sSlotID = gemSlot.p_sSlotID;
             }
         }
         #endregion

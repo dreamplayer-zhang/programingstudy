@@ -1257,7 +1257,7 @@ namespace RootTools
 
         public void ClearDrawElement()
         {
-            this.p_UIElement.Clear();
+            this.p_DrawElement.Clear();
         }
 
         public void InitRoiRect(int nWidth, int nHeight)

@@ -75,18 +75,15 @@ namespace Root_Pine2.Module
 
         public string RunTurnUp(bool bUp)
         {
-            if (m_axisXZ.p_axisX.p_posCommand == m_axisXZ.p_axisY.GetPosValue(c_sReady))
+            if (m_axisXZ.p_axisX.p_posCommand == m_axisXZ.p_axisX.GetPosValue(c_sReady))
             {
                 m_dioTurnUp.Write(bUp);
-                Thread.Sleep(4000);
-                return "OK";
-                //return m_dioTurnUp.WaitDone();
+                return m_dioTurnUp.WaitDone();
             }
             double zPos = m_axisXZ.p_axisY.p_posCommand;
             RunMoveZ((double)0);
             m_dioTurnUp.Write(bUp);
-            Thread.Sleep(4000);
-            //if (Run(m_dioTurnUp.WaitDone())) return p_sInfo;
+            if (Run(m_dioTurnUp.WaitDone())) return p_sInfo;
             RunMoveZ(zPos);
             return "OK";
         }
@@ -131,22 +128,28 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Run
-        public string RunUnload(Vision2D.eWorks eVisionWorks)
+        public string StartUnloadStrip()
         {
-            Boat boat = m_boats.m_aBoat[eVisionWorks];
+            return "OK";
+        }
+
+        public string RunUnload(Vision2D.eWorks eWorks)
+        {
+            Boat boat = m_boats.m_aBoat[eWorks];
             if (boat.p_eStep != Boat.eStep.Ready) return "Boat not Ready";
             try
             {
                 m_doVacuum.Write(true);
                 if (Run(RunTurnUp(false))) return p_sInfo;
-                if (Run(RunMoveX(eVisionWorks))) return p_sInfo;
-                if (Run(RunMoveZ(eVisionWorks))) return p_sInfo;
+                if (Run(m_boats.RunMoveReady(eWorks))) return p_sInfo;
+                if (Run(RunMoveX(eWorks))) return p_sInfo;
+                if (Run(RunMoveZ(eWorks))) return p_sInfo;
                 m_doVacuum.Write(false);
                 boat.RunVacuum(true);
                 Thread.Sleep((int)(1000 * m_secVacuum));
+                if (Run(RunMoveZ(c_sReady))) return p_sInfo;
                 boat.p_infoStrip = p_infoStrip;
                 p_infoStrip = null;
-                if (Run(RunMoveZ(c_sReady))) return p_sInfo;
                 if (Run(RunMoveX(c_sReady))) return p_sInfo;
                 if (Run(RunTurnUp(true))) return p_sInfo;
             }
@@ -171,6 +174,7 @@ namespace Root_Pine2.Module
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (p_infoStrip == null) return "OK";
+            if ((m_boats.m_aBoat[p_infoStrip.m_eWorks].p_eStep != Boat.eStep.Ready) || (m_boats.m_aBoat[p_infoStrip.m_eWorks].p_infoStrip != null)) return "OK"; 
             Run_Unload run = (Run_Unload)m_runUnload.Clone();
             run.m_eWorks = p_infoStrip.m_eWorks; 
             return StartRun(run);
@@ -183,8 +187,11 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
-            p_sInfo = base.StateHome();
-            if (p_sInfo == "OK") RunMoveReady(); 
+            p_sInfo = base.StateHome(m_axisXZ.p_axisY);
+            if (p_sInfo != "OK") return p_sInfo;
+            p_sInfo = base.StateHome(m_axisXZ.p_axisX);
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            if (p_sInfo == "OK") RunMoveReady();
             return p_sInfo;
         }
 
@@ -193,7 +200,8 @@ namespace Root_Pine2.Module
             base.Reset();
             p_infoStrip = null;
             RunMove(c_sReady);
-            RunTurnUp(true); 
+            RunTurnUp(true);
+            RunVacuum(false); 
         }
         public override void RunTree(Tree tree)
         {

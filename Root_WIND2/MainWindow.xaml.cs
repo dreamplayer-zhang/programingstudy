@@ -197,6 +197,7 @@ namespace Root_WIND2
                 ImageData maskLayer;
 
                 // ImageData
+                
                 if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
                 {
                     MemoryData memoryData = memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront);
@@ -399,7 +400,7 @@ namespace Root_WIND2
                             ebrImage.p_Size.Y,
                             ebrImage.GetBytePerPixel()));
 
-                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeEBR.CameraInfoIndex));
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_EdgeSideVision.GetGrabMode(recipeEBR.CameraInfoIndex));
                     ebrInspection.SetCameraInfo(camInfo);
                 }
 

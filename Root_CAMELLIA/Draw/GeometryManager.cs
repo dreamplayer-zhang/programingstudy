@@ -142,6 +142,16 @@ namespace Root_CAMELLIA.Draw
             path.StrokeThickness = thickness;
             path.Opacity = opcity;
         }
+        public CustomRectangleGeometry(Brush strokeBrush, string strokeDash, double thickness = 1, double opcity = 1)
+        {
+            RectangleGeometry = new RectangleGeometry();
+            path.Stroke = strokeBrush;
+            path.Data = RectangleGeometry;
+            path.StrokeDashArray = DoubleCollection.Parse(strokeDash);
+            path.StrokeThickness = thickness;
+            path.Opacity = opcity;
+        }
+
         public CustomRectangleGeometry(Brush fillBrush, double thickness = 1, double opcity = 1)
         {
             RectangleGeometry = new RectangleGeometry();
@@ -155,6 +165,13 @@ namespace Root_CAMELLIA.Draw
         public void SetData(Rect rect, int zIndex = 0)
         {
             RectangleGeometry.Rect = rect;
+            Panel.SetZIndex(path, zIndex);
+        }
+
+        public void SetData(Rect rect, double thickness, double opcity = 1,  int zIndex = 0)
+        {
+            RectangleGeometry.Rect = rect;
+            path.StrokeThickness = thickness;
             Panel.SetZIndex(path, zIndex);
         }
 
@@ -217,6 +234,16 @@ namespace Root_CAMELLIA.Draw
             path.Stroke = brush;
             path.Fill = brush;
             path.Data = PathGeometry;
+            path.StrokeThickness = thickness;
+            path.Opacity = opcity;
+        }
+        public CustomPathGeometry(Brush strokebrush, string strokeDash,  double thickness = 1, double opcity = 1)
+        {
+            PathGeometry = new PathGeometry();
+            //     path = new Path();
+            path.Stroke = strokebrush;
+            path.Data = PathGeometry;
+            path.StrokeDashArray = DoubleCollection.Parse(strokeDash);
             path.StrokeThickness = thickness;
             path.Opacity = opcity;
         }

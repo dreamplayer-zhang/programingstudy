@@ -301,6 +301,7 @@ namespace RootTools.Gem
                 _eAccessLP = value;
                 RunTree(Tree.eMode.Init);
                 OnPropertyChanged();
+                OnPropertyChanged("p_eAccessLP");
                 OnPropertyChanged("p_bAccessLP_Auto");
                 OnPropertyChanged("p_bAccessLP_Manual");
             }
@@ -325,7 +326,7 @@ namespace RootTools.Gem
             if (m_gem.p_eControl != eControl.ONLINEREMOTE)
             {
                 p_eStateCarrierID = eGemState.VerificationOK;
-                p_eTransfer = eTransfer.TransferBlocked;
+                p_eReqTransfer = eTransfer.TransferBlocked;
                 return;
             }
 

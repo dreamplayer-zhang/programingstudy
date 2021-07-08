@@ -157,6 +157,7 @@ namespace RootTools.Camera.Dalsa
         int m_nPreWidthG = 8000;
         int m_nPreWidthB = 8000;
 
+        public bool m_bGrabThreadOn = false;   // true When thread is arrived in Grab Loop
         const int thread = 12;
         const int threadBuff = 16000;
         CLR_IP m_clrip = new CLR_IP();
@@ -274,10 +275,10 @@ namespace RootTools.Camera.Dalsa
 
         void RunCameraConfig(Tree tree, bool bVisible)
         {
-            p_CamParam.p_eUserSetPowerup = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetPowerup, p_CamParam.p_eUserSetPowerup, "Power-up UserSet", "Selects the UserSet Configuration Set on camera power-up or reset", bVisible);
-            p_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetCurrent, p_CamParam.p_eUserSetCurrent, "Current UserSet", "Selects and Current UserSet", bVisible);
-            p_CamParam.p_nRotaryEncoderMultiplier = tree.Set(p_CamParam.p_nRotaryEncoderMultiplier, p_CamParam.p_nRotaryEncoderMultiplier, "RotaryEncoderMultiplier", "Specifies a multiplication factor for the rotary encoder output pulse generator", bVisible);
-            p_CamParam.p_nRotaryEncoderDivider = tree.Set(p_CamParam.p_nRotaryEncoderDivider, p_CamParam.p_nRotaryEncoderDivider, "RotaryEncoderDivider", "Specifies a division factor for the rotary encoder output pulse generator", bVisible);
+            //p_CamParam.p_eUserSetPowerup = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetPowerup, p_CamParam.p_eUserSetPowerup, "Power-up UserSet", "Selects the UserSet Configuration Set on camera power-up or reset", bVisible);
+            //p_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetCurrent, p_CamParam.p_eUserSetCurrent, "Current UserSet", "Selects and Current UserSet", bVisible);
+            //p_CamParam.p_nRotaryEncoderMultiplier = tree.Set(p_CamParam.p_nRotaryEncoderMultiplier, p_CamParam.p_nRotaryEncoderMultiplier, "RotaryEncoderMultiplier", "Specifies a multiplication factor for the rotary encoder output pulse generator", bVisible);
+            //p_CamParam.p_nRotaryEncoderDivider = tree.Set(p_CamParam.p_nRotaryEncoderDivider, p_CamParam.p_nRotaryEncoderDivider, "RotaryEncoderDivider", "Specifies a division factor for the rotary encoder output pulse generator", bVisible);
         }
 
         #endregion 
@@ -468,6 +469,7 @@ namespace RootTools.Camera.Dalsa
                 m_sapAcq.Dispose();
                 m_sapAcq = null;
             }
+            p_CamParam.DisconnectCamHandle();
 
             RunTree(Tree.eMode.Update);
 
@@ -535,15 +537,18 @@ namespace RootTools.Camera.Dalsa
                 m_GreenMemPtr = m_Memory.GetPtr(1);
                 m_BlueMemPtr = m_Memory.GetPtr(2);
             }
+
+            m_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)m_GD.nUserSet;
+
             if (Scandir == true) //ybkwon0113
             {
                 p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Forward);
-
             }
             else
             {
                 p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Reverse);
             }
+
             m_cpScanOffset = cpScanOffset;
             m_nInverseYOffset = grabData.ReverseOffsetY;
             m_nGrabCount = (int)Math.Truncate(1.0 * nLine / p_CamParam.p_Height) - 1;
@@ -927,12 +932,17 @@ namespace RootTools.Camera.Dalsa
             int fB = (int)((double)m_GD.m_nFovSize / m_GD.m_dScaleB);
             int nFovSize = Math.Max(fB, Math.Max(fR, fG));
             nFovSize = nFovSize + nOverlap;
+            if(m_GD.m_nFovSize > nFovSize)
+            {
+                nFovSize = m_GD.m_nFovSize;
+            }
 
             if (nCamWidth < nFovStart + nFovSize)
             {
                 MessageBox.Show("FovStart+ nFovSize+ nOverlap가 CamWidth보다 큽니다.(" + nFovStart.ToString() + " + " + nFovSize.ToString() + " > " + nCamWidth.ToString() + ")");
                 nFovSize = nCamWidth - nFovStart;
             }
+
             int nBufSize = nCamHeight * nCamWidth;
             long nMemWidth = m_Memory.W;
 
@@ -949,30 +959,34 @@ namespace RootTools.Camera.Dalsa
                 }
             }
 
+            int nXShiftR = (m_GD.m_dShiftR >= 0) ? (int)(m_GD.m_dShiftR) : (int)Math.Ceiling(m_GD.m_dShiftR);    // 정수값만 취함 (5.7 -> 5, -5.7 -> -5)
+            int nXShiftG = (m_GD.m_dShiftG >= 0) ? (int)(m_GD.m_dShiftG) : (int)Math.Ceiling(m_GD.m_dShiftG);
+            int nXShiftB = (m_GD.m_dShiftB >= 0) ? (int)(m_GD.m_dShiftB) : (int)Math.Ceiling(m_GD.m_dShiftB);
+
             if (m_GD.m_dScaleR != m_dPReXScaleR
-                || m_GD.m_dShiftR != m_dPReXShiftR
+                || (m_GD.m_dShiftR - nXShiftR) != m_dPReXShiftR
                 || nFovSize != m_nPreWidthR)
             {
                 m_dPReXScaleR = m_GD.m_dScaleR;
-                m_dPReXShiftR = m_GD.m_dShiftR;
+                m_dPReXShiftR = m_GD.m_dShiftR - nXShiftR;
                 m_nPreWidthR = nFovSize;
                 m_clrip.Cpp_CreatInterpolationData(0, m_dPReXScaleR, m_dPReXShiftR, m_nPreWidthR);
             }
             if (m_GD.m_dScaleG != m_dPReXScaleG
-                || m_GD.m_dShiftG != m_dPReXShiftG
+                || (m_GD.m_dShiftG - nXShiftG) != m_dPReXShiftG
                 || nFovSize != m_nPreWidthG)
             {
                 m_dPReXScaleG = m_GD.m_dScaleG;
-                m_dPReXShiftG = m_GD.m_dShiftG;
+                m_dPReXShiftG = m_GD.m_dShiftG - nXShiftG;
                 m_nPreWidthG = nFovSize;
                 m_clrip.Cpp_CreatInterpolationData(1, m_dPReXScaleG, m_dPReXShiftG, m_nPreWidthG);
             }
             if (m_GD.m_dScaleB != m_dPReXScaleB
-                || m_GD.m_dShiftG != m_dPReXShiftB
+                || (m_GD.m_dShiftB - nXShiftB) != m_dPReXShiftB
                 || nFovSize != m_nPreWidthB)
             {
                 m_dPReXScaleB = m_GD.m_dScaleB;
-                m_dPReXShiftB = m_GD.m_dShiftB;
+                m_dPReXShiftB = m_GD.m_dShiftB - nXShiftB;
                 m_nPreWidthB = nFovSize;
                 m_clrip.Cpp_CreatInterpolationData(2, m_dPReXScaleB, m_dPReXShiftB, m_nPreWidthB);
             }
@@ -981,6 +995,8 @@ namespace RootTools.Camera.Dalsa
             const int nTimeOutInterval = 10; // ms
             int nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
             int previBlock = 0;
+            Console.WriteLine("Grab Loop Start");
+            m_bGrabThreadOn = true;
             while (iBlock < m_nGrabCount)
             {
                 if (previBlock == iBlock)
@@ -1015,14 +1031,21 @@ namespace RootTools.Camera.Dalsa
                         int ypG = yp + m_GD.m_nYShiftG;
                         int ypB = yp + m_GD.m_nYShiftB;
 
+                        if (m_GD.m_bUseFlipVertical == true)     // 영상 상하 반전
+                        {
+                            ypR = m_Memory.p_sz.Y - yp + m_GD.m_nYShiftR;
+                            ypG = m_Memory.p_sz.Y - yp + m_GD.m_nYShiftG;
+                            ypB = m_Memory.p_sz.Y - yp + m_GD.m_nYShiftB;
+                        }
+
                         if (ypR < 0) ypR = 0;
                         if (ypG < 0) ypG = 0;
                         if (ypB < 0) ypB = 0;
 
-                        long nR = nScanOffsetX + ypR * nMemWidth;
-                        long nG = nScanOffsetX + ypG * nMemWidth;
-                        long nB = nScanOffsetX + ypB * nMemWidth;
-                        IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt + nFovStart;
+                        long nR = nScanOffsetX + ypR * nMemWidth + nXShiftR;
+                        long nG = nScanOffsetX + ypG * nMemWidth + nXShiftG;
+                        long nB = nScanOffsetX + ypB * nMemWidth + nXShiftB;
+                        IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt + nFovStart* nByteCnt ;
                         IntPtr RedPtr = (IntPtr)((long)m_RedMemPtr + nR);
                         IntPtr GreenPtr = (IntPtr)((long)m_GreenMemPtr + nG);
                         IntPtr BluePtr = (IntPtr)((long)m_BlueMemPtr + nB);
@@ -1096,6 +1119,7 @@ namespace RootTools.Camera.Dalsa
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;
+            Console.WriteLine("Grab Loop End");
         }
         unsafe void Overlap(byte* pS, byte* pD, int nOverlap)
         {
@@ -1242,7 +1266,7 @@ namespace RootTools.Camera.Dalsa
         {
             Camera_Dalsa cam = args.Context as Camera_Dalsa;
             cam.m_nGrabTrigger++;
-            Debug.WriteLine("XferTrigger : " + cam.m_nGrabTrigger);
+            //Debug.WriteLine("XferTrigger : " + cam.m_nGrabTrigger);
         }
         #endregion
 

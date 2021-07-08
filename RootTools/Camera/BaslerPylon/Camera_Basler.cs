@@ -919,9 +919,6 @@ namespace RootTools.Camera.BaslerPylon
                         }
                     }
                 }
-
-
-                grabLock = false;
             }
             catch (Exception exception)
             {
@@ -929,6 +926,8 @@ namespace RootTools.Camera.BaslerPylon
             }
             finally
             {
+                grabLock = false;
+
                 // Dispose the grab result if needed for returning it to the grab loop.
                 e.DisposeGrabResultIfClone();
             }

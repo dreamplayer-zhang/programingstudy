@@ -633,6 +633,9 @@ namespace Root_EFEM.Module
         {
             //string sPut = SendCmd(eCmd.VacuumOn);
             //m_bgwWaferExist.RunWorkerAsync(true);
+            MarsLogManager marsLogManager = MarsLogManager.Instance;
+            marsLogManager.ChangeMaterialSlot(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1);
+
             return "OK"; 
         }
 
@@ -720,9 +723,9 @@ namespace Root_EFEM.Module
 
         public override void Reset()
         {
-            SendCmd(eCmd.SlowStop);
-            SendCmd(eCmd.ClearError);
-            SendCmd(eCmd.ResetPos);
+            Run(SendCmd(eCmd.SlowStop));
+            Run(SendCmd(eCmd.ClearError));
+            Run(SendCmd(eCmd.ResetPos));
             base.Reset();
         }
         #endregion

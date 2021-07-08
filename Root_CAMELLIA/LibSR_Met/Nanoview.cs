@@ -53,7 +53,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public MaterialList m_MaterialListSave;
         public LayerList m_LayerListSave;
         string m_sConfigPath = string.Empty;
-
+        public bool isCalDCOLTransmittance = false;
         public bool isExceptNIR = false;
         public bool bCheckSampleCal = false;
         //double[] m_Spectrum;
@@ -888,8 +888,10 @@ namespace Root_CAMELLIA.LibSR_Met
                         m_SR.NKFitLayer = m_NKFitLayer;
                         Stopwatch sw = new Stopwatch();
                         sw.Start();
-                        ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.Fit(data.VIS_Reflectance, data.VIS_Reflectance, data.eV, m_DM.nThicknessDataNum);
-
+                        
+                            ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.Fit(data.VIS_Reflectance, data.VIS_Reflectance, data.eV, m_DM.nThicknessDataNum);
+                        
+                        
                         sw.Stop();
                         Debug.WriteLine("Fit >> " + sw.ElapsedMilliseconds.ToString());
 
@@ -920,7 +922,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
                         data.dGoF = m_Calculation.CalcGoF(data.VIS_Reflectance, data.CalcReflectance, 0, nWLCount, 0, nWLCount - 1, dAvgR);
 
-                        if (data.dGoF > 0.9999)
+                        if (data.dGoF > 0.99999)
                         {
                             data.dGoF = 0.9999;
                         }
@@ -1199,23 +1201,30 @@ namespace Root_CAMELLIA.LibSR_Met
                     dThickness[i] = m_SR.Thickness[nCalLayer];
                 }
                 Stopwatch sw1 = new Stopwatch();
-                sw1.Start();
-                m_Calculation.CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
-                sw1.Stop();
-                Debug.WriteLine("Cal t >> " + sw1.ElapsedMilliseconds.ToString());
-               
                 Stopwatch sw2 = new Stopwatch();
-                sw2.Start();
-                m_Calculation.PointCalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
-                sw2.Stop();
+                if (!isCalDCOLTransmittance)
+                {
+                    sw1.Start();
+                    m_Calculation.CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
+                    sw1.Stop();
+                    Debug.WriteLine("Cal t >> " + sw1.ElapsedMilliseconds.ToString());
+                }
+                else
+                {
+                    
+                    sw2.Start();
+                    m_Calculation.PointCalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
+                    sw2.Stop();
+                    Debug.WriteLine("CalPoint t >> " + sw2.ElapsedMilliseconds.ToString());
+                }
+               
+                
                 Debug.WriteLine("CalPoint t >> " + sw2.ElapsedMilliseconds.ToString());
                 return true;
             }
             catch (Exception ex)
             {
                 m_DM.m_Log.WriteLog(LogType.Operating, "Cal Transmittance Fail!");
-                //MessageBox.Show("Cal Transmittance Fail!");
-
                 return false;
             }
         }
@@ -1729,7 +1738,8 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     if (OutputData.Contains("Time:"))
                     {
-                        filepath = Application.StartupPath + "\\Timedata.txt";
+                        filepath = string.Empty;
+                        filepath = @"C:\Camellia2\Init\Timedata.txt";
 
                         FileInfo fi = new FileInfo(filepath);
 
@@ -1773,10 +1783,11 @@ namespace Root_CAMELLIA.LibSR_Met
                             m_Hr = m_Hr_Org;
                         }
                         value = m_Hr;
-                        strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
+                        strtime = string.Format("{ 0}:{1}:{2}", m_Hr, m_Min, m_Sec);
                         using (StreamWriter SW = new StreamWriter(filepath))
                         {
                             SW.WriteLine(strtime);
+                            m_DM.m_Log.WriteLog(LogType.Datas, "Lamp Use Time" + strtime);
                         }
                     }
 
@@ -1814,7 +1825,8 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         if (OutputData.Contains("Time:"))
                         {
-                            filepath = Application.StartupPath + "\\Timedata.txt";
+                            filepath = string.Empty;
+                            filepath = @"C:\Camellia2\Init\Timedata.txt";
 
                             FileInfo fi = new FileInfo(filepath);
 
@@ -1872,6 +1884,7 @@ namespace Root_CAMELLIA.LibSR_Met
                             using (StreamWriter SW = new StreamWriter(filepath))
                             {
                                 SW.WriteLine(strtime);
+                                m_DM.m_Log.WriteLog(LogType.Datas, "Lamp Use Time" + strtime);
                             }
                         }
 
@@ -1905,7 +1918,8 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     if (OutputData.Contains("Time:"))
                     {
-                        filepath = Application.StartupPath + "\\Timedata.txt";
+                        filepath = string.Empty;
+                        filepath = @"C:\Camellia2\Init\Timedata.txt";
 
                         FileInfo fi = new FileInfo(filepath);
 
@@ -1961,8 +1975,10 @@ namespace Root_CAMELLIA.LibSR_Met
                         using (StreamWriter SW = new StreamWriter(filepath))
                         {
                             SW.WriteLine(strtime);
+                            m_DM.m_Log.WriteLog(LogType.Datas, "Lamp Use Time" + strtime);
                         }
                         sp.Write("c");
+                        
                     }
                     else
                     {
@@ -1976,6 +1992,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
 
             }
+            
             return value;
         }
         private void UpdateLampTime(bool Initialize)

@@ -31,6 +31,107 @@ namespace Root_WIND2.UI_User
 
         #endregion
 
+        #region [Properties]
+        private bool isColorChecked = true;
+        public bool IsColorChecked
+        {
+            get => this.isColorChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsGChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.All;
+                SetProperty<bool>(ref this.isColorChecked, value);
+            }
+        }
+
+        private bool isRChecked = false;
+        public bool IsRChecked
+        {
+            get => this.isRChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsColorChecked = false;
+                    this.IsGChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.R;
+                SetProperty<bool>(ref this.isRChecked, value);
+            }
+        }
+
+        private bool isGChecked = false;
+        public bool IsGChecked
+        {
+            get => this.isGChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsColorChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.G;
+                SetProperty<bool>(ref this.isGChecked, value);
+            }
+        }
+
+        private bool isBChecked = false;
+        public bool IsBChecked
+        {
+            get => this.isBChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsGChecked = false;
+                    this.IsColorChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.B;
+                SetProperty<bool>(ref this.isBChecked, value);
+            }
+        }
+
+        private bool isDefectChecked = true;
+        public bool IsDefectChecked
+        {
+            get => this.isDefectChecked;
+            set
+            {
+                if (value)
+                {
+                    foreach (TRect rt in rectList)
+                    {
+                        if (p_DrawElement.Contains(rt.UIElement) == false)
+                        {
+                            p_DrawElement.Add(rt.UIElement);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (TRect rt in rectList)
+                    {
+                        if (p_DrawElement.Contains(rt.UIElement) == true)
+                        {
+                            p_DrawElement.Remove(rt.UIElement);
+                        }
+                    }
+                }
+
+                SetProperty(ref this.isDefectChecked, value);
+            }
+        }
+        #endregion
+
         public class DrawDefines
         {
             public static int RectTickness = 4;
@@ -126,8 +227,10 @@ namespace Root_WIND2.UI_User
                 {
                     using (var sr = new StreamReader(Constants.FilePath.BacksideCenterPointFilePath))
                     {
-                        XmlSerializer xs = new XmlSerializer(typeof(CPoint));
-                        CPoint centerPt = (CPoint)xs.Deserialize(sr);
+                        XmlSerializer xs = new XmlSerializer(typeof(BacksideCircleData));
+
+                        BacksideCircleData data = (BacksideCircleData)xs.Deserialize(sr);
+                        CPoint centerPt = data.CenterPoint;
 
                         SetSearchedCenter(centerPt);
                     }
@@ -306,7 +409,8 @@ namespace Root_WIND2.UI_User
 
             rectList.Add(tRect);
 
-            p_DrawElement.Add(rt);
+            if(this.IsDefectChecked == true)
+                p_DrawElement.Add(rt);
         }
 
 
@@ -354,7 +458,40 @@ namespace Root_WIND2.UI_User
             p_DrawElement.Add(grid);
         }
 
+        bool isRedrawing = false;
         private void RedrawShapes()
+        {
+            if (isRedrawing == true) return;
+            isRedrawing = true;
+
+            if(this.IsDefectChecked == true)
+            {
+                foreach (TRect rt in rectList)
+                {
+                    Rectangle rectangle = rt.UIElement as Rectangle;
+                    CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+                    CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+
+                    rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
+                    rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                    Canvas.SetLeft(rectangle, canvasLeftTop.X);
+                    Canvas.SetTop(rectangle, canvasLeftTop.Y);
+
+                    if (p_DrawElement.Contains(rt.UIElement) == false)
+                    {
+                        p_DrawElement.Add(rt.UIElement);
+                    }
+                }
+            }
+
+            DrawSearchedCircle();
+            DrawExclusivePolygon();
+
+            isRedrawing = false;
+        }
+
+        public void UpdateImageViewer()
         {
             foreach (TRect rt in rectList)
             {
@@ -372,8 +509,21 @@ namespace Root_WIND2.UI_User
                 }
             }
 
-            DrawSearchedCircle();
-            DrawExclusivePolygon();
+            //foreach (TRect rt in boxList)
+            //{
+            //    if (p_UIElement.Contains(rt.UIElement) == true)
+            //    {
+            //        Rectangle rectangle = rt.UIElement as Rectangle;
+            //        CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+            //        CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+
+            //        rectangle.Width = Math.Abs(canvasRightBottom.X - canvasLeftTop.X);
+            //        rectangle.Height = Math.Abs(canvasRightBottom.Y - canvasLeftTop.Y);
+
+            //        Canvas.SetLeft(rectangle, canvasLeftTop.X);
+            //        Canvas.SetTop(rectangle, canvasLeftTop.Y);
+            //    }
+            //}
         }
 
         public void RemoveObjectsByTag(string tag)

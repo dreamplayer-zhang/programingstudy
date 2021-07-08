@@ -112,9 +112,9 @@ void IP::Threshold(BYTE* pSrc, BYTE* pDst, int nW, int nH, bool bDark, int thres
 {
    
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
-    imgSrc = imgSrc.reshape(0, nW);
+    //imgSrc = imgSrc.reshape(0, nW); // ...?
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
-    imgDst = imgDst.reshape(0, nW);
+    //imgDst = imgDst.reshape(0, nW);
 
 
     if (bDark)
@@ -140,6 +140,8 @@ void IP::Threshold(BYTE* pSrc, BYTE* pDst, int nMemW, int nMemH, Point ptLT, Poi
         cv::threshold(imgSrc, imgDst, thresh, 255, CV_THRESH_BINARY_INV);
     else
         cv::threshold(imgSrc, imgDst, thresh, 255, CV_THRESH_BINARY);
+
+    delete[] imgROI;
 }
 
 float IP::Average(BYTE* pSrc, int nW, int nH)
@@ -150,20 +152,22 @@ float IP::Average(BYTE* pSrc, int nW, int nH)
 }
 float IP::Average(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB)
 {
-    uint64 roiW = (ptRB.x - (int64)ptLT.x);
-    uint64 roiH = (ptRB.y - (int64)ptLT.y);
+    uint64 nROIW = (ptRB.x - (int64)ptLT.x);
+    uint64 nROIH = (ptRB.y - (int64)ptLT.y);
 
-    PBYTE imgROI = new BYTE[roiW * roiH];
+    BYTE* pImgHeader = NULL;
+    uint64 nSum = 0;
     for (int64 r = ptLT.y; r < ptRB.y; r++)
     {
-        BYTE* pImg = &pSrc[r * nMemW + ptLT.x];
-        memcpy(&imgROI[roiW * (r - (int64)ptLT.y)], pImg, roiW);
+        pImgHeader = &pSrc[r * nMemW + ptLT.x];
+        for (int64 c = 0; c < nROIW; c++, pImgHeader++)
+        {
+            nSum += *pImgHeader;
+        }
     }
-
-    Mat imgSrc = Mat(roiH, roiW, CV_8UC1, imgROI);
-
-    return (cv::sum(cv::sum(imgSrc)))[0] / (roiW * roiH); // mean 함수의 return Type = Scalar
-
+    
+    delete pImgHeader;
+    return nSum / (nROIW * nROIH);
 }
 
 void IP::Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nW, int nH, bool bDark)
@@ -204,6 +208,12 @@ void IP::Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled
         data.value = (bDark) ? min : max;
         vtOutLabeled.push_back(data);
     }
+
+    hierarchy.clear(); // vector의 size를 0으로 줄임
+    std::vector< Vec4i>(hierarchy).swap(hierarchy); // vector의 capacity를 0으로 줄임
+    
+    contours.clear(); // vector의 size를 0으로 줄임
+    std::vector<std::vector<Point>>(contours).swap(contours); // vector의 capacity를 0으로 줄임
 }
 // Surface 전용 Subpixel Inspection
 void IP::Labeling_SubPix(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nW, int nH, bool bDark, int thresh, float Scale)
@@ -279,6 +289,18 @@ void IP::Labeling_SubPix(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOut
         data.area = round((size / Scale + abs(128 - data.value) / 255) * 100) / 100.0;
 
         vtOutLabeled.push_back(data);
+
+        hierarchy.clear(); // vector의 size를 0으로 줄임
+        std::vector< Vec4i>(hierarchy).swap(hierarchy); // vector의 capacity를 0으로 줄임
+
+        contours.clear(); // vector의 size를 0으로 줄임
+        std::vector<std::vector<Point>>(contours).swap(contours); // vector의 capacity를 0으로 줄임
+
+        Up_hierarchy.clear(); // vector의 size를 0으로 줄임
+        std::vector< Vec4i>(Up_hierarchy).swap(Up_hierarchy); // vector의 capacity를 0으로 줄임
+
+        Up_contours.clear(); // vector의 size를 0으로 줄임
+        std::vector<std::vector<Point>>(Up_contours).swap(Up_contours); // vector의 capacity를 0으로 줄임
     }
 }
 
@@ -338,9 +360,100 @@ float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nM
         minMaxLoc(result, NULL, &chMax, NULL, &outMatchPoint); // 완벽하게 매칭될 경우 1
     }
 
+    delete[] imgROI;
 
     return (chMax * 100 > 1) ? chMax * 100 : 1; // Matching Score
 }
+
+    float IP::TemplateMatching_LargeTrigger(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt, int nChIdx)
+    {
+        int nROIW = ptRB.x - ptLT.x;
+        int nROIH = ptRB.y - ptLT.y;
+
+        float fScale = 0.1;//(nTempW < nTempH) ? 300.0 / (float)nTempW : 300.0 / (float)nTempH;
+
+        cv::Size szROI = cv::Size(nROIW, nROIH);
+        LPBYTE imgROI = new BYTE[szROI.width * szROI.height];
+
+        for (int64 r = ptLT.y; r < ptRB.y; r++)
+        {
+            BYTE* pImg = &pSrc[r * nMemW + ptLT.x];
+            memcpy(&imgROI[(int64)nROIW * (r - ptLT.y)], pImg, nROIW);
+        }
+
+        Mat matSrc = Mat(szROI.height, szROI.width, CV_8UC1, imgROI);
+        Mat matFeature;
+        
+        if (nByteCnt == 1)
+        {
+            matFeature = Mat(nTempH, nTempW, CV_8UC1, pTemp);
+        }
+        else if (nByteCnt == 3)
+        {
+            Mat imgTemp = Mat(nTempH, nTempW, CV_8UC3, pTemp);
+            Mat bgr[3];
+            split(imgTemp, bgr);
+
+            matFeature = bgr[2 - nChIdx].clone();
+        }
+
+        // 2. Image Resize
+        cv::Size szDownSrc = cv::Size(szROI.width * fScale, szROI.height * fScale);
+        cv::Size szDownFeature = cv::Size(nTempW * fScale, nTempH * fScale);
+        LPBYTE pSrc_Down = new BYTE[szDownSrc.width * szDownSrc.height];
+        LPBYTE pFeature_Down = new BYTE[szDownFeature.width * szDownFeature.height];
+        Mat matSrc_Down, matFeature_Down;
+
+        cv::resize(matSrc, matSrc_Down, szDownSrc, 0, CV_INTER_LINEAR);
+        cv::resize(matFeature, matFeature_Down, szDownFeature, 0, 0, CV_INTER_LINEAR);
+
+        // 3. Rough Position
+        Mat matResult;
+        double maxVal;
+        cv::Point maxLoc;
+
+        cv::matchTemplate(matSrc_Down, matFeature_Down, matResult, method);
+        cv::minMaxLoc(matResult, NULL, &maxVal, NULL, &maxLoc, Mat());
+
+        cv::Point ptRoughTrans = cv::Point(maxLoc.x / fScale, maxLoc.y / fScale);
+
+        delete[] pSrc_Down;
+        delete[] pFeature_Down;
+        matResult.release();
+
+        // 4. Detail Position 
+        int nRoughPosMargin = 25;
+        cv::Size szDetailROI = cv::Size(nTempW + nRoughPosMargin * 2, nTempH + nRoughPosMargin * 2);
+
+        int nROIStartX = ptRoughTrans.x - nRoughPosMargin;
+        nROIStartX = (nROIStartX < 0) ? 0 : nROIStartX;
+        nROIStartX = (nROIStartX + szDetailROI.width + nRoughPosMargin > szROI.width) ? szROI.width - (szDetailROI.width + nRoughPosMargin) : nROIStartX;
+        int nROIStartY = ptRoughTrans.y - nRoughPosMargin;
+        nROIStartY = (nROIStartX < 0) ? 0 : nROIStartY;
+        nROIStartY = (nROIStartY + szDetailROI.height + nRoughPosMargin > szROI.height) ? szROI.height - (szDetailROI.height + nRoughPosMargin) : nROIStartY;
+
+        Mat matDetailROI = matSrc(cv::Rect(nROIStartX, nROIStartY, szDetailROI.width, szDetailROI.height));
+
+        cv::matchTemplate(matDetailROI, matFeature, matResult, method);
+        cv::minMaxLoc(matResult, NULL, &maxVal, NULL, &maxLoc, Mat());
+
+        
+        float fMatchingScore = (maxVal * 100);
+
+        outMatchPoint = Point(maxLoc.x + nROIStartX + ptLT.x, maxLoc.y + nROIStartY + ptLT.y);
+
+        // 5. ~Memory Free~
+        matDetailROI.release();
+        matResult.release();
+        matSrc.release();
+        matFeature.release();
+        matSrc_Down.release();
+        matFeature_Down.release();
+
+        delete[] pSrc;
+
+        return fMatchingScore;
+    }
 
 // D2D 
 void IP::SubtractAbs(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)
@@ -585,6 +698,9 @@ void IP::SelectMinDiffinArea(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int 
     }
     
     Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
+
+    delete[] pRefChipLT;
+    delete[] pRefIdx;
 }
 Point IP::FindMinDiffLoc(BYTE* pSrc, BYTE* pInOutTarget, int nTargetW, int nTargetH, int nTrigger)
 {
@@ -719,6 +835,7 @@ void IP::CreateGoldenImage_Avg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, in
 
         pResult += nChipW;
     }
+    delete[] pChipLT;
     //Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
 }
 void IP::CreateGoldenImage_Median(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nChipW, int nChipH)
@@ -784,7 +901,7 @@ void IP::CreateGoldenImage_Median(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW,
 
                     Ref_Min = _mm256_min_epu8(Ref, Ref_Min);
                     Ref_Max = _mm256_max_epu8(Ref, Ref_Max);
-
+ 
                     Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
                     Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
 
@@ -871,6 +988,8 @@ void IP::CreateGoldenImage_Median(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW,
 
         pResult += nChipW;
     }
+
+    delete[] pChipLT;
     //Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
 }
 void IP::CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nChipW, int nChipH)
@@ -1098,6 +1217,8 @@ void IP::CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMe
 
         pResult += nChipW;
     }
+
+    delete[] pChipLT;
     //Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
 }
 // OpenCV로 개발... 느려서 안씀
@@ -1115,6 +1236,7 @@ void IP::CreateGoldenImage_Avg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int 
 
     imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / imgNum);
 }
+
 void IP::CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
 {
     Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
@@ -1256,6 +1378,9 @@ void IP::MergeImage_Average(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int n
         for (int k = 0; k < imgNum; k++)
             pChipLT[k] += nMemW;
     }
+
+    delete[] p;
+    delete[] pChipLT;
 }
 
 // D2D 3.0
@@ -1424,6 +1549,40 @@ void IP::Multiply(BYTE* pSrc1, float* pSrc2, BYTE* pDst, int nW, int nH)
     fImgSrc1.convertTo(imgDst, CV_8UC1);
 }
 
+void IP::Multiply(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)
+{
+    Mat imgSrc1 = Mat(nH, nW, CV_8UC1, pSrc1);
+    Mat imgSrc2 = Mat(nH, nW, CV_8UC1, pSrc2);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+
+    cv::multiply(imgSrc1, imgSrc2, imgDst);
+}
+
+void IP::Bitwise_NOT(BYTE* pSrc, BYTE* pDst, int nW, int nH)
+{
+    Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+
+    cv::bitwise_not(imgSrc, imgDst);
+}
+
+void IP::Bitwise_AND(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)
+{
+    Mat imgSrc1 = Mat(nH, nW, CV_8UC1, pSrc1);
+    Mat imgSrc2 = Mat(nH, nW, CV_8UC1, pSrc2);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+
+    cv::bitwise_and(imgSrc1, imgSrc2, imgDst);
+}
+
+void IP::Bitwise_OR(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)
+{
+    Mat imgSrc1 = Mat(nH, nW, CV_8UC1, pSrc1);
+    Mat imgSrc2 = Mat(nH, nW, CV_8UC1, pSrc2);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+
+    cv::bitwise_or(imgSrc1, imgSrc2, imgDst);
+}
 // Filtering
 void IP::GaussianBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nSigma)
 {
@@ -1437,7 +1596,7 @@ void IP::AverageBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH)
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
 
-    cv::boxFilter(imgSrc, imgDst, CV_8UC1, cv::Size(3,3), cv::Point(-1,-1), false, cv::BorderTypes::BORDER_DEFAULT);
+    cv::boxFilter(imgSrc, imgDst, CV_8UC1, cv::Size(3,3), cv::Point(-1,-1), true, cv::BorderTypes::BORDER_DEFAULT);
 }
 void IP::MedianBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH, int FilterSz)
 {
@@ -1679,7 +1838,40 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOr
 
     return pMapData_Trans;
 }
+int IP::CalcAdaptiveThresholdParam(BYTE* pSrc, BYTE* pMask, int nW, int nH, int nGap_DominantGV2ParamGV)
+{
+    uint64_t nCnt = 0; 
+    uint64_t nValidPixelCnt = 0;
+    uint64_t pHist[256];
+    int nBandwidth = 10;
+    memset(pHist, 0, 256 * sizeof(uint64_t));
 
+    uint64_t bufferLen = (uint64_t)nW * nH;
+    for (uint64_t i = 0; i < bufferLen; i++) 
+    {
+        if(pMask != 0)
+        {
+            pHist[pSrc[i]]++;
+            nValidPixelCnt++;
+        }
+    }
+
+    for (int i = nGap_DominantGV2ParamGV; i < nGap_DominantGV2ParamGV + nBandwidth; i++) 
+    {
+        nCnt += pHist[i];
+    }
+
+    for (int i = nGap_DominantGV2ParamGV; i < 254 - nBandwidth; i++) 
+    {
+        if (nCnt > nValidPixelCnt / 10) {
+            return i - nGap_DominantGV2ParamGV;
+        }
+        nCnt = nCnt - pHist[i];
+        nCnt += pHist[i + nBandwidth];
+    }
+
+    return -1;    
+}
 // Image(Feature/Defect Image) Load/Save - (추후 C#단으로 올려야 할 듯) 
 void IP::SaveBMP(String sFilePath, BYTE* pSrc, int nW, int nH, int nByteCnt)
 {
@@ -1767,6 +1959,8 @@ void IP::SaveDefectListBMP(String sFilePath, BYTE* pSrc, int nW, int nH, Rect De
 		resize(saveROI, saveROI, Size(640, 480));
 
 	imwrite(Path, saveROI);
+
+    delete[] defectROI;
 }
 void IP::SaveDefectListBMP(String sFilePath, BYTE* pSrc, int nW, int nH, std::vector<Rect> DefectRect)
 {
@@ -1891,6 +2085,8 @@ void IP::SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB,
 			resize(saveROI, saveROI, Size(640, 480));
 
 		BGR[2 - ch] = saveROI;
+
+        delete[] defectROI;
 	}
 	Mat colorImg;
 	cv::merge(BGR, 3, colorImg);
@@ -1960,6 +2156,8 @@ void IP::SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB,
                 resize(saveROI, saveROI, Size(640, 480));
 
             BGR[2 - ch] = saveROI;
+
+            delete[] defectROI;
         }
         Mat colorImg;
         cv::merge(BGR, 3, colorImg);
@@ -1990,20 +2188,26 @@ void IP::SplitColorChannel(BYTE* pSrc, BYTE* pOutImg, int nW, int nH, Point ptLT
         pHeader += (nByteCnt * nPitch * nDownSample);
     }
 
-    Mat imgSrc = Mat((ptRB.y - ptLT.y) / nDownSample, ((ptRB.x - ptLT.x) / nDownSample) / 3, CV_8UC1, pOutImg); // Debug
+    //Mat imgSrc = Mat((ptRB.y - ptLT.y) / nDownSample, ((ptRB.x - ptLT.x) / nDownSample) / 3, CV_8UC1, pOutImg); // Debug
 }
 void IP::SubSampling(BYTE* pSrc, BYTE* pOutImg, int nW, int nH, Point ptLT, Point ptRB, int nDownSample)
 {
     uint64_t nIdx = 0;
     uint64_t nWidth = (ptRB.x - ptLT.x);
     nWidth -= nWidth % nDownSample;
+    uint64_t nHeight = (ptRB.y - ptLT.y);
+    nHeight -= nHeight % nDownSample;
 
-    byte* pHeader = pSrc;
-    byte* pDownSample = pOutImg;
+    //byte* pHeader = pSrc;
+    //byte* pDownSample = pOutImg;
 
-    for (uint64_t j = ptLT.y; j < ptRB.y; j += nDownSample)
-        for (uint64_t i = ptLT.x; i < ptLT.x + nWidth; i += nDownSample)
-            pOutImg[nIdx++] = pSrc[j * nWidth + i];
+    for (uint64_t j = 0; j < nHeight; j += nDownSample)
+    {
+        for (uint64_t i = 0; i < nWidth; i += nDownSample)
+        {
+            pOutImg[nIdx++] = pSrc[(j + ptLT.y) * nW + (i + ptLT.x)];
+        }
+    }
 
     //Mat imgSrc = Mat((ptRB.y - ptLT.y) / nDownSample, (ptRB.x - ptLT.x) / nDownSample, CV_8UC1, pOutImg); // Debug
 }
@@ -2081,7 +2285,7 @@ void IP::SobelEdgeDetection(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nDerivat
 {
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
     Mat imgSobel = Mat();
-    Mat imgAbsGradX = Mat();
+    Mat imgAbsGradX = Mat(nH, nW, CV_8UC1, pDst);
 
     /*int nDerivativeX = 1;
     int nDerivativeY = 0;
@@ -2092,7 +2296,7 @@ void IP::SobelEdgeDetection(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nDerivat
     Sobel(imgSrc, imgSobel, CV_8UC1, nDerivativeX, nDerivativeY, nKernelSize, nScale, nDelta);
     convertScaleAbs(imgSobel, imgAbsGradX);
 
-    pDst = imgAbsGradX.ptr<BYTE>();
+    //pDst = imgAbsGradX.ptr<BYTE>();
 }
 
 void IP::Histogram(BYTE* pSrc, BYTE* pDst, int nW, int nH, int channels, int dims, int histSize, float* ranges)

@@ -1,4 +1,5 @@
 ﻿using Root_WindII.Engineer;
+using RootTools;
 using RootTools_Vision;
 using System;
 using System.ComponentModel;
@@ -16,7 +17,10 @@ namespace Root_WindII
         public MainWindow()
         {
             InitializeComponent();
-        }
+
+			GlobalObjects.Instance.Register<DialogService>(this);
+
+		}
 
         //WindII_Engineer m_engineer = new WindII_Engineer();
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -43,7 +47,11 @@ namespace Root_WindII
 
 		private void M_timer_Tick(object sender, EventArgs e)
 		{
-			string strControlState = GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eControl.ToString();
+			string strControlState = "NULL";
+
+			if (GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem() != null)
+				strControlState = GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eControl.ToString();
+			
 			if (strControlState == "NULL")
 			{
 				strControlState = "OFFLINE";

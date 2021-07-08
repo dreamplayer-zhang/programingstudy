@@ -84,35 +84,36 @@ namespace RootTools_Vision
 
             //DeleteOutsideDefect(DefectList, waferCenterX, waferCenterY, radius, backsideOffset);
 
-            List<Defect> MergeDefectList = MergeDefect(DefectList, mergeDist);
+            List<Defect> mergeDefectList = MergeDefect(DefectList, mergeDist);
 
-            foreach (Defect defect in MergeDefectList)
+            foreach (Defect defect in mergeDefectList)
             {
                 defect.CalcAbsToRelPos(waferCenterX, waferCenterY);
             }
 
 
             //Workplace displayDefect = new Workplace();
-            foreach (Defect defect in MergeDefectList)
+            foreach (Defect defect in mergeDefectList)
             {
                 if (this.currentWorkplace.DefectList == null) continue;
                 this.currentWorkplace.DefectList.Add(defect);
             }
 
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            Tools.SaveDefectImage(Path.Combine(DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferInfo.ByteCnt);
-
-            //// Add Defect to DB
-            if (MergeDefectList.Count > 0)
-            {
-                DatabaseManager.Instance.AddDefectDataListNoAutoCount(MergeDefectList, "defect");
-            }
-
 
             Settings settings = new Settings();
             SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+            //Tools.SaveDefectImage(Path.Combine(DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferInfo.ByteCnt);
+            
 
-            Tools.SaveDefectImage(Path.Combine(settings_backside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
+            //// Add Defect to DB
+            if (mergeDefectList.Count > 0)
+            {
+                DatabaseManager.Instance.AddDefectDataListNoAutoCount(mergeDefectList, "defect");
+            }
+
+            //Tools.SaveDefectImage(Path.Combine(settings_backside.DefectImagePath, sInspectionID), mergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
+            Tools.SaveDefectImageParallel(Path.Combine(settings_backside.DefectImagePath, sInspectionID), mergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
 
             //if (settings_backside.UseKlarf)
             //{

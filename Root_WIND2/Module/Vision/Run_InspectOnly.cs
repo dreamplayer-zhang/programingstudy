@@ -105,6 +105,7 @@ namespace Root_WIND2.Module
 
         public override string Run()
         {
+
             Settings settings = new Settings();
             SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
 
@@ -121,8 +122,8 @@ namespace Root_WIND2.Module
 
             // Check Lot Start
             if ((infoWafer != null) && (
-                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
-                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)))
+                (infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                (infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)))
             {
                 LotStart(settings_frontside.KlarfSavePath, recipe, infoWafer, m_grabMode);
             }
@@ -277,8 +278,8 @@ namespace Root_WIND2.Module
 
                 // LotEnd Check
                 if ((infoWafer != null) && (
-                    (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
-                    (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
+                    (infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                    (infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
                 {
                     LotEnd(infoWafer);
                 }
