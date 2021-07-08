@@ -88,7 +88,7 @@ namespace Root_WindII
             this.motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
             this.motionViewerVM = new MotionViewer_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
 
-            if (visionModule.p_CamVRS.IsConnected() == true)
+            if (visionModule.p_CamVRS != null)
             {
                 this.ImageViewerVM.SetImageData(visionModule.p_CamVRS.p_ImageViewer.p_ImageData);
                 this.visionModule.p_CamVRS.Grabed += this.ImageViewerVM.OnUpdateImage;
@@ -206,7 +206,7 @@ namespace Root_WindII
         {
             get => new RelayCommand(() =>
             {
-                FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+                FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
 
                 ImageData featureImageData = this.ImageViewerVM.BoxImage;
 
@@ -226,10 +226,10 @@ namespace Root_WindII
             {
                 if (SelectedFeatureItem == null) return;
 
-                FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+                FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
 
                 int index = FeatureItemList.IndexOf(SelectedFeatureItem);
-                alignRecipe.AlignFeatureList.RemoveAt(index);
+                alignRecipe.AlignFeatureVRSList.RemoveAt(index);
 
                 this.FeatureItemList.Remove(SelectedFeatureItem);
                 SelectedFeatureItem = null;
@@ -248,19 +248,19 @@ namespace Root_WindII
         #region [Method]
         private void ClearFeatureList()
         {
-            this.featureItemList.Clear();
+            this.FeatureItemList.Clear();
 
-            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
-            alignRecipe.AlignFeatureList.Clear();
+            FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
+            alignRecipe.AlignFeatureVRSList.Clear();
         }
 
         private void RefreshFeatureItemList()
         {
             this.FeatureItemList.Clear();
 
-            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+            FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
 
-            foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureList)
+            foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureVRSList)
             {
                 Image image = new Image();
 
@@ -277,7 +277,7 @@ namespace Root_WindII
 
         public void LoadRecipe()
         {
-            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+            FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
 
             RefreshFeatureItemList();
         }

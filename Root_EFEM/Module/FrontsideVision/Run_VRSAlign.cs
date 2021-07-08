@@ -18,7 +18,7 @@ namespace Root_EFEM.Module.FrontsideVision
         //public RPoint m_firstPointPulse = new RPoint();
         //public RPoint m_secondPointPulse = new RPoint();
         public int m_focusPosZ = 0;
-        public Camera_Basler m_CamAlign;
+        public Camera_Basler m_CamVRS;
 
         //public bool m_saveAlignFailImage = false;
         //public string m_saveAlignFailImagePath = "D:\\";
@@ -65,7 +65,7 @@ namespace Root_EFEM.Module.FrontsideVision
         public Run_VRSAlign(Vision_Frontside module)
         {
             m_module = module;
-            m_CamAlign = m_module.CamAlign;
+            m_CamVRS = m_module.CamVRS;
             InitModuleRun(module);
         }
 
@@ -112,10 +112,10 @@ namespace Root_EFEM.Module.FrontsideVision
 
 
             // Camera Connection
-            if (m_CamAlign == null) return "Cam == null";
+            if (m_CamVRS == null) return "Cam == null";
 
-            m_CamAlign.Connect();
-            while (!m_CamAlign.m_ConnectDone)
+            m_CamVRS.Connect();
+            while (!m_CamVRS.m_ConnectDone)
             {
                 if (EQ.IsStop()) return "OK";
             }
@@ -131,11 +131,11 @@ namespace Root_EFEM.Module.FrontsideVision
 
             //Recipe Open
             RecipeAlign recipe = GlobalObjects.Instance.Get<RecipeAlign>();
-            FrontAlignRecipe alignRecipe = recipe.GetItem<FrontAlignRecipe>();
+            FrontVRSAlignRecipe alignRecipe = recipe.GetItem<FrontVRSAlignRecipe>();
 
             if(alignRecipe == null)
             {
-                return "FrontAlignRecipe == null";
+                return "FrontAlignVRSRecipe == null";
             }
 
             if (!recipe.Read(m_sRecipeName))
@@ -143,7 +143,7 @@ namespace Root_EFEM.Module.FrontsideVision
                 return "Recipe Open Fail";
             }
 
-            if (alignRecipe.AlignFeatureList.Count == 0)
+            if (alignRecipe.AlignFeatureVRSList.Count == 0)
                 return "Align Featur Count == 0";
 
             // Move Z
@@ -165,8 +165,6 @@ namespace Root_EFEM.Module.FrontsideVision
                 return p_sInfo;
             if (m_module.Run(axisXY.WaitReady()))
                 return p_sInfo;
-
-
 
             RPoint firstPoint = new RPoint(alignRecipe.FirstSearchPointX, alignRecipe.FirstSearchPointY);
             RPoint secondPoint = new RPoint(alignRecipe.SecondSearchPointX, alignRecipe.SecondSearchPointY);
@@ -192,15 +190,12 @@ namespace Root_EFEM.Module.FrontsideVision
             if (m_module.Run(axisXY.WaitReady()))
                 return p_sInfo;
 
-
             // 두번째는 첫번째에서 Score가 가장 높은 feature로 함
             long outX2, outY2;
             double score2 = TemplateMatchingWithSelectedFeature(alignRecipe, featureIndex, out outX2, out outY2);
 
-
             if (score2 < m_score)
                 return "Second Point Align Fail [Score : " + score2.ToString() + "]";
-
 
             double dAngle = CalcAngle(outX, outY, outX2, outY2);
 
@@ -244,11 +239,11 @@ namespace Root_EFEM.Module.FrontsideVision
             }
 
 
-            RecipeType_ImageData feature = alignRecipe.AlignFeatureList[featureIndex];
+            RecipeType_ImageData feature = alignRecipe.AlignFeatureVRSList[featureIndex];
             int featureWidth = feature.Width;
             int featureHeight = feature.Height;
-            int camWidth = m_CamAlign.GetRoiSize().X;
-            int camHeight = m_CamAlign.GetRoiSize().Y;
+            int camWidth = m_CamVRS.GetRoiSize().X;
+            int camHeight = m_CamVRS.GetRoiSize().Y;
 
 
             m_grabMode.m_ptXYAlignData = new RPoint(-(outX + (featureWidth / 2) - camWidth / 2) * m_grabMode.m_dRealResX_um * 10, (outY + (featureHeight / 2) - camHeight / 2) * m_grabMode.m_dRealResX_um * 10);
@@ -491,16 +486,16 @@ namespace Root_EFEM.Module.FrontsideVision
             return "OK";
         }
 
-        private double TemplateMatching(FrontAlignRecipe alignRecipe, out long maxOutX, out long maxOutY, out int featureIndex)
+        private double TemplateMatching(FrontVRSAlignRecipe alignRecipe, out long maxOutX, out long maxOutY, out int featureIndex)
         {
-            ImageData camImage = m_CamAlign.p_ImageViewer.p_ImageData;
+            ImageData camImage = m_CamVRS.p_ImageViewer.p_ImageData;
             IntPtr camImagePtr = camImage.GetPtr();
             double maxScore = double.MinValue;
             maxOutX = 0;
             maxOutY = 0;
             int index = 0;
             featureIndex = 0;
-            foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureList)
+            foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureVRSList)
             {
                 byte[] rawdata = feature.RawData;
                 double result;
@@ -535,15 +530,15 @@ namespace Root_EFEM.Module.FrontsideVision
 
 
 
-        private double TemplateMatchingWithSelectedFeature(FrontAlignRecipe alignRecipe, int featureIndex, out long maxOutX, out long maxOutY)
+        private double TemplateMatchingWithSelectedFeature(FrontVRSAlignRecipe alignRecipe, int featureIndex, out long maxOutX, out long maxOutY)
         {
-            ImageData camImage = m_CamAlign.p_ImageViewer.p_ImageData;
+            ImageData camImage = m_CamVRS.p_ImageViewer.p_ImageData;
             IntPtr camImagePtr = camImage.GetPtr();
             double maxScore = double.MinValue;
             maxOutX = 0;
             maxOutY = 0;
             int index = 0;
-            RecipeType_ImageData feature = alignRecipe.AlignFeatureList[featureIndex];
+            RecipeType_ImageData feature = alignRecipe.AlignFeatureVRSList[featureIndex];
 
             byte[] rawdata = feature.RawData;
             double result;
@@ -576,11 +571,11 @@ namespace Root_EFEM.Module.FrontsideVision
         }
 
         private double CalcAngle(long posX, long posY, long posX2, long posY2)
-        {            
-            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+        {
+            FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
 
-            int camWidth = m_CamAlign.GetRoiSize().X;
-            int camHeight = m_CamAlign.GetRoiSize().Y;
+            int camWidth = m_CamVRS.GetRoiSize().X;
+            int camHeight = m_CamVRS.GetRoiSize().Y;
             double cx = alignRecipe.FirstSearchPointX / PULSE_TO_UM - ((camWidth / 2) + posX) * m_grabMode.m_dRealResX_um;
             double cy = alignRecipe.FirstSearchPointY / PULSE_TO_UM - ((camHeight / 2) + posY) * m_grabMode.m_dRealResX_um;
 

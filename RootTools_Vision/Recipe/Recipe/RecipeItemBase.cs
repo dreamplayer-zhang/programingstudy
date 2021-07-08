@@ -22,6 +22,7 @@ namespace RootTools_Vision
     [XmlInclude(typeof(PBIRecipe))]
     [XmlInclude(typeof(VerticalWireRecipe))]
     [XmlInclude(typeof(FrontAlignRecipe))]
+    [XmlInclude(typeof(FrontVRSAlignRecipe))]
     #region[EUVPod]
     [XmlInclude(typeof(EUVOriginRecipe))]
     [XmlInclude(typeof(EUVPodSurfaceRecipe))]

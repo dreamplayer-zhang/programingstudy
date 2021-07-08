@@ -14,6 +14,7 @@ namespace Root_EFEM.Module
             base.Initilize();
 
             RegisterRecipeItem<FrontAlignRecipe>();
+            RegisterRecipeItem<FrontVRSAlignRecipe>();
         }
     }
 }

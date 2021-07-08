@@ -16,6 +16,8 @@ using System.Windows.Input;
 using Root_WindII.Engineer;
 using Root_EFEM;
 using Root_EFEM.Module;
+using Root_EFEM.Module.FrontsideVision;
+using RootTools.Light;
 
 namespace Root_WindII
 {
@@ -127,7 +129,7 @@ namespace Root_WindII
             this.motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
             this.motionViewerVM = new MotionViewer_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
 
-            if(visionModule.p_CamAlign.IsConnected() == true)
+            if(visionModule.p_CamAlign != null)
             {
                 this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
                 this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
@@ -227,6 +229,52 @@ namespace Root_WindII
                             VisionModule.p_CamAlign.GrabContinuousShot();
                         }
                     }
+
+                    #region [조명 설정]
+                    SettingItem_SetupCamera setupCamera = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupCamera>();
+
+                    string illumIndexListString = setupCamera.IlluminationIndexList.Trim();
+                    List<int> illumIndexList = new List<int>();
+                    if (illumIndexListString != "")
+                    {
+
+
+                        string[] stringArray = illumIndexListString.Split(',');
+                        foreach (string indexStr in stringArray)
+                        {
+                            illumIndexList.Add(Convert.ToInt32(indexStr));
+                        }
+                    }
+
+                    Vision_Frontside vision = ((WindII_Handler)GlobalObjects.Instance.Get<WindII_Engineer>().ClassHandler()).p_VisionFront;
+
+                    Run_VisionAlign alignModule = (Run_VisionAlign)vision.CloneModuleRun("VisionAlign");
+                    GrabModeFront grabMode = alignModule.m_grabMode;
+                    if(grabMode != null)
+                    {
+                        //for(int i= 0; i < grabMode.m_lightSet.m_aLight.Count; i++)
+                        //{
+                        //    if()
+                        //    grabMode.m_lightSet.m_aLight[i]
+                        //}
+
+                        List<Light> lightList = new List<Light>();
+                        foreach (var index in illumIndexList)
+                        {
+                            if (index < grabMode.m_lightSet.m_aLight.Count)
+                            {
+                                lightList.Add(grabMode.m_lightSet.m_aLight[index]);
+                            }
+                        }
+
+
+                        // for (int n = 0; n < m_aLightPower.Count; n++)
+                        //{
+                        //    if (m_lightSet.m_aLight[n].m_light != null)
+                        //        m_lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
+                        //}
+                    }
+                    #endregion
 
                     LoadRecipe();
                 });
