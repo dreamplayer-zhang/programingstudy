@@ -1366,5 +1366,34 @@ namespace RootTools.Gem.XGem
             }
         }
 
+        public void MakeObject(long nObject)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetListItem(long nObject, int listCnt)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetStringItem(long nObject, string strItem)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetInt4Item(long nObject, int nitem)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetFloat4Item(long nObject, float fItem)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GEMSetVariables(long nObject, long nVid)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

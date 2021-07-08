@@ -325,217 +325,217 @@ namespace Root_WindII_Option
 			}
 		}
 
-		//public ICommand btnEBRClickedCommand
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
-		//            SetPage(ebrSetup);
-		//            //ebrSetup.DataContext = ebrSetupVM;
-		//        });
-		//    }
-		//}
+        public ICommand btnEBRClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(ebrSetup);
+                    ebrSetup.DataContext = ebrSetupVM;
+                });
+            }
+        }
 
-		//public ICommand btnCameraClickedCommand
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
-		//            SetPage(cameraVrs);
-		//            //cameraVrs.DataContext = cameraVrsVM;
-		//        });
-		//    }
-		//}
+        //public ICommand btnCameraClickedCommand
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            SetPage(cameraVrs);
+        //            //cameraVrs.DataContext = cameraVrsVM;
+        //        });
+        //    }
+        //}
 
-		//#endregion
+        //#endregion
 
-		//#region [Command Home]
-		//public ICommand btnHomeRecipe
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
-		//            SetPage(homeRecipe);
-		//            //homeRecipe.DataContext = homeRecipeVM;
-		//        });
-		//    }
-		//}
-		//#endregion
+        //#region [Command Home]
+        //public ICommand btnHomeRecipe
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            SetPage(homeRecipe);
+        //            //homeRecipe.DataContext = homeRecipeVM;
+        //        });
+        //    }
+        //}
+        //#endregion
 
-		//#region [Command Front]
-		//public ICommand btnFrontSummary
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
-		//            SetPage(frontsideSummary);
-		//            //frontsideSummary.DataContext = frontsideSummaryVM;
-		//        });
-		//    }
-		//}
+        //#region [Command Front]
+        //public ICommand btnFrontSummary
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            SetPage(frontsideSummary);
+        //            //frontsideSummary.DataContext = frontsideSummaryVM;
+        //        });
+        //    }
+        //}
 
-		//public ICommand btnFrontProduct
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
-		//            SetPage(frontsideProduct);
-		//            //frontsideProduct.DataContext = frontsideProductVM;
-		//        });
-		//    }
-		//}
+        //public ICommand btnFrontProduct
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            SetPage(frontsideProduct);
+        //            //frontsideProduct.DataContext = frontsideProductVM;
+        //        });
+        //    }
+        //}
 
-		//public ICommand btnFrontOrigin
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
-		//            SetPage(frontsideOrigin);
-		//            //frontsideOrigin.DataContext = frontsideOriginVM;
-		//        });
-		//    }
-		//}
+        //public ICommand btnFrontOrigin
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            SetPage(frontsideOrigin);
+        //            //frontsideOrigin.DataContext = frontsideOriginVM;
+        //        });
+        //    }
+        //}
 
-		//public ICommand btnFrontAlignment
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
-		//            SetPage(frontsideAlignment);
-		//            //frontsideAlignment.DataContext = frontsideAlignmentVM;
-		//        });
-		//    }
-		//}
+        //public ICommand btnFrontAlignment
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            SetPage(frontsideAlignment);
+        //            //frontsideAlignment.DataContext = frontsideAlignmentVM;
+        //        });
+        //    }
+        //}
 
-		//public ICommand btnFrontMask
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
-		//            SetPage(frontsideMask);
-		//            //frontsideMask.DataContext = frontsideMaskVM;
-		//        });
-		//    }
-		//}
+        //public ICommand btnFrontMask
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            SetPage(frontsideMask);
+        //            //frontsideMask.DataContext = frontsideMaskVM;
+        //        });
+        //    }
+        //}
 
-		//public ICommand btnFrontSpec
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
-		//            SetPage(frontsideSpec);
-		//            //frontsideSpec.DataContext = frontsideSpecVM;
-		//        });
-		//    }
-		//}
+        //public ICommand btnFrontSpec
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            SetPage(frontsideSpec);
+        //            //frontsideSpec.DataContext = frontsideSpecVM;
+        //        });
+        //    }
+        //}
 
-		//public ICommand btnFrontInspect
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
-		//            SetPage(frontsideInspect);
-		//            //frontsideInspect.DataContext = frontsideInspectVM;
-		//        });
-		//    }
-		//}
+        //public ICommand btnFrontInspect
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            SetPage(frontsideInspect);
+        //            //frontsideInspect.DataContext = frontsideInspectVM;
+        //        });
+        //    }
+        //}
 
-		//public ICommand btnNewRecipeFront
-		//{
-		//    get => new RelayCommand(() =>
-		//    {
-		//        //System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-		//        //dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
-		//        //dlg.Title = "Save Recipe";
-		//        //dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
-		//        //if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-		//        //{
-		//        //    string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
-		//        //    string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
-		//        //    string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
-		//        //    string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
-		//        //    string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+        //public ICommand btnNewRecipeFront
+        //{
+        //    get => new RelayCommand(() =>
+        //    {
+        //        //System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+        //        //dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
+        //        //dlg.Title = "Save Recipe";
+        //        //dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+        //        //if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+        //        //{
+        //        //    string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+        //        //    string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+        //        //    string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+        //        //    string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+        //        //    string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
 
-		//        //    DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
-		//        //    if (!dir.Exists)
-		//        //        dir.Create();
+        //        //    DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+        //        //    if (!dir.Exists)
+        //        //        dir.Create();
 
-		//        //    RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-		//        //    recipe.Clear();
+        //        //    RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+        //        //    recipe.Clear();
 
-		//        //    recipe.Name = sFileNameNoExt;
-		//        //    recipe.RecipePath = sFullPath;
-		//        //    recipe.RecipeFolderPath = sRecipeFolderPath;
+        //        //    recipe.Name = sFileNameNoExt;
+        //        //    recipe.RecipePath = sFullPath;
+        //        //    recipe.RecipeFolderPath = sRecipeFolderPath;
 
-		//        //    recipe.Save(sFullPath);
-		//        //}
-		//    });
-		//}
+        //        //    recipe.Save(sFullPath);
+        //        //}
+        //    });
+        //}
 
-		//public ICommand btnSaveRecipeFront
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
-		//            //RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-		//            //if (recipe.RecipePath != "")
-		//            //{
-		//            //    recipe.Save(recipe.RecipePath);
-		//            //}
-		//            //else
-		//            //{
-		//            //    System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-		//            //    dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
-		//            //    dlg.Title = "Save Recipe";
-		//            //    dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
-		//            //    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-		//            //    {
-		//            //        string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
-		//            //        string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
-		//            //        string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
-		//            //        string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
-		//            //        string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+        //public ICommand btnSaveRecipeFront
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            //RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+        //            //if (recipe.RecipePath != "")
+        //            //{
+        //            //    recipe.Save(recipe.RecipePath);
+        //            //}
+        //            //else
+        //            //{
+        //            //    System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+        //            //    dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
+        //            //    dlg.Title = "Save Recipe";
+        //            //    dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+        //            //    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+        //            //    {
+        //            //        string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+        //            //        string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+        //            //        string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+        //            //        string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+        //            //        string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
 
-		//            //        DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
-		//            //        if (!dir.Exists)
-		//            //            dir.Create();
+        //            //        DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+        //            //        if (!dir.Exists)
+        //            //            dir.Create();
 
-		//            //        recipe.Name = sFileNameNoExt;
-		//            //        recipe.RecipePath = sFullPath;
-		//            //        recipe.RecipeFolderPath = sRecipeFolderPath;
+        //            //        recipe.Name = sFileNameNoExt;
+        //            //        recipe.RecipePath = sFullPath;
+        //            //        recipe.RecipeFolderPath = sRecipeFolderPath;
 
-		//            //        recipe.Save(sFullPath);
-		//            //    }
-		//            //}
-		//        });
-		//    }
-		//}
+        //            //        recipe.Save(sFullPath);
+        //            //    }
+        //            //}
+        //        });
+        //    }
+        //}
 
-		//public ICommand btnLoadRecipeFront
-		//{
-		//    get
-		//    {
-		//        return new RelayCommand(() =>
-		//        {
+        //public ICommand btnLoadRecipeFront
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
 
-		//        });
-		//    }
-		//}
-		//#endregion
+        //        });
+        //    }
+        //}
+        //#endregion
 
-		#region [Command Edge]
-		public ICommand btnEdgeSetup
+        #region [Command Edge]
+        public ICommand btnEdgeSetup
 		{
 			get
 			{

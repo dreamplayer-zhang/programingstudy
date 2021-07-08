@@ -4,24 +4,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RootTools_Vision
 {
-    #region [Parameter]
-    #endregion
-    #region [Getter Setter]
-    #endregion
+
     public class EUVPodSurfaceRecipe : RecipeItemBase
     {
         EUVPodSurfaceRecipeBase podStain;
-        EUVPodSurfaceRecipeBase podSide;
+        EUVPodSurfaceRecipeBase podSideLR;
+        EUVPodSurfaceRecipeBase podSideTB;
         EUVPodSurfaceRecipeBase podTDI;
         EUVPodSurfaceRecipeBase podStacking;
 
         public EUVPodSurfaceRecipe()
         {
             podStain = new EUVPodSurfaceRecipeBase();
-            podSide = new EUVPodSurfaceRecipeBase();
+            podSideLR = new EUVPodSurfaceRecipeBase();
+            podSideTB = new EUVPodSurfaceRecipeBase();
             podTDI = new EUVPodSurfaceRecipeBase();
             podStacking = new EUVPodSurfaceRecipeBase();
         }
@@ -32,10 +32,15 @@ namespace RootTools_Vision
             get => podStain;
             set => SetProperty(ref podStain, value);
         }
-        public EUVPodSurfaceRecipeBase PodSide
+        public EUVPodSurfaceRecipeBase PodSideLR
         {
-            get => podSide;
-            set => SetProperty(ref podSide, value);
+            get => podSideLR;
+            set => SetProperty(ref podSideLR, value);
+        }
+        public EUVPodSurfaceRecipeBase PodSideTB
+        {
+            get => podSideTB;
+            set => SetProperty(ref podSideTB, value);
         }
         public EUVPodSurfaceRecipeBase PodTDI
         {
@@ -50,6 +55,7 @@ namespace RootTools_Vision
         #endregion
         public override void Clear()
         {
+
         }
 
         public override bool Read(string recipePath)
@@ -62,8 +68,9 @@ namespace RootTools_Vision
             return true;
         }
     }
-
+    [Serializable]
     public class EUVPodSurfaceRecipeBase:ObservableObject
     {
+        public EUVPodSurfaceRecipeBase() { }
     }
 }

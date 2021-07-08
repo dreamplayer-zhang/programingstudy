@@ -153,12 +153,16 @@
                     <Grid Grid.Row="2" Margin="5,0,5,3">
                         <ProgressBar Style="{StaticResource CustomProgress}" Value="{Binding p_progressValue, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Text="{Binding p_progressValue, StringFormat={}{0:0.#}％}" VerticalAlignment="Center" Margin="10,0"/>
-                        <TextBlock Text="test" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0">
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0" FontWeight="Bold" FontSize="15" Foreground="DarkBlue">
+                            <Run Text="RNR "/>
+                            <Run Text="{Binding p_currentRNR, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Run Text=" / "/>
+                            <Run Text="{Binding p_totalRNR}"/>
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding manualJob_ViewModel.p_checkRnR}" Value="true">
+                                        <DataTrigger Binding="{Binding p_isRNR}" Value="true">
                                             <Setter Property="Visibility" Value="Visible"/>
                                         </DataTrigger>
                                     </Style.Triggers>

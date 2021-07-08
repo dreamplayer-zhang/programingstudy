@@ -8,41 +8,57 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
+    
     public class EUVPodSurfaceParameter:ParameterBase
     {
         EUVPodSurfaceParameterBase podStain;
-        EUVPodSurfaceParameterBase podSide;
+        EUVPodSurfaceParameterBase podSideLR;
+        EUVPodSurfaceParameterBase podSideTB;
         EUVPodSurfaceParameterBase podTDI;
         EUVPodSurfaceParameterBase podStacking;
 
         public EUVPodSurfaceParameter() : base(typeof(EUVPodSurface))
         {
-            podStain = new EUVPodSurfaceParameterBase();
-            podSide = new EUVPodSurfaceParameterBase();
-            podTDI = new EUVPodSurfaceParameterBase();
-            podStacking = new EUVPodSurfaceParameterBase();
+            /*
+             Mask Number Info
+            Stain 0,1
+            TDI 2,3,4
+            SideLR 5,6/ 
+            SideTB 7,8/
+            Stacking 9(Cover)
+             */
+            podStain = new EUVPodSurfaceParameterBase(0);
+            podSideLR = new EUVPodSurfaceParameterBase(5);
+            podSideTB = new EUVPodSurfaceParameterBase(7);
+            podTDI = new EUVPodSurfaceParameterBase(2);
+            podStacking = new EUVPodSurfaceParameterBase(9);
         }
 
         #region Getter/Setter
-        [Category("Parameter")]
+
         public EUVPodSurfaceParameterBase PodStain
         {
             get => podStain;
             set => SetProperty(ref podStain, value);
         }
-        [Category("Parameter")]
-        public EUVPodSurfaceParameterBase PodSide
+
+        public EUVPodSurfaceParameterBase PodSideLR
         {
-            get => podSide;
-            set => SetProperty(ref podSide, value);
+            get => podSideLR;
+            set => SetProperty(ref podSideLR, value);
         }
-        [Category("Parameter")]
+
+        public EUVPodSurfaceParameterBase PodSideTB
+        {
+            get => podSideTB;
+            set => SetProperty(ref podSideTB, value);
+        }
+
         public EUVPodSurfaceParameterBase PodTDI
         {
             get => podTDI;
-            set => SetProperty(ref podSide, value);
+            set => SetProperty(ref podSideLR, value);
         }
-        [Category("Parameter")]
         public EUVPodSurfaceParameterBase PodStacking
         {
             get => podStacking;
@@ -53,23 +69,35 @@ namespace RootTools_Vision
 
     }
 
-    public class EUVPodSurfaceParameterBase : ObservableObject, IMaskInspection
+    [Serializable]
+    public class SurfaceParam : ObservableObject
     {
         #region [Parameter]
-        bool absolute;
-        uint pitLevel,levelMin,levelMax,pitSize,sizeMax,sizeMin;
+        bool isEnable;
+        string defectName;
+        uint pitLevel, levelMin, levelMax, pitSize, sizeMax, sizeMin, defectCode;
         private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
 
         #endregion
 
+        public SurfaceParam()
+        { }
         #region [Getter/Setter]
-        [Browsable(false)]
-        public int MaskIndex { get; set; }
-
-        public bool Absolute
+ 
+        public string DefectName
         {
-            get => absolute;
-            set => SetProperty(ref absolute, value);
+            get => defectName;
+            set => SetProperty(ref defectName, value);
+        }
+        public uint DefectCode
+        {
+            get => defectCode;
+            set => SetProperty(ref defectCode, value);
+        }
+        public bool IsEnable
+        {
+            get => isEnable;
+            set => SetProperty(ref isEnable, value);
         }
         public uint PitLevel
         {
@@ -103,12 +131,61 @@ namespace RootTools_Vision
         }
         public DiffFilterMethod DiffFilter
         {
-            get => this.diffFilter;
+            get => diffFilter;
             set
             {
-                SetProperty<DiffFilterMethod>(ref this.diffFilter, value);
+                SetProperty(ref diffFilter, value);
             }
         }
+
+        #endregion
+    }
+
+    [Serializable]
+    public class EUVPodSurfaceParameterBase : ObservableObject, IMaskInspection //InspectionParameter
+    {
+        SurfaceParam brightParam, darkParam;
+        bool isEnablebrignt,isEnabledark;
+
+        #region Property
+        public bool IsEnableBright
+        {
+            get => isEnablebrignt;
+            set => SetProperty(ref isEnablebrignt, value);
+        }
+        public bool IsEnableDark
+        {
+            get => isEnabledark;
+            set => SetProperty(ref isEnabledark, value);
+        }
+        public SurfaceParam BrightParam
+        {
+            get => brightParam;
+            set => SetProperty(ref brightParam, value);
+        }
+        public SurfaceParam DarkParam
+        {
+            get => darkParam;
+            set => SetProperty(ref darkParam, value);
+        }
+
+        public EUVPodSurfaceParameterBase(int MaskIndex)
+        {
+            DarkParam = new SurfaceParam();
+            BrightParam = new SurfaceParam();
+            this.MaskIndex = MaskIndex;
+        }
+        public EUVPodSurfaceParameterBase(){ }
+        public EUVPodSurfaceParameterBase(EUVPodSurfaceParameterBase param)
+        {
+            isEnablebrignt = param.isEnablebrignt;
+            isEnabledark = param.isEnabledark;
+            brightParam = param.brightParam;
+            darkParam = param.darkParam;
+            MaskIndex = param.MaskIndex;
+        }
+        public int MaskIndex { get; set; }
+
         #endregion
     }
 }

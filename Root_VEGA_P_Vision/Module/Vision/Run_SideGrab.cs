@@ -69,22 +69,23 @@ namespace Root_VEGA_P_Vision.Module
         {
             if (p_sSideGrabMode == null) return "Grab Mode : Side Grab == Null";
 
+            AxisXY axisXY = m_module.m_stage.m_axisXY;
+            Axis axisZ = sideOpt.axisZ;
+            Axis axisR = m_module.m_stage.m_axisR;
+
             try
             {
                 if (!camSide.IsConnected())
                     camSide.Connect();
 
                 #region [Local Variable]
-                AxisXY axisXY = m_module.m_stage.m_axisXY;
-                Axis axisZ = sideOpt.axisZ;
-                Axis axisR = m_module.m_stage.m_axisR;
 
                 CPoint cpMemoryOffset = new CPoint(SidegrabMode.m_cpMemoryOffset);
 
                 SidegrabMode.m_dTrigger = Convert.ToInt32(10 * SidegrabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                 int nCamWidth = SidegrabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = SidegrabMode.m_camera.GetRoiSize().Y;
-                int nPodSizeY_px = Convert.ToInt32(SidegrabMode.m_nPodSize_mm * sideOpt.m_pulsePermm / SidegrabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
+                int nPodSizeY_px = Convert.ToInt32(SidegrabMode.m_nPodYSize_mm * sideOpt.m_pulsePermm / SidegrabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nPulsePerWidth = nCamWidth * SidegrabMode.m_dTrigger;
                 int nPulsePerHeight = nCamHeight * SidegrabMode.m_dTrigger;
 
@@ -187,6 +188,9 @@ namespace Root_VEGA_P_Vision.Module
             }
             finally
             {
+                m_module.Run(axisR.StartHome());
+                m_module.Run(axisR.WaitReady());
+
                 SidegrabMode.SetLight(false);
             }
 

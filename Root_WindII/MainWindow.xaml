@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Root_WindII"
         xmlns:engineer="clr-namespace:Root_WindII.Engineer"
         mc:Ignorable="d"
+        WindowState="Maximized"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
         Title="MainWindow" Height="450" Width="800">

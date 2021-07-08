@@ -31,6 +31,7 @@ using Root_EFEM;
 using static RootTools.Control.Axis;
 using RootTools.GAFs;
 using RootTools.OHTNew;
+using RootTools.Gem;
 
 namespace Root_CAMELLIA.Module
 {
@@ -134,6 +135,21 @@ namespace Root_CAMELLIA.Module
                 _dataSavePath = value;
             }
         }
+
+        private string _dataSavePathDate = "";
+        public string p_dataSavePathDate
+        {
+            get
+            {
+                return _dataSavePathDate;
+            }
+            set
+            {
+                _dataSavePathDate = value;
+            }
+        }
+
+        public IGem p_xGem { get; private set; }
 
         #region InfoWafer
         string m_sInfoWafer = "";
@@ -326,13 +342,7 @@ namespace Root_CAMELLIA.Module
                 CheckDocking[i] = false;
             }
 
-           // try
-            //{
-            //    if (p_CamVRS != null && !p_CamVRS.p_CamInfo._OpenStatus)
-            //    {
-            //        p_CamVRS.Connect();
-            //    }
-            //}
+            p_xGem = App.m_engineer.m_handler.m_gem;
 
         }
 
@@ -519,12 +529,14 @@ namespace Root_CAMELLIA.Module
                     }
                     //p_axisLifter.p_vaccumDIO_I.p_bIn = false;
                     p_axisLifter.p_IsLifterDown = true;
+                    MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Lifter Down", SSLNet.STATUS.START);
                     if (p_axisLifter.StartMove(eAxisPos.Home) != "OK")
                     {
                         return p_sInfo;
                     }
                     if (p_axisLifter.WaitReady() != "OK")
                         return p_sInfo;
+                    MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Lifter Down", SSLNet.STATUS.END);
                 }
             }
             finally
@@ -585,13 +597,14 @@ namespace Root_CAMELLIA.Module
                     {
                         return "OK";
                     }
-
+                    MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Lifter Up", SSLNet.STATUS.START);
                     if (Run(p_axisLifter.StartMove(eAxisPos.Ready)))
                     {
                         return p_sInfo;
                     }
                     if (Run(p_axisLifter.WaitReady()))
                         return p_sInfo;
+                    MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Lifter Up", SSLNet.STATUS.END);
                 }
                 else
                 {
@@ -668,7 +681,7 @@ namespace Root_CAMELLIA.Module
         private string MoveReadyPos()
         {
             if (p_axisLifter.IsInPos(eAxisPos.Ready)) return "OK";
-
+            MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Move Ready Position", SSLNet.STATUS.START);
             /* XY Ready 위치 이동 */
             if (Run(p_axisXY.p_axisX.StartMove(eAxisPos.Ready)))
                 return p_sInfo;
@@ -680,6 +693,7 @@ namespace Root_CAMELLIA.Module
                 return p_sInfo;
             if (Run(p_axisZ.WaitReady()))
                 return p_sInfo;
+            MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Move Ready Position", SSLNet.STATUS.END);
             /* Vaccum Check 후Lifter Up */
             if (LifterUp() != "OK")
                 return p_sInfo;
@@ -699,8 +713,6 @@ namespace Root_CAMELLIA.Module
         {
             //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.START,);
             //m_CamVRS.FunctionConnect();
-            //MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0);
-            //MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Move Ready Position", SSLNet.STATUS.START);
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;
@@ -734,19 +746,30 @@ namespace Root_CAMELLIA.Module
             return "OK";
         }
 
+        public string p_processStartDate { get; set; }
+        public string p_processStartTime { get; set; }
         public string AfterGet(int nID)
         {
             // Make Directory
             //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END,);
+            if (m_engineer.p_bUseXGem)
+            {
+                p_processStartDate = DateTime.Now.ToString("MM/dd/yyyy");
+                p_processStartTime = DateTime.Now.ToString("HH:mm:ss");
+            }
             return "OK";
         }
 
         public string AfterPut(int nID)
         {
-            p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe;// + @"\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
-            GeneralTools.MakeDirectory(p_dataSavePath);
+            if (p_infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer || p_infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer)
+            {
+                p_dataSavePathDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm");
+                p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe;
+                GeneralTools.MakeDirectory(p_dataSavePath);
+            }
 
-            MarsLogManager.Instance.ChangeMaterial(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1, p_infoWafer.p_sLotID, p_infoWafer.p_sCarrierID, p_infoWafer.p_sRecipe);
+            MarsLogManager.Instance.ChangeMaterialSlot(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1);
             MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, SSLNet.MATERIAL_TYPE.WAFER, this.p_id, 0);
             return "OK";
         }

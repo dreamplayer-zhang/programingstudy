@@ -382,7 +382,6 @@ namespace Root_CAMELLIA.LibSR_Met
             if (!m_bUseFile)
             {
                 comboBoxDataIndex.Items.Clear();
-
                 if (m_DM.nRepeatCount == 1)
                 {
                     for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
@@ -396,15 +395,14 @@ namespace Root_CAMELLIA.LibSR_Met
                 else
                 {
                     for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
-
                     {
                         if (m_DM.m_RawData[n].bDataExist)
                         {
-                            comboBoxDataIndex.Items.Add(n + 1);
+                            int nGraphIndex = (n % m_DM.nRepeatCount);
+                            int nPointIndex = (n / m_DM.nRepeatCount);
+                            string sGraphIndex = (nPointIndex+ 1).ToString() +"-"+ (nGraphIndex+1).ToString();                            
+                            comboBoxDataIndex.Items.Add(sGraphIndex);
                         }
-
-
-
                     }
                 }
             }

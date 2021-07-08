@@ -16,6 +16,8 @@ using System.Windows.Input;
 using Root_WindII.Engineer;
 using Root_EFEM;
 using Root_EFEM.Module;
+using Root_EFEM.Module.FrontsideVision;
+using RootTools.Light;
 
 namespace Root_WindII
 {
@@ -119,7 +121,6 @@ namespace Root_WindII
         }
         #endregion
 
-
         public CameraAlign_ViewModel()
         {
             this.imageViewerVM = new CameraAlign_ImageViewer_ViewModel();
@@ -209,15 +210,11 @@ namespace Root_WindII
             {
                 return new RelayCommand(() =>
                 {
-
-                    //if (GlobalObjects.Instance.Get<WIND2_Engineer>().m_eMode == WIND2_Engineer.eMode.Vision)
-                    //{
-                    //    if(this.ImageViewerVM.p_ImageData != null)
-                    //    {
-                    //        this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
-                    //        this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
-                    //    }
-                    //}
+                    if(this.ImageViewerVM.p_ImageData != null)
+                    {
+                        this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
+                        this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
+                    }
 
                     if (VisionModule == null) return;
 
@@ -233,6 +230,52 @@ namespace Root_WindII
                         }
                     }
 
+                    #region [조명 설정]
+                    SettingItem_SetupCamera setupCamera = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupCamera>();
+
+                    string illumIndexListString = setupCamera.IlluminationIndexList.Trim();
+                    List<int> illumIndexList = new List<int>();
+                    if (illumIndexListString != "")
+                    {
+
+
+                        string[] stringArray = illumIndexListString.Split(',');
+                        foreach (string indexStr in stringArray)
+                        {
+                            illumIndexList.Add(Convert.ToInt32(indexStr));
+                        }
+                    }
+
+                    Vision_Frontside vision = ((WindII_Handler)GlobalObjects.Instance.Get<WindII_Engineer>().ClassHandler()).p_VisionFront;
+
+                    Run_VisionAlign alignModule = (Run_VisionAlign)vision.CloneModuleRun("VisionAlign");
+                    GrabModeFront grabMode = alignModule.m_grabMode;
+                    if(grabMode != null)
+                    {
+                        //for(int i= 0; i < grabMode.m_lightSet.m_aLight.Count; i++)
+                        //{
+                        //    if()
+                        //    grabMode.m_lightSet.m_aLight[i]
+                        //}
+
+                        List<Light> lightList = new List<Light>();
+                        foreach (var index in illumIndexList)
+                        {
+                            if (index < grabMode.m_lightSet.m_aLight.Count)
+                            {
+                                lightList.Add(grabMode.m_lightSet.m_aLight[index]);
+                            }
+                        }
+
+
+                        // for (int n = 0; n < m_aLightPower.Count; n++)
+                        //{
+                        //    if (m_lightSet.m_aLight[n].m_light != null)
+                        //        m_lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
+                        //}
+                    }
+                    #endregion
+
                     LoadRecipe();
                 });
             }
@@ -242,7 +285,7 @@ namespace Root_WindII
         {
             get => new RelayCommand(() =>
             {
-                //VisionModule.p_CamAlign.StopGrab();
+                VisionModule.p_CamAlign.StopGrab();
             });
         }
 
@@ -284,10 +327,10 @@ namespace Root_WindII
                 ImageData featureImageData = this.ImageViewerVM.BoxImage;
 
                 byte[] srcBuf = featureImageData.m_aBuf;
-                byte[] rawData = new byte[featureImageData.p_Size.X * featureImageData.p_Size.Y];
+                byte[] rawData = new byte[featureImageData.p_Size.X * featureImageData.p_Size.Y * featureImageData.p_nByte];
                 Array.Copy(srcBuf, rawData, srcBuf.Length);
 
-                alignRecipe.AddAlignFeature(0, 0, featureImageData.p_Size.X, featureImageData.p_Size.Y, 1, rawData);
+                alignRecipe.AddAlignFeature(0, 0, featureImageData.p_Size.X, featureImageData.p_Size.Y, featureImageData.p_nByte, rawData);
 
                 RefreshFeatureItemList();
             });
@@ -316,12 +359,9 @@ namespace Root_WindII
                 ClearFeatureList();
             });
         }
-
-
         #endregion
 
         #region [Method]
-
         private void ClearFeatureList()
         {
             this.featureItemList.Clear();
@@ -353,16 +393,15 @@ namespace Root_WindII
 
         public void LoadRecipe()
         {
-            /*FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
 
             this.FirstAxisPositionX = alignRecipe.FirstSearchPointX;
             this.FirstAxisPositionY = alignRecipe.FirstSearchPointY;
             this.SecondAxisPositionX = alignRecipe.SecondSearchPointX;
             this.SecondAxisPositionY = alignRecipe.SecondSearchPointY;
 
-            RefreshFeatureItemList();*/
+            RefreshFeatureItemList();
         }
-
         #endregion
     }
 }
