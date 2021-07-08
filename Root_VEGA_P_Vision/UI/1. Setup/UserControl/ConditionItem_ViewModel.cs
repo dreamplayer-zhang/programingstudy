@@ -66,7 +66,21 @@ namespace Root_VEGA_P_Vision
                 //parameterBase = recipe.GetItem<EUVPodSurfaceParameter>().PodTDI;
             }
             else if(t.Name.Contains("HighResRecipe"))
+            {
                 parameterBase = recipe.GetItem<EUVPodSurfaceParameter>().PodStacking;
+
+            }
+
+            if (parameterBase.BrightParam.IsEnable)
+            {
+                defectName = parameterBase.BrightParam.DefectName;
+                defectCode = parameterBase.BrightParam.DefectCode.ToString();
+            }
+            else if (parameterBase.DarkParam.IsEnable)
+            {
+                defectName = parameterBase.DarkParam.DefectName;
+                defectCode = parameterBase.DarkParam.DefectCode.ToString();
+            }
         }
         public ICommand btnImagenROI
         {
