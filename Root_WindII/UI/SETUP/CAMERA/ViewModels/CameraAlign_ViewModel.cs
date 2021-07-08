@@ -129,7 +129,7 @@ namespace Root_WindII
             this.motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
             this.motionViewerVM = new MotionViewer_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
 
-            if(visionModule.p_CamAlign.IsConnected() == true)
+            if(visionModule.p_CamAlign != null)
             {
                 this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
                 this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
