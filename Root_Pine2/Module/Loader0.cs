@@ -162,17 +162,8 @@ namespace Root_Pine2.Module
         #endregion
 
         #region AxisXY
-        string MoveSafeY()
-        {
-            Axis axisY = m_axis.p_axisY;
-            if (axisY.p_posCommand <= axisY.GetPosValue(ePosTransfer.Transfer0)) return "OK";
-            axisY.StartMove(ePosTransfer.Transfer0);
-            return axisY.WaitReady(); 
-        }
-
         public string RunMoveTransfer(ePosTransfer ePos, double xOffset, bool bWait = true)
         {
-            if (Run(MoveSafeY())) return p_sInfo; 
             if (Run(StartMoveX(ePos.ToString(), xOffset))) return p_sInfo; 
             m_axis.p_axisY.StartMove(ePos);
             return bWait ? m_axis.WaitReady() : "OK";
@@ -180,7 +171,6 @@ namespace Root_Pine2.Module
 
         public string RunMoveBoat(eUnloadVision eVision, Vision2D.eWorks eWorks, bool bWait = true)
         {
-            if (Run(MoveSafeY())) return p_sInfo;
             string sPos = GetPosString(eVision, eWorks);
             if (Run(StartMoveX(sPos, 0))) return p_sInfo;
             m_axis.p_axisY.StartMove(sPos);
@@ -357,6 +347,30 @@ namespace Root_Pine2.Module
         #endregion
 
         #region RunUnload
+        public string StartUnloadStrip()
+        {
+            return StartRun(m_runUnloadStrip);
+        }
+
+        public string RunUnloadStrip()
+        {
+            if (p_infoStrip == null) return "OK";
+            try
+            {
+                if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMoveLoadEV())) return p_sInfo;
+                if (Run(RunMoveZ(c_sPosLoadEV, 5000))) return p_sInfo;
+                if (Run(m_picker.RunVacuum(false))) return p_sInfo;
+                if (Run(RunMoveUp())) return p_sInfo;
+                m_picker.p_infoStrip = null;
+            }
+            finally
+            {
+                RunMoveUp();
+            }
+            return "OK";
+        }
+
         public string RunUnloadPaper()
         {
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
@@ -529,6 +543,15 @@ namespace Root_Pine2.Module
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
+            if (m_pine2.p_eMode == Pine2.eRunMode.Magazine)
+            {
+                double fPos = m_axis.p_axisY.GetPosValue(ePosTransfer.Transfer0) + 5000;
+                if (m_axis.p_axisY.p_posCommand > fPos)
+                {
+                    m_axis.p_axisY.StartMove(fPos);
+                    m_axis.p_axisY.WaitReady(); 
+                }
+            }
             if (m_picker.p_infoStrip != null)
             {
                 if (m_picker.p_infoStrip.m_bPaper) return StartRun(m_runUnloadPaper); 
@@ -586,6 +609,7 @@ namespace Root_Pine2.Module
 
         #region ModuleRun
         ModuleRunBase m_runLoadEV;
+        ModuleRunBase m_runUnloadStrip;
         ModuleRunBase m_runLoadTransfer;
         ModuleRunBase m_runUnloadPaper;
         ModuleRunBase m_runUnloadBoat;
@@ -593,6 +617,7 @@ namespace Root_Pine2.Module
         protected override void InitModuleRuns()
         {
             m_runLoadEV = AddModuleRunList(new Run_LoadEV(this), true, "Load Strip from LoadEV");
+            m_runUnloadStrip = AddModuleRunList(new Run_UnloadStrip(this), false, "Unload Strip to GetPosition");
             m_runLoadTransfer = AddModuleRunList(new Run_LoadTransfer(this), true, "Load Strip from Transfer");
             m_runUnloadPaper = AddModuleRunList(new Run_UnloadPaper(this), true, "Unload Paper to Tray");
             m_runUnloadBoat = AddModuleRunList(new Run_UnloadBoat(this), true, "Unload Paper to Boat");
@@ -628,6 +653,31 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunLoadEV(m_nShake, m_dzShakeUp);
+            }
+        }
+
+        public class Run_UnloadStrip : ModuleRunBase
+        {
+            Loader0 m_module;
+            public Run_UnloadStrip(Loader0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_UnloadStrip run = new Run_UnloadStrip(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunUnloadStrip();
             }
         }
 

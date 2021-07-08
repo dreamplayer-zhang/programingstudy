@@ -29,6 +29,7 @@ namespace RootTools.RFIDs
         public IRFID m_RFID = null;
         void InitIRFID()
         {
+            if (m_RFID != null) return;
             switch (p_eRFID)
             {
                 case eRFID.Brooks: m_RFID = new RFID_Brooks(p_id, m_log); break;
@@ -53,7 +54,8 @@ namespace RootTools.RFIDs
         public string Read(out string sRFID)
         {
             p_sRFID = "";
-            if (m_RFID == null) InitIRFID();
+            if (m_RFID == null) 
+                InitIRFID();
             string sRun = m_RFID.Read(out sRFID);
             p_sRFID = sRFID; 
             return sRun;

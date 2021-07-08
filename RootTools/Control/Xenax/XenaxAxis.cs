@@ -82,6 +82,7 @@ namespace RootTools.Control.Xenax
                     m_comm = rs232;
                     p_commUI = rs232.p_ui;
                     rs232.OnReceive += Rs232_OnReceive;
+                    rs232.p_bConnect = true;
                     break;
                 case eComm.TCPIP:
                     TCPIPClient tcpip = new TCPIPClient(p_id + ".TCPIP", p_log);
@@ -238,7 +239,7 @@ namespace RootTools.Control.Xenax
                 {
                     case eCmd.GetPos: OnRecieveGetPos(ConvInt(sData)); break;
                     case eCmd.GetErrorCode: m_sErrorCode = sData; break;
-                    case eCmd.GetErrorString: p_sInfo = "Xenax Error : " + sData + " (" + m_sErrorCode + ")"; break; 
+                    case eCmd.GetErrorString: p_sInfo = "Xenax Error : " + sData + " (" + m_sErrorCode + ")"; break;
                 }
                 m_protocolSend = null;
             }
@@ -268,7 +269,7 @@ namespace RootTools.Control.Xenax
                     p_sensorInPos = false; 
                     break;
                 case eEvent.HomeDone:
-                    if (p_eState == eState.Home) p_eState = eState.Ready;
+                    /*if (p_eState == eState.Home) */p_eState = eState.Ready;
                     break;
                 case eEvent.Error:
                     p_eState = eState.Error;

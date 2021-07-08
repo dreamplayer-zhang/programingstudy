@@ -88,11 +88,27 @@ namespace Root_CAMELLIA.LibSR_Met
         private void comboBoxPointIndex_DropDownOpened(object sender, EventArgs e)
         {
             comboBoxPointIndex.Items.Clear();
-            for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
+            if (m_DM.nRepeatCount == 1)
             {
-                if (m_DM.m_RawData[n].bDataExist)
+                for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
                 {
-                    comboBoxPointIndex.Items.Add(n);
+                    if (m_DM.m_RawData[n].bDataExist)
+                    {
+                        comboBoxPointIndex.Items.Add(n + 1);
+                    }
+                }
+            }
+            else
+            {
+                for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
+                {
+                    if (m_DM.m_RawData[n].bDataExist)
+                    {
+                        int nGraphIndex = (n % m_DM.nRepeatCount);
+                        int nPointIndex = (n / m_DM.nRepeatCount);
+                        string sGraphIndex = (nPointIndex + 1).ToString() + "-" + (nGraphIndex + 1).ToString();
+                        comboBoxPointIndex.Items.Add(sGraphIndex);
+                    }
                 }
             }
         }

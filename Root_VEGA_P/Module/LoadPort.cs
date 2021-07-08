@@ -18,13 +18,11 @@ namespace Root_VEGA_P.Module
     public class Loadport : ModuleBase, IRTRChild
     {
         #region ToolBox
-        Camera_CognexOCR camBarcode;
         Camera_CognexDM150 m_camBCD; 
         OHT m_OHT;
         RFID m_RFID; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.GetCamera(ref camBarcode, this, "Barcode Cam");
             p_sInfo = m_toolBox.GetCamera(ref m_camBCD, this, "Barcode Camera");
             p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, m_infoPods, "OHT");
             p_sInfo = m_toolBox.Get(ref m_RFID, this, "RFID");
@@ -138,12 +136,13 @@ namespace Root_VEGA_P.Module
             public string RunVacuum(bool bOn)
             {
                 m_doVacuum.Write(bOn);
-                if (bOn) Thread.Sleep((int)(1000 * m_secVac)); 
+                if (bOn) 
+                    Thread.Sleep((int)(1000 * m_secVac)); 
                 else
                 {
                     m_doBlow.Write(true);
-                    Thread.Sleep((int)(500 * m_secBlow));
-                    m_doBlow.Write(false);
+                    //Thread.Sleep((int)(500 * m_secBlow));
+                    //m_doBlow.Write(false);
                 }
                 return "OK";
             }
@@ -204,12 +203,14 @@ namespace Root_VEGA_P.Module
                 {
                     string sSeal = RunSeal(eDoorSeal.Unseal);
                     if (sSeal != "OK") return sSeal;
+                    Thread.Sleep(500);
                     return RunOpen(bOpen); 
                 }
                 else
                 {
                     string sOpen = RunOpen(bOpen);
                     if (sOpen != "OK") return sOpen;
+                    Thread.Sleep(500);
                     return RunSeal(eDoorSeal.Seal); 
                 }
             }
@@ -436,8 +437,11 @@ namespace Root_VEGA_P.Module
             public string Run_GetWeight()
             {
                 string sInfo = ConnectRS232();
-                if (sInfo != "OK") return sInfo;
-                return "OK";
+                sInfo = m_rs232.Send("00RW");
+                return sInfo;
+
+                //if (sInfo != "OK") return sInfo;
+                //return "OK";
             }
 
             private void M_rs232_OnReceive(string sRead)
@@ -495,27 +499,37 @@ namespace Root_VEGA_P.Module
                     m_infoPods.NewInfoPod(4);
                     return "OK";
                 }
+
+                m_infoPods.CheckPlaced(m_infoPods.p_ePresentSensor);
+
                 switch (m_infoPods.p_eState)
                 {
-                    case InfoPods.eState.Dock: return "OK";
-                    case InfoPods.eState.Empty: return "Pod not Exist";
+                    case InfoPods.eState.Dock: 
+                        return "OK";
+                    case InfoPods.eState.Empty:
+                        return "Pod not Exist";
                 }
+
+                m_stage.RunWeigh();
                 string sRFID = "";
                 m_RFID.Read(out sRFID);
-                m_infoPods.p_sCarrierID = sRFID;
-                m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID);
+
+                //m_infoPods.p_sCarrierID = sRFID;
+                //m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID);
+
                 m_bDocking = true;
                 if (m_stage.p_bPlaced == false) return "Not Placed";
                 if (m_stage.p_bPresent == false) return "Not Present";
                 if (Run(m_stage.RunVacuum(true))) return p_sInfo;
                 if (Run(m_door.RunDoor(true))) return p_sInfo;
                 if (Run(m_stage.RunMove(Stage.ePos.Barcode))) return p_sInfo;
-                //forget
+                if (Run(m_camBCD.ReadBCD())) return p_sInfo;
                 if (Run(m_stage.RunMove(Stage.ePos.Inside))) return p_sInfo;
                 if (Run(m_door.RunDoor(false))) return p_sInfo;
                 if (Run(m_stage.RunPodOpen(true))) return p_sInfo;
                 if (Run(m_stage.RunVacuum(false))) return p_sInfo;
                 m_infoPods.NewInfoPod(4);
+                
                 return "OK";
             }
             finally { m_bDocking = false; }
@@ -534,6 +548,7 @@ namespace Root_VEGA_P.Module
                 if (Run(m_stage.RunMove(Stage.ePos.Outside))) return p_sInfo;
                 if (Run(m_door.RunDoor(false))) return p_sInfo;
                 if (Run(m_stage.RunVacuum(false))) return p_sInfo;
+
                 m_infoPods.ClearInfoPod();
                 return "OK";
             }
@@ -546,7 +561,8 @@ namespace Root_VEGA_P.Module
 
         public string IsGetOK()
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            if (p_eState != eState.Ready) 
+                return p_id + " eState not Ready";
             return (p_infoPod != null) ? "OK" : p_id + " IsGetOK - Pod not Exist";
         }
 
@@ -560,6 +576,9 @@ namespace Root_VEGA_P.Module
 
         public string BeforeGet()
         {
+            //LoadPort Blow 상태 확인
+            //Door Lock 상태 확인
+            //if()
             return "OK"; 
         }
 
@@ -593,7 +612,10 @@ namespace Root_VEGA_P.Module
         int[] m_teachRTR = new int[4] { 0, 0, 0, 0 }; 
         public int GetTeachRTR(InfoPod infoPod)
         {
-            return m_teachRTR[(int)infoPod.p_ePod]; 
+            if (infoPod != null)
+                return m_teachRTR[(int)infoPod.p_ePod];
+            else 
+                return -1;
         }
 
         public void RunTreeTeach(Tree tree)
@@ -623,7 +645,8 @@ namespace Root_VEGA_P.Module
             if (EQ.p_bSimulate) return "OK";
             if (Run(m_door.RunDoor(true))) return p_sInfo;
             if (Run(base.StateHome())) return p_sInfo;
-            if (Run(m_stage.RunMove(Stage.ePos.Outside))) return p_sInfo; 
+            if (Run(m_stage.RunMove(Stage.ePos.Outside))) return p_sInfo;
+
             return m_door.RunDoor(false);
         }
         #endregion

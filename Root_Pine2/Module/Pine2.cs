@@ -5,6 +5,7 @@ using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
+using RootTools.Printer;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
@@ -43,6 +44,7 @@ namespace Root_Pine2.Module
             m_toolBox.GetDIO(ref m_doFFU_Handler, this, "FFU Handler");
             m_toolBox.GetDIO(ref m_doFFU_Vision, this, "FFU Vision");
             m_toolBox.GetDIO(ref m_doIonizer, this, "Ionizer");
+            m_toolBox.Get(ref m_printer.m_srp350, this, "Printer"); 
             m_lamp.GetTools(m_toolBox, this);
             m_buzzer.GetTools(m_toolBox, this);
             m_display.GetTools(m_toolBox, this, bInit); 
@@ -178,9 +180,11 @@ namespace Root_Pine2.Module
 
         #region GAF
         public ALID m_alidNewLot;
+        public ALID m_alidSummary;
         void InitALID()
         {
             m_alidNewLot = m_gaf.GetALID(this, "NewLot", "New Lot Communication Error");
+            m_alidSummary = m_gaf.GetALID(this, "Summary", "Summary Error");
         }
         #endregion
 
@@ -701,6 +705,53 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region SRP-350III
+        public class Printer
+        {
+            public SRP350 m_srp350;
+
+            public class Doc
+            {
+                public string m_sTray = "";
+                public string m_sBundle;
+
+                public Doc(int nTray, string sBundle)
+                {
+                    for (int n = 0; n < 8; n++) m_sTray += ((n == nTray) ? n.ToString() : "+");
+                    m_sBundle = sBundle;
+                }
+            }
+            Queue<Doc> m_qDoc = new Queue<Doc>();
+
+            public DispatcherTimer m_timer = new DispatcherTimer();
+            void InitTimer()
+            {
+                m_timer.Interval = TimeSpan.FromSeconds(0.1);
+                m_timer.Tick += M_timer_Tick;
+                m_timer.Start();
+            }
+
+            private void M_timer_Tick(object sender, EventArgs e)
+            {
+                if (m_qDoc.Count == 0) return;
+                PrintDoc(m_qDoc.Dequeue()); 
+            }
+
+            void PrintDoc(Doc doc)
+            {
+            }
+
+            SRP350.eFontKoean m_eFont = SRP350.eFontKoean.Korean2x2;
+
+            public Printer()
+            {
+                InitTimer();
+
+            }
+        }
+        Printer m_printer = new Printer(); 
+        #endregion
+
         Pine2_Handler m_handler; 
         public Pine2(string id, IEngineer engineer)
         {
@@ -715,6 +766,7 @@ namespace Root_Pine2.Module
 
         public override void ThreadStop()
         {
+            m_printer.m_timer.Stop(); 
             m_display.m_timer.Stop(); 
             ThreadDIOStop(); 
             base.ThreadStop();

@@ -766,6 +766,10 @@ namespace Root_CAMELLIA
                 }
                 else if (int.TryParse(value, out val))
                 {
+                    if(val >= 30)
+                    {
+                        val = 30;
+                    }
                     _MeasureRepeatCount = val.ToString();
                     dataManager.recipeDM.TeachingRD.MeasureRepeatCount = val;
                 }
@@ -774,6 +778,7 @@ namespace Root_CAMELLIA
                     _MeasureRepeatCount = dataManager.recipeDM.TeachingRD.MeasureRepeatCount.ToString();
                 }
                 SetProperty(ref _MeasureRepeatCount, value);
+                RaisePropertyChanged("MeasureRepeatCount");
             }
         }
 
@@ -3015,7 +3020,7 @@ namespace Root_CAMELLIA
         {
             NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime.ToString();
             VISIntegrationTime = dataManager.recipeDM.TeachingRD.VISIntegrationTime.ToString();
-
+            MeasureRepeatCount = dataManager.recipeDM.TeachingRD.MeasureRepeatCount.ToString();
             p_UseThickness = dataManager.recipeDM.TeachingRD.UseThickness;
             p_UseTransmittance = dataManager.recipeDM.TeachingRD.UseTransmittance;
 

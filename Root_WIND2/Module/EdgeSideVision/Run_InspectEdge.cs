@@ -87,8 +87,8 @@ namespace Root_WIND2.Module
 
 			// Check Lot Start
 			if ((infoWafer != null) && (
-				(infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
-				(infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)))
+				(infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+				(infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)))
 			{
 				LotStart(settings_edgeside.KlarfSavePath, recipe, infoWafer, grabMode);
 			}
@@ -138,8 +138,8 @@ namespace Root_WIND2.Module
 
 				//LotEnd Check
 				if ((infoWafer != null) && (
-					(infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
-					(infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
+					(infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+					(infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
 				{
 					LotEnd(infoWafer);
 				}

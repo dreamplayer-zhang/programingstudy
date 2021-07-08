@@ -342,6 +342,7 @@ namespace RootTools_Vision
             recipe.MasterImage.Save(this.RecipeFolderPath);
         }
 
+
         public void LoadMasterImage()
         {
             if (this.RecipeFolderPath == "") return;
@@ -350,6 +351,17 @@ namespace RootTools_Vision
 
             recipe.MasterImage = new RecipeType_ImageData();
             recipe.MasterImage.FileName = "MasterImage.bmp";
+            recipe.MasterImage.Read(this.RecipeFolderPath);
+        }
+
+        public void LoadMasterImage(string fileName)
+        {
+            if (this.RecipeFolderPath == "") return;
+
+            OriginRecipe recipe = this.GetItem<OriginRecipe>();
+
+            recipe.MasterImage = new RecipeType_ImageData();
+            recipe.MasterImage.FileName = fileName;
             recipe.MasterImage.Read(this.RecipeFolderPath);
         }
 

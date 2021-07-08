@@ -128,6 +128,11 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Run
+        public string StartUnloadStrip()
+        {
+            return "OK";
+        }
+
         public string RunUnload(Vision2D.eWorks eWorks)
         {
             Boat boat = m_boats.m_aBoat[eWorks];

@@ -7,22 +7,22 @@
              mc:Ignorable="d"
              d:DesignHeight="818"
              d:DesignWidth="1912"
-             Background="{StaticResource PanelBackGround}">
+             Background="{StaticResource MainBackGroundColor}">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="12*" />
+            <ColumnDefinition Width="6*" />
             <ColumnDefinition Width="88*" />
         </Grid.ColumnDefinitions>
-        <Border Grid.Column="0" BorderBrush="{StaticResource Splitter}"
+        <Border Grid.Column="0" BorderBrush="{StaticResource BorderSplitColor}" Background="{StaticResource MainThema}"
                 BorderThickness="0,0,1,0">
-            <StackPanel Margin="0,10,0,0">
-                <RadioButton x:Name="radiobtnOrigin" Content="Origin" Command="{Binding btnOrigin}" Style="{StaticResource SetupPannelRadioBtn}"/>
+            <StackPanel Margin="0,30,0,0">
+                <RadioButton IsChecked="True" Content="Origin" Command="{Binding btnOrigin}" Style="{StaticResource SetupPannelRadioBtn}"/>
                 <RadioButton Content="Position" Command="{Binding btnPosition}" Style="{StaticResource SetupPannelRadioBtn}"/>
-                <RadioButton Content="Mask" Command="{Binding btnMask}" Style="{StaticResource SetupPannelRadioBtn}"/>
-                <!--<Button Content="Stain" Command="{Binding btnStain}" Style="{StaticResource SetupPanelBtn2}"/>
-                <Button Content="2D TDI" Command="{Binding btn6um}" Style="{StaticResource SetupPanelBtn2}"/>
-                <Button Content="Z Stack" Command="{Binding btn1um}" Style="{StaticResource SetupPanelBtn2}"/>
-                <Button Content="Side" Command="{Binding btnSide}" Style="{StaticResource SetupPanelBtn2}"/>-->
+                <RadioButton x:Name="MaskRadio" Content="Mask" Command="{Binding btnMask}" Style="{StaticResource SetupPannelRadioBtn}"/>
+                <RadioButton Visibility="{Binding ElementName=MaskRadio, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}" Content="Stain" Command="{Binding btnStain}" Style="{StaticResource SetupPannelRadioBtn}"/>
+                <RadioButton Visibility="{Binding ElementName=MaskRadio, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}" Content="2D TDI" Command="{Binding btn6um}" Style="{StaticResource SetupPannelRadioBtn}"/>
+                <RadioButton Visibility="{Binding ElementName=MaskRadio, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}" Content="Z Stack" Command="{Binding btn1um}" Style="{StaticResource SetupPannelRadioBtn}"/>
+                <RadioButton Visibility="{Binding ElementName=MaskRadio, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}" Content="Side" Command="{Binding btnSide}" Style="{StaticResource SetupPannelRadioBtn}"/>
             </StackPanel>
         </Border>
         <Grid Grid.Column="1">
