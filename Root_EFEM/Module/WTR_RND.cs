@@ -901,18 +901,19 @@ namespace Root_EFEM.Module
                     material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
 
                     to.AddData("WTR");
-                    toSlot.AddData(1);
+                    toSlot.AddData((int)m_eArm + 1);
                     marsLogManager.WriteXFR(EQ.p_nRunLP, "WTR", SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.START, from, fromSlot, to, toSlot, material);
                 }
                 else
                 {
+                    // WTR 제외 나머지 1 upper - 2 lower - 1
                     from.AddData(id);
                     from.AddData("WTR");
                     fromSlot.AddData(1);
-                    fromSlot.AddData(1);
+                    fromSlot.AddData((int)m_eArm + 1);
                     to.AddData("WTR");
                     to.AddData(id);
-                    toSlot.AddData(2);
+                    toSlot.AddData((int)m_eArm + 1);
                     toSlot.AddData(1);
 
                     material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
@@ -1037,7 +1038,7 @@ namespace Root_EFEM.Module
 
                         from.AddData("WTR");
 
-                        fromSlot.AddData(1);
+                        fromSlot.AddData((int)m_eArm + 1);
                         to.AddData(id);
 
                         if (id.Contains("Loadport"))
@@ -1068,10 +1069,10 @@ namespace Root_EFEM.Module
                         from.AddData(id);
                         from.AddData("WTR");
                         fromSlot.AddData(1);
-                        fromSlot.AddData(1);
+                        fromSlot.AddData((int)m_eArm + 1);
                         to.AddData("WTR");
                         to.AddData(id);
-                        toSlot.AddData(2);
+                        toSlot.AddData((int)m_eArm + 1);
                         toSlot.AddData(1);
 
                         material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, p_nExchangeSlot + 1);

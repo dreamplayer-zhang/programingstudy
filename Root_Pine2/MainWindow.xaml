@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
-        Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
+        Title="Pine2" Height="900" Width="1920" WindowState="Maximized">
     <Window.Resources>
         <DataTemplate x:Key="TabItemHeaderTemplate">
             <ContentPresenter Content="{TemplateBinding Content}" RenderTransformOrigin="0.5,0.5">

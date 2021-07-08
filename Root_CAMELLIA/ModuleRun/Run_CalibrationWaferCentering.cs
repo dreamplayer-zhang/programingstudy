@@ -187,12 +187,12 @@ namespace Root_CAMELLIA.Module
 
 
                 DataFormatter dataformatter = new DataFormatter();
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Lifter Down", SSLNet.STATUS.START);
+                //
                 if (m_module.LifterDown() != "OK")
                 {
                     return p_sInfo;
                 }
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Lifter Down", SSLNet.STATUS.END);
+                //logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Lifter Down", SSLNet.STATUS.END);
 
 
                 //

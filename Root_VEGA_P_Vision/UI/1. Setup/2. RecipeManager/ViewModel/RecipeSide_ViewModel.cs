@@ -16,9 +16,48 @@ namespace Root_VEGA_P_Vision
     public class RecipeSide_ViewModel:ObservableObject
     {
         public RecipeSide_Panel Main;
-        public RecipeMask_ViewModel recipeSetting;
+        public RecipeMask_ViewModel recipeMask;
         RecipeSideImageViewers_ViewModel EIPcoverViewers, EIPbaseViewers;
-
+        RecipeSideImageViewers_ViewModel selectedSideTab;
+        int selectedIdx;
+        public int SelectedIdx
+        {
+            get => selectedIdx;
+            set
+            {
+                SelectedSideTab.SelectedViewer.SelectedIdx = value;
+                SetProperty(ref selectedIdx, value);
+            }
+        }
+        int selectedTab;
+        public int SelectedTab
+        {
+            get => selectedTab;
+            set
+            {
+                switch(value)
+                {
+                    case 0:
+                        SelectedSideTab = EIPCoverViewers;
+                        break;
+                    case 1:
+                        selectedSideTab = EIPBaseViewers;
+                        break;
+                }
+                SetProperty(ref selectedTab, value);
+            } 
+        }
+        List<int> numList;
+        public List<int> MemNumList
+        {
+            get => numList;
+            set => SetProperty(ref numList, value);
+        }
+        public RecipeSideImageViewers_ViewModel SelectedSideTab
+        {
+            get => selectedSideTab;
+            set => SetProperty(ref selectedSideTab, value);
+        }
         #region Property
         public RecipeSideImageViewers_ViewModel EIPCoverViewers
         {
@@ -31,14 +70,19 @@ namespace Root_VEGA_P_Vision
             set => SetProperty(ref EIPbaseViewers, value);
         }
         #endregion
-        public RecipeSide_ViewModel(RecipeMask_ViewModel recipeSetting)
+        public RecipeSide_ViewModel(RecipeMask_ViewModel recipeMask)
         {
-            this.recipeSetting = recipeSetting;
+            this.recipeMask = recipeMask;
             Main = new RecipeSide_Panel();
             Main.DataContext = this;
 
             EIPcoverViewers = new RecipeSideImageViewers_ViewModel("EIP_Cover",this);
             EIPbaseViewers = new RecipeSideImageViewers_ViewModel("EIP_Plate",this);
+            SelectedSideTab = EIPcoverViewers;
+
+            numList = new List<int>();
+            for (int i = 0; i < EIPcoverViewers.Bottom_ViewerVM.p_ImageData.p_nPlane; i++)
+                MemNumList.Add(i + 1);
         }
 
         public ICommand btnSnap

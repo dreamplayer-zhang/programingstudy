@@ -21,7 +21,7 @@ namespace Root_VEGA_P_Vision
         {
             get => recipe;
         }
-        public List<SharedBufferInfo> SharedBufferInfoList //stain, side,tdi,stacking 
+        public List<SharedBufferInfo> SharedBufferInfoList //stain, side,tdi, stacking 
         {
             get => sharedBufferInfoList;
         }

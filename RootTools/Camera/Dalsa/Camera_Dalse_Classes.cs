@@ -133,6 +133,7 @@ namespace RootTools.Camera.Dalsa
             UserSet14,
             UserSet15,
             UserSet16,
+            Factory,
         }
 
         public enum eFlatFieldUserSet
