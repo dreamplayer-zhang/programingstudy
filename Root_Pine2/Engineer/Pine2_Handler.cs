@@ -69,6 +69,8 @@ namespace Root_Pine2.Engineer
             if (m_pine2.p_b3D) SendSortInfo(m_aBoats[Vision2D.eVision.Top3D], infoStrip);
             SendSortInfo(m_aBoats[Vision2D.eVision.Top2D], infoStrip);
             SendSortInfo(m_aBoats[Vision2D.eVision.Bottom], infoStrip);
+            string sRun = m_summary.SetSort(m_pine2.p_b3D, infoStrip); 
+            if (sRun != "OK") m_pine2.m_alidSummary.Run(true, sRun);
         }
 
         void SendSortInfo(Boats boats, InfoStrip infoStrip)
@@ -128,6 +130,7 @@ namespace Root_Pine2.Engineer
         public Loader1 m_loader1;
         public Loader2 m_loader2;
         public Loader3 m_loader3;
+        public Summary m_summary = new Summary(); 
         void InitModule()
         {
             m_swInit.Start(); 

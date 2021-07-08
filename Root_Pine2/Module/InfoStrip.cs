@@ -47,7 +47,7 @@ namespace Root_Pine2.Module
             get { return m_bInspect[Vision2D.eVision.Top3D] || m_bInspect[Vision2D.eVision.Top2D] || m_bInspect[Vision2D.eVision.Bottom]; }
         }
 
-        Summary.Data m_summnayData = new Summary.Data(); 
+        public Summary.Data m_summnayData = new Summary.Data(); 
         public string SetResult(Vision2D.eVision eVision, string sStripResult, string sX, string sY, string sMapResult)
         {
             string sResult = "OK";
