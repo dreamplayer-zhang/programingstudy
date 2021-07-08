@@ -9,7 +9,7 @@
         <Border Margin="1"
                 x:Name="Arrow"
                 Width="20"
-                Background="LightBlue">
+                Background="{StaticResource ButtonBackGroundColor}">
             <TextBlock Text=">"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"/>
@@ -19,7 +19,8 @@
                 Content="Name"
                 x:Name="Btn"
                 Cursor="Hand"
-                Background="LightBlue"
+                Foreground="{StaticResource TextBlack}"
+                Background="{StaticResource ButtonBackGroundColor}"
                 BorderBrush="{x:Null}"/>
 
     </StackPanel>

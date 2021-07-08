@@ -24,20 +24,22 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <GroupBox Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="3">
-                <GroupBox.Header>
-                    <TextBlock Text="EQ" Foreground="Black" FontWeight="Bold" />
-                </GroupBox.Header>
-                <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal" Margin="3">
-                        <Label Content="EQ :" Margin="3"/>
-                        <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="3"/>
+            <Grid Grid.Column="0" x:Name="gridEQ">
+                <GroupBox BorderBrush="Black" BorderThickness="1" Margin="3">
+                    <GroupBox.Header>
+                        <TextBlock Text="EQ" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal" Margin="3">
+                            <Label Content="EQ :" Margin="3"/>
+                            <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="3"/>
+                        </StackPanel>
+                        <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="3"/>
+                        <CheckBox x:Name="checkBoxPause" Content="EQ.Pause" IsChecked="{Binding p_bPause}" Margin="3"/>
+                        <CheckBox x:Name="checkBoxSimulate" Content="EQ.Simulate" IsChecked="{Binding p_bSimulate}" Margin="3"/>
                     </StackPanel>
-                    <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="3"/>
-                    <CheckBox x:Name="checkBoxPause" Content="EQ.Pause" IsChecked="{Binding p_bPause}" Margin="3"/>
-                    <CheckBox x:Name="checkBoxSimulate" Content="EQ.Simulate" IsChecked="{Binding p_bSimulate}" Margin="3"/>
-                </StackPanel>
-            </GroupBox>
+                </GroupBox>
+            </Grid>
             <GroupBox Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="3">
                 <GroupBox.Header>
                     <TextBlock Text="Run" Foreground="Black" FontWeight="Bold" />

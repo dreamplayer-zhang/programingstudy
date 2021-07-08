@@ -27,6 +27,7 @@ namespace RootTools_Vision
     [XmlInclude(typeof(ProcessDefectWaferParameter))]
     [XmlInclude(typeof(ProcessDefectBacksideParameter))]
     [XmlInclude(typeof(ProcessMeasurementParameter))]
+    [XmlInclude(typeof(EUVPodSurfaceParameter))]
 
     //[XmlType(TypeName = "Parameter")]
     public abstract class ParameterBase : ObservableObject, IComparable<ParameterBase>, IRecipe

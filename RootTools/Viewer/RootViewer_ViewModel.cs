@@ -45,7 +45,7 @@ namespace RootTools
             }
             InitCrossLine();
         }
-        private IDialogService m_DialogService;
+        protected IDialogService m_DialogService;
 
         StopWatch m_swMouse = new StopWatch();
         CPoint m_ptViewBuffer = new CPoint();
@@ -303,7 +303,7 @@ namespace RootTools
                 SetProperty(ref m_View_Rect, value);
             }
         }
-        private int m_CanvasWidth = 100;
+        protected int m_CanvasWidth = 100;
         public int p_CanvasWidth
         {
             get
@@ -451,8 +451,8 @@ namespace RootTools
                 SetProperty(ref m_Cursor, value);
             }
         }
-        private int m_MouseX = 0;
-        public int p_MouseX
+        protected int m_MouseX = 0;
+        public virtual int p_MouseX
         {
             get
             {
@@ -726,7 +726,7 @@ namespace RootTools
         }
 
         bool isUpdate = false;
-        public unsafe void SetImageSource()
+        public virtual unsafe void SetImageSource()
         {
 			try
 			{
@@ -1879,7 +1879,7 @@ namespace RootTools
             if (p_ImageData != null)
                 p_ImageData.ClearImage();
         }
-        void _CancelCopy()
+        protected void _CancelCopy()
         {
             if (p_ImageData.Worker_MemoryCopy.IsBusy)
             {

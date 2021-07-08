@@ -187,11 +187,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Engineer\Pine2_ALID_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Engineer\Pine2_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Engineer\Pine2_Handler_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Engineer\Pine2_Main_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -207,6 +215,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Engineer\Pine2_ALID_UI.xaml.cs">
+      <DependentUpon>Pine2_ALID_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Engineer\Pine2_Engineer.cs" />
     <Compile Include="Engineer\Pine2_Engineer_UI.xaml.cs">
       <DependentUpon>Pine2_Engineer_UI.xaml</DependentUpon>
@@ -214,6 +225,9 @@
     <Compile Include="Engineer\Pine2_Handler.cs" />
     <Compile Include="Engineer\Pine2_Handler_UI.xaml.cs">
       <DependentUpon>Pine2_Handler_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Engineer\Pine2_Main_UI.xaml.cs">
+      <DependentUpon>Pine2_Main_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Engineer\Pine2_Process.cs" />
     <Compile Include="Engineer\Pine2_Process_UI.xaml.cs">
@@ -269,6 +283,7 @@
     <Compile Include="Module\Picker.cs" />
     <Compile Include="Module\Loader0.cs" />
     <Compile Include="Module\Pine2.cs" />
+    <Compile Include="Module\Summary.cs" />
     <Compile Include="Module\Transfer.cs" />
     <Compile Include="Module\Transfer_UI.xaml.cs">
       <DependentUpon>Transfer_UI.xaml</DependentUpon>

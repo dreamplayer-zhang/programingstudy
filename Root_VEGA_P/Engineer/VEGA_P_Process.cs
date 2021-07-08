@@ -88,7 +88,8 @@ namespace Root_VEGA_P.Engineer
 
         public string RunProcess()
         {
-            if (m_qModuleRun.Count == 0) return "OK";
+            if (m_qModuleRun.Count == 0) 
+                return "OK";
             ModuleRunBase run = m_qModuleRun.Peek();
             if (run is RTR.Run_GetPut)
             {

@@ -74,5 +74,14 @@ namespace Root_Pine2.Module
             if (m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down] == false) return;
             m_magazineEV.StartUnload();
         }
+
+        private void gridInfo_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            switch (m_magazineEV.p_eState)
+            {
+                case ModuleBase.eState.Init: m_magazineEV.p_eState = ModuleBase.eState.Home; break;
+                case ModuleBase.eState.Error: m_magazineEV.Reset(); break;
+            }
+        }
     }
 }

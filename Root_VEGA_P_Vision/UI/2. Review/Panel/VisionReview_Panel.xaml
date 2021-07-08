@@ -38,16 +38,6 @@
                                 </Grid.ColumnDefinitions>
                                 <GroupBox Grid.Column="0" Header="Top">
                                     <Canvas>
-                                        <Ellipse Width="15"
-                                             Height="15"
-                                             HorizontalAlignment="Center"
-                                             VerticalAlignment="Center"
-                                             Fill="ForestGreen" Canvas.Left="85" Canvas.Top="74"/>
-                                        <Ellipse Width="8"
-                                            Height="8"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Fill="Navy" Canvas.Left="204" Canvas.Top="169"/>
                                         <Canvas.Background>
                                             <ImageBrush ImageSource="../../../Resources/EIPCoverTop.jpg"/>
                                         </Canvas.Background>
@@ -96,16 +86,6 @@
                                 </GroupBox>
                                 <GroupBox Grid.Column="1" Header="Bottom">
                                     <Canvas>
-                                        <Ellipse Width="15"
-                                             Height="15"
-                                             HorizontalAlignment="Center"
-                                             VerticalAlignment="Center"
-                                             Fill="ForestGreen" Canvas.Left="212" Canvas.Top="89"/>
-                                        <Ellipse Width="23"
-                                            Height="23"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Fill="Crimson" Canvas.Left="97" Canvas.Top="165"/>
                                         <Canvas.Background>
                                             <ImageBrush ImageSource="../../../Resources/EIPBasePlateBottom.jpg"/>
                                         </Canvas.Background>
@@ -141,58 +121,34 @@
                                 <ColumnDefinition/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0" VerticalAlignment="Center">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="2*"/>
-                                    <ColumnDefinition Width="2*"/>
-                                </Grid.ColumnDefinitions>
-                                <CheckBox Grid.Column="0" Content="Stain" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
-                                <Canvas Grid.Column="1">
-                                    <Ellipse Width="8"
-                                             Height="8"
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Orientation="Horizontal">
+                                <CheckBox Content="Stain"/>
+                                <Ellipse Width="10"
+                                             Height="10"
                                              HorizontalAlignment="Center"
                                              VerticalAlignment="Center"
-                                             Fill="Crimson" Canvas.Left="16" Canvas.Top="3"/>
-                                </Canvas>
-                                <TextBlock Grid.Column="2" Text="1EA" VerticalAlignment="Stretch" HorizontalAlignment="Left"/>
-                            </Grid>
+                                             Fill="Crimson" Canvas.Left="16" Canvas.Top="3" Margin="10,0,0,0"/>
+                                <TextBlock Text="1EA" Margin="3,0,0,0"/>
+                            </StackPanel>
 
-                            <Grid Grid.Column="1" VerticalAlignment="Center">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="2*"/>
-                                    <ColumnDefinition Width="2*"/>
-                                </Grid.ColumnDefinitions>
-                                <CheckBox Grid.Column="0" Content="6um" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
-                                <Canvas Grid.Column="1">
-                                    <Ellipse Width="8"
-                                             Height="8"
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal">
+                                <CheckBox Content="6um"/>
+                                <Ellipse Width="10"
+                                             Height="10"
                                              HorizontalAlignment="Center"
                                              VerticalAlignment="Center"
-                                             Fill="ForestGreen" Canvas.Left="16" Canvas.Top="3"/>
-                                </Canvas>
-                                <TextBlock Grid.Column="2" Text="2EA" VerticalAlignment="Stretch" HorizontalAlignment="Left"/>
-                            </Grid>
-                            <Grid Grid.Column="2" VerticalAlignment="Center">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="2*"/>
-                                    <ColumnDefinition Width="2*"/>
-                                </Grid.ColumnDefinitions>
-                                <CheckBox Grid.Column="0" Content="1um" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
-                                <Canvas Grid.Column="1">
-                                    <Ellipse Width="8"
-                                             Height="8"
+                                             Fill="ForestGreen" Canvas.Left="16" Canvas.Top="3" Margin="10,0,0,0"/>
+                                <TextBlock Text="2EA" Margin="3,0,0,0"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal">
+                                <CheckBox Content="Stacking"/>
+                                <Ellipse Width="10"
+                                             Height="10"
                                              HorizontalAlignment="Center"
                                              VerticalAlignment="Center"
-                                             Fill="Navy" Canvas.Left="16" Canvas.Top="3"/>
-                                </Canvas>
-                                <TextBlock Grid.Column="2" Text="1EA"  VerticalAlignment="Stretch" HorizontalAlignment="Left"/>
-                            </Grid>
+                                             Fill="Navy" Canvas.Left="16" Canvas.Top="3" Margin="10,0,0,0"/>
+                                <TextBlock Text="2EA" Margin="3,0,0,0"/>
+                            </StackPanel>
 
                         </Grid>
 

@@ -251,17 +251,22 @@ namespace RootTools.Camera.CognexDM150
         #endregion
 
         #region Read BCD
-        public void ReadBCD()
+        public string ReadBCD()
         {
             m_bReadDone = false;
             try
             {
+                if (m_rs232.m_connect == null)
+                    Connect();
+
                 m_dm.SendCommand("TRIGGER ON");
             }
-            catch
+            catch(Exception e)
             {
                 m_log.Info("Send Command Fail !!");
+                return "Send Command Fail !!";
             }
+            return "OK";
         }
         #endregion
 
