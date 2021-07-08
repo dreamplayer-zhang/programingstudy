@@ -7,37 +7,31 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
-             d:DesignHeight="836" d:DesignWidth="1912" 
-             Background="{StaticResource PanelBackGround}">
+             d:DesignHeight="836" d:DesignWidth="1912">
     <Grid>
-        <TabControl Grid.Column="1" x:Name="MaskViewerTab">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="9*"/>
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="1" x:Name="MaskViewerTab" Style="{StaticResource ImageViewerTabControlStyle}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding TabChanged}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-            <TabItem Header="EIP Cover Top" Width="120" >
-                <GroupBox Header="Viewer">
+            <TabItem Header="EIP Cover Top" Width="120" Style="{StaticResource ImageViewerTabItemStyle}">
                     <Tools:RootViewer DataContext="{Binding EIPCoverTop_ImageViewerVM}"/>
-                </GroupBox>
             </TabItem>
             <TabItem Header="EIP Cover Bottom"
-                                 Width="120">
-                <GroupBox Header="Viewer">
+                                 Width="120" Style="{StaticResource ImageViewerTabItemStyle}">
                     <Tools:RootViewer DataContext="{Binding EIPCoverBottom_ImaageViewerVM}"/>
-                </GroupBox>
             </TabItem>
             <TabItem Header="EIP Base Top"
-                                 Width="120">
-                <GroupBox Header="Viewer">
+                                 Width="120" Style="{StaticResource ImageViewerTabItemStyle}">
                     <Tools:RootViewer DataContext="{Binding EIPBaseTop_ImageViewerVM}"/>
-                </GroupBox>
             </TabItem>
             <TabItem Header="EIP Base Bottom"
-                                 Width="120">
-                <GroupBox Header="Viewer">
+                                 Width="120" Style="{StaticResource ImageViewerTabItemStyle}">
                     <Tools:RootViewer DataContext="{Binding EIPBaseBottom_ImageViewerVM}"/>
-                </GroupBox>
             </TabItem>
         </TabControl>
 
