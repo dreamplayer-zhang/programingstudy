@@ -637,7 +637,7 @@ namespace Root_Pine2_Vision.Module
                         }
                         else  // 역방향
                         {
-                            m_aSnap[i].m_eDirection = Snap.eDirection.Backward;
+                            m_aSnap[i].m_eDirection = Snap.eDirection.Backward/*Backward*/;
                             //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
                         }
 
