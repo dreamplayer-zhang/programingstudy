@@ -106,6 +106,9 @@ namespace Root_WindII
         {
             base.PreviewMouseDown(sender, e);
 
+            if (this.p_ImageData == null)
+                return;
+
             if (m_KeyEvent != null)
                 if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
                     return;
