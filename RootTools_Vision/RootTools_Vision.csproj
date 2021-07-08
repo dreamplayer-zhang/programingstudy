@@ -192,6 +192,7 @@
     <Compile Include="Recipe\Recipe\EUVPod\LowResRecipe.cs" />
     <Compile Include="Recipe\Recipe\EUVPod\SideRecipe.cs" />
     <Compile Include="Recipe\Recipe\EUVPod\StainRecipe.cs" />
+    <Compile Include="Recipe\Recipe\FrontVRSAlignRecipe.cs" />
     <Compile Include="Recipe\Recipe\FrontAlignRecipe.cs" />
     <Compile Include="Recipe\Recipe\OriginRecipe.cs" />
     <Compile Include="Recipe\Recipe\VerticalWireRecipe.cs" />

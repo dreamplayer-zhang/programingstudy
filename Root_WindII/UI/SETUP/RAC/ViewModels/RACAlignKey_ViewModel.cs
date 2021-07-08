@@ -77,46 +77,6 @@ namespace Root_WindII
                 SetProperty<Image>(ref this.selectedFeatureItem, value);
             }
         }
-
-        private long firstAxisPositionX = 0;
-        public long FirstAxisPositionX
-        {
-            get => this.firstAxisPositionX;
-            set
-            {
-                SetProperty(ref this.firstAxisPositionX, value);
-            }
-        }
-
-        private long firstAxisPositionY = 0;
-        public long FirstAxisPositionY
-        {
-            get => this.firstAxisPositionY;
-            set
-            {
-                SetProperty(ref this.firstAxisPositionY, value);
-            }
-        }
-
-        private long secondAxisPositionX = 0;
-        public long SecondAxisPositionX
-        {
-            get => this.secondAxisPositionX;
-            set
-            {
-                SetProperty(ref this.secondAxisPositionX, value);
-            }
-        }
-
-        private long secondAxisPositionY = 0;
-        public long SecondAxisPositionY
-        {
-            get => this.secondAxisPositionY;
-            set
-            {
-                SetProperty(ref this.secondAxisPositionY, value);
-            }
-        }
         #endregion
 
 
@@ -128,7 +88,7 @@ namespace Root_WindII
             this.motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
             this.motionViewerVM = new MotionViewer_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
 
-            if (visionModule.p_CamVRS != null)
+            if (visionModule.p_CamVRS.IsConnected() == true)
             {
                 this.ImageViewerVM.SetImageData(visionModule.p_CamVRS.p_ImageViewer.p_ImageData);
                 this.visionModule.p_CamVRS.Grabed += this.ImageViewerVM.OnUpdateImage;
@@ -242,48 +202,19 @@ namespace Root_WindII
             });
         }
 
-        public ICommand btnSetFirstAxisPositionCommond
-        {
-            get => new RelayCommand(() =>
-            {
-                this.FirstAxisPositionX = (long)VisionModule.AxisXY.p_axisX.p_posActual;
-                this.FirstAxisPositionY = (long)VisionModule.AxisXY.p_axisY.p_posActual;
-
-                FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
-
-                alignRecipe.FirstSearchPointX = this.FirstAxisPositionX;
-                alignRecipe.FirstSearchPointY = this.FirstAxisPositionY;
-
-            });
-        }
-
-        public ICommand btnSetSecondAxisPositionCommond
-        {
-            get => new RelayCommand(() =>
-            {
-                this.SecondAxisPositionX = (long)VisionModule.AxisXY.p_axisX.p_posActual;
-                this.SecondAxisPositionY = (long)VisionModule.AxisXY.p_axisY.p_posActual;
-
-                FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
-
-                alignRecipe.SecondSearchPointX = this.SecondAxisPositionX;
-                alignRecipe.SecondSearchPointY = this.SecondAxisPositionY;
-            });
-        }
-
         public ICommand btnFeatureAddCommand
         {
             get => new RelayCommand(() =>
             {
-                FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+                FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
 
                 ImageData featureImageData = this.ImageViewerVM.BoxImage;
 
                 byte[] srcBuf = featureImageData.m_aBuf;
-                byte[] rawData = new byte[featureImageData.p_Size.X * featureImageData.p_Size.Y];
+                byte[] rawData = new byte[featureImageData.p_Size.X * featureImageData.p_Size.Y * featureImageData.p_nByte];
                 Array.Copy(srcBuf, rawData, srcBuf.Length);
 
-                alignRecipe.AddAlignFeature(0, 0, featureImageData.p_Size.X, featureImageData.p_Size.Y, 1, rawData);
+                alignRecipe.AddAlignFeature(0, 0, featureImageData.p_Size.X, featureImageData.p_Size.Y, featureImageData.p_nByte, rawData);
 
                 RefreshFeatureItemList();
             });
@@ -295,10 +226,10 @@ namespace Root_WindII
             {
                 if (SelectedFeatureItem == null) return;
 
-                FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+                FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
 
                 int index = FeatureItemList.IndexOf(SelectedFeatureItem);
-                alignRecipe.AlignFeatureList.RemoveAt(index);
+                alignRecipe.AlignFeatureVRSList.RemoveAt(index);
 
                 this.FeatureItemList.Remove(SelectedFeatureItem);
                 SelectedFeatureItem = null;
@@ -317,19 +248,19 @@ namespace Root_WindII
         #region [Method]
         private void ClearFeatureList()
         {
-            this.featureItemList.Clear();
+            this.FeatureItemList.Clear();
 
-            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
-            alignRecipe.AlignFeatureList.Clear();
+            FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
+            alignRecipe.AlignFeatureVRSList.Clear();
         }
 
         private void RefreshFeatureItemList()
         {
             this.FeatureItemList.Clear();
 
-            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+            FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
 
-            foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureList)
+            foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureVRSList)
             {
                 Image image = new Image();
 
@@ -346,12 +277,7 @@ namespace Root_WindII
 
         public void LoadRecipe()
         {
-            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
-
-            this.FirstAxisPositionX = alignRecipe.FirstSearchPointX;
-            this.FirstAxisPositionY = alignRecipe.FirstSearchPointY;
-            this.SecondAxisPositionX = alignRecipe.SecondSearchPointX;
-            this.SecondAxisPositionY = alignRecipe.SecondSearchPointY;
+            FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
 
             RefreshFeatureItemList();
         }

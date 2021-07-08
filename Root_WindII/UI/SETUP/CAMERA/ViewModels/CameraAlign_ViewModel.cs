@@ -129,7 +129,7 @@ namespace Root_WindII
             this.motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
             this.motionViewerVM = new MotionViewer_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
 
-            if(visionModule.p_CamAlign != null)
+            if(visionModule.p_CamAlign.IsConnected() == true)
             {
                 this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
                 this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
@@ -327,10 +327,10 @@ namespace Root_WindII
                 ImageData featureImageData = this.ImageViewerVM.BoxImage;
 
                 byte[] srcBuf = featureImageData.m_aBuf;
-                byte[] rawData = new byte[featureImageData.p_Size.X * featureImageData.p_Size.Y];
+                byte[] rawData = new byte[featureImageData.p_Size.X * featureImageData.p_Size.Y * featureImageData.p_nByte];
                 Array.Copy(srcBuf, rawData, srcBuf.Length);
 
-                alignRecipe.AddAlignFeature(0, 0, featureImageData.p_Size.X, featureImageData.p_Size.Y, 1, rawData);
+                alignRecipe.AddAlignFeature(0, 0, featureImageData.p_Size.X, featureImageData.p_Size.Y, featureImageData.p_nByte, rawData);
 
                 RefreshFeatureItemList();
             });
