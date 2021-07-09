@@ -31,11 +31,11 @@ namespace Root_Pine2.Module
                     }
                     public List<List<eResult>> m_aUnit = new List<List<eResult>>();
                     public CPoint m_szMap = null;
-                    public void SetResult(CPoint szMap, string sMapResult)
+                    public void SetResult(CPoint szMap, bool bTop, string sMapResult)
                     {
                         m_szMap = szMap;
                         InitMap(); 
-                        int x = 0;
+                        int x = bTop ? 0 : szMap.X - 1;
                         int y = 0;
                         foreach (char c in sMapResult)
                         {
@@ -47,10 +47,10 @@ namespace Root_Pine2.Module
                                 case '5': m_aUnit[y][x] = eResult.XOut; break;
                                 default: m_aUnit[y][x] = eResult.Unknown; break;
                             }
-                            x++;
+                            if (bTop) x++; else x--; 
                             if (x >= m_szMap.X)
                             {
-                                x = 0;
+                                x = x = bTop ? 0 : szMap.X - 1;
                                 y++;
                             }
                         }
@@ -104,17 +104,17 @@ namespace Root_Pine2.Module
                 }
                 public eResult m_eResult = eResult.Good;
                 
-                public void SetResult(InfoStrip.eResult result, CPoint szMap, string sMapResult)
+                public void SetResult(InfoStrip.eResult result, CPoint szMap, bool bTop, string sMapResult)
                 {
                     switch (result)
                     {
                         case InfoStrip.eResult.GOOD: 
                             m_eResult = eResult.Good;
-                            m_unit.SetResult(szMap, sMapResult); 
+                            m_unit.SetResult(szMap, bTop, sMapResult); 
                             break;
                         case InfoStrip.eResult.DEF: 
                             m_eResult = eResult.Defect;
-                            m_unit.SetResult(szMap, sMapResult); 
+                            m_unit.SetResult(szMap, bTop, sMapResult); 
                             break;
                         case InfoStrip.eResult.POS: m_eResult = eResult.PosError; break;
                         case InfoStrip.eResult.BCD: m_eResult = eResult.Barcode; break; 
@@ -143,7 +143,7 @@ namespace Root_Pine2.Module
                     case Vision2D.eVision.Top2D: eVision = eVision.Top2D; break;
                     case Vision2D.eVision.Bottom: eVision = eVision.Bottom; break;
                 }
-                m_aStrip[eVision].SetResult(result, szMap, sMapResult); 
+                m_aStrip[eVision].SetResult(result, szMap, vision != Vision2D.eVision.Bottom, sMapResult); 
             }
 
             public CPoint m_szMap = new CPoint(); 
