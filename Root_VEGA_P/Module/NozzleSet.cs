@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_VEGA_P_Vision;
+using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
@@ -88,9 +89,11 @@ namespace Root_VEGA_P.Module
         {
             get
             {
+                PodIDInfo podIDInfo = new PodIDInfo();
+                podIDInfo.ReadReg();
                 List<string> asFile = new List<string>();
                 string sExt = "." + m_sExt; 
-                string sPath = App.RecipeRootPath + "\\Nozzle";
+                string sPath = App.RecipeRootPath +podIDInfo.DualPodID+ "\\Nozzle";
                 DirectoryInfo directory = new DirectoryInfo(sPath);
                 if (!directory.Exists)
                     directory.Create();
@@ -104,7 +107,9 @@ namespace Root_VEGA_P.Module
 
         public void FileSave(string sFile)
         {
-            string sPath = App.RecipeRootPath + "\\Nozzle"; 
+            PodIDInfo podIDInfo = new PodIDInfo();
+            podIDInfo.ReadReg();
+            string sPath = App.RecipeRootPath + podIDInfo.DualPodID + "\\Nozzle"; 
             Directory.CreateDirectory(sPath);
             Job job = new Job(sPath + "\\" + sFile + "." +m_sExt, true, m_module.m_log);
             m_treeRootJob.m_job = job;
@@ -116,7 +121,10 @@ namespace Root_VEGA_P.Module
 
         public void FileOpen(string sFile)
         {
-            string sPath = App.RecipeRootPath + "\\Nozzle";
+            PodIDInfo podIDInfo = new PodIDInfo();
+            podIDInfo.ReadReg();
+
+            string sPath = App.RecipeRootPath + podIDInfo.DualPodID + "\\Nozzle";
             Directory.CreateDirectory(sPath);
             Job job = new Job(sPath + "\\" + sFile + "." + m_sExt, false, m_module.m_log);
             m_treeRootJob.m_job = job;
@@ -128,21 +136,27 @@ namespace Root_VEGA_P.Module
 
         public void FileSave()
         {
+            PodIDInfo podIDInfo = new PodIDInfo();
+            podIDInfo.ReadReg();
+
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.DefaultExt = "." + m_sExt;
             dlg.Filter = "Nozzle File (*." + m_sExt + ")|*." + m_sExt;
-            dlg.InitialDirectory = App.RecipeRootPath + "\\Nozzle";
+            dlg.InitialDirectory = App.RecipeRootPath +podIDInfo.DualPodID+ "\\Nozzle";
             if (dlg.ShowDialog() == false) return;
             FileSave(GetFileTitle(dlg.SafeFileName)); 
         }
 
         public void FileOpen()
         {
+            PodIDInfo podIDInfo = new PodIDInfo();
+            podIDInfo.ReadReg();
+
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             string sExt = "." + m_sExt; 
             dlg.DefaultExt = sExt;
             dlg.Filter = "Nozzle File (*" + sExt + ")|*" + sExt;
-            dlg.InitialDirectory = App.RecipeRootPath + "\\Nozzle";
+            dlg.InitialDirectory = App.RecipeRootPath+podIDInfo.DualPodID + "\\Nozzle";
             if (dlg.ShowDialog() == false) return;
             FileOpen(GetFileTitle(dlg.SafeFileName));
         }
