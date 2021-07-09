@@ -39,5 +39,10 @@ namespace Root_VEGA_P
                 SubPanel = MainT;
             });
         }
+        public ICommand btnOperate
+        {
+            get => new RelayCommand(() => { 
+            });
+        }
     }
 }
