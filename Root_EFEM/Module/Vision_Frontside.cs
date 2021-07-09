@@ -575,7 +575,7 @@ namespace Root_EFEM
             AddModuleRunList(new Run_GrabLineScan(this), true, "Run Grab LineScan Camera");
             AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
             AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
-            //AddModuleRunList(new Run_VisionVRS(this), true, "Run VisionVRS");
+            AddModuleRunList(new Run_VRSAlign(this), true, "Run VRSAlign");
             //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
         }
         #endregion

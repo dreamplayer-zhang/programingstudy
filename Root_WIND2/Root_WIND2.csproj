@@ -218,6 +218,11 @@
     </Compile>
     <Compile Include="Dialog\Dialog_MapCreator_ImageViewer_ViewModel.cs" />
     <Compile Include="Dialog\Dialog_MapCreator_ViewModel.cs" />
+    <Compile Include="Dialog\ManualAlignViewer.xaml.cs">
+      <DependentUpon>ManualAlignViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\ManualAlignViewer_ImageViewer_ViewModel.cs" />
+    <Compile Include="Dialog\ManualAlignViewer_ViewModel.cs" />
     <Compile Include="Module\Vision\Run_InspectOnly.cs" />
     <Compile Include="Recipe\RecipeAlign.cs" />
     <Compile Include="Tools\Constants.cs" />
@@ -591,6 +596,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\Dialog_MapCreator.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialog\ManualAlignViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

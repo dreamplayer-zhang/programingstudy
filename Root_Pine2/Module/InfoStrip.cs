@@ -47,7 +47,7 @@ namespace Root_Pine2.Module
             get { return m_bInspect[Vision2D.eVision.Top3D] || m_bInspect[Vision2D.eVision.Top2D] || m_bInspect[Vision2D.eVision.Bottom]; }
         }
 
-        public CPoint m_szMap = new CPoint();
+        public Summary.Data m_summnayData = new Summary.Data(); 
         public string SetResult(Vision2D.eVision eVision, string sStripResult, string sX, string sY, string sMapResult)
         {
             string sResult = "OK";
@@ -56,9 +56,9 @@ namespace Root_Pine2.Module
                 eResult eResult = GetResult(sStripResult);
                 if (eResult == eResult.Init) return "Invalid Result"; 
                 if (p_eResult < eResult) p_eResult = eResult; 
-                m_szMap.X = Convert.ToInt32(sX);
-                m_szMap.Y = Convert.ToInt32(sY);
-                SetMapResult(sMapResult); 
+                int szX = Convert.ToInt32(sX);
+                int szY = Convert.ToInt32(sY);
+                m_summnayData.SetResult(eVision, eResult, new CPoint(szX, szY), sMapResult); 
             }
             catch (Exception e) { sResult = "SetResult Exception : " + e.Message; }
             m_bInspect[eVision] = false; 
@@ -72,30 +72,6 @@ namespace Root_Pine2.Module
                 if (sStripResult == eResult.ToString()) return eResult; 
             }
             return eResult.Init; 
-        }
-
-        public List<List<int>> m_aMapResult = new List<List<int>>();
-        void SetMapResult(string sMapResult)
-        {
-            while (m_aMapResult.Count < m_szMap.Y) m_aMapResult.Add(new List<int>()); 
-            for (int yp = 0; yp < m_szMap.Y; yp++)
-            {
-                while (m_aMapResult[yp].Count < m_szMap.X) m_aMapResult[yp].Add(1); 
-            }
-            int y = 0;
-            int x = 0;
-            foreach (char c in sMapResult)
-            {
-                switch (c)
-                {
-                    case '0': if (m_aMapResult[y][x] == 1) m_aMapResult[y][x] = 0; break;
-                    case '1': break;
-                    default:
-                        int n = c - '0';
-                        if (m_aMapResult[y][x] < n) m_aMapResult[y][x] = n;
-                        break; 
-                }
-            }
         }
         #endregion
 
