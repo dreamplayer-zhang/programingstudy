@@ -12,10 +12,10 @@ namespace Root_Pine2.Module
         {
             public enum eVision
             {
+                Total,
                 Top3D,
                 Top2D,
                 Bottom,
-                Total
             }
             public class Strip
             {
@@ -77,6 +77,21 @@ namespace Root_Pine2.Module
                             while (m_aUnit[yp].Count < m_szMap.X) m_aUnit[yp].Add(eResult.Good);
                         }
                     }
+
+                    public Dictionary<eResult, int> m_aCount = new Dictionary<eResult, int>();
+                    public void CalcCount()
+                    {
+                        foreach (eResult eResult in Enum.GetValues(typeof(eResult))) m_aCount[eResult] = 0;
+                        for (int y = 0; y < m_szMap.Y; y++)
+                        {
+                            for (int x = 0; x < m_szMap.X; x++) m_aCount[m_aUnit[y][x]]++;
+                        }
+                    }
+
+                    public Unit()
+                    {
+                        foreach (eResult eResult in Enum.GetValues(typeof(eResult))) m_aCount.Add(eResult, 0); 
+                    }
                 }
                 public Unit m_unit = new Unit(); 
 
@@ -111,14 +126,12 @@ namespace Root_Pine2.Module
                     m_eResult = (eResult)Math.Max((int)m_eResult, (int)strip.m_eResult);
                     return m_unit.SetSort(strip.m_unit); 
                 }
-            }
-            public Dictionary<eVision, Strip> m_aStrip = new Dictionary<eVision, Strip>();
-            public void InitStrip()
-            {
-                m_aStrip.Add(eVision.Top3D, new Strip());
-                m_aStrip.Add(eVision.Top2D, new Strip());
-                m_aStrip.Add(eVision.Bottom, new Strip());
-                m_aStrip.Add(eVision.Total, new Strip());
+
+                public eVision m_eVision; 
+                public Strip(eVision eVision)
+                {
+                    m_eVision = eVision; 
+                }
             }
 
             public void SetResult(Vision2D.eVision vision, InfoStrip.eResult result, CPoint szMap, string sMapResult)
@@ -133,26 +146,45 @@ namespace Root_Pine2.Module
                 m_aStrip[eVision].SetResult(result, szMap, sMapResult); 
             }
 
+            public CPoint m_szMap = new CPoint(); 
             public string SetSort(bool b3D)
             {
+                m_szMap.X = 0;
+                m_szMap.Y = 0; 
                 string sRun = "";
                 if (b3D)
                 {
                     sRun = m_aStrip[eVision.Total].SetSort(m_aStrip[eVision.Top3D]);
+                    CalcMapSize(m_aStrip[eVision.Top3D].m_unit.m_szMap); 
                     if (sRun != "OK") return sRun;
                 }
                 sRun = m_aStrip[eVision.Total].SetSort(m_aStrip[eVision.Top2D]);
+                CalcMapSize(m_aStrip[eVision.Top2D].m_unit.m_szMap);
                 if (sRun != "OK") return sRun;
                 sRun = m_aStrip[eVision.Total].SetSort(m_aStrip[eVision.Bottom]);
+                CalcMapSize(m_aStrip[eVision.Bottom].m_unit.m_szMap);
                 if (sRun != "OK") return sRun;
                 return "OK";
+            }
+
+            void CalcMapSize(CPoint szMap)
+            {
+                m_szMap.X = Math.Max(m_szMap.X, szMap.X);
+                m_szMap.Y = Math.Max(m_szMap.Y, szMap.Y);
+            }
+
+            public string m_sStripID; 
+            public Dictionary<eVision, Strip> m_aStrip = new Dictionary<eVision, Strip>();
+            public Data()
+            {
+                foreach (eVision eVision in Enum.GetValues(typeof(eVision))) m_aStrip.Add(eVision, new Strip(eVision)); 
             }
         }
         public Data m_data = new Data();
         #endregion
 
         #region Counter
-        public class Count
+        public class CountStrip
         {
             public Dictionary<Data.Strip.eResult, int> m_aCount = new Dictionary<Data.Strip.eResult, int>(); 
             public void Clear()
@@ -160,46 +192,126 @@ namespace Root_Pine2.Module
                 foreach (Data.Strip.eResult eResult in Enum.GetValues(typeof(Data.Strip.eResult))) m_aCount[eResult] = 0;
             }
 
-            public void Add(Data.Strip.eResult eResult)
+            public void AddResult(Data.Strip.eResult eResult)
             {
                 m_aCount[eResult]++; 
             }
 
-            public Count()
+            public CountStrip()
             {
                 foreach (Data.Strip.eResult eResult in Enum.GetValues(typeof(Data.Strip.eResult))) m_aCount.Add(eResult, 0); 
             }
         }
-        public Dictionary<Data.eVision, Count> m_countStrip = new Dictionary<Data.eVision, Count>(); 
+        public Dictionary<Data.eVision, CountStrip> m_countStrip = new Dictionary<Data.eVision, CountStrip>();
+
+        public class CountUnit
+        {
+            public Dictionary<Data.Strip.Unit.eResult, int> m_aCount = new Dictionary<Data.Strip.Unit.eResult, int>();
+            public void Clear()
+            {
+                foreach (Data.Strip.Unit.eResult eResult in Enum.GetValues(typeof(Data.Strip.Unit.eResult))) m_aCount[eResult] = 0;
+            }
+
+            public void AddResult(Data.Strip.Unit unit)
+            {
+                foreach (Data.Strip.Unit.eResult eResult in Enum.GetValues(typeof(Data.Strip.Unit.eResult)))
+                {
+                    m_aCount[eResult] += unit.m_aCount[eResult];
+                }
+            }
+
+            public CountUnit()
+            {
+                foreach (Data.Strip.Unit.eResult eResult in Enum.GetValues(typeof(Data.Strip.Unit.eResult))) m_aCount.Add(eResult, 0);
+            }
+        }
+        public Dictionary<Data.eVision, CountUnit> m_countUnit = new Dictionary<Data.eVision, CountUnit>();
+
         public void ClearCount()
         {
-            foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision))) m_countStrip[eVision].Clear(); 
+            foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision)))
+            {
+                m_countStrip[eVision].Clear();
+                m_countUnit[eVision].Clear();
+            }
         }
         #endregion
 
+        #region Time
+        string m_sLot = "";
+        public string m_sLotStart = "";
+        public DateTime m_dtLotStart;
+        public void LotStart(string sLot)
+        {
+            if (sLot == m_sLot) return;
+            m_sLot = sLot;
+            m_dtLotStart = DateTime.Now;
+            m_sLotStart = m_dtLotStart.ToString("HH:mm:ss"); 
+        }
+
+        public string m_sLotTime = "";
+        public string m_sTactTime = "";
+        public string m_sTactAve = "";
+        public void CheckTime()
+        {
+            DateTime dt = DateTime.Now;
+            m_sLotTime = (dt - m_dtLotStart).ToString();
+            AddDateTime(dt);
+            if (m_aTime.Count < 2) return;
+            int nTime = m_aTime.Count - 1;
+            m_sTactTime = GetTactString((m_aTime[nTime] - m_aTime[nTime - 1]).Milliseconds); 
+            m_sTactAve = GetTactString((m_aTime[nTime] - m_aTime[0]).Milliseconds / nTime);
+        }
+
+        List<DateTime> m_aTime = new List<DateTime>();
+        void AddDateTime(DateTime dt)
+        {
+            m_aTime.Add(dt);
+            while (m_aTime.Count > 6) m_aTime.RemoveAt(0); 
+        }
+
+        string GetTactString(int ms)
+        {
+            int sec = ms / 1000;
+            ms %= 1000;
+            return sec.ToString() + "." + (ms / 10).ToString("00"); 
+        }
+        #endregion
+
+        public bool m_bUpdated = false; 
         public string SetSort(bool b3D, InfoStrip infoStrip)
         {
             m_data = infoStrip.m_summnayData;
+            m_data.m_sStripID = infoStrip.p_id; 
             string sRun = m_data.SetSort(b3D);
             if (sRun != "OK") return sRun;
             foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision)))
             {
-                m_countStrip[eVision].Add(m_data.m_aStrip[eVision].m_eResult);
+                m_countStrip[eVision].AddResult(m_data.m_aStrip[eVision].m_eResult);
             }
             switch (m_data.m_aStrip[Data.eVision.Total].m_eResult)
             {
                 case Data.Strip.eResult.Good:
                 case Data.Strip.eResult.Defect:
+                    foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision)))
+                    {
+                        m_data.m_aStrip[eVision].m_unit.CalcCount(); 
+                        m_countUnit[eVision].AddResult(m_data.m_aStrip[eVision].m_unit);
+                    }
                     break; 
             }
-            //forget
+            CheckTime(); 
+            m_bUpdated = true; 
             return "OK";
         }
 
         public Summary()
         {
-            m_data.InitStrip();
-            foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision))) m_countStrip.Add(eVision, new Count());
+            foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision)))
+            {
+                m_countStrip.Add(eVision, new CountStrip());
+                m_countUnit.Add(eVision, new CountUnit());
+            }
         }
     }
 }

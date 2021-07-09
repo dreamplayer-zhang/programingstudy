@@ -208,6 +208,7 @@
         <SolidColorBrush x:Key="Splitter" Color="DimGray"/>
         <!-- ThemColor -->
         <SolidColorBrush x:Key="ButtonSelectedColor" Color="#FF68B882"/>
+        <SolidColorBrush x:Key="WorkingNozzleColor" Color="#8868B882"/>
         <SolidColorBrush x:Key="MainThema" Color="#FF363C58"/>
         <SolidColorBrush x:Key="DisableMainThem" Color="#FF515782"/>
         <SolidColorBrush x:Key="TextBlack" Color="#FF222222"/>
@@ -307,6 +308,8 @@
                          Color="#FFEAEAEA" />
         <!--#endregion-->
 
+        <Style x:Key="NozzleNum" TargetType="TextBlock">
+        </Style>
         <Style x:Key="ImageROIBtn" TargetType="Button">
             <Setter Property="Margin" Value="4,0,4,0"/>
             <Setter Property="Background" Value="Black"/>
