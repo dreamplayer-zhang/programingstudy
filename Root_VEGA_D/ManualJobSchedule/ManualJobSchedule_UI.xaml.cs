@@ -119,6 +119,7 @@ namespace Root_VEGA_D
                 m_handler.CalcSequence();
             }
             EQ.p_nRnR = (bool)checkRnR.IsChecked ? Convert.ToInt32(textboxRnR.Text) : 0;
+            m_handler.m_bIsRNR = (bool)checkRnR.IsChecked ? true : false;
             //if (m_infoWafer != null)
             //{
             //m_infoWafer.p_eState = GemSlotBase.eState.Select;
