@@ -49,15 +49,15 @@ namespace RootTools_Vision
             }
 
             T obj = (T)Activator.CreateInstance(typeof(T), args: param);
-            objectDictionary.Add(_name, obj);
+            objectDictionary.Add(_name.ToLower(), obj);
             return obj;
         }
 
         public T GetNamed<T>(string name)
         {
-            if (objectDictionary.ContainsKey(name) == true)
+            if (objectDictionary.ContainsKey(name.ToLower()) == true)
             {
-                return (T)objectDictionary[name];
+                return (T)objectDictionary[name.ToLower()];
             }
             else
             {
@@ -68,9 +68,9 @@ namespace RootTools_Vision
 
         public void DelistNamed(string name)
         {
-            if (objectDictionary.ContainsKey(name) == true)
+            if (objectDictionary.ContainsKey(name.ToLower()) == true)
             {
-                objectDictionary.Remove(name);
+                objectDictionary.Remove(name.ToLower());
             }
             else
             {
