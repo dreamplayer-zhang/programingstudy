@@ -20,8 +20,8 @@ namespace RootTools.ImageProcess
         public MemoryData memData;
         public string sDirPath = @"C:\Recipe\VEGA_P\";
         public bool bTest = false;
-        public int nTest_afterAvg = 0;
-        public int nTest_beforeAvg = 0;
+        public int nTest_afterAvg = 1;
+        public int nTest_beforeAvg = 1;
         public double dGammaValue = 0;
 
         //마스크 사이즈.
@@ -128,7 +128,7 @@ namespace RootTools.ImageProcess
             DI = new DataInfo_new(mem);
         }
 
-        unsafe public void Run(int nWidth,int nHeight)
+        unsafe public void Run(int nWidth,int nHeight,int cntX, int cntY)
         {
             DI.sw = new Stopwatch();
             Stopwatch total = new Stopwatch();
@@ -143,7 +143,7 @@ namespace RootTools.ImageProcess
             DI.p_nWidth = nWidth;
             ListOfSrc = new Mat[DI.p_nFocusCount];
 
-            CreateSrcData(ref ListOfSrc,nHeight,nWidth);
+            CreateSrcData(ref ListOfSrc,nHeight,nWidth,cntX*nWidth,cntY*nHeight);
 
             //ListofMat
             Mat[] ListOfLaplacianData = new Mat[DI.p_nFocusCount];
@@ -186,7 +186,7 @@ namespace RootTools.ImageProcess
                 CvInvoke.Resize(ListOfLaplacianData[i], ListOfLaplacianData[i], new System.Drawing.Size(0, 0), (double)1 / DI.p_nScale, (double)1 / DI.p_nScale);
             });
 
-            //Console.WriteLine("전처리과정 소요시간 : " + DI.sw.ElapsedMilliseconds + "ms");
+            Console.WriteLine("전처리과정 소요시간 : " + DI.sw.ElapsedMilliseconds + "ms");
 
             Mat res;
             Mat[] ListOfPartImg;
@@ -197,7 +197,7 @@ namespace RootTools.ImageProcess
             Parallel.For(0, res.Height, (j) =>
             {
                 int memWidth = (int)DI.memData.W;
-                IntPtr n_ptr = DI.memData.GetPtr(DI.memData.p_nCount - 1) + j*memWidth;
+                IntPtr n_ptr = DI.memData.GetPtr(DI.memData.p_nCount - 1) + (j+cntY*nHeight)*memWidth+nWidth*cntX;
                 IntPtr ptr = res.DataPointer + j*res.Width;
 
                 Buffer.MemoryCopy((void*)ptr, (void*)n_ptr, res.Width, res.Width);
@@ -211,7 +211,7 @@ namespace RootTools.ImageProcess
         //실질적 연산 함수.
         // 
 
-        unsafe public void CreateSrcData(ref Mat[] SrcMat, int nHeight,int nWidth)
+        unsafe public void CreateSrcData(ref Mat[] SrcMat, int nHeight,int nWidth,int startoffsetX, int startoffsetY)
         {
             MemoryData mem = DI.memData;
             int memcnt = DI.memData.p_nCount-1;
@@ -224,7 +224,7 @@ namespace RootTools.ImageProcess
                 byte* ptr = (byte*)SrcMat[i].DataPointer.ToPointer();
                 Parallel.For(0, height, (j) =>
                 {
-                    Buffer.MemoryCopy(n_ptr + j * mem.W, ptr + j * width, width, width);
+                    Buffer.MemoryCopy(n_ptr + (j+startoffsetY) * mem.W+startoffsetX, ptr + j * width, width, width);
                 });
             }
         }

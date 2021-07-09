@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -47,6 +48,54 @@ namespace Root_VEGA_P_Vision
         }
     }
 
+    public class ListToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (System.Convert.ToInt32(value) > 0)
+            {
+                return Visibility.Collapsed;
+            }
+            return Visibility.Visible;
+            //if((List<typeof()>)value).Count == 0);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class CountToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (System.Convert.ToInt32(value) > 0)
+            {
+                return Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+            //if((List<typeof()>)value).Count == 0);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class InverseBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return !(bool)value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return true;
+        }
+    }
     public class BooleanToVisiblityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -58,6 +107,26 @@ namespace Root_VEGA_P_Vision
             else
             {
                 return Visibility.Collapsed;
+            }
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class InverseBooleanToVisiblityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value)
+            {
+                return Visibility.Collapsed;
+            }
+            else
+            {
+                return Visibility.Visible;
             }
 
         }
@@ -92,7 +161,7 @@ namespace Root_VEGA_P_Vision
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             WindowState state = (WindowState)parameter;
-            for(int i=0;i<values.Length;i++)
+            for (int i = 0; i < values.Length; i++)
             {
                 switch (values[i])
                 {

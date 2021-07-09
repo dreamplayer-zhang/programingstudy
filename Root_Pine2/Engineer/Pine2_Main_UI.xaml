@@ -14,5 +14,10 @@
         </Grid.ColumnDefinitions>
         <local:Pine2_Process_UI x:Name="processUI"/>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+        <TabControl Grid.Column="2">
+            <TabItem x:Name="tabItemALID" Header="ALID">
+                <local:Pine2_ALID_UI x:Name="alidUI"/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>
