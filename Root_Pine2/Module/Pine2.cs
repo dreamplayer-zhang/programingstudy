@@ -180,9 +180,11 @@ namespace Root_Pine2.Module
 
         #region GAF
         public ALID m_alidNewLot;
+        public ALID m_alidSummary;
         void InitALID()
         {
             m_alidNewLot = m_gaf.GetALID(this, "NewLot", "New Lot Communication Error");
+            m_alidSummary = m_gaf.GetALID(this, "Summary", "Summary Error");
         }
         #endregion
 

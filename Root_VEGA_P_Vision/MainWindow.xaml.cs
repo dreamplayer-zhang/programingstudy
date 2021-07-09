@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Root_VEGA_P_Vision.Engineer;
 using RootTools;
+using RootTools.Database;
 using RootTools.Memory;
 using RootTools_Vision;
 using RootTools_Vision.WorkManager3;
@@ -28,17 +29,17 @@ namespace Root_VEGA_P_Vision
 		#region Title Bar
 		private void MinimizeButton_Click(object sender, RoutedEventArgs e)
 		{
-			this.WindowState = WindowState.Minimized;
+			WindowState = WindowState.Minimized;
 		}
 		private void MaximizeButton_Click(object sender, RoutedEventArgs e)
 		{
-			this.WindowState = WindowState.Maximized;
+			WindowState = WindowState.Maximized;
 			NormalizeButton.Visibility = Visibility.Visible;
 			MaximizeButton.Visibility = Visibility.Collapsed;
 		}
 		private void NormalizeButton_Click(object sender, RoutedEventArgs e)
 		{
-			this.WindowState = WindowState.Normal;
+			WindowState = WindowState.Normal;
 			MaximizeButton.Visibility = Visibility.Visible;
 			NormalizeButton.Visibility = Visibility.Collapsed;
 		}
@@ -46,22 +47,22 @@ namespace Root_VEGA_P_Vision
 		{
 			if (e.ClickCount == 2)
 			{
-				if (this.WindowState == WindowState.Maximized)
+				if (WindowState == WindowState.Maximized)
 				{
-					this.WindowState = WindowState.Normal;
+					WindowState = WindowState.Normal;
                     MaximizeButton.Visibility = Visibility.Visible;
                     NormalizeButton.Visibility = Visibility.Collapsed;
                 }
 				else
 				{
-					this.WindowState = WindowState.Maximized;
+					WindowState = WindowState.Maximized;
                     NormalizeButton.Visibility = Visibility.Visible;
                     MaximizeButton.Visibility = Visibility.Collapsed;
                 }
 			}
 			else
 			{
-				this.DragMove();
+				DragMove();
 			}
 		}
 		#endregion
@@ -72,7 +73,7 @@ namespace Root_VEGA_P_Vision
 			if (!Directory.Exists(@"C:\Recipe\Vega_P")) Directory.CreateDirectory(@"C:\Recipe\Vega_P");
 
 			Init();
-			if (this.WindowState == WindowState.Maximized)
+			if (WindowState == WindowState.Maximized)
 			{
 				MaximizeButton.Visibility = Visibility.Collapsed;
 			}
@@ -100,8 +101,11 @@ namespace Root_VEGA_P_Vision
 			UIManager.Instance.MainPanel = MainPanel;
 			UIManager.Instance.ChangeUIMode();
 
+			DatabaseManager.Instance.SetDatabase(1);
+			DatabaseManager.Instance.ValidateDatabase();
+
 			logView.Init(LogView._logView);
-			InitTimer();
+            InitTimer();
         }
 		void CreateGlobalPaths()
 		{
@@ -130,20 +134,21 @@ namespace Root_VEGA_P_Vision
 				int updownlen = Enum.GetValues(UpdownType).Length;
 				int insplen = Enum.GetValues(InspType).Length;
 
-				RecipeVision recipe_VegaP = GlobalObjects.Instance.Register<RecipeVision>();
-				GlobalObjects.Instance.RegisterNamed<ImageData>(App.mMaskLayer, memoryTool.GetMemory(App.mPool, App.mGroup, App.mMaskLayer));
+				RecipeCoverFront recipeCoverFront = GlobalObjects.Instance.Register<RecipeCoverFront>();
+				RecipeCoverBack recipeCoverBack = GlobalObjects.Instance.Register<RecipeCoverBack>();
+				RecipePlateFront recipePlateFront = GlobalObjects.Instance.Register<RecipePlateFront>();
+				RecipePlateBack recipePlateBack = GlobalObjects.Instance.Register<RecipePlateBack>();
 
+				GlobalObjects.Instance.RegisterNamed<ImageData>(App.mMaskLayer, memoryTool.GetMemory(App.mPool, App.mGroup, App.mMaskLayer));
+				GlobalObjects.Instance.Register<PodIDInfo>();
 				foreach (var v in Enum.GetValues(partstype))
                     foreach (var v2 in Enum.GetValues(InspType))
                         foreach (var v3 in Enum.GetValues(UpdownType))
                         {
 							List<IntPtr> li = new List<IntPtr>();
                             string memstr = v.ToString() + "." + v2.ToString() + "." + v3.ToString();
-							//string maskstr = memstr + ".MaskImage";
 							MemoryData memData = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr);
-
                             ImageData Data = GlobalObjects.Instance.RegisterNamed<ImageData>(memstr, memoryTool.GetMemory(App.mPool,App.mGroup,memstr));
-                            //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
                             if (Data.m_MemData!=null)
                             {
 								Data.p_nByte = memData.p_nByte;
@@ -156,7 +161,20 @@ namespace Root_VEGA_P_Vision
 							if(Data.GetPtr()!=IntPtr.Zero)
                             {
 								WorkManager Insp = GlobalObjects.Instance.RegisterNamed<WorkManager>(memstr + ".Inspection",4);
-								Insp.SetRecipe(recipe_VegaP);
+								RecipeBase recipe = recipeCoverBack;
+
+								switch(v)
+                                {
+									case Module.Vision.eParts.EIP_Cover:
+										recipe = v3.Equals(Module.Vision.eUpDown.Front) ? recipeCoverFront : recipeCoverBack;
+										break;
+									case Module.Vision.eParts.EIP_Plate:
+										recipe = v3.Equals(Module.Vision.eUpDown.Front) ? recipePlateFront : recipePlateBack;
+										break;
+                                }
+									
+
+								Insp.SetRecipe(recipe);
 								Insp.SetSharedBuffer(new SharedBufferInfo(
 									Data.p_Size.X,
 									Data.p_Size.Y,
@@ -165,15 +183,14 @@ namespace Root_VEGA_P_Vision
                             }
 						}
 
+
 				foreach(var v in Enum.GetValues(partstype))
 					foreach(var v2 in Enum.GetValues(SideType))
                     {
 						string memstr = v.ToString() + "." + v2.ToString();
-						//string maskstr = memstr + ".MaskImage";
-
+	
 						MemoryData memData = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr);
                         ImageData Data = GlobalObjects.Instance.RegisterNamed<ImageData>(memstr, memoryTool.GetMemory(App.mPool, App.mGroup, memstr));
-                        //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
                         List<IntPtr> li = new List<IntPtr>();
 						if(Data.m_MemData!=null)
                         {
@@ -186,7 +203,19 @@ namespace Root_VEGA_P_Vision
 						if(Data.GetPtr()!=IntPtr.Zero)
                         {
 							WorkManager Insp = GlobalObjects.Instance.RegisterNamed<WorkManager>(memstr + ".Inspection", 4);
-							Insp.SetRecipe(recipe_VegaP);
+							RecipeBase recipe = recipeCoverFront;
+
+							switch (v)
+							{
+								case Module.Vision.eParts.EIP_Cover:
+									recipe =  recipeCoverFront;
+									break;
+								case Module.Vision.eParts.EIP_Plate:
+									recipe = recipePlateFront;
+									break;
+							}
+
+							Insp.SetRecipe(recipe);
 							Insp.SetSharedBuffer(new SharedBufferInfo(
 								Data.p_Size.X,
 								Data.p_Size.Y,

@@ -72,7 +72,7 @@ namespace Root_EFEM.Module.FrontsideVision
                 int nScanLine = 0;
                 int nMMPerUM = 1000;
 
-                double dXScale = m_grabMode.m_dTargetResX_um * 10;
+                double dXScale = m_grabMode.m_dRealResX_um * 10;
                 cpMemoryOffset.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize;
                 m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dTargetResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                 int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dTargetResY_um);  // 웨이퍼 영역의 Y픽셀 갯수

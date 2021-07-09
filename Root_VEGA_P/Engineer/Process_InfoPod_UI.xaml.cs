@@ -36,14 +36,17 @@ namespace Root_VEGA_P.Engineer
             textBlock.Text = ePod.ToString();
             textBlock.Foreground = Brushes.LightGray;
             m_child = child;
+            m_ePod = ePod;
         }
 
+        InfoPod.ePod m_ePod;
         RTR m_rtr = null;
         public void Init(InfoPod.ePod ePod, RTR rtr)
         {
             textBlock.Text = ePod.ToString();
             textBlock.Foreground = Brushes.LightGray;
             m_rtr = rtr;
+            m_ePod = ePod;
         }
 
         public void OnTimer()
@@ -53,7 +56,7 @@ namespace Root_VEGA_P.Engineer
             else
             {
                 m_bTurn = infoPod.p_bTurn;
-                p_bExist = true; 
+                p_bExist = (infoPod.p_ePod==m_ePod); 
             }
         }
     }

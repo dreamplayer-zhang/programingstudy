@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using RootTools.GAFs;
+using System.Windows.Controls;
 
 namespace Root_Pine2.Engineer
 {
@@ -12,12 +13,15 @@ namespace Root_Pine2.Engineer
             InitializeComponent();
         }
 
-        Pine2_Handler m_handler = null;
-        public void Init(Pine2_Handler handler)
+        Pine2_Handler m_handler;
+        GAF m_gaf; 
+        public void Init(Pine2_Engineer engineer)
         {
-            m_handler = handler;
-            processUI.Init(handler);
+            m_handler = (Pine2_Handler)engineer.ClassHandler();
+            m_gaf = engineer.ClassGAF(); 
+            processUI.Init(m_handler);
+            alidUI.Init(m_gaf.m_listALID, engineer);
+            summaryUI.Init(m_handler.m_summary); 
         }
-
     }
 }

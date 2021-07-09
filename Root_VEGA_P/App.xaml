@@ -32,7 +32,11 @@
             <Setter Property="Cursor"
                     Value="Hand" />
         </Style>
-
+        <Style x:Key="HeaderTextBlock" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="ExtraBlack"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="20,0,0,0"/>
+        </Style>
         <BooleanToVisibilityConverter x:Key="BooleanToVisiblity" />
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter" />
         <local:VisibilityToWindowStateConverter x:Key="VisibilityToWindowState" />
@@ -45,9 +49,17 @@
                          Color="Transparent" />
         <SolidColorBrush x:Key="Splitter"
                          Color="DimGray" />
-        <SolidColorBrush x:Key="MainThema"
-                         Color="#FF2D2D50" />
 
+        <!-- ThemColor -->
+        <SolidColorBrush x:Key="ButtonSelectedColor" Color="#FF68B882"/>
+        <SolidColorBrush x:Key="MainThema" Color="#FF363C58"/>
+        <SolidColorBrush x:Key="DisableMainThem" Color="#FF515782"/>
+        <SolidColorBrush x:Key="TextBlack" Color="#FF222222"/>
+        <SolidColorBrush x:Key="TextBodyColor" Color="#FF888888"/>
+        <SolidColorBrush x:Key="BorderSplitColor" Color="#FFCCCCCC"/>
+        <SolidColorBrush x:Key="MainBackGroundColor" Color="#FFEDECEA"/>
+        <SolidColorBrush x:Key="ButtonBackGroundColor" Color="#FF8FDAD6"/>
+        
         <!--#region [Color Definition] -->
         <SolidColorBrush x:Key="main_background"
                          Color="#080820" />
@@ -159,7 +171,73 @@
         <SolidColorBrush x:Key="LightGray"
                          Color="#FFEAEAEA" />
         <!--#endregion-->
+        <Style x:Key="ImageBaseBtn" TargetType="Button">
+            <Setter Property="Padding" Value="15,1,15,1"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Margin" Value="2,0,2,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="5" Background="{StaticResource MainThema}" BorderBrush="#ccc" BorderThickness="0,1,1,0" >
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" 
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="NozzleHeaderText">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="RadioButton" x:Key="SetupPannelRadioBtn">
+            <Setter Property="Margin" Value="4,3,4,3"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border CornerRadius="10" BorderThickness="1.5" 
+                                Width="{TemplateBinding Width}"
+                                Height="40"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Border>
 
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsChecked" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource ButtonSelectedColor}"/>
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </Trigger>
+                            <Trigger  Property="IsChecked" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource MainBackGroundColor}"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
+                                <Setter Property="Background" Value="#FF515782"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="InfoTextBox" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="10"/>
+        </Style>
         <Style x:Key="main_view_groupbox"
                TargetType="GroupBox">
             <Setter Property="BorderBrush"

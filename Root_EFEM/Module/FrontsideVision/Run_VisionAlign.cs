@@ -101,7 +101,7 @@ namespace Root_EFEM.Module.FrontsideVision
             m_dVRSToAlignOffsetZ = tree.Set(m_dVRSToAlignOffsetZ, m_dVRSToAlignOffsetZ, "VRS To Align Offset Z Pos", "VRS To Align Offset Z Pos", bVisible);
 
             // New
-            m_sRecipeName = tree.Set(m_sRecipeName, m_sRecipeName, "Recipe Name", "Recipe Name", bVisible);
+            m_sRecipeName = tree.SetFile(m_sRecipeName, m_sRecipeName, "rcp", "Recipe", "Recipe Name", bVisible);
         }
 
         public override string Run()

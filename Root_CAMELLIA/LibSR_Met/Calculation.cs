@@ -396,6 +396,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
 
                 m_DM.m_RawData[nPointIdx].DCOLTransmittance2.Add(dTAvg);
+                //m_DM.m_RawData[nPointidx].DCOLTransmittance.Add(DCOLData);
             }
             // });
             sw.Stop();

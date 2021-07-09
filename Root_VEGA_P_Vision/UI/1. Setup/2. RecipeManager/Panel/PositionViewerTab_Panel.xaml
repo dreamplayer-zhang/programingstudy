@@ -4,42 +4,28 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TabControl>
-            <TabItem Header="Align">
-                <TabControl>
-                    <TabItem Header="EIP Cover Top">
-                        <Tools:RootViewer DataContext="{Binding p_EIPCoverTop}"/>
-                    </TabItem>
-                    <TabItem Header="EIP Cover Bottom">
-                        <Tools:RootViewer DataContext="{Binding p_EIPCoverBtm}"/>
-                    </TabItem>
-                    <TabItem Header="EIP Base Top">
-                        <Tools:RootViewer DataContext="{Binding p_EIPBaseTop}"/>
-                    </TabItem>
-                    <TabItem Header="EIP Base Top">
-                        <Tools:RootViewer DataContext="{Binding p_EIPBaseBtm}"/>
-                    </TabItem>
-                </TabControl>
+        <TabControl x:Name="ViewerTab" Grid.Row="1" Style="{StaticResource ImageViewerTabControlStyle}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding TabChanged}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <TabItem Header="EIP Cover Top" Style="{StaticResource ImageViewerTabItemStyle}">
+                <Tools:RootViewer DataContext="{Binding p_EIPCoverTop}"/>
             </TabItem>
-            <TabItem Header="Position">
-                <TabControl>
-                    <TabItem Header="EIP Cover Top">
-                        <Tools:RootViewer DataContext="{Binding p_EIPCoverTop}"/>
-                    </TabItem>
-                    <TabItem Header="EIP Cover Bottom">
-                        <Tools:RootViewer DataContext="{Binding p_EIPCoverBtm}"/>
-                    </TabItem>
-                    <TabItem Header="EIP Base Top">
-                        <Tools:RootViewer DataContext="{Binding p_EIPBaseTop}"/>
-                    </TabItem>
-                    <TabItem Header="EIP Base Top">
-                        <Tools:RootViewer DataContext="{Binding p_EIPBaseBtm}"/>
-                    </TabItem>
-                </TabControl>
+            <TabItem Header="EIP Cover Bottom" Style="{StaticResource ImageViewerTabItemStyle}">
+                <Tools:RootViewer DataContext="{Binding p_EIPCoverBtm}"/>
+            </TabItem>
+            <TabItem Header="EIP Base Top" Style="{StaticResource ImageViewerTabItemStyle}">
+                <Tools:RootViewer DataContext="{Binding p_EIPBaseTop}"/>
+            </TabItem>
+            <TabItem Header="EIP Base Bottom" Style="{StaticResource ImageViewerTabItemStyle}">
+                <Tools:RootViewer DataContext="{Binding p_EIPBaseBtm}"/>
             </TabItem>
         </TabControl>
     </Grid>

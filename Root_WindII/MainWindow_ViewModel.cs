@@ -208,6 +208,27 @@ namespace Root_WindII
                 GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eReqControl = XGem.eControl.OFFLINE;
             });
         }
+
+
+        public ICommand btnPopUpSetting
+        {
+            get => new RelayCommand(() =>
+            {
+                var viewModel = new SettingDialog_ViewModel(GlobalObjects.Instance.Get<Settings>());
+                Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+                if (result.HasValue)
+                {
+                    if (result.Value)
+                    {
+
+                    }
+                    else
+                    {
+
+                    }
+                }
+            });
+        }
         #endregion
         #endregion
 
@@ -332,7 +353,7 @@ namespace Root_WindII
 
                 // Engineer
                 WindII_Engineer engineer = GlobalObjects.Instance.Register<WindII_Engineer>();
-                //DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
+                DialogService dialogService = GlobalObjects.Instance.Get<DialogService>();
                 WindII_Warning warning = GlobalObjects.Instance.Register<WindII_Warning>();
                 engineer.Init("WIND2F");
 
@@ -392,7 +413,7 @@ namespace Root_WindII
 
                 if (frontImage.GetPtr() != IntPtr.Zero)
                 {
-                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4);
+                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4, true);
 
                     frontInspection.SetRecipe(recipeFront);
                     frontInspection.SetSharedBuffer(new SharedBufferInfo(
@@ -407,6 +428,8 @@ namespace Root_WindII
                     CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_VisionFront.GetGrabMode(recipeFront.CameraInfoIndex));
                     frontInspection.SetCameraInfo(camInfo);
                 }
+
+                Root_EFEM.Module.RecipeAlign recipeAlign = GlobalObjects.Instance.Register<Root_EFEM.Module.RecipeAlign>();
 
                 /*if (backImage.GetPtr() == IntPtr.Zero)
                 {
@@ -457,11 +480,12 @@ namespace Root_WindII
                 */
 
                 // DialogService
-                //dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
-                //dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
-                //dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
-                //dialogService.Register<TK4S, TK4SModuleUI>();
-                //dialogService.Register<FFUModule, FFUModuleUI>();
+                dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+                dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
+                dialogService.Register<ManualAlignViewer_ViewModel, ManualAlignViewer>();
+                dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
+                dialogService.Register<TK4S, TK4SModuleUI>();
+                dialogService.Register<FFUModule, FFUModuleUI>();
             }
             catch (Exception ex)
             {

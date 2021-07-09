@@ -90,7 +90,7 @@ namespace Root_VEGA_P.Module
                 if (value == null) m_infoPod.Pop();
                 else m_infoPod.Push(value);
                 m_reg.Write("InfoPod", nPod);
-                value.WriteReg();
+                value?.WriteReg();
                 OnPropertyChanged();
             }
         }

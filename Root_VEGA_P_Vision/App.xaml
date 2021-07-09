@@ -1,10 +1,89 @@
 ﻿<Application x:Class="Root_VEGA_P_Vision.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
+             xmlns:ToolsVision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:local="clr-namespace:Root_VEGA_P_Vision"
              StartupUri="MainWindow.xaml">
 
     <Application.Resources>
+        <Style x:Key="ParamText" TargetType="TextBlock">
+            <Setter Property="Margin" Value="6,2,6,2"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+        <Style x:Key="ImageViewerTabControlStyle" TargetType="TabControl">
+            <Setter Property="Background" Value="#FFEDECEA"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+        <Style x:Key="HeaderTextBlock" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="ExtraBlack"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="20,0,0,0"/>
+        </Style>
+        <Style x:Key="InfoTextBlock" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,0,20,0"/>
+        </Style>
+        <Style x:Key="InfoTextBox" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="10"/>
+        </Style>
+        <Style x:Key="InspectionTabItemStyle" TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Margin="0,2,0,2" Background="#FF363C58">
+                            <TextBlock Name="TB" FontSize="12" Foreground="#FF515782" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <ContentPresenter ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TB" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="TB" Property="Foreground" Value="#FF515782"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ImageViewerTabItemStyle" TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Margin="0,2,0,2" Padding="19,12,18,12" Background="#FF363C58">
+                            <TextBlock Name="TB" FontSize="12" Foreground="#FF515782" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <ContentPresenter ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TB" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="TB" Property="Foreground" Value="#FF515782"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="MenuItemStyle" TargetType="MenuItem">
+            <Setter Property="Background" Value="#FF363C58"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style x:Key="InspectionItemHeader" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="9"/>
+        </Style>
         <Style x:Key="BorderLine" TargetType="Border">
             <Setter Property="BorderBrush" Value="Black"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -85,27 +164,59 @@
         <Style TargetType="GroupBox" x:Key="GroupBoxStyle">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="AliceBlue"/>
+                    <Setter Property="BorderBrush" Value="#FF363C58"/>
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="False">
-                    <Setter Property="Background" Value="Gainsboro"/>
+                    <Setter Property="BorderBrush" Value="#FFEDECEA"/>
                 </Trigger>
             </Style.Triggers>
-            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="5"/>
             <Setter Property="Margin" Value="40,120"/>
-            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
+        <Style TargetType="Button" x:Key="ListViewHeader">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#FF363C58"/>
+                    <Setter Property="Background" Value="#FF363C58"/>
+                </Trigger>
+            </Style.Triggers>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FF363C58"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Background" Value="#FF363C58"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
+        <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="ToolsVision:DiffFilterMethod"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
 
+        <local:InverseBooleanConverter x:Key="InverseBoolean"/>
         <local:BooleanToVisiblityConverter x:Key="BooleanToVisiblity"/>
+        <local:InverseBooleanToVisiblityConverter x:Key="InverseBooleanToVisibility"/>
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
         <local:VisibilityToWindowStateConverter x:Key="VisibilityToWindowState"/>
+        <local:ListToVisibilityConverter x:Key="ListToVisibility"/>
+        <local:CountToVisibilityConverter x:Key="CountToVisibility"/>
         <!--Color-->
         <SolidColorBrush x:Key="PanelBackGround" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
         <SolidColorBrush x:Key="ControlBackGround" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
         <SolidColorBrush x:Key="GroupBoxBackground" Color="Transparent"/>
         <SolidColorBrush x:Key="Splitter" Color="DimGray"/>
-        <SolidColorBrush x:Key="MainThema" Color="#FF2D2D50"/>
+        <!-- ThemColor -->
+        <SolidColorBrush x:Key="ButtonSelectedColor" Color="#FF68B882"/>
+        <SolidColorBrush x:Key="WorkingNozzleColor" Color="#8868B882"/>
+        <SolidColorBrush x:Key="MainThema" Color="#FF363C58"/>
+        <SolidColorBrush x:Key="DisableMainThem" Color="#FF515782"/>
+        <SolidColorBrush x:Key="TextBlack" Color="#FF222222"/>
+        <SolidColorBrush x:Key="TextBodyColor" Color="#FF888888"/>
+        <SolidColorBrush x:Key="BorderSplitColor" Color="#FFCCCCCC"/>
+        <SolidColorBrush x:Key="MainBackGroundColor" Color="#FFEDECEA"/>
+        <SolidColorBrush x:Key="ButtonBackGroundColor" Color="#FF8FDAD6"/>
+        <SolidColorBrush x:Key="ButtonMouseoverBGColor" Color="#FF59c8c2"/>
 
         <!--#region [Color Definition] -->
         <SolidColorBrush x:Key="main_background" Color="#080820"/>
@@ -197,25 +308,72 @@
                          Color="#FFEAEAEA" />
         <!--#endregion-->
 
+        <Style x:Key="NozzleNum" TargetType="TextBlock">
+        </Style>
+        <Style x:Key="ImageROIBtn" TargetType="Button">
+            <Setter Property="Margin" Value="4,0,4,0"/>
+            <Setter Property="Background" Value="Black"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border  x:Name="btnBorder" CornerRadius="10" BorderThickness="2" Width="{TemplateBinding Width}" Padding="5"
+                                Background="{StaticResource ButtonBackGroundColor}">
+
+                            <ContentPresenter VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="BorderBrush" Value="{StaticResource ButtonMouseoverBGColor}"/>
+                                <Setter TargetName="btnBorder" Property="Background" Value="{StaticResource ButtonMouseoverBGColor}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        
         <Style x:Key="ImageBaseBtn" TargetType="Button">
-            <Setter Property="Padding" Value="8,1,8,1"/>
-            <Setter Property="Foreground" Value="DarkSlateGray"/>
+            <Setter Property="Padding" Value="15,1,15,1"/>
+            <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="Margin" Value="2,0,2,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border CornerRadius="5" Background="Gainsboro" BorderBrush="#ccc" BorderThickness="0,1,1,0" >
-                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        <Border x:Name="btnBorder" CornerRadius="5" Background="{StaticResource MainThema}" BorderBrush="#ccc" BorderThickness="0,1,1,0" >
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" 
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="{StaticResource DisableMainThem}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
         <Style x:Key="ImageText" TargetType="TextBlock">
-            <Setter Property="Padding" Value="8,1,8,1"/>
-            <Setter Property="Foreground" Value="DarkSlateGray"/>
+            <Setter Property="Padding" Value="15,1,15,1"/>
+            <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="ROIListItem" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10,0,10,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="ROIListHeader" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="ExtraBold"/>
         </Style>
         <Style x:Key="main_view_groupbox" TargetType="GroupBox">
             <Setter Property="BorderBrush" Value="Gray"/>
@@ -404,11 +562,11 @@
         <Style TargetType="{x:Type Button}" x:Key="PanelBtn">
             <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="FontSize" Value="15"/>
-            <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin" Value="10"/>
             <Setter Property="Height" Value="40"/>
+            <Setter Property="Foreground" Value="White"/>
             <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
-            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
+            <Setter Property="Background" Value="{StaticResource MainThema}"/>
         </Style>
         <Style TargetType="{x:Type Button}"
                x:Key="BasicBtn">
@@ -959,32 +1117,107 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="RadioButton" x:Key="SetupPannelRadioBtn">
-            <Setter Property="Margin" Value="8,8,8,8"/>
-            <Setter Property="FontSize" Value="15"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+        <Style TargetType="ComboBox" x:Key="ComboBoxStyle"> 
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="{StaticResource MainThema}"/>
+        </Style>
+        <Style TargetType="Button" x:Key="MaskButton">
+            <Setter Property="Width" Value="90"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
+            <Setter Property="Template"> 
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border  x:Name="btnBorder" CornerRadius="10" BorderThickness="2" Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}" Background="{StaticResource ButtonBackGroundColor}">
+                            
+                        <ContentPresenter VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="BorderBrush" Value="{StaticResource ButtonMouseoverBGColor}"/>
+                                <Setter TargetName="btnBorder" Property="Background" Value="{StaticResource ButtonMouseoverBGColor}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                        
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="RadioButton" x:Key="SelecteRadioBtn">
+            <Setter Property="Margin" Value="1,2,1,2"/>
+            <Setter Property="FontSize" Value="13"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Background" Value="Gainsboro"/>
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type RadioButton}">
-                        <Border BorderThickness="1" 
+                        <Border CornerRadius="10" BorderThickness="1.5" 
                                 Width="{TemplateBinding Width}"
                                 Height="40"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="Gray">
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsChecked" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource MainBackGroundColor}"/>
+                                <Setter Property="Background" Value="{StaticResource MainThema}"/>
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </Trigger>
+                            <Trigger  Property="IsChecked" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
+                                <Setter Property="Background" Value="#FF515782"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="RadioButton" x:Key="SetupPannelRadioBtn">
+            <Setter Property="Margin" Value="4,3,4,3"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border CornerRadius="10" BorderThickness="1.5" 
+                                Width="{TemplateBinding Width}"
+                                Height="40"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}">
                             <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                         </Border>
 
                         <ControlTemplate.Triggers>
                             <Trigger  Property="IsChecked" Value="True">
-                                <Setter Property="Background" Value="MediumTurquoise"/>
+                                <Setter Property="Foreground" Value="{StaticResource ButtonSelectedColor}"/>
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </Trigger>
+                            <Trigger  Property="IsChecked" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource MainBackGroundColor}"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
                             </Trigger>
                             <Trigger  Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="PaleTurquoise"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
+                                <Setter Property="Background" Value="#FF515782"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
