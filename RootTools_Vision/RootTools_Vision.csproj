@@ -253,6 +253,14 @@
     <Compile Include="UserControls\MapViewer.xaml.cs">
       <DependentUpon>MapViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\MotionViewer\MotionController.xaml.cs">
+      <DependentUpon>MotionController.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\MotionViewer\MotionController_ViewModel.cs" />
+    <Compile Include="UserControls\MotionViewer\MotionViewer.xaml.cs">
+      <DependentUpon>MotionViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\MotionViewer\MotionViewer_ViewModel.cs" />
     <Compile Include="UserControls\SizeObserver.cs" />
     <Compile Include="UserControls\MapViewer_ViewModel.cs" />
     <Compile Include="Utility\Enums.cs" />
@@ -327,6 +335,14 @@
     <Page Include="UserControls\MapViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\MotionViewer\MotionController.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\MotionViewer\MotionViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

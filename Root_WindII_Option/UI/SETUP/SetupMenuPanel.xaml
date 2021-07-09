@@ -71,7 +71,7 @@
                 Background="{StaticResource sidetap_child_background}">
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
                     <RadioButton Content="Setup" Command="{Binding btnEBRSetup}" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <!--<RadioButton Content="Inspect" Command="{Binding btnEBRInspect}" Style="{StaticResource sidetap_child_radiobutton}"/>-->
+                    <RadioButton Content="Inspect" Command="{Binding btnEBRInspect}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <Button Content="NEW" Command="{Binding btnNewRecipeEBR}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="SAVE" Command="{Binding btnSaveRecipeEBR}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="LOAD" Command="{Binding btnLoadRecipeEBR}" Style="{StaticResource sidetap_child_button}"/>
