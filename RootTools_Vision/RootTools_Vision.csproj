@@ -134,6 +134,7 @@
     <Compile Include="DataTypes\SharedBufferInfo.cs" />
     <Compile Include="Inspection\BacksideAlignment.cs" />
     <Compile Include="Inspection\BacksideSurface.cs" />
+    <Compile Include="Inspection\PreCreateGolden.cs" />
     <Compile Include="Inspection\EUVPodSurface.cs" />
     <Compile Include="Inspection\ProcessDefect_Backside.cs" />
     <Compile Include="Inspection\ProcessDefect_EUVPod.cs" />
@@ -158,6 +159,8 @@
     <Compile Include="Recipe\Interfaces\IOptionParameter.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
     <Compile Include="Recipe\Parameter\BacksideSurfaceParameter.cs" />
+    <Compile Include="Recipe\Parameter\FrontsideOthersParameterBase.cs" />
+    <Compile Include="Recipe\Parameter\PreCreateGoldenParameter.cs" />
     <Compile Include="Recipe\Parameter\EUVPodSurfaceParameter.cs" />
     <Compile Include="Recipe\Parameter\ProcessDefectEUVPodParameter.cs" />
     <Compile Include="Recipe\Parameter\VerticalWireParameter.cs" />

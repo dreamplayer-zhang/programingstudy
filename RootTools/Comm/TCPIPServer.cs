@@ -133,7 +133,7 @@ namespace RootTools.Comm
                 catch (SocketException ex)
                 {
                     // SocketException 발생
-                    m_commLog.Add(CommLog.eType.Info, "Receive SocketException : " + ex.Message);
+                    m_commLog.Add(CommLog.eType.Info, "Receive SocketException : " + ex.Message + ex.StackTrace);
 
                     if (ex.SocketErrorCode == SocketError.ConnectionReset)
                     {
