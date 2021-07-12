@@ -336,6 +336,7 @@ namespace Root_Pine2.Engineer
 
         void RunThread()
         {
+            EQ.eState m_eEQState = EQ.eState.Init; 
             m_bThread = true;
             Thread.Sleep(100);
             while (m_bThread)
@@ -344,12 +345,15 @@ namespace Root_Pine2.Engineer
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
-                    case EQ.eState.Run: break;
+                    case EQ.eState.Run:
+                        if (m_eEQState == EQ.eState.Ready) m_summary.LotStart(m_pine2.p_sLotID);
+                        break;
                     case EQ.eState.ModuleRunList: 
 
                         break;
                 }
                 p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
+                m_eEQState = EQ.p_eState; 
             }
         }
         #endregion

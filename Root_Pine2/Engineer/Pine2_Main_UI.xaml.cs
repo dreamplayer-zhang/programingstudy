@@ -20,8 +20,8 @@ namespace Root_Pine2.Engineer
             m_handler = (Pine2_Handler)engineer.ClassHandler();
             m_gaf = engineer.ClassGAF(); 
             processUI.Init(m_handler);
-            alidUI.Init(m_gaf.m_listALID, engineer); 
-
+            alidUI.Init(m_gaf.m_listALID, engineer);
+            summaryUI.Init(m_handler.m_summary); 
         }
     }
 }

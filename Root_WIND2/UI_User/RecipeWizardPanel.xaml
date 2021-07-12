@@ -30,7 +30,8 @@
                     <RadioButton Content="Mask" IsEnabled = "{Binding IsEnabledMask}" Command="{Binding btnFrontMask}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Spec" IsEnabled ="{Binding IsEnabledSpec}" Command="{Binding btnFrontSpec}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Inspect" Command="{Binding btnFrontInspect}" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <RadioButton Content="Remote" Command="{Binding btnFrontRemote}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <!-- <RadioButton Content="Remote" Command="{Binding btnFrontRemote}" Style="{StaticResource sidetap_child_radiobutton}"/>-->
+                    <RadioButton Content="Others" IsEnabled ="{Binding IsEnabledOthers}" Command="{Binding btnFrontOthers}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <Button Content="NEW" Command="{Binding btnNewRecipeFront}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="SAVE" Command="{Binding btnSaveRecipeFront}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="LOAD" Command="{Binding btnLoadRecipeFront}" Style="{StaticResource sidetap_child_button}"/>
