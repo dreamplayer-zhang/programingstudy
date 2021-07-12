@@ -44,7 +44,7 @@ namespace Root_Pine2_Vision.Module
                 p_sInfo = m_toolBox.GetComm(ref m_tcpRequest, this, "Request");
                 if (bInit)
                 {
-                    m_tcpRequest.EventReceiveData += M_tcpRequest_EventReceiveData;
+                    m_tcpRequest.EventReciveData += M_tcpRequest_EventReceiveData;
                     m_rs232RGBW.p_bConnect = true;
                     m_camera.Connect();
                 }
@@ -942,7 +942,7 @@ namespace Root_Pine2_Vision.Module
         #region Request  
         int m_nReq = 0; //forget
         string m_sReceive = "";
-        TCPAsyncClient m_tcpRequest;
+        TCPIPClient m_tcpRequest;
         private void M_tcpRequest_EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
             m_sReceive = Encoding.Default.GetString(aBuf, 0, nSize);
