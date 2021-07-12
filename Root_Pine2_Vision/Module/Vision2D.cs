@@ -1195,7 +1195,6 @@ namespace Root_Pine2_Vision.Module
             SendSnapInfo,
             SendLotInfo,
             SendSortInfo,
-            SendChangeUserset,
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
