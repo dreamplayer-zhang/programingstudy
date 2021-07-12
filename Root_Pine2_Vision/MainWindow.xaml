@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
-        Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
+        Title="Pine2 Vision" Height="450" Width="800" WindowState="Maximized">
     <Grid>
         <engineer:Pine2_Vision_Engineer_UI x:Name="engineerUI"/>
     </Grid>
