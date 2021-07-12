@@ -37,8 +37,8 @@ namespace Root_Pine2.Engineer
             comboRecipe.DataContext = handler; 
             textBlockMode.DataContext = m_pine2;
             textBoxWidth.DataContext = m_pine2;
-            textBoxThickness.DataContext = m_pine2; 
-            textBlock3D.DataContext = m_pine2;
+            textBoxThickness.DataContext = m_pine2;
+            checkBox3D.DataContext = m_pine2; 
 
             textBoxWorker.DataContext = m_pine2; 
             textBoxLotID.DataContext = m_pine2;
@@ -178,11 +178,6 @@ namespace Root_Pine2.Engineer
         private void textBlockMode_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             m_pine2.p_eMode = 1 - m_pine2.p_eMode;
-        }
-
-        private void textBlock3D_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            m_pine2.p_b3D = !m_pine2.p_b3D; 
         }
 
         #region Run Button

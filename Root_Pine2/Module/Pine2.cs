@@ -634,6 +634,7 @@ namespace Root_Pine2.Module
             }
         }
 
+        Registry m_reg = new Registry("Pine2");
         string _sLotID = "";
         public string p_sLotID
         {
@@ -642,12 +643,11 @@ namespace Root_Pine2.Module
             {
                 if (_sLotID == value) return; 
                 _sLotID = value;
-                OnPropertyChanged(); 
-
+                OnPropertyChanged();
+                m_reg.Write("LotID", value);
             }
         }
 
-        Registry m_reg = new Registry("Pine2");
         int _iBundle = 0;
         public int p_iBundle
         {
@@ -827,9 +827,10 @@ namespace Root_Pine2.Module
             InitVisionOption(); 
             p_id = id;
             m_handler = (Pine2_Handler)engineer.ClassHandler();
-            m_printer = new Printer(m_handler); 
+            m_printer = new Printer(m_handler);
+            p_sLotID = m_reg.Read("LotID", ""); 
             p_iBundle = m_reg.Read("Bundle", 0); 
-            InitBase(id, engineer);
+            InitBase(id, engineer); 
 
             InitThread();
         }
