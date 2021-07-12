@@ -1,4 +1,5 @@
-﻿using Root_Pine2.Engineer;
+﻿using QRCoder;
+using Root_Pine2.Engineer;
 using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.Comm;
@@ -10,6 +11,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -376,7 +378,13 @@ namespace Root_Pine2.Module
             set
             {
                 if (_eMode == value) return;
-                _eMode = value;
+                switch (value)
+                {
+                    case eRunMode.Magazine: _eMode = value; break;
+                    case eRunMode.Stack:
+                        if (m_handler.m_magazineEVSet.IsMagazineUp() == false) _eMode = value;
+                        break; 
+                }
                 OnPropertyChanged();
             }
         }
@@ -578,7 +586,8 @@ namespace Root_Pine2.Module
             m_thicknessDefault = tree.GetTree("Default Strip").Set(m_thicknessDefault, m_thicknessDefault, "Thickness", "Strip Thickness (um)");
             p_lStack = tree.GetTree("Stack").Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
             p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
-            RunTreeVisionOption(tree.GetTree("VisionOption")); 
+            RunTreeVisionOption(tree.GetTree("VisionOption"));
+            m_printer.RunTree(tree.GetTree("Printer")); 
         }
         #endregion
 
@@ -607,6 +616,17 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Lot
+        string _sOperator = ""; 
+        public string p_sOperator
+        {
+            get { return _sOperator; }
+            set
+            {
+                _sOperator = value;
+                OnPropertyChanged(); 
+            }
+        }
+
         string _sLotID = "";
         public string p_sLotID
         {
@@ -709,19 +729,30 @@ namespace Root_Pine2.Module
         public class Printer
         {
             public SRP350 m_srp350;
+            QRCodeGenerator m_qrGenerator = new QRCodeGenerator(); 
 
             public class Doc
             {
-                public string m_sTray = "";
+                public string m_sSorter = "";
                 public string m_sBundle;
+                public InfoStrip m_InfoStrip = null;
+                public int m_nStrip = 0;
+                public DateTime m_dtNow = DateTime.Now; 
 
-                public Doc(int nTray, string sBundle)
+                public Doc(int iSorter, int iBundle, int nStrip)
                 {
-                    for (int n = 0; n < 8; n++) m_sTray += ((n == nTray) ? n.ToString() : "+");
-                    m_sBundle = sBundle;
+                    for (int n = 0; n < 8; n++) m_sSorter += ((n == iSorter) ? n.ToString() : "+");
+                    m_sBundle = iBundle.ToString("00");
+                    m_nStrip = nStrip; 
                 }
             }
             Queue<Doc> m_qDoc = new Queue<Doc>();
+
+            public void AddPrint(int iSorter, int iBundle, int nStrip)
+            {
+                Doc doc = new Doc(iSorter, iBundle, nStrip);
+                m_qDoc.Enqueue(doc); 
+            }
 
             public DispatcherTimer m_timer = new DispatcherTimer();
             void InitTimer()
@@ -739,17 +770,48 @@ namespace Root_Pine2.Module
 
             void PrintDoc(Doc doc)
             {
+                string sVS = m_handler.m_pine2.p_sLotID + "_S00_C" + doc.m_sBundle; 
+                m_srp350.Start("Print Bundle");
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "Machine ID : " + m_sMachine);
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "--------------------------------");
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "Recipe : " + m_handler.p_sRecipe);
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "Lot ID : " + m_handler.m_pine2.p_sLotID);
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "Operator : " + m_handler.m_pine2.p_sOperator);
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "VS File : " + sVS);
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "--------------------------------");
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "3D Inspect : " + m_handler.m_pine2.p_b3D.ToString());
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "Bundle : " + doc.m_sBundle);
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "Sorter : " + doc.m_sSorter);
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "Strip Count : " + doc.m_nStrip.ToString());
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "");
+                m_srp350.Write(0, 0, m_eFont, m_szFont, doc.m_dtNow.ToString("yyyy-MM-dd HH:mm:ss"));
+                QRCodeData data = m_qrGenerator.CreateQrCode(sVS, QRCodeGenerator.ECCLevel.Q);
+                QRCode code = new QRCode(data);
+                Bitmap bitmap = code.GetGraphic(20);
+                bitmap.Save(EQ.c_sPathRecipe + "\\QRcode.bmp");
+                m_srp350.Write(0, 0, EQ.c_sPathRecipe + "\\QRcode.bmp"); 
+                m_srp350.Cut(m_srp350.p_bCutFeeding);
+                m_srp350.End(); 
             }
 
+            string m_sMachine = "Pine2 #1";
             SRP350.eFontKoean m_eFont = SRP350.eFontKoean.Korean2x2;
-
-            public Printer()
+            int m_szFont = 9;
+            public void RunTree(Tree tree)
             {
-                InitTimer();
+                m_sMachine = tree.Set(m_sMachine, m_sMachine, "Machine", "Machine ID");
+                m_eFont = (SRP350.eFontKoean)tree.Set(m_eFont, m_eFont, "Type", "Font Type");
+                m_szFont = tree.Set(m_szFont, m_szFont, "Size", "Fonr Size");
+            }
 
+            Pine2_Handler m_handler; 
+            public Printer(Pine2_Handler handler)
+            {
+                m_handler = handler; 
+                InitTimer();
             }
         }
-        Printer m_printer = new Printer(); 
+        public Printer m_printer;
         #endregion
 
         Pine2_Handler m_handler; 
@@ -758,6 +820,7 @@ namespace Root_Pine2.Module
             InitVisionOption(); 
             p_id = id;
             m_handler = (Pine2_Handler)engineer.ClassHandler();
+            m_printer = new Printer(m_handler); 
             p_iBundle = m_reg.Read("Bundle", 0); 
             InitBase(id, engineer);
 
