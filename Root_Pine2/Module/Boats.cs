@@ -222,7 +222,7 @@ namespace Root_Pine2.Module
                     if (Run(RunMoveSnapStart(eWorks, snap, i % xLine))) return p_sInfo;
                     while (m_bSnapReady == false)
                     {
-                        Thread.Sleep(2);
+                        Thread.Sleep(10);
                         if (EQ.IsStop()) return "EQ Stop";
                     }
 

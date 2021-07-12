@@ -805,8 +805,9 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region RunSnap
-        bool m_bDoneChangeUserSet = true;
         bool m_bCanChangeUserSet = true;
+        bool m_bUserSetThreadOn = false;
+        bool m_bDoneChangeUserSet = true;
         int nWaitTime = 3 * 1000;
         int nWaitInterval = 10;
         int nTimeCount = 0;
@@ -880,6 +881,7 @@ namespace Root_Pine2_Vision.Module
                 m_log.Info("Check Userset Thread Done");
                 // Set Camera GrabThread On
                 m_bCanChangeUserSet = false;
+                m_bUserSetThreadOn = false;
                 m_camera.m_bGrabThreadOn = false;
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 while (m_camera.m_bGrabThreadOn != true)
@@ -896,6 +898,52 @@ namespace Root_Pine2_Vision.Module
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
+                    if(m_bCanChangeUserSet == true)
+                    {
+                        m_bCanChangeUserSet = false;
+                        m_bUserSetThreadOn = true;
+
+                        if (iSnap < nTotalSnap - 1)
+                        {
+                            Recipe.Snap nextRecipe = m_RunningRecipe[eWorks].m_aSnap[iSnap + 1];
+                            System.Threading.Thread thUpdate = new Thread(new ParameterizedThreadStart(UpdateCalUserset));
+                            int nNextSnap = iSnap + 1;
+                            int nNextSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? nNextSnap % (nTotalSnap / 2) : nNextSnap;
+                            m_bDoneChangeUserSet = false;
+
+                            if (nSnapMode == Recipe.eSnapMode.ALL)
+                            {
+                                if (nNextSnap < (nTotalSnap / 2))
+                                {
+                                    if (nNextSnapLineIndex % 2 == 0)
+                                        thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet1);
+                                    else
+                                        thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet2);
+                                }
+                                else
+                                {
+                                    if (nNextSnapLineIndex % 2 == 0)
+                                        thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet3);
+                                    else
+                                        thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet4);
+                                }
+                            }
+                            else if (nSnapMode == Recipe.eSnapMode.RGB)
+                            {
+                                if (nNextSnapLineIndex % 2 == 0)
+                                    thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet1);
+                                else
+                                    thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet2);
+                            }
+                            else if (nSnapMode == Recipe.eSnapMode.APS)
+                            {
+                                if (nNextSnapLineIndex % 2 == 0)
+                                    thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet3);
+                                else
+                                    thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet4);
+                            }
+                        }
+                    }
                 }
 
                 m_log.Info("Grab Done");
@@ -905,14 +953,7 @@ namespace Root_Pine2_Vision.Module
 
                 m_log.Info("Send Snap Done Done");
                 // Set Next Snap Userset
-                nTimeCount = 0;
-                while (m_bCanChangeUserSet == false && nTimeCount < nWaitTime)
-                {
-                    nTimeCount += nWaitInterval;
-                    Thread.Sleep(nWaitInterval);
-                    if (EQ.IsStop()) return "EQ Stop";
-                }
-                if (iSnap < nTotalSnap - 1)
+                if (m_bUserSetThreadOn == false && iSnap < nTotalSnap - 1)
                 {
                     Recipe.Snap nextRecipe = m_RunningRecipe[eWorks].m_aSnap[iSnap + 1];
                     System.Threading.Thread thUpdate = new Thread(new ParameterizedThreadStart(UpdateCalUserset));
