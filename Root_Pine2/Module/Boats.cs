@@ -290,7 +290,7 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Request
-        TCPAsyncServer m_tcpRequest;
+        TCPIPServer m_tcpRequest;
         private void M_tcpRequest_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
             string sRead = Encoding.Default.GetString(aBuf, 0, nSize);

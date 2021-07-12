@@ -240,6 +240,15 @@ namespace Root_Pine2.Engineer
         }
         #endregion
 
+        #region PickerSet
+        public void StartPickerSet()
+        {
+            if (EQ.p_eState != EQ.eState.Ready) return; 
+            p_moduleList.m_moduleRunList.OpenJob(m_pine2.m_sFilePickerSet);
+            p_moduleList.StartModuleRuns();
+        }
+        #endregion
+
         #region Reset
         public string Reset()
         {
