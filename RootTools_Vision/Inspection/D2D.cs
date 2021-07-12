@@ -76,15 +76,48 @@ namespace RootTools_Vision
                 // Chip_trigger mode에서는 golden image를 생성하지 않으므로 첫 chip에서 golden image를 임시로 생성 후 scale map을 만들어줍니다.
                 else if((parameterD2D.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) && (parameterD2D.ScaleMap == true))
                 {
-                    CreateGoldenImage();
+                    if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) == null)
+                    { 
+                        // 미리 생성해둔 Golden Image가 있으면 불러와서 Scale Map 생성
+                        if (recipeD2D.PreGoldenW == this.currentWorkplace.Width && recipeD2D.PreGoldenH == this.currentWorkplace.Height)
+                        {
+                            GoldenImage = recipeD2D.PreGolden[(int)parameterD2D.IndexChannel];
+                        }
+                        // 미리 생성해둔 Golden Image가 없으면 임시로 생성
+                        else
+                        { 
+                            CreateGoldenImage();
+                        }
 
-                    if (scaleMap == null)
-                        scaleMap = new float[this.currentWorkplace.Width * this.currentWorkplace.Height];
+                        if (scaleMap == null)
+                            scaleMap = new float[this.currentWorkplace.Width * this.currentWorkplace.Height];
 
-                    CLR_IP.Cpp_CreateDiffScaleMap(GoldenImage, scaleMap, this.currentWorkplace.Width, this.currentWorkplace.Height, 10, 10);
+                        CLR_IP.Cpp_CreateDiffScaleMap(GoldenImage, scaleMap, this.currentWorkplace.Width, this.currentWorkplace.Height, 10, 10);
 
-                    foreach (Workplace wp in this.workplaceBundle)
-                        wp.SetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP, (object)(scaleMap));
+                        foreach (Workplace wp in this.workplaceBundle)
+                            wp.SetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP, (object)(scaleMap));
+                    }
+                }
+                else if(parameterD2D.RefImageUpdate == RefImageUpdateFreq.PreCreate)
+                {
+                    if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) == null)
+                    {
+                        // 미리 생성해둔 Golden Image가 있으면 불러와서 Scale Map 생성
+                        if (recipeD2D.PreGoldenW == this.currentWorkplace.Width && recipeD2D.PreGoldenH == this.currentWorkplace.Height)
+                        {
+                            GoldenImage = recipeD2D.PreGolden[(int)parameterD2D.IndexChannel];
+                        }
+                        // 미리 생성해둔 Golden Image가 반드시 있어야하는데 없으면 임시로 생성 (검사 잘 안될듯)
+                        else
+                        {
+                            CreateGoldenImage();
+                        }
+
+                        // Golden Image 해당라인 Workplace에 복사
+                        foreach (Workplace wp in this.workplaceBundle)
+                            wp.SetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE, (object)(GoldenImage) /*Tools.ByteArrayToObject(GoldenImage)*/);
+                    }
+                     
                 }
                 else
                 {
@@ -114,6 +147,18 @@ namespace RootTools_Vision
                 if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) != null)
                 {
                     this.scaleMap = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) as float[];
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if (parameterD2D.RefImageUpdate == RefImageUpdateFreq.PreCreate)
+            {
+                if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) != null)
+                {
+                    this.GoldenImage = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) as byte[];
                     return true;
                 }
                 else
