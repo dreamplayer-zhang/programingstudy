@@ -27,7 +27,7 @@ namespace RootTools_Vision
         //[XmlIgnore]
         public List<RecipeType_ImageData> AlignFeatureList { get => alignFeatureList; set => alignFeatureList = value; }
 
-        public long FirstSearchPointX { get => this.firstSearchPointX; set => this.firstSearchPointY = value; }
+        public long FirstSearchPointX { get => this.firstSearchPointX; set => this.firstSearchPointX = value; }
         public long FirstSearchPointY { get => this.firstSearchPointY; set => this.firstSearchPointY = value; }
 
         public long SecondSearchPointX { get => this.secondSearchPointX; set => this.secondSearchPointX = value; }
