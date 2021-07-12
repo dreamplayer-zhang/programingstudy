@@ -215,6 +215,7 @@ namespace Root_WindII
                 Array.Copy(srcBuf, rawData, srcBuf.Length);
 
                 alignRecipe.AddAlignFeature(0, 0, featureImageData.p_Size.X, featureImageData.p_Size.Y, featureImageData.p_nByte, rawData);
+                alignRecipe.Save(Constants.RootPath.RootSetupRACAlignKeyPath);
 
                 RefreshFeatureItemList();
             });

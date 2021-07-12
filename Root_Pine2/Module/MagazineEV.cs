@@ -655,7 +655,8 @@ namespace Root_Pine2.Module
                         sRun = RunUnload(ePos);
                         if (m_aMagazine[ePos] != null)
                         {
-                            m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos].p_iBundle, m_aMagazine[ePos].m_nStripCount);
+                            int nStrip = m_aMagazine[ePos].m_nStripCount; 
+                            m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos].p_iBundle, nStrip);
                         }
                         m_aMagazine[ePos] = null;
                         if (Run(m_elevator.RunAlign(true))) return p_sInfo;
@@ -667,7 +668,8 @@ namespace Root_Pine2.Module
                         sRun = RunUnload(ePos); 
                         if (m_aMagazine[ePos] != null)
                         {
-                            m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos].p_iBundle, m_aMagazine[ePos].m_nStripCount);
+                            int nStrip = m_aMagazine[ePos].m_nStripCount; 
+                            m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos].p_iBundle, nStrip);
                         }
                         m_aMagazine[ePos] = null;
                         return sRun;
@@ -677,7 +679,8 @@ namespace Root_Pine2.Module
                     sRun = RunUnload(InfoStrip.eMagazinePos.Up); 
                     if (m_stack != null)
                     {
-                        m_pine2.m_printer.AddPrint((int)p_eMagazine, m_stack.p_iBundle, m_stack.p_nStack); 
+                        int nStrip = m_stack.p_nStack; 
+                        if (nStrip > 0) m_pine2.m_printer.AddPrint((int)p_eMagazine, m_stack.p_iBundle, nStrip, m_stack.p_eResult); 
                         m_stack.WriteResultLED();
                     }
                     m_stack = null;

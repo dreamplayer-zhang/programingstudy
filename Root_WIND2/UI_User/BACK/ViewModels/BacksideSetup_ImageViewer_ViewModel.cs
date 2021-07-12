@@ -202,8 +202,16 @@ namespace Root_WIND2.UI_User
             Bottom
         }
 
+        private enum CIRCLE_CENTER_EDIT_STATE
+        {
+            None = 0,
+            Edit
+        }
+
         private CIRCLE_DRAW_STATE circleState = CIRCLE_DRAW_STATE.None;
         private CIRCLE_EDIT_STATE circleEditState = CIRCLE_EDIT_STATE.None;
+
+        private CIRCLE_CENTER_EDIT_STATE circleCenterEditState = CIRCLE_CENTER_EDIT_STATE.None;
 
         private Ellipse CircleUI;
         private Grid CircleEditUI;
@@ -247,7 +255,9 @@ namespace Root_WIND2.UI_User
             CircleUI.Stroke = ColorDefines.Circle;
             CircleUI.StrokeThickness = 1;
             CircleUI.Opacity = 0.5;
-            
+
+            Canvas.SetZIndex(CircleUI, 1);
+
             CircleEditUI = new Grid();
 
             Ellipse CenterPoint = new Ellipse();
@@ -310,17 +320,21 @@ namespace Root_WIND2.UI_User
             BottomPoint.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
             BottomPoint.VerticalAlignment = System.Windows.VerticalAlignment.Bottom;
 
-            Canvas.SetZIndex(CenterPoint, 99);
-            Canvas.SetZIndex(LeftPoint, 99);
-            Canvas.SetZIndex(TopPoint, 99);
-            Canvas.SetZIndex(RightPoint, 99);
-            Canvas.SetZIndex(BottomPoint, 99);
+            //Canvas.SetZIndex(CenterPoint, 97);
+            //Canvas.SetZIndex(LeftPoint, 97);
+            //Canvas.SetZIndex(TopPoint, 97);
+            //Canvas.SetZIndex(RightPoint, 97);
+            //Canvas.SetZIndex(BottomPoint, 97);
+
+            
 
             CircleEditUI.Children.Add(CenterPoint);
             CircleEditUI.Children.Add(LeftPoint);
             CircleEditUI.Children.Add(TopPoint);
             CircleEditUI.Children.Add(RightPoint);
             CircleEditUI.Children.Add(BottomPoint);
+
+            Canvas.SetZIndex(CircleEditUI, 2);
 
             #endregion
 
@@ -345,19 +359,40 @@ namespace Root_WIND2.UI_User
             line2.Stroke = ColorDefines.SearchCenterPoint;
             line2.StrokeThickness = 3;
 
-            Canvas.SetZIndex(line1, 98);
-            Canvas.SetZIndex(line2, 98);
+            //Canvas.SetZIndex(line1, 99);
+            //Canvas.SetZIndex(line2, 99);
+
+            Ellipse circleCenterEditPoint = new Ellipse();
+            circleCenterEditPoint.Width = EditPointSize;
+            circleCenterEditPoint.Height = EditPointSize;
+            circleCenterEditPoint.Fill = Brushes.White;
+            circleCenterEditPoint.Stroke = Brushes.Gray;
+            circleCenterEditPoint.StrokeThickness = 1;
+            circleCenterEditPoint.Cursor = Cursors.SizeAll;
+            circleCenterEditPoint.MouseLeftButtonDown += MouseLeftButtonDown_CircleCenterEditUI_Bottom;
+            circleCenterEditPoint.MouseLeftButtonUp += MouseLeftButtonUp_CircleCenterEditUI_Bottom;
+            circleCenterEditPoint.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            circleCenterEditPoint.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+            //Canvas.SetZIndex(circleCenterEditPoint, 99);
 
             SearchedCenterPointUI.Children.Add(line1);
             SearchedCenterPointUI.Children.Add(line2);
+            SearchedCenterPointUI.Children.Add(circleCenterEditPoint);
+
+            Canvas.SetZIndex(SearchedCenterPointUI, 3);
 
             SearchedCirclePointsUI = new Polygon();
             SearchedCirclePointsUI.Stroke = ColorDefines.SearchCircle;
             SearchedCirclePointsUI.StrokeThickness = 2;
 
+            Canvas.SetZIndex(SearchedCirclePointsUI, 3);
+
             InspectionCircleUI = new Ellipse();
             InspectionCircleUI.Stroke = ColorDefines.SearchCenterPoint;
             InspectionCircleUI.StrokeThickness = 2;
+
+            Canvas.SetZIndex(InspectionCircleUI, 3);
+
             #endregion
 
 
@@ -416,6 +451,17 @@ namespace Root_WIND2.UI_User
         {
             this.circleEditState = CIRCLE_EDIT_STATE.None;
         }
+
+        private void MouseLeftButtonDown_CircleCenterEditUI_Bottom(object sender, MouseEventArgs e)
+        {
+            this.circleCenterEditState = CIRCLE_CENTER_EDIT_STATE.Edit;
+        }
+
+        private void MouseLeftButtonUp_CircleCenterEditUI_Bottom(object sender, MouseEventArgs e)
+        {
+            this.circleCenterEditState = CIRCLE_CENTER_EDIT_STATE.None;
+        }
+
         #endregion
 
         private void DrawCircle()
@@ -476,14 +522,6 @@ namespace Root_WIND2.UI_User
 
         public void DrawSearchedCircle()
         {
-            if(this.p_UIElement.Contains(SearchedCenterPointUI))
-            {
-                CPoint canvasPt = GetCanvasPoint(this.searchedCenterMemoryPoint);
-
-                Canvas.SetLeft(SearchedCenterPointUI, canvasPt.X - 15);
-                Canvas.SetTop(SearchedCenterPointUI, canvasPt.Y - 15);
-            }
-
             if(this.p_UIElement.Contains(SearchedCirclePointsUI))
             {
                 this.SearchedCirclePointsUI.Points.Clear();
@@ -492,6 +530,17 @@ namespace Root_WIND2.UI_User
                     CPoint canvasPt = GetCanvasPoint(pt);
                     this.SearchedCirclePointsUI.Points.Add(new Point(canvasPt.X, canvasPt.Y));
                 }
+            }
+        }
+
+        private void DrawInspectionROI()
+        {
+            if (this.p_UIElement.Contains(SearchedCenterPointUI))
+            {
+                CPoint canvasPt = GetCanvasPoint(this.searchedCenterMemoryPoint);
+
+                Canvas.SetLeft(SearchedCenterPointUI, canvasPt.X - 15);
+                Canvas.SetTop(SearchedCenterPointUI, canvasPt.Y - 15);
             }
 
             if (this.p_UIElement.Contains(InspectionCircleUI))
@@ -621,6 +670,7 @@ namespace Root_WIND2.UI_User
                 tRect.MemoryRect.Right = rt.Right;
                 tRect.MemoryRect.Bottom = rt.Bottom;
 
+                Canvas.SetZIndex(rtUI, 2);
                 mapRectList.Add(tRect);
                 p_DrawElement.Add(rtUI);
             }
@@ -696,15 +746,18 @@ namespace Root_WIND2.UI_User
         public void SetSearchedCenter(CPoint memPt)
         {
             this.searchedCenterMemoryPoint = memPt;
-            if (this.p_UIElement.Contains(SearchedCenterPointUI))
-                this.p_UIElement.Remove(SearchedCenterPointUI);
+            if (!this.p_UIElement.Contains(SearchedCenterPointUI))
+            {
+                this.p_UIElement.Add(SearchedCenterPointUI);
+            }
 
-            //Canvas.SetZIndex(this.SearchedCenterPointUI, 99);
-            this.p_UIElement.Add(SearchedCenterPointUI);
+            if (!this.p_UIElement.Contains(InspectionCircleUI))
+            {
+                this.p_UIElement.Add(InspectionCircleUI);
 
+            }
 
-
-            DrawSearchedCircle();
+            DrawInspectionROI();
         }
 
         public void SetSearchedCirclePoints(List<CPoint> points)
@@ -713,11 +766,8 @@ namespace Root_WIND2.UI_User
             if (this.p_UIElement.Contains(SearchedCirclePointsUI))
                 this.p_UIElement.Remove(SearchedCirclePointsUI);
 
-            if (this.p_UIElement.Contains(InspectionCircleUI))
-                this.p_UIElement.Remove(InspectionCircleUI);
 
             this.p_UIElement.Add(SearchedCirclePointsUI);
-            this.p_UIElement.Add(InspectionCircleUI);
 
             DrawSearchedCircle();
         }
@@ -729,6 +779,8 @@ namespace Root_WIND2.UI_User
             DrawCircle();
             DrawCircleEdit();
             DrawSearchedCircle();
+
+            DrawInspectionROI();
 
             // Polygon
             DrawExclusivePolygon();
@@ -757,6 +809,15 @@ namespace Root_WIND2.UI_User
             if (this.IsPolyChecked == true)
             {
                 AddExclusivePolygonPoint(memPt);
+            }
+
+
+            if(this.circleCenterEditState == CIRCLE_CENTER_EDIT_STATE.Edit)
+            {
+                searchedCenterMemoryPoint.X = memPt.X;
+                searchedCenterMemoryPoint.Y = memPt.Y;
+
+                DrawInspectionROI();
             }
 
             if(this.circleEditState == CIRCLE_EDIT_STATE.None)
@@ -834,6 +895,14 @@ namespace Root_WIND2.UI_User
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
+                if(this.circleCenterEditState == CIRCLE_CENTER_EDIT_STATE.Edit)
+                {
+                    searchedCenterMemoryPoint.X = memPt.X;
+                    searchedCenterMemoryPoint.Y = memPt.Y;
+
+                    DrawInspectionROI();
+                }
+
                 switch (circleEditState)
                 {
                     case CIRCLE_EDIT_STATE.None:
@@ -1014,16 +1083,14 @@ namespace Root_WIND2.UI_User
                 {
                     this.p_UIElement.Remove(this.SearchedCirclePointsUI);
                 }
-
-                if (this.p_UIElement.Contains(this.InspectionCircleUI))
-                {
-                    this.p_UIElement.Remove(this.InspectionCircleUI);
-                }
-
-                this.mapRectList.Clear();
-                this.mapOutterRectList.Clear();
-                this.p_DrawElement.Clear();
             });
+        }
+
+        public void ClearMapRectList()
+        {
+            this.mapRectList.Clear();
+            this.mapOutterRectList.Clear();
+            this.p_DrawElement.Clear();
         }
 
 

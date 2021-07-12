@@ -78,10 +78,7 @@
                         <Label Content="Thickness :" Margin="3" VerticalAlignment="Center"/>
                         <TextBox x:Name="textBoxThickness" Text="{Binding p_thickness}" Margin="3" MinWidth="40" VerticalAlignment="Center" TextAlignment="Center"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content=" 3D  :" Margin="3" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="textBlock3D" Text="{Binding p_b3D}" Margin="3" VerticalAlignment="Center" PreviewMouseDown="textBlock3D_PreviewMouseDown"/>
-                    </StackPanel>
+                    <CheckBox x:Name="checkBox3D" IsChecked="{Binding p_b3D}" Content="3D Inspect" Margin="3"/>
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Column="3" BorderBrush="Black" BorderThickness="1" Margin="3">
