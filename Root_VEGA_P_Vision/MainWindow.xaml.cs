@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Root_VEGA_P_Vision.Engineer;
 using RootTools;
+using RootTools.Database;
 using RootTools.Memory;
 using RootTools_Vision;
 using RootTools_Vision.WorkManager3;
@@ -100,7 +101,10 @@ namespace Root_VEGA_P_Vision
 			UIManager.Instance.MainPanel = MainPanel;
 			UIManager.Instance.ChangeUIMode();
 
-            logView.Init(LogView._logView);
+			DatabaseManager.Instance.SetDatabase(1);
+			DatabaseManager.Instance.ValidateDatabase();
+
+			logView.Init(LogView._logView);
             InitTimer();
         }
 		void CreateGlobalPaths()

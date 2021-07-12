@@ -15,6 +15,7 @@
             <StackPanel Margin="0,30,0,0">
                 <RadioButton IsChecked="True" Content="Pod Recipe" Command="{Binding btnPodRecipe}" Style="{StaticResource SetupPannelRadioBtn}"/>
                 <RadioButton Content="Maintenance" Command="{Binding btnMaintenance}" Style="{StaticResource SetupPannelRadioBtn}"/>
+                <RadioButton Content="Operate" Command="{Binding btnOperate}" Style="{StaticResource SetupPannelRadioBtn}"/>
             </StackPanel>
         </Border>
 

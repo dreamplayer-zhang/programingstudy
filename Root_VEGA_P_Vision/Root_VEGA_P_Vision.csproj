@@ -327,6 +327,16 @@
     </Compile>
     <Compile Include="UI\1. Setup\3. PodInfo\ImageNROI_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. PodInfo\PodInfo_ViewModel.cs" />
+    <Compile Include="UI\3. Operation\Operating_Panel.xaml.cs">
+      <DependentUpon>Operating_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\3. Operation\Operating_ViewModel.cs" />
+    <Compile Include="UI\3. Operation\UserControl\NozzleState.xaml.cs">
+      <DependentUpon>NozzleState.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\3. Operation\UserControl\TaskQItem.xaml.cs">
+      <DependentUpon>TaskQItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Interfaces\IPage.cs" />
     <Compile Include="UI\Viewer_ViewModel\MaskRootViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\MaskViewer_ViewModel.cs" />
@@ -619,6 +629,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\3. Operation\Operating_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\3. Operation\UserControl\NozzleState.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\3. Operation\UserControl\TaskQItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\SelectMode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -698,7 +720,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Dialog\" />
-    <Folder Include="UI\3. Operation\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\basebot.png" />
@@ -753,6 +774,17 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Control\Icon\Resource\Review_ico.JPG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CoverBack.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\3. Operation\Resource\CoverBack.png" />
+    <Resource Include="UI\3. Operation\Resource\CoverFront.png" />
+    <Resource Include="UI\3. Operation\Resource\Dome.png" />
+    <Resource Include="UI\3. Operation\Resource\DoorFront.png" />
+    <Resource Include="UI\3. Operation\Resource\PlateBack.png" />
+    <Resource Include="UI\3. Operation\Resource\PlateFront.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
