@@ -229,7 +229,7 @@ namespace Root_Pine2.Module
                     if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (i < m_aBoat[eWorks].m_recipe.m_aSnap.Count-1)
                     {
-                        m_vision.SendChangeUserset();
+                        SendChangeUserSet();
                         if (Run(RunMoveSnapStart(eWorks, m_aBoat[eWorks].m_recipe.m_aSnap[i + 1], i % xLine))) return p_sInfo;
                     }
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
@@ -338,6 +338,14 @@ namespace Root_Pine2.Module
                 bool bConnect = (asRead[3] == "1");
                 m_aBoat[eWorks].p_bWorksConnect = bConnect; 
             }
+        }
+
+        int m_nReq = 0;
+        public string SendChangeUserSet()
+        {
+            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.ChangeUserset.ToString() ;
+            m_tcpRequest.Send(sSend);
+            return "OK";
         }
         #endregion
 

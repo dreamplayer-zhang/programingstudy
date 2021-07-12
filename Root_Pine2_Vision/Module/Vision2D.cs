@@ -220,16 +220,6 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public string SendChangeUserset()
-        {
-            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendChangeUserset, eRemote.Client, 0);
-            else
-            {
-                m_bCanChangeUserSet = true;
-                return "OK";
-            }
-        }
-
         public class LotInfo
         {
             public int m_nMode = 0;
@@ -1004,6 +994,18 @@ namespace Root_Pine2_Vision.Module
         private void M_tcpRequest_EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
             m_sReceive = Encoding.Default.GetString(aBuf, 0, nSize);
+            if (m_sReceive.Length <= 0) return;
+            ReadReceive(m_sReceive);
+        }
+
+        void ReadReceive(string sReceive)
+        {
+            string[] asRead = sReceive.Split(',');
+            if (asRead.Length < 2) return;
+            if (asRead[1] == Works2D.eProtocol.ChangeUserset.ToString())
+            {
+                m_bCanChangeUserSet = true;
+            }
         }
 
         public string ReqSnap(string sRecipe, eWorks eWorks)
@@ -1282,7 +1284,6 @@ namespace Root_Pine2_Vision.Module
                     case eRemoteRun.SendSnapInfo: return m_module.SendSnapInfo(m_snapInfo);
                     case eRemoteRun.SendLotInfo: return m_module.SendLotInfo(m_lotInfo);
                     case eRemoteRun.SendSortInfo: return m_module.SendSortInfo(m_sortInfo);
-                    case eRemoteRun.SendChangeUserset: return m_module.SendChangeUserset();
                 }
                 return "OK";
             }
