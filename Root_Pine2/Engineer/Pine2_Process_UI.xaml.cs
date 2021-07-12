@@ -40,6 +40,7 @@ namespace Root_Pine2.Engineer
             textBoxThickness.DataContext = m_pine2; 
             textBlock3D.DataContext = m_pine2;
 
+            textBoxWorker.DataContext = m_pine2; 
             textBoxLotID.DataContext = m_pine2;
             textBoxBundle.DataContext = m_pine2;
 
