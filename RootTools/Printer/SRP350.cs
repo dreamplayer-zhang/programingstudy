@@ -214,7 +214,7 @@ namespace RootTools.Printer
         public void Write(int x, int dy, string sFileNameBMP)
         {
             m_yDoc += dy;
-            m_yDoc += BXL.PrintBitmap(x, m_yDoc, sFileNameBMP); 
+            m_yDoc += BXL.PrintBitmap(x, m_yDoc, sFileNameBMP);
         }
         #endregion
 

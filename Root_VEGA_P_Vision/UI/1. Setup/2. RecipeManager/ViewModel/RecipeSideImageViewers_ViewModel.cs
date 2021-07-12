@@ -59,7 +59,8 @@ namespace Root_VEGA_P_Vision
                         SelectedParamBase = selectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>().PodSideLR;
                         break;
                 }
-                recipeSide.recipeMask.SurfaceParameterBase = SelectedParamBase;
+                if(recipeSide!=null)
+                    recipeSide.recipeMask.SurfaceParameterBase = SelectedParamBase;
                 SelectedViewer.SetMask();
                 SetProperty(ref selectedTab, value);
             }
@@ -123,6 +124,31 @@ namespace Root_VEGA_P_Vision
                 recipe.GetItem<EUVOriginRecipe>().SideLROriginInfo,recipe.GetItem<EUVPodSurfaceParameter>().PodSideLR.MaskIndex);
 
             right_ViewerVM = new MaskRootViewer_ViewModel(parts+".Right", recipeSide.recipeMask.MaskTools, recipe,
+                recipe.GetItem<EUVOriginRecipe>().SideLROriginInfo, recipe.GetItem<EUVPodSurfaceParameter>().PodSideLR.MaskIndex);
+
+            selectedViewer = Top_ViewerVM;
+        }
+        public RecipeSideImageViewers_ViewModel(string parts)
+        {
+            Main = new RecipeSideImageViewers_Panel();
+            Main.DataContext = this;
+            RecipeBase recipe = GlobalObjects.Instance.Get<RecipeCoverFront>();
+            MaskTools_ViewModel maskTools = new MaskTools_ViewModel();
+            if (parts.Contains("Cover"))
+                recipe = GlobalObjects.Instance.Get<RecipeCoverFront>();
+            else if (parts.Contains("Plate"))
+                recipe = GlobalObjects.Instance.Get<RecipePlateFront>();
+
+            top_ViewerVM = new MaskRootViewer_ViewModel(parts + ".Top", maskTools, recipe,
+                recipe.GetItem<EUVOriginRecipe>().SideTBOriginInfo, recipe.GetItem<EUVPodSurfaceParameter>().PodSideTB.MaskIndex);
+
+            bottom_ViewerVM = new MaskRootViewer_ViewModel(parts + ".Bottom", maskTools, recipe,
+                recipe.GetItem<EUVOriginRecipe>().SideTBOriginInfo, recipe.GetItem<EUVPodSurfaceParameter>().PodSideTB.MaskIndex);
+
+            left_ViewerVM = new MaskRootViewer_ViewModel(parts + ".Left", maskTools, recipe,
+                recipe.GetItem<EUVOriginRecipe>().SideLROriginInfo, recipe.GetItem<EUVPodSurfaceParameter>().PodSideLR.MaskIndex);
+
+            right_ViewerVM = new MaskRootViewer_ViewModel(parts + ".Right", maskTools, recipe,
                 recipe.GetItem<EUVOriginRecipe>().SideLROriginInfo, recipe.GetItem<EUVPodSurfaceParameter>().PodSideLR.MaskIndex);
 
             selectedViewer = Top_ViewerVM;
