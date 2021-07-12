@@ -192,6 +192,7 @@ namespace Root_Pine2.Engineer
             buttonStop.IsEnabled = (EQ.p_eState == EQ.eState.Run); 
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Error);
             buttonHome.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Error);
+            buttonPickerSet.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
             groupBoxStack.IsEnabled = m_pine2.p_eMode == Pine2.eRunMode.Stack; 
         }
 
