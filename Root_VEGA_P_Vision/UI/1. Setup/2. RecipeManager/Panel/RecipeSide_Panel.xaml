@@ -7,14 +7,13 @@
              mc:Ignorable="d" 
              xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              d:DesignHeight="818"
-             d:DesignWidth="1912"
-             Background="{StaticResource PanelBackGround}">
+             d:DesignWidth="1912">
 
-    <TabControl>
-        <TabItem Header="EIP Cover">
+    <TabControl Style="{StaticResource ImageViewerTabControlStyle}" SelectedIndex="{Binding SelectedTab}">
+        <TabItem Header="EIP Cover" Style="{StaticResource ImageViewerTabItemStyle}">
             <local:RecipeSideImageViewers_Panel DataContext="{Binding EIPCoverViewers}"/>
         </TabItem>
-        <TabItem Header="EIP BasePlate">
+        <TabItem Header="EIP BasePlate" Style="{StaticResource ImageViewerTabItemStyle}">
             <local:RecipeSideImageViewers_Panel DataContext="{Binding EIPBaseViewers}"/>
         </TabItem>
     </TabControl>

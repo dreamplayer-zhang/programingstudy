@@ -877,12 +877,11 @@ namespace Root_EFEM.Module
                 if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
                 m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
                 
-                //MaterialFormatter materialFormatter = new MaterialFormatter();
+                MaterialFormatter material = new MaterialFormatter();
                 FlowData fromSlot = new FlowData();
                 FlowData from = new FlowData();
                 FlowData to = new FlowData();
                 FlowData toSlot = new FlowData();
-                //MaterialFormatter material = new MaterialFormatter();
                 string id = child.p_id;
                 if (!(id.Contains("Loadport") || id.Contains("Aligner")))
                 {
@@ -899,27 +898,28 @@ namespace Root_EFEM.Module
                     {
                         fromSlot.AddData(1);
                     }
-                    //material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
+                    material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
 
                     to.AddData("WTR");
-                    toSlot.AddData(1);
-                    marsLogManager.WriteXFR("WTR", SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.START, from, fromSlot, to, toSlot);
+                    toSlot.AddData((int)m_eArm + 1);
+                    marsLogManager.WriteXFR(EQ.p_nRunLP, "WTR", SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.START, from, fromSlot, to, toSlot, material);
                 }
                 else
                 {
+                    // WTR 제외 나머지 1 upper - 2 lower - 1
                     from.AddData(id);
                     from.AddData("WTR");
                     fromSlot.AddData(1);
-                    fromSlot.AddData(1);
+                    fromSlot.AddData((int)m_eArm + 1);
                     to.AddData("WTR");
                     to.AddData(id);
-                    toSlot.AddData(2);
+                    toSlot.AddData((int)m_eArm + 1);
                     toSlot.AddData(1);
 
-                    //material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
-                    //material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, p_nExchangeSlot + 1);
+                    material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
+                    material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, p_nExchangeSlot + 1);
 
-                    marsLogManager.WriteXFR("WTR", XFR_EVENTID.EXCHANGE, STATUS.START, from, fromSlot, to, toSlot);
+                    marsLogManager.WriteXFR(EQ.p_nRunLP, "WTR", XFR_EVENTID.EXCHANGE, STATUS.START, from, fromSlot, to, toSlot, material);
                 }
 
 
@@ -940,7 +940,7 @@ namespace Root_EFEM.Module
                 }
                 if (!p_isExchange)
                 {
-                    marsLogManager.WriteXFR("WTR", SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END, from, fromSlot, to, toSlot);
+                    marsLogManager.WriteXFR(EQ.p_nRunLP, "WTR", SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END, from, fromSlot, to, toSlot, material);
                     p_isExchange = false;
                 }
                 
@@ -1021,11 +1021,11 @@ namespace Root_EFEM.Module
                 child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
 
 
+                MaterialFormatter material = new MaterialFormatter();
                 FlowData from = new FlowData();
                 FlowData fromSlot = new FlowData();
                 FlowData to = new FlowData();
                 FlowData toSlot = new FlowData();
-                //MaterialFormatter material = new MaterialFormatter();
                 string id = child.p_id;
                 try
                 {
@@ -1038,7 +1038,7 @@ namespace Root_EFEM.Module
 
                         from.AddData("WTR");
 
-                        fromSlot.AddData(1);
+                        fromSlot.AddData((int)m_eArm + 1);
                         to.AddData(id);
 
                         if (id.Contains("Loadport"))
@@ -1050,9 +1050,9 @@ namespace Root_EFEM.Module
                             toSlot.AddData(1);
                         }
 
-                        //material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
+                        material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
 
-                        marsLogManager.WriteXFR("WTR", SSLNet.XFR_EVENTID.PUT, SSLNet.STATUS.START, from, fromSlot, to, toSlot);
+                        marsLogManager.WriteXFR(EQ.p_nRunLP, "WTR", SSLNet.XFR_EVENTID.PUT, SSLNet.STATUS.START, from, fromSlot, to, toSlot, material);
                     }
 
                     child.p_bLock = true;
@@ -1062,23 +1062,23 @@ namespace Root_EFEM.Module
 
                     if (!p_isExchange)
                     {
-                        marsLogManager.WriteXFR("WTR", SSLNet.XFR_EVENTID.PUT, SSLNet.STATUS.END, from, fromSlot, to, toSlot);
+                        marsLogManager.WriteXFR(EQ.p_nRunLP, "WTR", SSLNet.XFR_EVENTID.PUT, SSLNet.STATUS.END, from, fromSlot, to, toSlot, material);
                     }
                     else
                     {
                         from.AddData(id);
                         from.AddData("WTR");
                         fromSlot.AddData(1);
-                        fromSlot.AddData(1);
+                        fromSlot.AddData((int)m_eArm + 1);
                         to.AddData("WTR");
                         to.AddData(id);
-                        toSlot.AddData(2);
+                        toSlot.AddData((int)m_eArm + 1);
                         toSlot.AddData(1);
 
-                        //material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, p_nExchangeSlot + 1);
-                        //material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
+                        material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, p_nExchangeSlot + 1);
+                        material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
 
-                        marsLogManager.WriteXFR("WTR", SSLNet.XFR_EVENTID.EXCHANGE, SSLNet.STATUS.END, from, fromSlot, to, toSlot);
+                        marsLogManager.WriteXFR(EQ.p_nRunLP, "WTR", SSLNet.XFR_EVENTID.EXCHANGE, SSLNet.STATUS.END, from, fromSlot, to, toSlot, material);
                         p_isExchange = false;
                     }
                     child.AfterPut(m_nChildID);

@@ -625,7 +625,10 @@ namespace RootTools.Camera.BaslerPylon
 
         public bool IsConnected()
         {
-            return m_cam.IsOpen;
+            if (m_cam == null)
+                return false;
+            else
+                return m_cam.IsOpen;
         }
 
         // Starts the continuous grabbing of images and handles exceptions.
@@ -916,9 +919,6 @@ namespace RootTools.Camera.BaslerPylon
                         }
                     }
                 }
-
-
-                grabLock = false;
             }
             catch (Exception exception)
             {
@@ -926,6 +926,8 @@ namespace RootTools.Camera.BaslerPylon
             }
             finally
             {
+                grabLock = false;
+
                 // Dispose the grab result if needed for returning it to the grab loop.
                 e.DisposeGrabResultIfClone();
             }

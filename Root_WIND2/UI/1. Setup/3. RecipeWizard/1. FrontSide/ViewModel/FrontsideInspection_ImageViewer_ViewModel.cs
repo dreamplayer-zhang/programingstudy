@@ -113,7 +113,7 @@ namespace Root_WIND2
 
                 Shapes.Add(rectInfo);
                 p_DrawElement.Add(rectInfo.UIElement);
-
+                 
                 if (textList[i] != null)
                 {
                     Grid textGrid = WriteInfoText(textList[i++], rect, color, FontSz);

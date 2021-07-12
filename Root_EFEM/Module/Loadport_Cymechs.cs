@@ -1336,7 +1336,9 @@ namespace Root_EFEM.Module
                 for (int i = 0; i < m_infoCarrier.m_aGemSlot.Count; i++)
                 {
                     if (m_infoCarrier.m_aGemSlot[i].p_eState == GemSlotBase.eState.Select)
+                    {
                         m_infoCarrier.StartProcess(m_infoCarrier.m_aGemSlot[i].p_id);
+                    }
                 }
 
                 return sResult;

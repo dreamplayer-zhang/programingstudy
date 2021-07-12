@@ -17,8 +17,8 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="3*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" Margin="3" Background="AntiqueWhite" PreviewMouseLeftButtonDown="Grid_PreviewMouseLeftButtonDown">
                 <TextBlock x:Name="textBlockVision" Text="Vision" HorizontalAlignment="Center"/>
@@ -28,10 +28,10 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0" Margin="3" Background="Beige">
+                <Grid Grid.Column="0" x:Name="gridStripB" Margin="3" Background="Beige">
                     <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
                 </Grid>
-                <Grid Grid.Column="1" Margin="3" Background="Beige">
+                <Grid Grid.Column="1" x:Name="gridStripA" Margin="3" Background="Beige">
                     <TextBlock x:Name="textBlockA" HorizontalAlignment="Center"/>
                 </Grid>
             </Grid>
@@ -40,14 +40,14 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0" Margin="3" Background="AliceBlue" PreviewMouseLeftButtonDown="GridB_PreviewMouseLeftButtonDown">
+                <Grid Grid.Column="0" x:Name="gridB" Margin="3" Background="AliceBlue" PreviewMouseLeftButtonDown="GridB_PreviewMouseLeftButtonDown">
                     <TextBlock x:Name="textBlockStepB" HorizontalAlignment="Center"/>
                 </Grid>
-                <Grid Grid.Column="1" Margin="3" Background="AliceBlue" PreviewMouseLeftButtonDown="GridA_PreviewMouseLeftButtonDown">
+                <Grid Grid.Column="1" x:Name="gridA" Margin="3" Background="AliceBlue" PreviewMouseLeftButtonDown="GridA_PreviewMouseLeftButtonDown">
                     <TextBlock x:Name="textBlockStepA" HorizontalAlignment="Center"/>
                 </Grid>
             </Grid>
-            <Grid Grid.Row="3" Margin="3" Background="White">
+            <Grid Grid.Row="3" x:Name="gridInfo" Margin="3" Background="White" PreviewMouseLeftButtonDown="GridInfo_PreviewMouseLeftButtonDown">
                 <TextBlock x:Name="textBlockInfo" Text="{Binding p_sInfo}"/>
             </Grid>
             <tree:TreeUI Grid.Row="4" x:Name="treeRootUI" IsEnabled="False"/>

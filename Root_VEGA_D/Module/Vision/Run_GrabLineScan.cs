@@ -274,7 +274,7 @@ namespace Root_VEGA_D.Module
         }
 
         public event OnGrabLineScanEvent AlignCompleted;
-        string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY, out CRect rectBotMarker)
+        string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY, bool bFindBotAlignMarker, out CRect rectBotMarker)
         {
             rectBotMarker = new CRect(0, 0, 0, 0);
 
@@ -345,7 +345,7 @@ namespace Root_VEGA_D.Module
                             return p_sInfo;
 
                         // IPU 연결된 상태라면 좌하단 Align Marker 위치 전달을 위해 찾아야함
-                        if (m_module.TcpipCommServer.IsConnected())
+                        if (bFindBotAlignMarker)
                         {
                             if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
                                 return p_sInfo;
@@ -383,36 +383,45 @@ namespace Root_VEGA_D.Module
                             rectBotMarker.Right = rectBotMarker.Left + imgBot.Width;
                             rectBotMarker.Bottom = rectBotMarker.Top + imgBot.Height;
 
-                            // FindEdge 함수 사용하여 정확한 위치 보정
-                            int nEdgeCheckMargin = 10;
-
-                            CRect rectROI = new CRect(
-                                rectBotMarker.Left - nEdgeCheckMargin - (int)(m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5),
-                                rectBotMarker.Top - nEdgeCheckMargin,
-                                rectBotMarker.Right + nEdgeCheckMargin - (int)(m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5),
-                                rectBotMarker.Bottom + nEdgeCheckMargin);
-
-                            unsafe
+                            if(m_grabMode.m_bUseFindEdge)
                             {
-                                IntPtr intPtr = mem.GetPtr();
-                                byte* ptrImg = (byte*)intPtr.ToPointer();
+                                // FindEdge 함수 사용하여 정확한 위치 보정
+                                int nEdgeCheckMargin = 10;
 
-                                int centerX = (rectROI.Left + rectROI.Right) / 2;
-                                int centerY = (rectROI.Top + rectROI.Bottom) / 2;
-                                int width = rectROI.Width;
-                                int height = rectROI.Height;
+                                CRect rectROI = new CRect(
+                                    rectBotMarker.Left - nEdgeCheckMargin - (int)(m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5),
+                                    rectBotMarker.Top - nEdgeCheckMargin,
+                                    rectBotMarker.Right + nEdgeCheckMargin - (int)(m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5),
+                                    rectBotMarker.Bottom + nEdgeCheckMargin);
 
-                                int nOffsetX_LtoR = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, rectROI.Left, (int)(centerY - height * 0.1 * 0.5), (int)(rectROI.Left + width * 0.1), (int)(centerY + height * 0.1 * 0.5), 0, 100);
-                                int nOffsetY_BtoT = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, (int)(centerX - width * 0.1 * 0.5), (int)(rectROI.Bottom - height * 0.1), (int)(centerX + width * 0.1 * 0.5), rectROI.Bottom, 3, 100);
+                                unsafe
+                                {
+                                    IntPtr intPtr = mem.GetPtr();
+                                    byte* ptrImg = (byte*)intPtr.ToPointer();
 
-                                botMarkerX += nOffsetX_LtoR - nEdgeCheckMargin - rectROI.Left;
-                                botMarkerY += nOffsetY_BtoT + nEdgeCheckMargin - rectROI.Bottom;
+                                    int centerX = (rectROI.Left + rectROI.Right) / 2;
+                                    int centerY = (rectROI.Top + rectROI.Bottom) / 2;
+                                    int width = rectROI.Width;
+                                    int height = rectROI.Height;
+
+                                    int nOffsetX_LtoR = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, rectROI.Left, (int)(centerY - height * 0.1 * 0.5), (int)(rectROI.Left + width * 0.1), (int)(centerY + height * 0.1 * 0.5), 0, 100);
+                                    int nOffsetY_BtoT = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, (int)(centerX - width * 0.1 * 0.5), (int)(rectROI.Bottom - height * 0.1), (int)(centerX + width * 0.1 * 0.5), rectROI.Bottom, 3, 100);
+
+                                    botMarkerX += nOffsetX_LtoR - nEdgeCheckMargin - rectROI.Left;
+                                    botMarkerY += nOffsetY_BtoT + nEdgeCheckMargin - rectROI.Bottom;
+                                }
+
+                                rectBotMarker.Left = botMarkerX;
+                                rectBotMarker.Top = botMarkerY;
+                                rectBotMarker.Right = rectBotMarker.Left + imgBot.Width;
+                                rectBotMarker.Bottom = rectBotMarker.Top + imgBot.Height;
                             }
 
-                            rectBotMarker.Left = botMarkerX;
-                            rectBotMarker.Top = botMarkerY;
-                            rectBotMarker.Right = rectBotMarker.Left + imgBot.Width;
-                            rectBotMarker.Bottom = rectBotMarker.Top + imgBot.Height;
+                            // offset 적용
+                            rectBotMarker.Left += m_grabMode.m_ptBotAlignMarkerOffset.X;
+                            rectBotMarker.Top += m_grabMode.m_ptBotAlignMarkerOffset.Y;
+                            rectBotMarker.Right += m_grabMode.m_ptBotAlignMarkerOffset.X;
+                            rectBotMarker.Bottom += m_grabMode.m_ptBotAlignMarkerOffset.Y;
 
                             m_log.Info(string.Format("LeftBottom Align Marker is found - {0}, {1}", rectBotMarker.Left, rectBotMarker.Bottom));
                         }
@@ -431,7 +440,7 @@ namespace Root_VEGA_D.Module
             {
                 m_grabMode.SetLight(false);
 
-                if(AlignCompleted != null) AlignCompleted(this, null);
+                if(AlignCompleted != null) AlignCompleted(this, rectBotMarker);
             }
 
             m_log.Info("Align Failed");
@@ -564,7 +573,9 @@ namespace Root_VEGA_D.Module
 
                 // 얼라인
                 CRect rectBotMarker = new CRect(0, 0, 0, 0);
-                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, out rectBotMarker)))
+                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, false, out rectBotMarker)))
+                    return p_sInfo;
+                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, true, out rectBotMarker)))
                     return p_sInfo;
 
                 // IPU 접속 대기

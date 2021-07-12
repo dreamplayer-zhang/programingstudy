@@ -62,7 +62,7 @@ namespace Root_CAMELLIA.Module
             DataFormatter dataFormatter = new DataFormatter();
             dataFormatter.AddData(nameof(m_InitialCal), m_InitialCal.ToString());
             dataFormatter.AddData(nameof(m_nCalibrationCnt), m_nCalibrationCnt);
-            logManager.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Background Calibration", SSLNet.STATUS.END, dataFormatter);
+            logManager.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Background Calibration", SSLNet.STATUS.END, dataFormatter:dataFormatter);
         }
 
         public override ModuleRunBase Clone()
@@ -187,26 +187,26 @@ namespace Root_CAMELLIA.Module
 
 
                 DataFormatter dataformatter = new DataFormatter();
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Lifter Down", SSLNet.STATUS.START);
+                //
                 if (m_module.LifterDown() != "OK")
                 {
                     return p_sInfo;
                 }
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Lifter Down", SSLNet.STATUS.END);
+                //logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Lifter Down", SSLNet.STATUS.END);
 
 
                 //
-                logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, "Calibration WaferCentering", (int)BaseDefine.Process.CalbrationWaferCentering);
+                logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, MATERIAL_TYPE.WAFER, "Calibration WaferCentering", (int)BaseDefine.Process.CalbrationWaferCentering);
                 DataFormatter dataFormatter = new DataFormatter();
                 dataFormatter.AddData("Z Axis", m_dFocusZ, "Pulse");
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.START, dataFormatter);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.START, dataFormatter: dataFormatter);
 
                 if (m_module.Run(axisZ.StartMove(m_dFocusZ)))
                     return p_sInfo;
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
 
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.END, dataFormatter);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.END, dataFormatter: dataFormatter);
                 dataFormatter.ClearData();
 
 
@@ -215,7 +215,7 @@ namespace Root_CAMELLIA.Module
                     //logManager.WritePRC(EQ.p_nRunLP, deviceID, PRC_EVENTID., STATUS.START, "Background Calibration", 1);
                     dataFormatter.AddData(nameof(m_InitialCal), m_InitialCal.ToString());
                     dataFormatter.AddData(nameof(m_nCalibrationCnt), m_nCalibrationCnt);
-                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Background Calibration", SSLNet.STATUS.START, dataFormatter);
+                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Background Calibration", SSLNet.STATUS.START, dataFormatter: dataFormatter);
 
                     if (m_useCentering)
                     {
@@ -244,22 +244,22 @@ namespace Root_CAMELLIA.Module
                             if (!success)
                                 return "Calibration Fail";
                         }
-                        logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Background Calibration", SSLNet.STATUS.END, dataFormatter);
+                        logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Background Calibration", SSLNet.STATUS.END, dataFormatter: dataFormatter);
                         dataFormatter.ClearData();
-                        logManager.WritePRC(EQ.p_nRunLP, deviceID, PRC_EVENTID.StepProcess, STATUS.END, "Calibration WaferCentering", (int)BaseDefine.Process.CalbrationWaferCentering);
+                        logManager.WritePRC(EQ.p_nRunLP, deviceID, PRC_EVENTID.StepProcess, STATUS.END, MATERIAL_TYPE.WAFER, "Calibration WaferCentering", (int)BaseDefine.Process.CalbrationWaferCentering);
                     }
                 }
 
                 if (!m_useCentering)
                 {
                     dataFormatter.AddData("Z Axis", axisZ.GetPosValue(eAxisPos.Home), "Pulse");
-                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.START, dataFormatter);
+                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.START, dataFormatter: dataFormatter);
 
                     if (m_module.Run(axisZ.StartMove(eAxisPos.Home)))
                         return p_sInfo;
                     if (m_module.Run(axisZ.WaitReady()))
                         return p_sInfo;
-                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.END, dataFormatter);
+                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.END, dataFormatter: dataFormatter);
                     dataformatter.ClearData();
                     //logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0);
                     return "OK";
@@ -270,23 +270,23 @@ namespace Root_CAMELLIA.Module
                 m_module.SetLight(true);
 
 
-
-                dataformatter.AddData(nameof(m_bUseCustomSpeed), m_bUseCustomSpeed.ToString());
+                DataFormatter stageDataFormatter = new DataFormatter();
+                stageDataFormatter.AddData(nameof(m_bUseCustomSpeed), m_bUseCustomSpeed.ToString());
 
                 //logManager.WritePRC(EQ.p_nRunLP, deviceID, PRC_EVENTID., STATUS.START, "Move To FOV", 2);
                 if (m_bUseCustomSpeed && CheckVaildParameter())
                 {
 
-                    dataformatter.AddData("X Axis", m_WaferLT_pulse.X, "Pulse");
-                    dataformatter.AddData(nameof(m_dMoveSpeedX), m_dMoveSpeedX);
-                    dataformatter.AddData(nameof(m_dMoveAccX), m_dMoveAccX);
-                    dataformatter.AddData(nameof(m_dMoveDecX), m_dMoveDecX);
-                    dataformatter.AddData("Y Axis", m_WaferLT_pulse.Y, "Pulse");
-                    dataformatter.AddData(nameof(m_dMoveSpeedY), m_dMoveSpeedY);
-                    dataformatter.AddData(nameof(m_dMoveAccY), m_dMoveAccY);
-                    dataformatter.AddData(nameof(m_dMoveDecY), m_dMoveDecY);
+                    stageDataFormatter.AddData("X Axis", m_WaferLT_pulse.X, "Pulse");
+                    stageDataFormatter.AddData(nameof(m_dMoveSpeedX), m_dMoveSpeedX);
+                    stageDataFormatter.AddData(nameof(m_dMoveAccX), m_dMoveAccX);
+                    stageDataFormatter.AddData(nameof(m_dMoveDecX), m_dMoveDecX);
+                    stageDataFormatter.AddData("Y Axis", m_WaferLT_pulse.Y, "Pulse");
+                    stageDataFormatter.AddData(nameof(m_dMoveSpeedY), m_dMoveSpeedY);
+                    stageDataFormatter.AddData(nameof(m_dMoveAccY), m_dMoveAccY);
+                    stageDataFormatter.AddData(nameof(m_dMoveDecY), m_dMoveDecY);
 
-                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
+                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter: stageDataFormatter);
 
                     if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferLT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
                     {
@@ -301,16 +301,16 @@ namespace Root_CAMELLIA.Module
                 }
                 else
                 {
-                    dataformatter.AddData("X Axis", m_WaferLT_pulse.X, "Pulse");
-                    dataformatter.AddData("Y Axis", m_WaferLT_pulse.Y, "Pulse");
-                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
+                    stageDataFormatter.AddData("X Axis", m_WaferLT_pulse.X, "Pulse");
+                    stageDataFormatter.AddData("Y Axis", m_WaferLT_pulse.Y, "Pulse");
+                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter: stageDataFormatter);
                     if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
                 }
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter);
-                dataformatter.ClearData();
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter: stageDataFormatter);
+                stageDataFormatter.ClearData();
 
                 logManager.WriteFNC(EQ.p_nRunLP, deviceID, "GrabOneShot", SSLNet.STATUS.START);
                 VRS.GrabOneShot();
@@ -323,17 +323,20 @@ namespace Root_CAMELLIA.Module
                 ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
 
 
-                dataformatter.AddData(nameof(m_bUseCustomSpeed), m_bUseCustomSpeed.ToString());
+                stageDataFormatter.AddData(nameof(m_bUseCustomSpeed), m_bUseCustomSpeed.ToString());
                 if (m_bUseCustomSpeed && CheckVaildParameter())
                 {
-                    dataformatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
-                    dataformatter.AddData(nameof(m_dMoveSpeedX), m_dMoveSpeedX);
-                    dataformatter.AddData(nameof(m_dMoveAccX), m_dMoveAccX);
-                    dataformatter.AddData(nameof(m_dMoveDecX), m_dMoveDecX);
-                    dataformatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
-                    dataformatter.AddData(nameof(m_dMoveSpeedY), m_dMoveSpeedY);
-                    dataformatter.AddData(nameof(m_dMoveAccY), m_dMoveAccY);
-                    dataformatter.AddData(nameof(m_dMoveDecY), m_dMoveDecY);
+                    stageDataFormatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
+                    stageDataFormatter.AddData(nameof(m_dMoveSpeedX), m_dMoveSpeedX);
+                    stageDataFormatter.AddData(nameof(m_dMoveAccX), m_dMoveAccX);
+                    stageDataFormatter.AddData(nameof(m_dMoveDecX), m_dMoveDecX);
+                    stageDataFormatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
+                    stageDataFormatter.AddData(nameof(m_dMoveSpeedY), m_dMoveSpeedY);
+                    stageDataFormatter.AddData(nameof(m_dMoveAccY), m_dMoveAccY);
+                    stageDataFormatter.AddData(nameof(m_dMoveDecY), m_dMoveDecY);
+
+                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter: stageDataFormatter);
+
                     if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferRT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
                     {
                         return p_sInfo;
@@ -347,17 +350,17 @@ namespace Root_CAMELLIA.Module
                 }
                 else
                 {
-                    dataformatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
-                    dataformatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
-                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
+                    stageDataFormatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
+                    stageDataFormatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
+                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter: stageDataFormatter);
 
                     if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
                 }
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter);
-                dataformatter.ClearData();
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter: stageDataFormatter);
+                stageDataFormatter.ClearData();
                 // return "OK";
                 //m_DataManager.m_waferCentering.FindEdge(param);
                 //Thread.Sleep(1000);
@@ -387,17 +390,20 @@ namespace Root_CAMELLIA.Module
 
                 // Thread.Sleep(1000);
 
-                dataformatter.AddData(nameof(m_bUseCustomSpeed), m_bUseCustomSpeed.ToString());
+                stageDataFormatter.AddData(nameof(m_bUseCustomSpeed), m_bUseCustomSpeed.ToString());
                 if (m_bUseCustomSpeed && CheckVaildParameter())
                 {
-                    dataformatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
-                    dataformatter.AddData(nameof(m_dMoveSpeedX), m_dMoveSpeedX);
-                    dataformatter.AddData(nameof(m_dMoveAccX), m_dMoveAccX);
-                    dataformatter.AddData(nameof(m_dMoveDecX), m_dMoveDecX);
-                    dataformatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
-                    dataformatter.AddData(nameof(m_dMoveSpeedY), m_dMoveSpeedY);
-                    dataformatter.AddData(nameof(m_dMoveAccY), m_dMoveAccY);
-                    dataformatter.AddData(nameof(m_dMoveDecY), m_dMoveDecY);
+                    stageDataFormatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
+                    stageDataFormatter.AddData(nameof(m_dMoveSpeedX), m_dMoveSpeedX);
+                    stageDataFormatter.AddData(nameof(m_dMoveAccX), m_dMoveAccX);
+                    stageDataFormatter.AddData(nameof(m_dMoveDecX), m_dMoveDecX);
+                    stageDataFormatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
+                    stageDataFormatter.AddData(nameof(m_dMoveSpeedY), m_dMoveSpeedY);
+                    stageDataFormatter.AddData(nameof(m_dMoveAccY), m_dMoveAccY);
+                    stageDataFormatter.AddData(nameof(m_dMoveDecY), m_dMoveDecY);
+
+                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter: stageDataFormatter);
+
                     if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferRB_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
                     {
                         return p_sInfo;
@@ -411,17 +417,17 @@ namespace Root_CAMELLIA.Module
                 }
                 else
                 {
-                    dataformatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
-                    dataformatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
-                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
+                    stageDataFormatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
+                    stageDataFormatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
+                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter: stageDataFormatter);
 
                     if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
                 }
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter);
-                dataformatter.ClearData();
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter: stageDataFormatter);
+                stageDataFormatter.ClearData();
 
                 //if (VRS.Grab() == "OK")
                 //{
@@ -484,21 +490,21 @@ namespace Root_CAMELLIA.Module
                 }
 
 
-                dataFormatter.AddData("Z Axis", axisZ.GetPosValue(eAxisPos.Home), "Pulse");
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.START, dataFormatter);
+                stageDataFormatter.AddData("Z Axis", axisZ.GetPosValue(eAxisPos.Home), "Pulse");
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.START, dataFormatter: stageDataFormatter);
 
                 if (m_module.Run(axisZ.StartMove(eAxisPos.Home)))
                     return p_sInfo;
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.END, dataFormatter);
-                dataformatter.ClearData();
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Navigation Cam Move", SSLNet.STATUS.END, dataFormatter: stageDataFormatter);
+                stageDataFormatter.ClearData();
                 m_module.SetLight(false);
 
                 test.Stop();
                 m_log.Warn("Calibration End >> " + test.ElapsedMilliseconds);
 
-                logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, "Calibration WaferCentering", (int)BaseDefine.Process.CalbrationWaferCentering);
+                logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, MATERIAL_TYPE.WAFER, "Calibration WaferCentering", (int)BaseDefine.Process.CalbrationWaferCentering);
             }
             finally
             {

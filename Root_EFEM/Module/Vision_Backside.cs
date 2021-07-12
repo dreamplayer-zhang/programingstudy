@@ -409,20 +409,20 @@ namespace Root_EFEM.Module
 
         public void RunTest()
         {
-            while(true)
-            {
-                Thread.Sleep(500);
-                if (!di_test1.p_bIn)
-                    GeneralFunction.WriteINIFile("1","2",di_test1.m_id + "Door Open Detected", @"D:\Share\1.ini");
-                else if (!di_test2.p_bIn)
-                    GeneralFunction.WriteINIFile("1", "2", di_test2.m_id + "Door Open Detected", @"D:\Share\1.ini");
-                else if (!di_test3.p_bIn)
-                    GeneralFunction.WriteINIFile("1", "2", di_test3.m_id + "Door Open Detected", @"D:\Share\1.ini");
-                else if (!di_test4.p_bIn)
-                    GeneralFunction.WriteINIFile("1", "2", di_test4.m_id + "Door Open Detected", @"D:\Share\1.ini");
-                else
-                    GeneralFunction.WriteINIFile("1", "2", "", @"D:\Share\1.ini");
-            }
+            //while(true)
+            //{
+            //    Thread.Sleep(500);
+            //    if (!di_test1.p_bIn)
+            //        GeneralFunction.WriteINIFile("1","2",di_test1.m_id + "Door Open Detected", @"D:\Share\1.ini");
+            //    else if (!di_test2.p_bIn)
+            //        GeneralFunction.WriteINIFile("1", "2", di_test2.m_id + "Door Open Detected", @"D:\Share\1.ini");
+            //    else if (!di_test3.p_bIn)
+            //        GeneralFunction.WriteINIFile("1", "2", di_test3.m_id + "Door Open Detected", @"D:\Share\1.ini");
+            //    else if (!di_test4.p_bIn)
+            //        GeneralFunction.WriteINIFile("1", "2", di_test4.m_id + "Door Open Detected", @"D:\Share\1.ini");
+            //    else
+            //        GeneralFunction.WriteINIFile("1", "2", "", @"D:\Share\1.ini");
+            //}
         }
 
         Thread testthread;

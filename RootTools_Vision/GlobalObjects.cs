@@ -57,7 +57,7 @@ namespace RootTools_Vision
         {
             if (objectDictionary.ContainsKey(name.ToLower()) == true)
             {
-                  return (T)objectDictionary[name.ToLower()];
+                return (T)objectDictionary[name.ToLower()];
             }
             else
             {
@@ -68,9 +68,9 @@ namespace RootTools_Vision
 
         public void DelistNamed(string name)
         {
-            if (objectDictionary.ContainsKey(name) == true)
+            if (objectDictionary.ContainsKey(name.ToLower()) == true)
             {
-                objectDictionary.Remove(name);
+                objectDictionary.Remove(name.ToLower());
             }
             else
             {

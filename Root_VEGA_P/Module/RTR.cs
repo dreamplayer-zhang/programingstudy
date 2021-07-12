@@ -17,15 +17,16 @@ namespace Root_VEGA_P.Module
     public class RTR : ModuleBase
     {
         #region ToolBox
-        TCPAsyncClient m_tcpip;
+        RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.GetComm(ref m_tcpip, this, "TCPIP");
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
             m_armEOP.GetTools(m_toolBox, this);
             m_armEIP.GetTools(m_toolBox, this);
             if (bInit)
             {
-                m_tcpip.EventReceiveData += M_tcpip_EventReciveData;
+                m_rs232.OnReceive += M_rs232_OnReceive;
+                m_rs232.p_bConnect = true;
                 InitALID();
             }
         }
@@ -104,7 +105,7 @@ namespace Root_VEGA_P.Module
             public void GetTools(ToolBox toolBox, RTR module)
             {
                 module.p_sInfo = toolBox.GetDIO(ref m_diArmClose, module, p_id + ".ArmClose");
-                module.p_sInfo = toolBox.GetDIO(ref m_diGrip, module, p_id + ".Grip", Enum.GetNames(typeof(eGrip))); 
+                module.p_sInfo = toolBox.GetDIO(ref m_diGrip, module, p_id + ".Grip", Enum.GetNames(typeof(eGrip)));
             }
 
             public string RunGrip(bool bGrip, RTR module)
@@ -152,7 +153,7 @@ namespace Root_VEGA_P.Module
         Registry m_reg = null;
         public void ReadPod_Registry()
         {
-            m_reg = new Registry("InfoPod"); 
+            m_reg = new Registry("InfoPod");
             int nPod = m_reg.Read(p_id, -1);
             if (nPod >= 0)
             {
@@ -192,9 +193,9 @@ namespace Root_VEGA_P.Module
         {
             switch (m_eCheckPod)
             {
-                case eCheckPod.InfoPod: return IsPodExistInfoPod(ePod); 
+                case eCheckPod.InfoPod: return IsPodExistInfoPod(ePod);
                 case eCheckPod.Sensor: return IsPodExistSensor(ePod);
-                default: return IsPodExistInfoPod(ePod) && IsPodExistSensor(ePod); 
+                default: return IsPodExistInfoPod(ePod) && IsPodExistSensor(ePod);
             }
         }
 
@@ -428,12 +429,21 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        #region TCPIP
-        private void M_tcpip_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        #region RS232
+        //private void M_tcpip_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        //{
+        //    string sRead = Encoding.Default.GetString(aBuf);
+        //    string[] sReads = sRead.Split(' ');
+        //    if (sReads[0] == "ERR") m_log.Error(GetErrorString(sReads[1]));
+        //    else m_log.Info(sRead + " <-- Recv] ");
+        //    Run(ReplyCmd(sReads));
+        //    if (p_sInfo != "OK") p_eState = eState.Error;
+        //    m_eSendCmd = eCmd.None;
+        //}
+        protected void M_rs232_OnReceive(string sRead)
         {
-            string sRead = Encoding.Default.GetString(aBuf);
             string[] sReads = sRead.Split(' ');
-            if (sReads[0] == "ERR") m_log.Error(GetErrorString(sReads[1]));
+            if (sReads[0] == "ERR" || sReads.Length > 1) m_log.Error(GetErrorString(sReads[1]));
             else m_log.Info(sRead + " <-- Recv] ");
             Run(ReplyCmd(sReads));
             if (p_sInfo != "OK") p_eState = eState.Error;
@@ -449,7 +459,7 @@ namespace Root_VEGA_P.Module
             {
                 if (EQ.IsStop()) return "EQ Stop";
                 Thread.Sleep(200);
-                if (m_eSendCmd != eCmd.None) return " Communication Error !!";
+                if (m_eSendCmd != eCmd.None) return "RS232 Communication Error !!";
             }
             if (EQ.IsStop()) return "EQ Stop";
             string str = m_dicCmd[cmd];
@@ -467,7 +477,7 @@ namespace Root_VEGA_P.Module
             }
             m_log.Info(" [ Send --> " + str);
             m_eSendCmd = cmd;
-            m_tcpip.Send(str);
+            m_rs232.Send(str);
             return "OK";
         }
 
@@ -487,7 +497,7 @@ namespace Root_VEGA_P.Module
             str += " " + sSpeed;
             m_log.Info(" [ Send --> " + str);
             m_eSendCmd = cmd;
-            m_tcpip.Send(str);
+            m_rs232.Send(str);
             return "OK";
         }
 
@@ -508,7 +518,7 @@ namespace Root_VEGA_P.Module
             str += " " + sMove;
             m_log.Info(" [ Send --> " + str);
             m_eSendCmd = cmd;
-            m_tcpip.Send(str);
+            m_rs232.Send(str);
             return "OK";
         }
 
@@ -519,7 +529,7 @@ namespace Root_VEGA_P.Module
                 // if (EQ.IsStop()) return "EQ Stop";
                 int msDelay = 1000 * secTimeout;
                 int ms10 = 0;
-                if (m_tcpip.p_bConnect == false) return m_eSendCmd.ToString() + " Communication not Connect !!";
+                if (m_rs232.p_bConnect == false) return m_eSendCmd.ToString() + " Communication not Connect !!";
                 while (m_eSendCmd != eCmd.None)
                 {
                     //if (EQ.IsStop()) return "EQ Stop";
@@ -588,9 +598,9 @@ namespace Root_VEGA_P.Module
         bool m_bNeedHome = true;
         bool IsFailResetCPU()
         {
-            int msComm = (int)(1000 * m_secDelayComm);
+            int msRS232 = (int)(1000 * m_secDelayRS232);
             int ms10 = 0;
-            if (m_tcpip.p_bConnect == false) m_tcpip.Connect();
+            if (m_rs232.p_bConnect == false) m_rs232.p_bConnect = true;
 
             if (Run(WriteCmd(eCmd.ResetCPU))) return true;
             Thread.Sleep(100);
@@ -599,8 +609,9 @@ namespace Root_VEGA_P.Module
             {
                 Thread.Sleep(10);
                 ms10 += 10;
-                if (ms10 > msComm)
+                if (ms10 > msRS232)
                 {
+                    m_rs232.p_bConnect = false;
                     m_bNeedHome = true;
                     m_eSendCmd = eCmd.None;
                     return true;
@@ -611,12 +622,12 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region Timeout
-        public int m_secDelayComm = 2;
+        public int m_secDelayRS232 = 2;
         public int m_secHome = 60;
         public int m_secMotion = 20;
         void RunTimeoutTree(Tree tree)
         {
-            m_secDelayComm = tree.Set(m_secDelayComm, m_secDelayComm, "Comm", "Communication Delay (sec)");
+            m_secDelayRS232 = tree.Set(m_secDelayRS232, m_secDelayRS232, "RS232", "Timeout (sec)");
             m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
             m_secMotion = tree.Set(m_secMotion, m_secMotion, "Motion", "Timeout (sec)");
         }
@@ -650,7 +661,7 @@ namespace Root_VEGA_P.Module
 
         public bool IsEnableRecovery()
         {
-            return p_infoPod != null; 
+            return p_infoPod != null;
         }
         #endregion
 
@@ -666,8 +677,8 @@ namespace Root_VEGA_P.Module
                 return "OK";
             }
             int posRTR = child.GetTeachRTR(child.p_infoPod);
-            int nArm = GetArmID(child.p_infoPod);
             if (posRTR < 0) return "RTR Teach Position Not Defined";
+            int nArm = GetArmID(child.p_infoPod);
             if (child.p_eState != eState.Ready)
             {
                 if (Run(WriteCmd(eCmd.GetReady, posRTR, 1, nArm))) return p_sInfo;
@@ -690,8 +701,10 @@ namespace Root_VEGA_P.Module
             }
             finally
             {
-                if (IsPodExist()) child.p_infoPod = null;
-                else p_infoPod = null;
+                if (IsPodExist()) 
+                    child.p_infoPod = null;
+                else
+                    p_infoPod = null;
             }
             return IsPodExist() ? "OK" : "RTR Get Error : " + child.p_id;
         }
@@ -711,11 +724,11 @@ namespace Root_VEGA_P.Module
                 if (EQ.IsStop()) return "Stop";
                 Thread.Sleep(100);
             }
+            if (Run(child.BeforePut(p_infoPod))) return p_sInfo;
+            if (Run(child.IsPutOK(p_infoPod))) return p_sInfo;
             int posRTR = child.GetTeachRTR(p_infoPod);
             int nArm = GetArmID(p_infoPod);
             if (posRTR < 0) return "RTR Teach Position Not Defined";
-            if (Run(child.BeforePut(p_infoPod))) return p_sInfo;
-            if (Run(child.IsPutOK(p_infoPod))) return p_sInfo;
             child.p_infoPod = p_infoPod;
             try
             {
@@ -727,8 +740,10 @@ namespace Root_VEGA_P.Module
             }
             finally
             {
-                if (IsPodExist()) child.p_infoPod = null;
-                else p_infoPod = null;
+                if (IsPodExist()) 
+                    child.p_infoPod = null;
+                else 
+                    p_infoPod = null;
             }
             return IsPodExist() ? "RTR Put Error : " + child.p_id : "OK";
         }
@@ -740,7 +755,7 @@ namespace Root_VEGA_P.Module
             child = GetChild(sChildPut);
             if (child == null) return "RTR Child not Found : " + sChildPut;
             if (Run(RunGet(sChildGet))) return p_sInfo;
-            return RunPut(sChildPut); 
+            return RunPut(sChildPut);
         }
         #endregion
 
@@ -775,7 +790,7 @@ namespace Root_VEGA_P.Module
             {
                 EQ.p_bStop = true;
                 p_eState = eState.Error;
-                return "State Home Exception : " + e.Message; 
+                return "State Home Exception : " + e.Message;
             }
         }
         #endregion
@@ -803,9 +818,11 @@ namespace Root_VEGA_P.Module
 
         public RTR(string id, IEngineer engineer)
         {
-            p_aChild = new List<IRTRChild>(); 
+            p_aChild = new List<IRTRChild>();
+            InitCmd();
             InitBase(id, engineer);
         }
+
 
         public override void ThreadStop()
         {
@@ -821,13 +838,13 @@ namespace Root_VEGA_P.Module
             return run;
         }
 
-        ModuleRunBase m_runGetPut; 
+        ModuleRunBase m_runGetPut;
         public Run_GetPut GetModuleRunGetPut(string sChildGet, string sChildPut)
         {
             Run_GetPut run = (Run_GetPut)m_runGetPut.Clone();
             run.m_sChildGet = sChildGet;
             run.m_sChildPut = sChildPut;
-            return run; 
+            return run;
         }
 
         protected override void InitModuleRuns()
@@ -904,7 +921,7 @@ namespace Root_VEGA_P.Module
                 InitModuleRun(module);
             }
 
-            public string m_sChild = ""; 
+            public string m_sChild = "";
             public override ModuleRunBase Clone()
             {
                 Run_Get run = new Run_Get(m_module);
@@ -919,7 +936,7 @@ namespace Root_VEGA_P.Module
 
             public override string Run()
             {
-                return m_module.RunGet(m_sChild); 
+                return m_module.RunGet(m_sChild);
             }
         }
 
@@ -932,7 +949,7 @@ namespace Root_VEGA_P.Module
                 InitModuleRun(module);
             }
 
-            public string m_sChild = ""; 
+            public string m_sChild = "";
             public override ModuleRunBase Clone()
             {
                 Run_Put run = new Run_Put(m_module);
@@ -947,7 +964,7 @@ namespace Root_VEGA_P.Module
 
             public override string Run()
             {
-                return m_module.RunPut(m_sChild); 
+                return m_module.RunPut(m_sChild);
             }
         }
 
@@ -966,7 +983,7 @@ namespace Root_VEGA_P.Module
             {
                 Run_GetPut run = new Run_GetPut(m_module);
                 run.m_sChildGet = m_sChildGet;
-                run.m_sChildPut = m_sChildPut; 
+                run.m_sChildPut = m_sChildPut;
                 return run;
             }
 

@@ -39,6 +39,8 @@ namespace Root_EFEM
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
         Camera_Basler m_CamAutoFocus;
+        Camera_Basler m_CamVRS;
+
         public Camera_Basler p_CamAutoFocus
         {
             get
@@ -48,6 +50,18 @@ namespace Root_EFEM
             set
             {
                 m_CamAutoFocus = value;
+            }
+        }
+
+        public Camera_Basler p_CamVRS
+        {
+            get
+            {
+                return m_CamVRS;
+            }
+            set
+            {
+                m_CamVRS = value;
             }
         }
 
@@ -78,6 +92,7 @@ namespace Root_EFEM
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
+        public Camera_Basler CamVRS { get => m_CamVRS; private set => m_CamVRS = value; }
         public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
 
         public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
@@ -95,6 +110,7 @@ namespace Root_EFEM
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
+                p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRSCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamAutoFocus, this, "AutoFocusCam");
                 p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
             }
@@ -554,13 +570,14 @@ namespace Root_EFEM
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
-			//AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-			//AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
-			AddModuleRunList(new Run_GrabLineScan(this), true, "Run Grab LineScan Camera");
-			AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
-			//AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
-			//AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
-		}
+            //AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+            //AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
+            AddModuleRunList(new Run_GrabLineScan(this), true, "Run Grab LineScan Camera");
+            AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
+            AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
+            AddModuleRunList(new Run_VRSAlign(this), true, "Run VRSAlign");
+            //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
+        }
         #endregion
     }
 }

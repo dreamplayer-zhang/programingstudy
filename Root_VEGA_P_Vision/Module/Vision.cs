@@ -70,7 +70,13 @@ namespace Root_VEGA_P_Vision.Module
         {
             public AxisXY m_axisXY;
             public Axis m_axisR;
+            public enum eLoading
+            {
+                StageLoadX,StageLoadY
+            }
             DIO_I[] m_diStageLoad = new DIO_I[2] { null, null };
+            DIO_I[] m_diStageVac = new DIO_I[2] { null, null };
+            DIO_O[] m_doStageVac = new DIO_O[2] { null, null };
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
@@ -78,12 +84,53 @@ namespace Root_VEGA_P_Vision.Module
                 m_vision.p_sInfo = toolBox.GetAxis(ref m_axisR, m_vision, "Stage Rotate");
                 m_vision.p_sInfo = toolBox.GetDIO(ref m_diStageLoad[0], m_vision, "Stage Load X");
                 m_vision.p_sInfo = toolBox.GetDIO(ref m_diStageLoad[1], m_vision, "Stage Load Y");
+                m_vision.p_sInfo = toolBox.GetDIO(ref m_diStageVac[0], m_vision, "Stage Vac Cover Check");
+                m_vision.p_sInfo = toolBox.GetDIO(ref m_diStageVac[1], m_vision, "Stage Vac Base Plate Check"); 
+                m_vision.p_sInfo = toolBox.GetDIO(ref m_doStageVac[0], m_vision, "Stage Vac Cover");
+                m_vision.p_sInfo = toolBox.GetDIO(ref m_doStageVac[1], m_vision, "Stage Vac Base Plate");
                 if (bInit)
                 {
-
+                    m_axisXY.p_axisX.AddPos(Enum.GetName(typeof(eLoading), eLoading.StageLoadX));
+                    m_axisXY.p_axisY.AddPos(Enum.GetName(typeof(eLoading), eLoading.StageLoadY));
                 }
             }
 
+            public bool IsCoverVac()
+            {
+                if (m_diStageVac[0] == null) return false;
+
+                return m_diStageVac[0].p_bIn;
+            }
+            public bool IsPlateVac()
+            {
+                if (m_diStageVac[1] == null) return false;
+
+                return m_diStageVac[1].p_bIn;
+            }
+            public string RunCoverStageVac(bool bCover)
+            {
+                m_doStageVac[0].Write(bCover);
+                StopWatch sw = new StopWatch();
+                while (sw.ElapsedMilliseconds < 3000)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                    if (bCover == IsCoverVac()) return "OK";
+                }
+                return "Run Cover Stage Vac Timeout";
+            }
+            public string RunPlateStageVac(bool bPlate)
+            {
+                m_doStageVac[1].Write(bPlate);
+                StopWatch sw = new StopWatch();
+                while (sw.ElapsedMilliseconds < 3000)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                    if (bPlate == IsPlateVac()) return "OK";
+                }
+                return "Run Plate Stage Vac Timeout";
+            }
             public bool IsLoad()
             {
                 if (m_diStageLoad[0] == null) return false;
@@ -104,7 +151,8 @@ namespace Root_VEGA_P_Vision.Module
 
             public string Rotate(double degree, bool bWait = true)
             {
-                string sRun = m_axisR.StartMove(degree * p_pulsePerRound / 360);
+                double rotate = m_axisR.p_posActual + degree * p_pulsePerRound / 360;
+                string sRun = m_axisR.StartMove(rotate);
                 if (sRun != "OK") return sRun;
                 return bWait ? m_axisR.WaitReady() : "OK";
             }
@@ -268,7 +316,7 @@ namespace Root_VEGA_P_Vision.Module
                 int nPod = (value != null) ? (int)value.p_ePod : -1; 
                 _infoPod = value;
                 m_reg.Write("InfoPod", nPod);
-                value.WriteReg(); 
+                value?.WriteReg(); 
                 OnPropertyChanged();
             }
         }
@@ -310,8 +358,31 @@ namespace Root_VEGA_P_Vision.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, null);
             else
             {
-                // Move to Ready Pos ?
-                // Vacuum Off ?
+                if (p_infoPod == null)
+                    return "Pod Doesn't exist";
+                if (Run(m_stage.m_axisXY.p_axisX.StartMove(Enum.GetName(typeof(Stage.eLoading), Stage.eLoading.StageLoadX))))
+                    return p_sInfo;
+                if (Run(m_stage.m_axisXY.p_axisY.StartMove(Enum.GetName(typeof(Stage.eLoading), Stage.eLoading.StageLoadY))))
+                    return p_sInfo;
+
+                if (Run(m_stage.m_axisXY.p_axisX.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_stage.m_axisXY.p_axisY.WaitReady()))
+                    return p_sInfo;
+
+                switch (p_infoPod.p_ePod)
+                {
+                    case InfoPod.ePod.EIP_Cover:
+                        if (Run(m_stage.RunCoverStageVac(false)))
+                            return p_sInfo;
+                        break;
+                    case InfoPod.ePod.EIP_Plate:
+                        if (Run(m_stage.RunPlateStageVac(false)))
+                            return p_sInfo;
+                        break;
+                }
+
+                p_infoPod = null;
                 return "OK";
             }
         }
@@ -321,8 +392,29 @@ namespace Root_VEGA_P_Vision.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, infoPod);
             else
             {
-                // Move to Ready Pos ?
-                // Vacuum Off ?
+                if (Run(m_stage.m_axisXY.p_axisX.StartMove(Enum.GetName(typeof(Stage.eLoading), Stage.eLoading.StageLoadX))))
+                    return p_sInfo;
+                if (Run(m_stage.m_axisXY.p_axisY.StartMove(Enum.GetName(typeof(Stage.eLoading), Stage.eLoading.StageLoadY))))
+                    return p_sInfo;
+
+                if (Run(m_stage.m_axisXY.p_axisX.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_stage.m_axisXY.p_axisY.WaitReady()))
+                    return p_sInfo;
+
+                switch (infoPod.p_ePod)
+                {
+                    case InfoPod.ePod.EIP_Cover:
+                        if (Run(m_stage.RunCoverStageVac(false)))
+                            return p_sInfo;
+                        break;
+                    case InfoPod.ePod.EIP_Plate:
+                        if (Run(m_stage.RunPlateStageVac(false)))
+                            return p_sInfo;
+                        break;
+                }
+
+                p_infoPod = infoPod;
                 return "OK";
             }
         }
@@ -395,12 +487,16 @@ namespace Root_VEGA_P_Vision.Module
                 m_sideOptic.CameraInit();
 
                 p_sInfo = m_sideOptic.axisZ.StartHome();
+                p_sInfo = m_mainOptic.m_axisZ.StartHome();
+
                 m_sideOptic.axisZ.WaitReady();
+                m_mainOptic.m_axisZ.WaitReady();
 
                 p_sInfo = base.StateHome();
                 m_stage.m_axisR.StartMove(m_stage.m_thetaOffset);
                 m_stage.m_axisR.WaitReady();
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+
                 return "OK";
             }
         }
@@ -458,7 +554,7 @@ namespace Root_VEGA_P_Vision.Module
 
         public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
-            m_reg = new Registry(p_id + "_InfoPod");
+            m_reg = new Registry(id + "_InfoPod");
             m_teach = new Holder.TeachRTR(); 
             m_stage = new Stage(this);
             m_mainOptic = new MainOptic(this);
@@ -607,13 +703,15 @@ namespace Root_VEGA_P_Vision.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Rotate(this), true, "Rotate");
+            AddModuleRunList(new Run_Rotate(this), true, App.mRotate);
             AddModuleRunList(new Run_MainGrab(this), true, App.mMainGrab);
             AddModuleRunList(new Run_SideGrab(this), true, App.mSideGrab);
             AddModuleRunList(new Run_StainGrab(this), true, App.mStainGrab);
             AddModuleRunList(new Run_ZStack(this), true, App.mZStack);
             AddModuleRunList(new Run_Remote(this), false, "Remote Run");
+            AddModuleRunList(new Run_Align(this), false, App.mVisionAlign);
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+            AddModuleRunList(new Run_Inspection(this), true, App.mInspection);
         }        
             
         public class Run_Delay : ModuleRunBase

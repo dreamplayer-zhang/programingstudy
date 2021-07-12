@@ -17,6 +17,12 @@ namespace Root_CAMELLIA
             Measure
         }
 
+        public enum Category
+        {
+            EQUIPMENT = 1,
+            ETC
+        }
+
 
         public const int ViewSize = 310;
         public const int WFRadius = 300;
@@ -28,6 +34,7 @@ namespace Root_CAMELLIA
         public const string RegNanoViewConfig = "NanoViewConfigPath";
         public const string RegNanoViewPort = "NanoViewPort";
         public const string RegNanoViewExceptNIR = "ExceptNIR";
+        public const string RegNanoViewCalDCOLTransmittance = "CalDCOLTransmittance";
         public const string RegNanoViewUseThickness = "Use Thickness"; 
         public const string RegLightSourcePath = "LightSourcePath";
         public const string Dir_SequenceInitialPath = @"C:\Recipe\";

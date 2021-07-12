@@ -1,0 +1,200 @@
+﻿<Window x:Class="Root_WindII.Dialog_Scan"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
+        Height="230"
+        Width="500"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        Background="#FF2D2D30">
+    <Window.InputBindings></Window.InputBindings>
+    <Window.Resources>
+        <converter:ListViewContentsWidthConverter  x:Key="ListViewContentsWidthConverters" />
+        <Style TargetType="Button"
+               x:Key="MyBtn">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="0"
+                                Background="#FF1B1B1C"
+                                BorderBrush="Gray"
+                                BorderThickness="0"
+                                x:Name="Bdr"
+                                Margin="0,0,0,0">
+                            <TextBlock FontSize="15"
+                                       FontFamily="Arial"
+                                       Foreground="White"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="5" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+                                <Setter Property="Background"
+                                        Value="#FF3E3E40" />
+                                <Setter Property="Cursor"
+                                        Value="Hand" />
+                            </Trigger>
+                            <Trigger Property="Button.IsPressed"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="#FF43437A" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"></RowDefinition>
+            <RowDefinition Height="55"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <GroupBox Header="ScanMode"
+                  TextElement.Foreground="White"
+                  BorderThickness="0">
+            <ListBox ItemsSource="{Binding p_GrabMode}"
+                     SelectedItem="{Binding p_SelGrabMode}"
+                     Background="{PriorityBinding}"
+                     BorderBrush="Black"
+                     BorderThickness="0">
+                <ListBox.Template>
+                    <ControlTemplate>
+                        <Border  BorderBrush="Black"
+                                 BorderThickness="2"
+                                 Background="#FF2D2D30"
+                                 CornerRadius="5">
+                            <ItemsPresenter />
+                        </Border>
+                    </ControlTemplate>
+                </ListBox.Template>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"></StackPanel>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding"
+                                Value="3" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border  BorderThickness="2" x:Name="ItemBorder"
+                                 BorderBrush="#FF1B1B1C"
+                                 Background="#FF1B1B1C"
+                                 Height="65"
+                                 CornerRadius="5">
+                            <Border.Width>
+                                <MultiBinding Converter="{StaticResource ListViewContentsWidthConverters}">
+                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}" />
+                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}"
+                                             Path="ActualWidth" />
+                                </MultiBinding>
+                            </Border.Width>
+                            <TextBlock HorizontalAlignment="Center"
+                                       Height="Auto"
+                                       TextWrapping="Wrap"
+                                       Text="{Binding p_sName}"
+                                       VerticalAlignment="Center"
+                                       FontSize="17"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       TextAlignment="Center" />
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="true">
+                                <Setter TargetName="ItemBorder"
+                                        Property="Background"
+                                        Value="#FF3E3E40"></Setter>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}"
+                                         Value="True">
+                                <Setter TargetName="ItemBorder"
+                                        Property="Background"
+                                        Value="#FF43437A"></Setter>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
+        <StackPanel Margin="10,3,0,0"
+                    Grid.Row="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="4*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock TextElement.Foreground="White"
+                           VerticalAlignment="Center">
+                    <Run Text="Start Line ( "></Run>
+                    <Run Text="{Binding p_nScanWholeLine}"></Run>
+                    <Run Text=" )"></Run>
+                </TextBlock>
+                <Button Grid.Column="1"
+                        Command="{Binding MinusScanStartLineCommand}"
+                        Content="-"
+                        Style="{StaticResource MyBtn}"></Button>
+                <TextBox Text="{Binding p_nStartLine}"
+                         Grid.Column="2"
+                         Background="{PriorityBinding}"
+                         BorderThickness="0"
+                         TextAlignment="Center"
+                         TextElement.Foreground="White" />
+                <Button Grid.Column="3"
+                        Command="{Binding PlusScanStartLineCommand}"
+                        Style="{StaticResource MyBtn}"
+                        Content="+"></Button>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="4*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock TextElement.Foreground="White" VerticalAlignment="Center"
+                           Text="Scan Line Num" />
+                <Button Grid.Column="1"
+                        Command="{Binding MinusScanNumCommand}"
+                        Style="{StaticResource MyBtn}"
+                        Content="-"></Button>
+                <TextBox Text="{Binding p_nScanNum}"
+                         Grid.Column="2"
+                         Background="{PriorityBinding}"
+                         BorderThickness="0"
+                         TextAlignment="Center"
+                         TextElement.Foreground="White"></TextBox>
+                <Button Grid.Column="3"
+                        Command="{Binding PlusScanNumCommand}"
+                        Style="{StaticResource MyBtn}"
+                        Content="+"></Button>
+            </Grid>
+        </StackPanel>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0"
+                    Style="{StaticResource MyBtn}"
+                    Content="Scan Start"
+                    Command="{Binding OkCommand}"
+                    Margin="20,5,20,5"></Button>
+            <Button Grid.Column="1"
+                    Style="{StaticResource MyBtn}"
+                    Content="Cancel"
+                    Command="{Binding CancelCommand}"
+                    Margin="20,5,20,5"></Button>
+        </Grid>
+    </Grid>
+</Window>

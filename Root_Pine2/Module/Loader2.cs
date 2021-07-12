@@ -128,6 +128,11 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Run
+        public string StartUnloadStrip()
+        {
+            return "OK";
+        }
+
         public string RunUnload(Vision2D.eWorks eWorks)
         {
             Boat boat = m_boats.m_aBoat[eWorks];
@@ -169,7 +174,7 @@ namespace Root_Pine2.Module
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (p_infoStrip == null) return "OK";
-            if (m_boats.m_aBoat[p_infoStrip.m_eWorks].p_eStep != Boat.eStep.Ready) return "OK"; 
+            if ((m_boats.m_aBoat[p_infoStrip.m_eWorks].p_eStep != Boat.eStep.Ready) || (m_boats.m_aBoat[p_infoStrip.m_eWorks].p_infoStrip != null)) return "OK"; 
             Run_Unload run = (Run_Unload)m_runUnload.Clone();
             run.m_eWorks = p_infoStrip.m_eWorks; 
             return StartRun(run);

@@ -100,6 +100,8 @@ namespace Root_WindII
 
         // RAC
         public readonly RACProduct racProduct = new RACProduct();
+        public readonly RACSetup racSetup = new RACSetup();
+        public readonly RACAlignKey racAlignKey = new RACAlignKey();
         #endregion
 
         //#region [ViewModels]
@@ -162,13 +164,13 @@ namespace Root_WindII
         }
         #endregion
 
-        //#region [Camera ViewModes]
-        //private .CameraVRS_ImageViewer_ViewModel cameraVrsVM = new .CameraVRS_ImageViewer_ViewModel();
-        //public .CameraVRS_ImageViewer_ViewModel CameraVrsVM
-        //{
-        //    get => cameraVrsVM;
-        //}
-        //#endregion
+        #region [Camera ViewModes]
+        private CameraVRS_ViewModel cameraVrsVM = new CameraVRS_ViewModel();
+        public CameraVRS_ViewModel CameraVrsVM
+        {
+            get => cameraVrsVM;
+        }
+        #endregion
 
         //#region [Back ViewModels]
         //private .BacksideSetup_ViewModel backsideSetupVM = new .BacksideSetup_ViewModel();
@@ -205,19 +207,31 @@ namespace Root_WindII
         //}
         //#endregion
 
-        //#region [Camera ViewModels]
-        //private .CameraAlign_ViewModel cameraAlignVM = new .CameraAlign_ViewModel();
-        //public .CameraAlign_ViewModel CameraAlignVM
-        //{
-        //    get => cameraAlignVM;
-        //}
-        //#endregion
+        #region [Camera ViewModels]
+        private CameraAlign_ViewModel cameraAlignVM = new CameraAlign_ViewModel();
+        public CameraAlign_ViewModel CameraAlignVM
+        {
+            get => cameraAlignVM;
+        }
+        #endregion
 
         #region [RAC ViewModels]
         private RACProduct_ViewModel racProductVM = new RACProduct_ViewModel();
         public RACProduct_ViewModel RACProductVM
         {
             get => racProductVM;
+        }
+        private RACSetup_ViewModel racSetupVM = new RACSetup_ViewModel();
+
+        public RACSetup_ViewModel RACSetupVM
+        {
+            get => racSetupVM;
+        }
+
+        private RACAlignKey_ViewModel racAlignKeyVM = new RACAlignKey_ViewModel();
+        public RACAlignKey_ViewModel RACAlignKeyVM
+        {
+            get => racAlignKeyVM;
         }
         #endregion
 
@@ -352,7 +366,7 @@ namespace Root_WindII
                 return new RelayCommand(() =>
                 {
                     SetPage(cameraVrs);
-                    //cameraVrs.DataContext = cameraVrsVM;
+                    cameraVrs.DataContext = cameraVrsVM;
                 });
             }
         }
@@ -368,6 +382,7 @@ namespace Root_WindII
                 });
             }
         }
+
         #endregion
 
         #region [Command Home]
@@ -755,7 +770,7 @@ namespace Root_WindII
                 return new RelayCommand(() =>
                 {
                     SetPage(cameraVrs);
-                    //cameraVrs.DataContext = CameraVrsVM;
+                    cameraVrs.DataContext = CameraVrsVM;
                 });
             }
         }
@@ -767,7 +782,7 @@ namespace Root_WindII
                 return new RelayCommand(() =>
                 {
                     SetPage(cameraAlign);
-                    //cameraAlign.DataContext = CameraAlignVM;
+                    cameraAlign.DataContext = CameraAlignVM;
                 });
             }
         }
@@ -781,7 +796,30 @@ namespace Root_WindII
                 return new RelayCommand(() =>
                 {
                     SetPage(racProduct);
-                    racProduct.DataContext = racProductVM;
+                    racProduct.DataContext = RACProductVM;
+                });
+            }
+        }
+        public ICommand btnRACSetup
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(racSetup);
+                    racSetup.DataContext = RACSetupVM;
+                });
+            }
+        }
+
+        public ICommand btnRACAlignKey
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(racAlignKey);
+                    racAlignKey.DataContext = RACAlignKeyVM;
                 });
             }
         }

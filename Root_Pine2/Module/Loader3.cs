@@ -217,6 +217,39 @@ namespace Root_Pine2.Module
         #endregion
 
         #region RunUnload
+        public string StartUnloadStrip()
+        {
+            return StartRun(m_runUnloadStrip); 
+        }
+
+        public string RunUnloadStrip()
+        {
+            if (p_infoStrip == null) return "OK";
+            Boats boats = m_handler.m_aBoats[Vision2D.eVision.Bottom];
+            if (boats.IsBusy()) return "OK";
+            if (boats.p_eState != eState.Ready) return "OK";
+            Boat boat = boats.m_aBoat[p_infoStrip.m_eWorks];
+            try
+            {
+                if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(boats.m_aBoat[p_infoStrip.m_eWorks].RunMove(Boat.ePos.Handler))) return p_sInfo;
+                if (Run(RunMoveBoat(p_infoStrip.m_eWorks))) return p_sInfo;
+                if (Run(RunMoveZ(p_infoStrip.m_eWorks, 0))) return p_sInfo;
+                boat.RunVacuum(true);
+                if (Run(m_picker.RunVacuum(false))) return p_sInfo;
+                Thread.Sleep(500);
+                if (Run(RunMoveUp())) return p_sInfo;
+                boat.p_infoStrip = m_picker.p_infoStrip;
+                m_picker.p_infoStrip = null;
+                boat.p_eStep = Boat.eStep.Done;
+            }
+            finally
+            {
+                RunMoveUp();
+            }
+            return "OK";
+        }
+
         string StartUnloadTransfer() 
         {
             Run_UnloadTransfer run = (Run_UnloadTransfer)m_runUnloadTransfer.Clone();
@@ -269,14 +302,16 @@ namespace Root_Pine2.Module
                     Thread.Sleep(200); 
                     return "OK";
                 }
-                foreach (MagazineEV magazineEV in m_handler.m_magazineEV.m_aEV.Values) magazineEV.m_conveyor.m_bInv = false;
-                MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePosTray];
+                foreach (MagazineEV magazineEV in m_handler.m_magazineEVSet.m_aEV.Values) magazineEV.m_conveyor.m_bInv = false;
+                MagazineEV magazine = m_handler.m_magazineEVSet.m_aEV[(InfoStrip.eMagazine)ePosTray];
                 magazine.m_conveyor.m_bInv = true; 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveTray(ePosTray))) return p_sInfo;
                 if (Run(RunMoveZ(ePosTray))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 if (Run(RunMoveUp())) return p_sInfo;
+                m_picker.p_infoStrip.m_iBundle = magazine.m_stack.p_iBundle;
+                m_handler.SendSortInfo(m_picker.p_infoStrip); 
                 m_picker.p_infoStrip = null;
                 magazine.PutInfoStrip(m_picker.p_infoStrip);
                 if (Run(RunMoveBoat(1 - m_eWorksLoad))) return p_sInfo;
@@ -291,7 +326,12 @@ namespace Root_Pine2.Module
 
         string CalcTrayPos(ref ePosTray eTray)
         {
-            MagazineEVSet magazine = m_handler.m_magazineEV;
+            MagazineEVSet magazine = m_handler.m_magazineEVSet;
+            while (m_picker.p_infoStrip.p_bInspect)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop"; 
+            }
             InfoStrip.eResult eResult = m_picker.p_infoStrip.p_eResult;
             foreach (ePosTray ePosTray in Enum.GetValues(typeof(ePosTray)))
             {
@@ -433,13 +473,15 @@ namespace Root_Pine2.Module
 
         #region ModuleRun
         ModuleRunBase m_runLoadBoat;
+        ModuleRunBase m_runUnloadStrip;
         ModuleRunBase m_runUnloadTransfer;
         ModuleRunBase m_runUnloadTray;
         ModuleRunBase m_runAvoidX;
         protected override void InitModuleRuns()
         {
             m_runLoadBoat = AddModuleRunList(new Run_LoadBoat(this), true, "Load Strip from Boat");
-            m_runUnloadTransfer = AddModuleRunList(new Run_UnloadTransfer(this), true, "Unload Strip from Transfer");
+            m_runUnloadStrip = AddModuleRunList(new Run_UnloadStrip(this), false, "Unload Strip to GetPosition");
+            m_runUnloadTransfer = AddModuleRunList(new Run_UnloadTransfer(this), true, "Unload Strip to Transfer");
             m_runUnloadTray = AddModuleRunList(new Run_UnloadTray(this), true, "Unload Strip to Paper Tray");
             m_runAvoidX = AddModuleRunList(new Run_AvoidX(this), true, "Avoid Axis X");
             AddModuleRunList(new Run_PickerSet(this), false, "Picker Set");
@@ -470,6 +512,31 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunLoad(m_eWorks);
+            }
+        }
+
+        public class Run_UnloadStrip : ModuleRunBase
+        {
+            Loader3 m_module;
+            public Run_UnloadStrip(Loader3 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_UnloadStrip run = new Run_UnloadStrip(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunUnloadStrip();
             }
         }
 

@@ -272,6 +272,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    p_checkRnR = false;
                     CloseRequested(this, new DialogCloseRequestedEventArgs(false));
                 });
             }
@@ -304,6 +305,9 @@ namespace Root_CAMELLIA
             string recipePath = p_selectRecipe.Replace(Path.GetExtension(p_selectRecipe), "") + "\\" + p_selectRecipe;
             string sequenceRecipePath = BaseDefine.Dir_SequenceInitialPath + p_selectRecipe;
             bool isVisionRecipeOpen = false;
+
+            int firstIdx = -1;
+            int lastIdx = -1;
             for (int i = 0; i < nSlot; i++)
             {
                 m_infoCarrier.m_aGemSlot[i].p_sRecipe = "";
@@ -318,6 +322,10 @@ namespace Root_CAMELLIA
                     infoWafer.p_sCarrierID = p_carrierID;
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {
+                        if (firstIdx == -1)
+                        {
+                            firstIdx = i;
+                        }
                         infoWafer.RecipeOpen(sequenceRecipePath);
                         string visionPath = recipePath.Replace(Path.GetExtension(recipePath), ".aco");
                         m_infoCarrier.m_aGemSlot[i].p_sRecipe = infoWafer.p_sRecipe;
@@ -328,13 +336,32 @@ namespace Root_CAMELLIA
                             return;
                         }
                         isVisionRecipeOpen = true;
+                        
+
+
                         m_infoCarrier.StartProcess(infoWafer.p_id);
+ 
+                        lastIdx = i;
                     }
                 }
             }
-            m_infoCarrier.SetSelectMapData(m_infoCarrier);
-            EQ.p_nRnR = p_checkRnR ? p_RnR : 0;
+            //foreach (CAMELLIA_Process.Sequence prc in App.m_engineer.m_handler.p_process.p_qSequence)
+            //{
+            //    string s = prc.p_moduleRun.p_id;
+            //}
+            if (firstIdx == lastIdx)
+                m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstLastWafer;
+            else
+            {
+                m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstWafer;
+                m_infoCarrier.m_aInfoWafer[lastIdx].p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
+            }
 
+
+
+            m_infoCarrier.SetSelectMapData(m_infoCarrier);
+            
+            EQ.p_nRnR = p_checkRnR ? p_RnR : 1;
             CloseRequested(this, new DialogCloseRequestedEventArgs(true));
         }
 

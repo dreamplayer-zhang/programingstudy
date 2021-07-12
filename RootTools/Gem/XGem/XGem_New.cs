@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Media;
@@ -441,6 +442,17 @@ namespace RootTools.Gem.XGem
         {
             if (p_bEnable == false) return -1;
             m_svID[0] = sv.p_nID;
+            m_svValue[0] = value.ToString();
+            long nError = p_bEnable ? m_xGem.GEMSetVariable(1, m_svID, m_svValue) : 0;
+            LogSend(nError, "GEMSetVariable", m_svID[0], m_svValue[0]);
+            //p_sInfo = "SetSV " + sv.p_sModule + "." + sv.p_id + " : " + sv.p_value.ToString() + " -> " + value.ToString(); 
+            return nError;
+        }
+
+        public long SetSV(long svid, dynamic value)
+        {
+            if (p_bEnable == false) return -1;
+            m_svID[0] = svid;
             m_svValue[0] = value.ToString();
             long nError = p_bEnable ? m_xGem.GEMSetVariable(1, m_svID, m_svValue) : 0;
             LogSend(nError, "GEMSetVariable", m_svID[0], m_svValue[0]);
@@ -1014,6 +1026,13 @@ namespace RootTools.Gem.XGem
             m_xGem.OnCJDeleted += M_xGem_OnCJDeleted;
             m_xGem.OnCJStateChanged += M_xGem_OnCJStateChanged;
             m_xGem.OnCJRspSelect += M_xGem_OnCJRspSelect;
+            m_xGem.OnGEMReqPPList += M_xGem_OnGEMReqPPList;
+        }
+
+        private void M_xGem_OnGEMReqPPList(long nMsgId)
+        {
+            string[] files = Directory.GetFiles(@"C:\Recipe", "*." + m_sRecipeExt);
+            m_xGem.GEMRspPPList(nMsgId, files.Length, files);
         }
 
         private void M_xGem_OnCJCreated(string sCJobID, long nStartMethod, long nCountPRJob, string[] psPRJobID)
@@ -1399,5 +1418,34 @@ namespace RootTools.Gem.XGem
             }
         }
 
+        public void MakeObject(long nObject)
+        {
+            m_xGem.MakeObject(ref nObject);
+        }
+
+        public void SetListItem(long nObject, int listCnt)
+        {
+            m_xGem.SetListItem(nObject, listCnt);
+        }
+
+        public void SetStringItem(long nObject, string strItem)
+        {
+            m_xGem.SetStringItem(nObject, strItem);
+        }
+
+        public void SetInt4Item(long nObject, int nitem)
+        {
+            m_xGem.SetInt4Item(nObject, nitem);
+        }
+
+        public void SetFloat4Item(long nObject, float fItem)
+        {
+            m_xGem.SetFloat4Item(nObject, fItem);
+        }
+
+        public void GEMSetVariables(long nObject, long nVid)
+        {
+            m_xGem.GEMSetVariables(nObject, nVid);
+        }
     }
 }

@@ -131,15 +131,15 @@ namespace RootTools_Vision
 
                     if(mapData != null)
                     {
-                        if(mapData[y * sizeY + x] == (int)CHIP_TYPE.NO_CHIP)
+                        if(mapData[y * sizeX + x] == (int)CHIP_TYPE.NO_CHIP)
                         {
                             rect.Fill = Brushes.DimGray;
                         }
-                        else if (mapData[y * sizeY + x] == (int)CHIP_TYPE.NORMAL)
+                        else if (mapData[y * sizeX + x] == (int)CHIP_TYPE.NORMAL)
                         {
                             rect.Fill = Brushes.YellowGreen;
                         }
-                        else if (mapData[y * sizeY + x] == (int)CHIP_TYPE.EXTRA)
+                        else if (mapData[y * sizeX + x] == (int)CHIP_TYPE.EXTRA)
                         {
                             rect.Fill = Brushes.Yellow;
                         }
@@ -228,6 +228,11 @@ namespace RootTools_Vision
             {
                 //MessageBox.Show("Chip Index를 벗어났습니다.");
             }
+        }
+
+        public void RefreshMap()
+        {
+            RedrawMap();
         }
 
 

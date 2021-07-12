@@ -13,7 +13,7 @@
         AllowsTransparency="False"
         ResizeMode="CanResizeWithGrip"
         Height="1080" Width="1920"
-        Title="Root Vega-P">
+        Title="Root Vega-P" >
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding WindowLoadedCommand}" />
@@ -23,11 +23,14 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="285*"/>
+            <ColumnDefinition Width="1627*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="85*"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="15*"/>
             <!--<RowDefinition Height="Auto" x:Name="ViewArea"/>-->
         </Grid.RowDefinitions>
@@ -35,7 +38,7 @@
         <Grid Grid.Row="0"
               Name="TitleBar"
               Background="{DynamicResource MainThema}"
-              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" Grid.ColumnSpan="2">
             <StackPanel Orientation="Horizontal">
                 <Viewbox Margin="3" VerticalAlignment="Center">
                     <icon:AtiLogo/>
@@ -93,40 +96,40 @@
 
         <!--Menu-->
         <Border Grid.Row="1"
-                Background="{StaticResource ControlBackGround}"
-                BorderBrush="DimGray"
-                BorderThickness="0,0,0,0">
+                Background="{StaticResource MainThema}"
+                BorderThickness="0,0,0,0" Grid.ColumnSpan="2">
             <Grid>
                 <StackPanel Orientation="Horizontal">
-                    <Menu Background="{StaticResource ControlBackGround}">
-                        <MenuItem Background="{StaticResource ControlBackGround}"
+                    <Menu Background="{StaticResource MainThema}">
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   Width="70" Height="30"
                                   Padding="0"
-                                  BorderBrush="#FF707070"
+                                  BorderBrush="{StaticResource MainThema}"
                                   BorderThickness="0,0,0,0">
                             <MenuItem.Header>
                                 <Grid Width="70">
                                     <TextBlock Text="File"
                                                FontSize="13"
-                                               FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
-                            <MenuItem Header="New" Command="{Binding MenuFileNew}">
+                            <MenuItem Header="New" Style="{StaticResource MenuItemStyle}" Command="{Binding MenuFileNew}">
 
                             </MenuItem>
-                            <MenuItem Header="Load" Command="{Binding MenuFileLoad}">
+                            <MenuItem Header="Load" Style="{StaticResource MenuItemStyle}" Command="{Binding MenuFileLoad}">
 
                             </MenuItem>
-                            <MenuItem Header="Save" Command="{Binding MenuFileSave}">
+                            <MenuItem Header="Save" Style="{StaticResource MenuItemStyle}" Command="{Binding MenuFileSave}">
 
                             </MenuItem>
-                            <MenuItem Header="Save As" Command="{Binding MenuFileSaveAs}">
+                            <MenuItem Header="Save As" Style="{StaticResource MenuItemStyle}" Command="{Binding MenuFileSaveAs}">
 
                             </MenuItem>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"                                
+                        <MenuItem Background="{StaticResource MainThema}"  
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="70" 
                                   x:Name="ViewMenu"
@@ -135,17 +138,18 @@
                                 <Grid Width="70">
                                     <TextBlock Text="View"
                                                FontSize="13"
-                                               FontWeight="Bold"
+                                                
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
-                            <MenuItem Header="Log" IsCheckable="True" x:Name="viewLog"/>
-                            <MenuItem Header="FDC" IsCheckable="True" x:Name="viewFDC"/>
+                            <MenuItem Style="{StaticResource MenuItemStyle}" Header="Log" IsCheckable="True" x:Name="viewLog"/>
+                            <MenuItem  Style="{StaticResource MenuItemStyle}" Header="FDC" IsCheckable="True" x:Name="viewFDC"/>
 
 
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="70"
                                   BorderThickness="0,0,0,0" Padding="0">
@@ -153,7 +157,7 @@
                                 <Grid Width="70">
                                     <TextBlock Text="Tool"
                                                FontSize="13"
-                                               FontWeight="Bold"
+                                                
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
                                 </Grid>
@@ -163,7 +167,8 @@
                             <MenuItem Header="Setting">
                             </MenuItem>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="100"
                                   BorderThickness="0,0,0,0" Padding="0">
@@ -171,7 +176,7 @@
                                 <Grid Width="100">
                                     <TextBlock Text="Network"
                                                FontSize="13"
-                                               FontWeight="Bold"
+                                                
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
                                 </Grid>
@@ -187,7 +192,8 @@
                             </MenuItem>
 
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="100"
                                   BorderThickness="0,0,0,0" Padding="0">
@@ -195,7 +201,7 @@
                                 <Grid Width="100">
                                     <TextBlock Text="Navigation"
                                                FontSize="13"
-                                               FontWeight="Bold"
+                                                
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
                                 </Grid>
@@ -213,7 +219,8 @@
                             <MenuItem Header="Run">
                             </MenuItem>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="110"
                                   BorderThickness="0,0,0,0" Padding="0" Command="{Binding ModeSelectCommand}">
@@ -221,13 +228,14 @@
                                 <Grid Width="110">
                                     <TextBlock Text="Mode Select"
                                                FontSize="13"
-                                               FontWeight="Bold"
+                                                
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="110"
                                   BorderThickness="0,0,0,0" Padding="0">
@@ -235,10 +243,10 @@
                                 <Grid Width="100">
                                     <TextBlock Text="Setting" 
                                                FontSize="13"
-                                               FontWeight="Bold"
+                                                
                                                VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>                                   
-                                </Grid>                                
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
                             </MenuItem.Header>
                         </MenuItem>
                     </Menu>
@@ -247,20 +255,12 @@
         </Border>
 
         <!--Main Panel-->
-        <Grid Grid.Row="2" x:Name="MainPanel">
+        <Grid Grid.Row="2" x:Name="MainPanel" Grid.ColumnSpan="2">
         </Grid>
 
         <!--Splitter-->
-        <GridSplitter Grid.Row="3" 
-                      Height="3"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch"
-                      x:Name="splitter"
-                      Background="{StaticResource Splitter}"
-                      ShowsPreview="True" Grid.ColumnSpan="2"/>
-
         <!--Log-->
-        <Border Grid.Row="4"
+        <Border Grid.Row="3"
                 Grid.ColumnSpan="2"
                 Panel.ZIndex="99"
                 Margin="3">
