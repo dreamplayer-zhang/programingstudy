@@ -30,7 +30,7 @@ namespace RootTools_Vision
         Chip = 0,
         Chip_Trigger,
         Line,
-        BeforeInsp,
+        PreCreate,
     }
     public class D2DParameter : ParameterBase, IMaskInspection, IColorInspection, IDisplaySpecSummary, IFrontsideInspection
     {

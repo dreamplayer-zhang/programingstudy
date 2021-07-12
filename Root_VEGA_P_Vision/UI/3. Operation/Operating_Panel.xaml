@@ -385,7 +385,7 @@
                             <tools:RootViewer DataContext="{Binding PlateFrontStain}"/>
                         </TabItem>
                         <TabItem Header="Side" Style="{StaticResource ImageViewerTabItemStyle}">
-                            <local:RecipeSideImageViewers_Panel DataContext="{Binding EIPCoverViewers}"/>
+                            <local:RecipeSideImageViewers_Panel DataContext="{Binding EIPPlateViewers}"/>
                         </TabItem>
                     </TabControl>
                 </TabItem>
@@ -495,7 +495,7 @@
                       VerticalAlignment="Center"
                       X2="1"/>
                     </Grid>
-                    <ListBox Grid.Row="1" Background="Transparent" HorizontalContentAlignment="Stretch" ItemsSource="{Binding TaskQ}" SelectedIndex="{Binding SelectedIdx}">
+                    <ListBox IsEnabled="true" Grid.Row="1" Background="Transparent" HorizontalContentAlignment="Stretch" ItemsSource="{Binding TaskQ}">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Vertical"/>
@@ -503,6 +503,7 @@
                         </ListBox.ItemsPanel>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
+                                <Setter Property="IsEnabled" Value="False"/>
                                 <Setter Property="VerticalContentAlignment" Value="Stretch"/>
                                 <Setter Property="Height" Value="50"/>
                             </Style>
