@@ -157,6 +157,7 @@ namespace Root_Pine2.Engineer
                 case EQ.eState.Home: gridEQ.Background = Brushes.MediumPurple; break;
                 case EQ.eState.Ready: gridEQ.Background = Brushes.LightGreen; break;
                 case EQ.eState.Run: gridEQ.Background = Brushes.Yellow; break;
+                case EQ.eState.ModuleRunList: gridEQ.Background = Brushes.Orange; break;
                 case EQ.eState.Error: gridEQ.Background = Brushes.OrangeRed; break;
             }
             foreach (MagazineEV_UI ui in m_aMagazineUI) ui.OnTimer(); 
@@ -230,6 +231,11 @@ namespace Root_Pine2.Engineer
                     m_handler.Reset();
                     break; 
             }
+        }
+
+        private void buttonPickerSet_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.StartPickerSet(); 
         }
 
         BackgroundWorker m_bgwNewLot = new BackgroundWorker();

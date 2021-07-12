@@ -134,6 +134,12 @@ namespace Root_Pine2.Module
             sec = sw.ElapsedMilliseconds / 1000.0;
             return "OK"; 
         }
+
+        public string m_sFilePickerSet = "c:\\Recipe\\PickerSet.RunPine2";
+        void RunTreePickerSet(Tree tree)
+        {
+            m_sFilePickerSet = tree.SetFile(m_sFilePickerSet, m_sFilePickerSet, "RunPine2", "File", "PickerSet ModuleRun File"); 
+        }
         #endregion
 
         #region Emergency
@@ -587,7 +593,8 @@ namespace Root_Pine2.Module
             p_lStack = tree.GetTree("Stack").Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
             p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
             RunTreeVisionOption(tree.GetTree("VisionOption"));
-            m_printer.RunTree(tree.GetTree("Printer")); 
+            m_printer.RunTree(tree.GetTree("Printer"));
+            RunTreePickerSet(tree.GetTree("PickerSet")); 
         }
         #endregion
 
