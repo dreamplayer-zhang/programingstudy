@@ -175,7 +175,7 @@ namespace RootTools.Comm
                 catch (SocketException ex)
                 {
                     // SocketException 발생
-                    m_commLog.Add(CommLog.eType.Info, "Receive SocketException : " + ex.Message);
+                    m_commLog.Add(CommLog.eType.Info, "Receive SocketException : " + ex.Message + ex.StackTrace);
 
                     if (ex.SocketErrorCode == SocketError.ConnectionReset)
                     {
@@ -262,15 +262,14 @@ namespace RootTools.Comm
         void RunThread()
         {
             m_bThread = true;
-            Thread.Sleep(3000);
             while (m_bThread)
             {
-                Thread.Sleep(10);
+                Thread.Sleep(100);
                 if (p_bUse)
                 {
                     if (p_bConnect == false)
                     {
-                        Thread.Sleep(1000);
+                        Thread.Sleep(5000);
                         p_sInfo = Connect();
                     }
                     else if (m_qSend.Count > 0)
