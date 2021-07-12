@@ -327,26 +327,51 @@ namespace RootTools
 
             else if (nByte == 3)
             {
-                if (imgData.m_MemData == null)
+                if (imgData.m_eMode == eMode.ImageBuffer)
                 {
-                    System.Windows.MessageBox.Show("ImageData SetData() 실패\nMemoryData == null");
-                    return;
-                }
-                    
-                byte* Rptr = (byte*)imgData.m_MemData.GetPtr(0).ToPointer();
-                byte* Gptr = (byte*)imgData.m_MemData.GetPtr(1).ToPointer();
-                byte* Bptr = (byte*)imgData.m_MemData.GetPtr(2).ToPointer();
-
-                int idx = 0;
-                long xOffset;
-                for (int r = rect.Top; r < rect.Top + rect.Height; r++)
-                {
-                    for (int c = rect.Left; c < rect.Left + rect.Width; c++, idx++)
+                    if (imgData.m_aBuf == null)
                     {
-                        xOffset = c + (long)r * stride;
-                        m_aBuf[nByte * idx + 0] = *(Rptr + xOffset);
-                        m_aBuf[nByte * idx + 1] = *(Gptr + xOffset);
-                        m_aBuf[nByte * idx + 2] = *(Bptr + xOffset);
+                        System.Windows.MessageBox.Show("ImageData SetData() 실패\nm_aBuf == null");
+                        return;
+                    }
+
+                    int idx = 0;
+                    long xOffset;
+                    for (int r = rect.Top; r < rect.Top + rect.Height; r++)
+                    {
+                        for (int c = rect.Left; c < rect.Left + rect.Width; c++, idx++)
+                        {
+                            xOffset = c + (long)r * stride;
+                            m_aBuf[nByte * idx + 0] = imgData.m_aBuf[3 * (r * imgData.m_Size.X + c) + 2];
+                            m_aBuf[nByte * idx + 1] = imgData.m_aBuf[3 * (r * imgData.m_Size.X + c) + 1];
+                            m_aBuf[nByte * idx + 2] = imgData.m_aBuf[3 * (r * imgData.m_Size.X + c) + 0];
+                        }
+                    }
+                }
+
+                else if (imgData.m_eMode == eMode.MemoryRead || imgData.m_eMode == eMode.OtherPCMem)
+                {
+                    if (imgData.m_MemData == null)
+                    {
+                        System.Windows.MessageBox.Show("ImageData SetData() 실패\nMemoryData == null");
+                        return;
+                    }
+
+                    byte* Rptr = (byte*)imgData.m_MemData.GetPtr(0).ToPointer();
+                    byte* Gptr = (byte*)imgData.m_MemData.GetPtr(1).ToPointer();
+                    byte* Bptr = (byte*)imgData.m_MemData.GetPtr(2).ToPointer();
+
+                    int idx = 0;
+                    long xOffset;
+                    for (int r = rect.Top; r < rect.Top + rect.Height; r++)
+                    {
+                        for (int c = rect.Left; c < rect.Left + rect.Width; c++, idx++)
+                        {
+                            xOffset = c + (long)r * stride;
+                            m_aBuf[nByte * idx + 0] = *(Rptr + xOffset);
+                            m_aBuf[nByte * idx + 1] = *(Gptr + xOffset);
+                            m_aBuf[nByte * idx + 2] = *(Bptr + xOffset);
+                        }
                     }
                 }
             }
