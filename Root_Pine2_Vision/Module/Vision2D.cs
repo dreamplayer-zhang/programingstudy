@@ -335,7 +335,8 @@ namespace Root_Pine2_Vision.Module
 
         public class CalibrationData
         {
-            public DalsaParameterSet.eFlatFieldUserSet m_eCalUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
+            public DalsaParameterSet.eFlatFieldUserSet m_eForwardUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
+            public DalsaParameterSet.eFlatFieldUserSet m_eBackwardUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
             public DalsaParameterSet.eAnalogGain m_eAnalogGain = DalsaParameterSet.eAnalogGain.One;
             public string _sAnalogGain = "1";
             public string m_sAnalogGain
@@ -396,7 +397,8 @@ namespace Root_Pine2_Vision.Module
 
             public void RunTree(Tree tree)
             {
-                m_eCalUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eCalUserSet, m_eCalUserSet, "Flat Field Correction UserSet", "Select Flat Field Correction UserSet");
+                m_eForwardUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eForwardUserSet, m_eForwardUserSet, "Forward UserSet", "Select Flat Field Correction UserSet");
+                m_eBackwardUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eBackwardUserSet, m_eBackwardUserSet, "Reverse UserSet", "Select Flat Field Correction UserSet");
                 m_sAnalogGain = tree.Set(m_sAnalogGain, m_sAnalogGain, DalsaParameterSet.m_aAnalogGain, "Analog Gain", "Analog Gain");
                 m_dSystemGain = tree.Set(m_dSystemGain, m_dSystemGain, "System Gain", "System Gain");
                 m_dAllRowsGain = tree.Set(m_dAllRowsGain, m_dAllRowsGain, "AllRows Gain", "AllRows Gain");
@@ -868,6 +870,24 @@ namespace Root_Pine2_Vision.Module
                         SetCameraGain((eCalMode)nSnapMode, recipe.m_eDirection);
                 }
 
+                if (iSnap == 0)
+                {
+                    if (nSnapMode == Recipe.eSnapMode.ALL || nSnapMode == Recipe.eSnapMode.RGB)
+                    {
+                        if(recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
+                            m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.RGB].m_eForwardUserSet;
+                        else
+                            m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.RGB].m_eBackwardUserSet;
+                    }
+                    else if (nSnapMode == Recipe.eSnapMode.APS)
+                    {
+                        if (recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
+                            m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.APS].m_eForwardUserSet;
+                        else
+                            m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.APS].m_eBackwardUserSet;
+                    }
+                }
+
                 m_log.Info("Set Gain Done");
                 // Check Userset Change Thread
                 nTimeCount = 0;
@@ -913,34 +933,34 @@ namespace Root_Pine2_Vision.Module
 
                             if (nSnapMode == Recipe.eSnapMode.ALL)
                             {
-                                if (nNextSnap < (nTotalSnap / 2))
+                                if (nNextSnap < (nTotalSnap / 2))       // RGB
                                 {
                                     if (nNextSnapLineIndex % 2 == 0)
-                                        thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet1);
+                                        thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
                                     else
-                                        thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet2);
+                                        thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
                                 }
-                                else
+                                else    // APS
                                 {
                                     if (nNextSnapLineIndex % 2 == 0)
-                                        thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet3);
+                                        thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
                                     else
-                                        thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet4);
+                                        thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
                                 }
                             }
                             else if (nSnapMode == Recipe.eSnapMode.RGB)
                             {
                                 if (nNextSnapLineIndex % 2 == 0)
-                                    thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet1);
+                                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
                                 else
-                                    thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet2);
+                                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
                             }
                             else if (nSnapMode == Recipe.eSnapMode.APS)
                             {
                                 if (nNextSnapLineIndex % 2 == 0)
-                                    thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet3);
+                                    thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
                                 else
-                                    thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet4);
+                                    thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
                             }
                         }
                     }
@@ -963,34 +983,34 @@ namespace Root_Pine2_Vision.Module
 
                     if (nSnapMode == Recipe.eSnapMode.ALL)
                     {
-                        if(nNextSnap < (nTotalSnap / 2))
+                        if (nNextSnap < (nTotalSnap / 2))       // RGB
                         {
                             if (nNextSnapLineIndex % 2 == 0)
-                                thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet1);
+                                thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
                             else
-                                thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet2);
+                                thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
                         }
-                        else
+                        else    // APS
                         {
                             if (nNextSnapLineIndex % 2 == 0)
-                                thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet3);
+                                thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
                             else
-                                thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet4);
+                                thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
                         }
                     }
                     else if (nSnapMode == Recipe.eSnapMode.RGB)
                     {
                         if (nNextSnapLineIndex % 2 == 0)
-                            thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet1);
+                            thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
                         else
-                            thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet2);
+                            thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
                     }
-                    else if(nSnapMode == Recipe.eSnapMode.APS)
+                    else if (nSnapMode == Recipe.eSnapMode.APS)
                     {
                         if (nNextSnapLineIndex % 2 == 0)
-                            thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet3);
+                            thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
                         else
-                            thUpdate.Start(DalsaParameterSet.eFlatFieldUserSet.UserSet4);
+                            thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
                     }
                 }
                 m_log.Info("Userset Thread Done");
