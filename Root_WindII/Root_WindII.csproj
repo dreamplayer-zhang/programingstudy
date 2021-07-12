@@ -268,9 +268,9 @@
     </Compile>
     <Compile Include="UI\Dialog\ManualAlignViewer_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\Dialog\ManualAlignViewer_ViewModel.cs" />
-	  <Compile Include="Tools\PositionConverter.cs" />
-	  <Compile Include="Tools\StepTableData.cs" />
-	  <Compile Include="UI\SelectMode.xaml.cs">
+    <Compile Include="Tools\PositionConverter.cs" />
+    <Compile Include="Tools\StepTableData.cs" />
+    <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MAINTENANCE\MaintenancePanel.xaml.cs">
@@ -361,6 +361,9 @@
       <DependentUpon>MotionViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\MapFileSelectionViewer.xaml.cs">
+      <DependentUpon>MapFileSelectionViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SETUP\RAC\RACAlignKey.xaml.cs">
       <DependentUpon>RACAlignKey.xaml</DependentUpon>
     </Compile>
@@ -373,6 +376,7 @@
     <Compile Include="UI\SETUP\RAC\RACSetup.xaml.cs">
       <DependentUpon>RACSetup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SETUP\RAC\ViewModels\MapFileSelectionViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACAlignKey_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\MapFileListViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACAlignKey_ViewModel.cs" />
@@ -551,6 +555,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\SETUP\CAMERA\MotionViewer\MotionViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\RAC\MapFileSelectionViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
