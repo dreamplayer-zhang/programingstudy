@@ -206,18 +206,20 @@ namespace Root_WindII
         {
             get => new RelayCommand(() =>
             {
-                FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
+                if (this.ImageViewerVM.BoxImage != null)
+                {
+                    FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
+                    ImageData featureImageData = this.ImageViewerVM.BoxImage;
 
-                ImageData featureImageData = this.ImageViewerVM.BoxImage;
+                    byte[] srcBuf = featureImageData.m_aBuf;
+                    byte[] rawData = new byte[featureImageData.p_Size.X * featureImageData.p_Size.Y * featureImageData.p_nByte];
+                    Array.Copy(srcBuf, rawData, srcBuf.Length);
 
-                byte[] srcBuf = featureImageData.m_aBuf;
-                byte[] rawData = new byte[featureImageData.p_Size.X * featureImageData.p_Size.Y * featureImageData.p_nByte];
-                Array.Copy(srcBuf, rawData, srcBuf.Length);
+                    alignRecipe.AddAlignFeature(0, 0, featureImageData.p_Size.X, featureImageData.p_Size.Y, featureImageData.p_nByte, rawData);
+                    alignRecipe.Save(Constants.RootPath.RootSetupRACAlignKeyPath);
 
-                alignRecipe.AddAlignFeature(0, 0, featureImageData.p_Size.X, featureImageData.p_Size.Y, featureImageData.p_nByte, rawData);
-                alignRecipe.Save(Constants.RootPath.RootSetupRACAlignKeyPath);
-
-                RefreshFeatureItemList();
+                    RefreshFeatureItemList();
+                }
             });
         }
 
