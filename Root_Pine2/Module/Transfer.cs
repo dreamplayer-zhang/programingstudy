@@ -428,11 +428,20 @@ namespace Root_Pine2.Module
                 Thread.Sleep(2000);
                 return m_pusher.WaitUnlock();
             }
+            double xOffset = m_magazineEV.CalcXOffset(infoStrip);
+            if (Run(m_loaderPusher.RunMove(infoStrip.p_eMagazine, false))) return p_sInfo; 
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, false))) return p_sInfo;
+            if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, true))) return p_sInfo;
+            m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
             try
             {
+                if (Run(m_gripper.RunGripperReady(Gripper.eGripper.Grip))) return p_sInfo;
+                if (Run(m_loaderPusher.RunPusher(infoStrip.p_eMagazine))) return p_sInfo;
                 if (m_gripper.IsPushed())
                 {
                     if (Run(m_gripper.RunGripper())) return p_sInfo;
+                    infoStrip = m_magazineEV.GetInfoStrip(false);
                     if (m_gripper.IsGripped()) m_gripper.p_infoStrip = infoStrip;
                     else return "Check Strip in Gripper";
                 }
@@ -441,35 +450,8 @@ namespace Root_Pine2.Module
             }
             finally
             {
-                m_gripper.RunGripperReady(Gripper.eGripper.Ready);
+                m_gripper.RunGripperReady(Gripper.eGripper.Ready); 
             }
-            m_magazineEV.GetInfoStrip(false);
-        }
-
-        public string RunLoad(InfoStrip.eMagazine eMagazine, InfoStrip.eMagazinePos ePos, int iSlot)
-        {
-            MagazineEV magazineEV = m_magazineEV.m_aEV[eMagazine];
-            MagazineEV.Magazine magazine = magazineEV.m_aMagazine[ePos];
-            if (magazine == null) return "Magazine == null";
-            InfoStrip infoStrip = new InfoStrip(eMagazine, ePos, magazine.p_iBundle, iSlot); 
-            return "OK"; 
-        }
-
-        string RunLoad(InfoStrip infoStrip)
-        {
-            try
-            {
-                double xOffset = m_magazineEV.CalcXOffset(infoStrip);
-                if (Run(m_loaderPusher.RunMove(infoStrip.p_eMagazine, false))) return p_sInfo;
-                if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, false))) return p_sInfo;
-                if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
-                if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, true))) return p_sInfo;
-                m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
-                if (Run(m_gripper.RunGripperReady(Gripper.eGripper.Grip))) return p_sInfo;
-                if (Run(m_loaderPusher.RunPusher(infoStrip.p_eMagazine))) return p_sInfo;
-            }
-            finally { }
-            return "OK";
         }
         #endregion
 
@@ -766,28 +748,16 @@ namespace Root_Pine2.Module
             public override ModuleRunBase Clone()
             {
                 Run_RunLoad run = new Run_RunLoad(m_module);
-                run.m_bFind = m_bFind;
-                run.m_eMagazine = m_eMagazine;
-                run.m_ePos = m_ePos; 
                 return run;
             }
 
-            bool m_bFind = true;
-            InfoStrip.eMagazine m_eMagazine = InfoStrip.eMagazine.Magazine7;
-            InfoStrip.eMagazinePos m_ePos = InfoStrip.eMagazinePos.Up;
-            int m_iSlot = 0; 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_bFind = tree.Set(m_bFind, m_bFind, "Find Strip", "Find Enable Strip", bVisible);
-                m_eMagazine = (InfoStrip.eMagazine)tree.Set(m_eMagazine, m_eMagazine, "Magazine", "Select Magazine", bVisible && m_bFind);
-                m_ePos = (InfoStrip.eMagazinePos)tree.Set(m_ePos, m_ePos, "Position", "Select Position", bVisible && m_bFind);
-                m_iSlot = tree.Set(m_iSlot, m_iSlot, "Slot", "Select Slot", bVisible && m_bFind); 
             }
 
             public override string Run()
             {
-                if (m_bFind) return m_module.RunLoad();
-                return m_module.RunLoad(m_eMagazine, m_ePos, m_iSlot); 
+                return m_module.RunLoad();
             }
         }
 
