@@ -134,8 +134,10 @@
     <Compile Include="DataTypes\SharedBufferInfo.cs" />
     <Compile Include="Inspection\BacksideAlignment.cs" />
     <Compile Include="Inspection\BacksideSurface.cs" />
+    <Compile Include="Inspection\PreCreateGolden.cs" />
     <Compile Include="Inspection\EUVPodSurface.cs" />
     <Compile Include="Inspection\ProcessDefect_Backside.cs" />
+    <Compile Include="Inspection\ProcessDefect_EUVPod.cs" />
     <Compile Include="Inspection\ReticleSurface.cs" />
     <Compile Include="GlobalObjects.cs" />
     <Compile Include="Inspection\D2D.cs" />
@@ -157,7 +159,10 @@
     <Compile Include="Recipe\Interfaces\IOptionParameter.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
     <Compile Include="Recipe\Parameter\BacksideSurfaceParameter.cs" />
+    <Compile Include="Recipe\Parameter\FrontsideOthersParameterBase.cs" />
+    <Compile Include="Recipe\Parameter\PreCreateGoldenParameter.cs" />
     <Compile Include="Recipe\Parameter\EUVPodSurfaceParameter.cs" />
+    <Compile Include="Recipe\Parameter\ProcessDefectEUVPodParameter.cs" />
     <Compile Include="Recipe\Parameter\VerticalWireParameter.cs" />
     <Compile Include="Recipe\Parameter\PBIParameter.cs" />
     <Compile Include="Recipe\Parameter\ProcessDefectBacksideParameter.cs" />
@@ -185,7 +190,14 @@
     <Compile Include="Recipe\Recipe\D2DRecipe.cs" />
     <Compile Include="Recipe\Recipe\EBRRecipe.cs" />
     <Compile Include="Recipe\Recipe\EdgeSurfaceRecipe.cs" />
-    <Compile Include="Recipe\Recipe\EUVPodSurfaceRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\EUVOriginRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\EUVPodSurfaceRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\EUVPositionRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\HighResRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\LowResRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\SideRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\StainRecipe.cs" />
+    <Compile Include="Recipe\Recipe\FrontVRSAlignRecipe.cs" />
     <Compile Include="Recipe\Recipe\FrontAlignRecipe.cs" />
     <Compile Include="Recipe\Recipe\OriginRecipe.cs" />
     <Compile Include="Recipe\Recipe\VerticalWireRecipe.cs" />
@@ -244,6 +256,14 @@
     <Compile Include="UserControls\MapViewer.xaml.cs">
       <DependentUpon>MapViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\MotionViewer\MotionController.xaml.cs">
+      <DependentUpon>MotionController.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\MotionViewer\MotionController_ViewModel.cs" />
+    <Compile Include="UserControls\MotionViewer\MotionViewer.xaml.cs">
+      <DependentUpon>MotionViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\MotionViewer\MotionViewer_ViewModel.cs" />
     <Compile Include="UserControls\SizeObserver.cs" />
     <Compile Include="UserControls\MapViewer_ViewModel.cs" />
     <Compile Include="Utility\Enums.cs" />
@@ -318,6 +338,14 @@
     <Page Include="UserControls\MapViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\MotionViewer\MotionController.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\MotionViewer\MotionViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

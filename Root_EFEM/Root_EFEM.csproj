@@ -260,6 +260,7 @@
     <Compile Include="Module\EFEM_AOP.cs" />
     <Compile Include="Module\FrontsideVision\Run_GrabLineScan.cs" />
     <Compile Include="Module\FrontsideVision\Run_Inspect.cs" />
+    <Compile Include="Module\FrontsideVision\Run_VRSAlign.cs" />
     <Compile Include="Module\FrontsideVision\Run_VisionAlign.cs" />
     <Compile Include="Module\Gem_XGem300Pro.cs" />
     <Compile Include="Module\IWTRRun.cs" />

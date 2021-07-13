@@ -75,7 +75,7 @@ namespace Root_VEGA_P.Module
                 int nPod = (value != null) ? (int)value.p_ePod : -1;
                 _infoPod = value;
                 m_reg.Write("InfoPod", nPod);
-                value.WriteReg();
+                value?.WriteReg();
                 OnPropertyChanged();
             }
         }

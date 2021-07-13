@@ -218,6 +218,11 @@
     </Compile>
     <Compile Include="Dialog\Dialog_MapCreator_ImageViewer_ViewModel.cs" />
     <Compile Include="Dialog\Dialog_MapCreator_ViewModel.cs" />
+    <Compile Include="Dialog\ManualAlignViewer.xaml.cs">
+      <DependentUpon>ManualAlignViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\ManualAlignViewer_ImageViewer_ViewModel.cs" />
+    <Compile Include="Dialog\ManualAlignViewer_ViewModel.cs" />
     <Compile Include="Module\Vision\Run_InspectOnly.cs" />
     <Compile Include="Recipe\RecipeAlign.cs" />
     <Compile Include="Tools\Constants.cs" />
@@ -351,6 +356,9 @@
     <Compile Include="UI_User\FRONT\FrontsideInspect.xaml.cs">
       <DependentUpon>FrontsideInspect.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_User\FRONT\FrontsideOthers.xaml.cs">
+      <DependentUpon>FrontsideOthers.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_User\FRONT\ViewModels\FrontsideAlignment_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\FRONT\ViewModels\FrontsideAlignment_ViewModel.cs" />
     <Compile Include="UI_User\FRONT\FrontsideMask.xaml.cs">
@@ -367,6 +375,8 @@
     <Compile Include="UI_User\FRONT\FrontsideProduct.xaml.cs">
       <DependentUpon>FrontsideProduct.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideOthers_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideOthers_ViewModel.cs" />
     <Compile Include="UI_User\FRONT\ViewModels\FrontsideProduct_ViewModel.cs" />
     <Compile Include="UI_User\FRONT\FrontsideSpec.xaml.cs">
       <DependentUpon>FrontsideSpec.xaml</DependentUpon>
@@ -591,6 +601,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\Dialog_MapCreator.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialog\ManualAlignViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -823,6 +837,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_User\FRONT\FrontsideMask.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\FRONT\FrontsideOthers.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

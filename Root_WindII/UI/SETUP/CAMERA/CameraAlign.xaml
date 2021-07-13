@@ -248,7 +248,7 @@
                     </Grid.RowDefinitions>
                     <ListBox Grid.Row="0" 
                          ItemsSource="{Binding FeatureItemList}"
-                         SelectedIndex="{Binding SelectedFeatureItem}"
+                         SelectedItem="{Binding SelectedFeatureItem}"
                          Background="Transparent">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>

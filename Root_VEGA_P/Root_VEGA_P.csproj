@@ -204,6 +204,7 @@
     <Compile Include="Engineer\VEGA_P_Process_UI.xaml.cs">
       <DependentUpon>VEGA_P_Process_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MainVM.cs" />
     <Compile Include="Module\EIP_Cover.cs" />
     <Compile Include="Module\EIP_Plate.cs" />
     <Compile Include="Module\EOP.cs" />
@@ -213,12 +214,37 @@
     </Compile>
     <Compile Include="Module\ParticleCounterSet.cs" />
     <Compile Include="Module\VEGA_P.cs" />
+    <Compile Include="UIManager.cs" />
+    <Compile Include="UI\1. Setup\Home_Panel.xaml.cs">
+      <DependentUpon>Home_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\Home_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\Maintenance_Panel.xaml.cs">
+      <DependentUpon>Maintenance_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\Operate_Panel.xaml.cs">
+      <DependentUpon>Operate_Panel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\1. Setup\Panel_RecipeManger.xaml.cs">
       <DependentUpon>Panel_RecipeManger.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\Mode_Setup.xaml.cs">
       <DependentUpon>Mode_Setup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\1. Setup\PodRecipe_Panel.xaml.cs">
+      <DependentUpon>PodRecipe_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\PodRecipe_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\UserControls\FileItem.xaml.cs">
+      <DependentUpon>FileItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\UserControls\NozzleItem.xaml.cs">
+      <DependentUpon>NozzleItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\UserControls\NozzleRecipeInfo_Panel.xaml.cs">
+      <DependentUpon>NozzleRecipeInfo_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\UserControls\NozzleRecipeInfo_ViewModel.cs" />
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
@@ -300,11 +326,39 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\1. Setup\Home_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\Maintenance_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\Operate_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1. Setup\Panel_RecipeManger.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\Mode_Setup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\PodRecipe_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\UserControls\FileItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\UserControls\NozzleItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\UserControls\NozzleRecipeInfo_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -353,6 +407,10 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RootTools_Vision\RootTools_Vision.csproj">
+      <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
+      <Name>RootTools_Vision</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Root_EFEM\Root_EFEM.csproj">
       <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
       <Name>Root_EFEM</Name>
@@ -379,22 +437,8 @@
     <Folder Include="ViewModel\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UI\1. Setup\covertop.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="UI\1. Setup\doom.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="UI\1. Setup\door.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="UI\1. Setup\coverbot.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="UI\1. Setup\basetop.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="UI\1. Setup\basebot.png" />
+    <Resource Include="UI\1. Setup\Resources\CoverBtm.png" />
+    <Resource Include="UI\1. Setup\Resources\CoverTop.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

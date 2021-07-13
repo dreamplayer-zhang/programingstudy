@@ -144,7 +144,10 @@ namespace RootTools.Comm
                 }
                 m_client.Connect(); 
             }
-            catch (Exception) { return "Connection Error"; }
+            catch (Exception e) 
+            {
+                return "Connection Error : " + e.ToString();
+            }
             if (m_client.Connected == false) return "Connection False";
             m_client.SendDataChanged += M_client_SendDataChanged;
             m_client.ReceiveDataChanged += M_client_ReceiveDataChanged;

@@ -95,6 +95,7 @@ namespace Root_VEGA_P.Engineer
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
+            sInfo = StateHome(m_VEGA, m_loadport, m_EOP, m_EIP_Plate, m_EIP_Cover, m_holder, m_vision);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }

@@ -156,11 +156,11 @@ namespace Root_Pine2.Module
 
         public string RunSnap()
         {
-            try
+            try     
             {
-                m_axis.SetTrigger(m_axis.m_trigger.m_aPos[0], m_axis.m_trigger.m_aPos[1], m_axis.m_trigger.m_dPos, 5, true);
+                m_axis.SetTrigger(m_axis.m_trigger.m_aPos[0], m_axis.m_trigger.m_aPos[1], m_axis.m_trigger.m_dPos, 5, false);
                 //m_axis.RunTrigger(true);
-                m_axis.StartMove(m_pSnap[1], "Snap");
+                     m_axis.StartMove(m_pSnap[1], "Snap");
                 return m_axis.WaitReady();
 
             }

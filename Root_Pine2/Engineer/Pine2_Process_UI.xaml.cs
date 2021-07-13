@@ -37,9 +37,10 @@ namespace Root_Pine2.Engineer
             comboRecipe.DataContext = handler; 
             textBlockMode.DataContext = m_pine2;
             textBoxWidth.DataContext = m_pine2;
-            textBoxThickness.DataContext = m_pine2; 
-            textBlock3D.DataContext = m_pine2;
+            textBoxThickness.DataContext = m_pine2;
+            checkBox3D.DataContext = m_pine2; 
 
+            textBoxWorker.DataContext = m_pine2; 
             textBoxLotID.DataContext = m_pine2;
             textBoxBundle.DataContext = m_pine2;
 
@@ -156,6 +157,7 @@ namespace Root_Pine2.Engineer
                 case EQ.eState.Home: gridEQ.Background = Brushes.MediumPurple; break;
                 case EQ.eState.Ready: gridEQ.Background = Brushes.LightGreen; break;
                 case EQ.eState.Run: gridEQ.Background = Brushes.Yellow; break;
+                case EQ.eState.ModuleRunList: gridEQ.Background = Brushes.Orange; break;
                 case EQ.eState.Error: gridEQ.Background = Brushes.OrangeRed; break;
             }
             foreach (MagazineEV_UI ui in m_aMagazineUI) ui.OnTimer(); 
@@ -178,11 +180,6 @@ namespace Root_Pine2.Engineer
             m_pine2.p_eMode = 1 - m_pine2.p_eMode;
         }
 
-        private void textBlock3D_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            m_pine2.p_b3D = !m_pine2.p_b3D; 
-        }
-
         #region Run Button
         void OnTimerRun()
         {
@@ -190,6 +187,7 @@ namespace Root_Pine2.Engineer
             buttonStop.IsEnabled = (EQ.p_eState == EQ.eState.Run); 
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Error);
             buttonHome.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Error);
+            buttonPickerSet.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
             groupBoxStack.IsEnabled = m_pine2.p_eMode == Pine2.eRunMode.Stack; 
         }
 
@@ -229,6 +227,11 @@ namespace Root_Pine2.Engineer
                     m_handler.Reset();
                     break; 
             }
+        }
+
+        private void buttonPickerSet_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.StartPickerSet(); 
         }
 
         BackgroundWorker m_bgwNewLot = new BackgroundWorker();

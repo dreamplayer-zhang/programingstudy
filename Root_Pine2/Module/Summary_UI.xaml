@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="Root_Pine2.Module.Summary_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_Pine2.Module"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="6*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="7*"/>
+                <RowDefinition Height="6*"/>
+                <RowDefinition Height="6*"/>
+                <RowDefinition Height="5*"/>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Strip Info" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <Grid x:Name="gridStripInfo"/>
+            </GroupBox>
+            <GroupBox Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Strip Count" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <Grid x:Name="gridStripCount"/>
+            </GroupBox>
+            <GroupBox Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Unit Count" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <Grid x:Name="gridUnitCount"/>
+            </GroupBox>
+            <GroupBox Grid.Row="3" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Time" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <Grid x:Name="gridTime">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                </Grid>
+            </GroupBox>
+        </Grid>
+        <GroupBox Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="3">
+            <GroupBox.Header>
+                <TextBlock Text="Unit Map" Foreground="Black" FontWeight="Bold" />
+            </GroupBox.Header>
+            <Grid x:Name="gridUnit"/>
+        </GroupBox>
+    </Grid>
+</UserControl>

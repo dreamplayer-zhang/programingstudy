@@ -203,22 +203,22 @@ namespace Root_Pine2.Module
         #region PickerSet
         double m_mmPickerSetUp = 10;
         double m_secPickerSet = 7;
-        public string RunPickerSet()
+        public string RunPickerSet(Vision2D.eVision eVision, Vision2D.eWorks eWorks)
         {
             StopWatch sw = new StopWatch();
             long msPickerSet = (long)(1000 * m_secPickerSet);
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(RunMoveX(Vision2D.eVision.Top3D, Vision2D.eWorks.A))) return p_sInfo; 
+                if (Run(RunMoveX(eVision, eWorks))) return p_sInfo; 
                 while (true)
                 {
-                    if (Run(RunMoveZ(Vision2D.eVision.Top3D, Vision2D.eWorks.A, 0))) return p_sInfo;
+                    if (Run(RunMoveZ(eVision, eWorks, 0))) return p_sInfo;
                     if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                     double sec = 0;
                     if (Run(m_pine2.WaitPickerSet(ref sec))) return p_sInfo;
                     if (Run(m_picker.RunVacuum(true))) return p_sInfo;
-                    if (Run(RunMoveZ(Vision2D.eVision.Top3D, Vision2D.eWorks.A, 1000 * m_mmPickerSetUp))) return p_sInfo;
+                    if (Run(RunMoveZ(eVision, eWorks, 1000 * m_mmPickerSetUp))) return p_sInfo;
                     Thread.Sleep(200);
                     m_pine2.p_diPickerSet = false;
                     if (m_picker.IsVacuum())
@@ -326,6 +326,7 @@ namespace Root_Pine2.Module
         string StartUnloadTurnover()
         {
             if (m_handler.m_loader2.p_eState != eState.Ready) return "OK";
+            if (m_handler.m_loader2.p_infoStrip != null) return "OK"; 
             return StartRun(m_runUnloadTurnover);
         }
 
@@ -487,19 +488,25 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
+            Vision2D.eVision m_eVision = Vision2D.eVision.Top3D;
+            Vision2D.eWorks m_eWorks = Vision2D.eWorks.B;
             public override ModuleRunBase Clone()
             {
                 Run_PickerSet run = new Run_PickerSet(m_module);
+                run.m_eVision = m_eVision;
+                run.m_eWorks = m_eWorks; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_eVision = (Vision2D.eVision)tree.Set(m_eVision, m_eVision, "Vision", "Select Boat", bVisible);
+                m_eWorks = (Vision2D.eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Select Boat", bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunPickerSet();
+                return m_module.RunPickerSet(m_eVision, m_eWorks);
             }
         }
         #endregion

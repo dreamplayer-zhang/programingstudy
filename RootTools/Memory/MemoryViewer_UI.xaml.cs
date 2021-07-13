@@ -151,10 +151,13 @@ namespace RootTools.Memory
 
         private void memuClear_Click(object sender, RoutedEventArgs e)
         {
+            
             MemoryData tttt = m_viewer.p_memoryData;
+
+            IntPtr point = m_viewer.p_memoryData.GetPtr(m_viewer.p_nMemoryIndex);
             CPoint p_Size = tttt.p_sz;
             byte[] pBuf = new byte[p_Size.X * tttt.p_nByte];
-           
+
             Parallel.For(0, tttt.p_sz.Y, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (y) =>
             {
                 for (int i = 0; i < tttt.p_nCount; i++)
@@ -166,9 +169,6 @@ namespace RootTools.Memory
 
         private void memuOption_Click(object sender, RoutedEventArgs e)
         {
-            if (m_viewer.p_memoryData == null)
-                return;
-
             MemoryViewerOption optionWindow = new MemoryViewerOption();
             optionWindow.Owner = Window.GetWindow(this);
             optionWindow.SetOverlapOption(m_viewer.p_bRemoveOverlapArea, m_viewer.p_nFov, m_viewer.p_nOverlap);
@@ -193,6 +193,36 @@ namespace RootTools.Memory
                 m_viewer.UpdateBitmapSource();
             }
 
+        }
+
+        private void memuAllClear_Click(object sender, RoutedEventArgs e)
+        {
+
+            MemoryData tttt = m_viewer.p_memoryData;
+
+            for (int i = 0; i < m_viewer.p_memoryData.p_nCount; i++)
+            {
+                IntPtr point = m_viewer.p_memoryData.GetPtr(i);
+                CPoint p_Size = tttt.p_sz;
+                byte[] pBuf = new byte[p_Size.X * tttt.p_nByte];
+
+                Parallel.For(0, tttt.p_sz.Y, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (y) =>
+                {
+
+                    Marshal.Copy(pBuf, 0, (IntPtr)((long)point + (long)p_Size.X * y), p_Size.X * tttt.p_nByte);
+                    if (tttt.p_nCount == 3)
+                    {
+                        Marshal.Copy(pBuf, 0, (IntPtr)((long)tttt.GetPtr(1) + (long)p_Size.X * y), p_Size.X);
+                        Marshal.Copy(pBuf, 0, (IntPtr)((long)tttt.GetPtr(2) + (long)p_Size.X * y), p_Size.X);
+                    }
+                //Marshal.Copy(pBuf, 0, (IntPtr)((long)tttt.GetPtr(0) + (long)p_Size.X * y), p_Size.X * tttt.p_nByte);
+                //if (tttt.p_nCount == 3)
+                //{
+                //    Marshal.Copy(pBuf, 0, (IntPtr)((long)tttt.GetPtr(1) + (long)p_Size.X * y), p_Size.X);
+                //    Marshal.Copy(pBuf, 0, (IntPtr)((long)tttt.GetPtr(2) + (long)p_Size.X * y), p_Size.X);
+                //}
+            });
+            }
         }
     }
 }

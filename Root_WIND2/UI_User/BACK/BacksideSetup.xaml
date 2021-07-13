@@ -42,17 +42,23 @@
 
                     <TextBlock Text="Center Point" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <CheckBox Content="Circle" IsChecked="{Binding IsROIChecked, Mode=TwoWay}" Command="{Binding btnROICommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    
+                    <Button Content="Detect" Command="{Binding btnCircleDetectCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Clear" Command="{Binding btnCircleClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    
+                    <TextBlock Text="Inspection Range" VerticalAlignment="Center" TextAlignment="Center" Width="120" Height="auto" Margin="4,0,0,0"/>
                     <TextBox Text="{Binding InspectionCircleDiameter, UpdateSourceTrigger=PropertyChanged}" KeyDown="TextBox_KeyDown" Width="60" Height="24" Margin="4,0,0,0" TextAlignment="Center"/>
                     <TextBlock Text="[mm]" VerticalAlignment="Center" TextAlignment="Center" Width="30" Height="auto" Margin="4,0,0,0"/>
-                    <Button Content="Detect" Command="{Binding btnCircleDetectCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Save" Command="{Binding btnCircleSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
-                    <Button Content="Clear" Command="{Binding btnCircleClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    
 
                     <TextBlock Text="Exclusive Region" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <CheckBox Content="Poly" IsChecked="{Binding IsPolyChecked, Mode=TwoWay}" Command="{Binding btnPolyCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                     <Button Content="Save" Command="{Binding btnSavePolyCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Cancel" Command="{Binding btnCancelPolyCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Clear" Command="{Binding btnClearPolyCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+
+                    
                 </StackPanel>
                 <Grid Grid.Row="1" >
                     <tools:RootViewer />
@@ -73,6 +79,9 @@
                 <StackPanel Orientation="Vertical">
                     <Button Content="Create ROI"
                         Command="{Binding btnCreateROICommand}"
+                        Style="{StaticResource groupbox_button}"/>
+                    <Button Content="Clear"
+                        Command="{Binding btnClearROICommand}"
                         Style="{StaticResource groupbox_button}"/>
                 </StackPanel>
             </GroupBox>

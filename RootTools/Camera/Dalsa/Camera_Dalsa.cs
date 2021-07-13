@@ -177,6 +177,7 @@ namespace RootTools.Camera.Dalsa
 
         double[] m_pdOverlap = new double[overlapsize];
         int m_nPreOverlap = 100;
+        bool enableCameraconfig = false;
         public TreeRoot p_treeRoot
         {
             get
@@ -245,7 +246,8 @@ namespace RootTools.Camera.Dalsa
         {
             RunSetTree(treeRoot.GetTree("Connect Set"));
             RunImageRoiTree(treeRoot.GetTree("Buffer Image ROI", true, m_sapXfer != null));
-            RunCameraConfig(treeRoot.GetTree("Camera Config", true, m_sapXfer != null), m_sapXfer != null);
+            if(enableCameraconfig)
+                RunCameraConfig(treeRoot.GetTree("Camera Config", true, m_sapXfer != null), m_sapXfer != null);
         }
 
         void RunSetTree(Tree tree)
@@ -254,6 +256,7 @@ namespace RootTools.Camera.Dalsa
             p_CamInfo.p_sFile = tree.SetFile(p_CamInfo.p_sFile, p_CamInfo.p_sFile, "ccf", "CamFile", "Cam File");
             p_CamInfo.p_sAreaCamFile = tree.SetFile(p_CamInfo.p_sAreaCamFile, p_CamInfo.p_sAreaCamFile, "ccf", "Area Cam file", "Area Cam File");
             p_CamInfo.p_nResourceIdx = tree.Set(p_CamInfo.p_nResourceIdx, p_CamInfo.p_nResourceIdx, "Resource Count", "Resource Count");
+            enableCameraconfig = tree.Set(enableCameraconfig, enableCameraconfig, "Use Camera Config", "Use Camera Config");
         }
 
         void RunImageRoiTree(Tree tree)
@@ -272,8 +275,8 @@ namespace RootTools.Camera.Dalsa
 
         void RunCameraConfig(Tree tree, bool bVisible)
         {
-            //p_CamParam.p_eUserSetPowerup = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetPowerup, p_CamParam.p_eUserSetPowerup, "Power-up UserSet", "Selects the UserSet Configuration Set on camera power-up or reset", bVisible);
-            //p_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetCurrent, p_CamParam.p_eUserSetCurrent, "Current UserSet", "Selects and Current UserSet", bVisible);
+            p_CamParam.p_eUserSetPowerup = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetPowerup, p_CamParam.p_eUserSetPowerup, "Power-up UserSet", "Selects the UserSet Configuration Set on camera power-up or reset", bVisible);
+            p_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetCurrent, p_CamParam.p_eUserSetCurrent, "Current UserSet", "Selects and Current UserSet", bVisible);
             //p_CamParam.p_nRotaryEncoderMultiplier = tree.Set(p_CamParam.p_nRotaryEncoderMultiplier, p_CamParam.p_nRotaryEncoderMultiplier, "RotaryEncoderMultiplier", "Specifies a multiplication factor for the rotary encoder output pulse generator", bVisible);
             //p_CamParam.p_nRotaryEncoderDivider = tree.Set(p_CamParam.p_nRotaryEncoderDivider, p_CamParam.p_nRotaryEncoderDivider, "RotaryEncoderDivider", "Specifies a division factor for the rotary encoder output pulse generator", bVisible);
         }
@@ -535,7 +538,8 @@ namespace RootTools.Camera.Dalsa
                 m_BlueMemPtr = m_Memory.GetPtr(2);
             }
 
-            m_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)m_GD.nUserSet;
+            if(m_CamParam.p_eUserSetCurrent != (DalsaParameterSet.eUserSet)m_GD.nUserSet)
+                m_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)m_GD.nUserSet;
 
             if (Scandir == true) //ybkwon0113
             {
@@ -696,7 +700,7 @@ namespace RootTools.Camera.Dalsa
                     {
                         int yp;
                         if (Scandir)
-                            yp = m_nLine - (y + (iBlock) * nCamHeight) + m_nInverseYOffset + m_nOffsetTest;
+                            yp = m_nLine - (y + iBlock * nCamHeight) + m_nInverseYOffset + m_nOffsetTest;
                         else
                             yp = y + iBlock * nCamHeight + nScanOffsetY + m_nOffsetTest;
 
@@ -757,8 +761,9 @@ namespace RootTools.Camera.Dalsa
             int nByteCnt = m_sapBuf.BytesPerPixel;
             int nCamHeight = p_CamParam.p_Height;
             int nCamWidth = p_CamParam.p_Width;
+            int nFOV = m_GD.m_nFovSize;
             long lMemoryWidth = (long)m_Memory.W;
-            int nMemoryOffsetX = m_cpScanOffset.X;
+            int nMemoryOffsetX = m_cpScanOffset.X ;
             int nMemoryOffsetY = m_cpScanOffset.Y;
             while (iBlock < m_nGrabCount)
             {
@@ -773,10 +778,10 @@ namespace RootTools.Camera.Dalsa
                         else
                             yp = y + (iBlock) * nCamHeight;
 
-                        IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt;
+                        IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt + m_GD.m_nFovStart;
                         IntPtr dstPtr = (IntPtr)((long)m_MemPtr + nMemoryOffsetX * nByteCnt + (yp + nMemoryOffsetY) * lMemoryWidth);
 
-                        long lDataWidth = nCamWidth * nByteCnt;
+                        long lDataWidth = nFOV * nByteCnt;
                         Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, lDataWidth, lDataWidth);
                     });
                     iBlock++;

@@ -44,7 +44,8 @@ namespace RootTools_Vision
         }
 
         [Category("Parameter")]
-        [DisplayName("Pattern Intensity <-> Param Intensity Offset")]
+        //[DisplayName("Pattern Intensity <-> Param Intensity Offset")]
+        [DisplayName("Adaptive Intensity")]
         public int AdaptiveOffset
         {
             get => this.adaptiveOffset;

@@ -647,7 +647,7 @@ namespace Root_EFEM.Module
             m_qProtocol.Enqueue(protocol);
             if (Run(IsACK(protocol))) return sCmd + " ACK Error : "  + p_sInfo;
             if (Run(IsReady(protocol, secDone))) return sCmd + " READY Error : " + p_sInfo;
-            return "OK";
+			return "OK";
         }
 
         string CmdClear()
@@ -1050,6 +1050,7 @@ namespace Root_EFEM.Module
                     child.p_bLock = true;
                     if (m_module.Run(m_module.CmdPick(posWTR, m_nChildID + 1, m_eArm))) return p_sInfo;
                     child.p_bLock = false;
+                    m_log.Info("Material Location change : " + child.p_id + " -> " + "Robot");
                     child.AfterGet(m_nChildID);
                 }
                 finally
@@ -1131,6 +1132,7 @@ namespace Root_EFEM.Module
                     child.p_bLock = true;
                     if (m_module.Run(m_module.CmdPlace(posWTR, m_nChildID + 1, m_eArm))) return p_sInfo;
                     child.p_bLock = false;
+                    m_log.Info("Material Location change : " + "Robot" + " -> " + child.p_id);
                     child.AfterPut(m_nChildID);
                 }
                 finally

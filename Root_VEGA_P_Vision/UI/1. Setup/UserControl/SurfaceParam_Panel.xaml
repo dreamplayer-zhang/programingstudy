@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.SurfaceParam_Panel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UniformGrid Rows="10" DataContext="{Binding Param}">
+        <TextBlock Text="Enable" Style="{StaticResource ParamText}"/>
+        <CheckBox IsChecked="{Binding IsEnable}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+        <TextBlock Text="Defect Code" Style="{StaticResource ParamText}"/>
+        <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+            <TextBox Text="{Binding DefectCode}" BorderBrush="White" Margin="6,2,6,2"/>
+        </Border>
+        <TextBlock Text="Defect Name" Style="{StaticResource ParamText}"/>
+        <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+            <TextBox Text="{Binding DefectName}" BorderBrush="White" Margin="6,2,6,2"/>
+        </Border>
+        <TextBlock Text="Pit Level" Style="{StaticResource ParamText}"/>
+        <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+            <TextBox Text="{Binding PitLevel}" BorderBrush="White" Margin="6,2,6,2"/>
+        </Border>
+        <TextBlock Text="Max Level" Style="{StaticResource ParamText}"/>
+        <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+            <TextBox Text="{Binding LevelMax}" BorderBrush="White" Margin="6,2,6,2"/>
+        </Border>
+        <TextBlock Text="Min Level" Style="{StaticResource ParamText}"/>
+        <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+            <TextBox Text="{Binding LevelMin}" BorderBrush="White" Margin="6,2,6,2"/>
+        </Border>
+        <TextBlock Text="Pit Size" Style="{StaticResource ParamText}"/>
+        <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+            <TextBox Text="{Binding PitSize}" BorderBrush="White" Margin="6,2,6,2"/>
+        </Border>
+        <TextBlock Text="Max Size" Style="{StaticResource ParamText}"/>
+        <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+            <TextBox Text="{Binding SizeMax}" BorderBrush="White" Margin="6,2,6,2"/>
+        </Border>
+        <TextBlock Text="Min Size" Style="{StaticResource ParamText}"/>
+        <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+            <TextBox Text="{Binding SizeMin}" BorderBrush="White" Margin="6,2,6,2"/>
+        </Border>
+        <TextBlock Text="Filter" Style="{StaticResource ParamText}"/>
+        <ComboBox ItemsSource="{Binding Source={StaticResource dataFromEnum}}" Style="{StaticResource ComboBoxStyle}"/>
+
+    </UniformGrid>
+</UserControl>

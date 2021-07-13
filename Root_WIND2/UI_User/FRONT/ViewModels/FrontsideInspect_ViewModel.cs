@@ -280,6 +280,27 @@ namespace Root_WIND2.UI_User
             });
         }
 
+        public RelayCommand btnManualAlign
+        {
+            get => new RelayCommand(() =>
+            {
+                var viewModel = new ManualAlignViewer_ViewModel(this.imageViewerVM.p_ImageData);
+                Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+
+                if (result.HasValue)
+                {
+                    if (result.Value)
+                    {
+
+                    }
+                    else
+                    {
+
+                    }
+                }
+            });
+        }
+
         public RelayCommand btnStop
         {
             get => new RelayCommand(() =>

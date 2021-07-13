@@ -75,21 +75,21 @@ namespace Root_EFEM.Module.EdgesideVision
 
 				double pulsePerDegree = module.Pulse360 / 360;
 				int camHeight = module.CamEBR.GetRoiSize().Y;
-				int trigger = 1; //gmEBR.m_dTrigger;
 				int scanSpeed = 10000;// Convert.ToInt32((double)gmEBR.m_nMaxFrame* camHeight * trigger * (double)gmEBR.m_nScanRate/ 100);
 
                 //double currPos = axisR.p_posActual - axisR.p_posActual % m_module.dPulse360;
                 //double triggerStart = currPos + (m_fStartDegree * pulsePerDegree);
                 double triggerStart = gmEBR.m_nStartDegree * pulsePerDegree;
 				double triggerDest = triggerStart + (gmEBR.m_nScanDegree * pulsePerDegree);
-
-                //double moveStart = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed*4;   //y 축 이동 시작 지점
-                //double moveEnd = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;  // Y 축 이동 끝 지점
-
-                double moveStart = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;  // Y 축 이동 끝 지점
+				
+				// 시계 방향
+				//double moveStart = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed*4;   //y 축 이동 시작 지점
+				//double moveEnd = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;  // Y 축 이동 끝 지점
+				// 반시계 방향
+				double moveStart = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;  // Y 축 이동 끝 지점
                 double moveEnd = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;   //y 축 이동 시작 지점
-                int grabCount = Convert.ToInt32((gmEBR.m_nScanDegree / 360) * gmEBR.m_nWaferSize_mm * pulsePerDegree * Math.PI / gmEBR.m_dRealResX_um);
-				//int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * gmEBR.m_dCamTriggerRatio);
+                
+				int grabCount = Convert.ToInt32((gmEBR.m_nScanDegree / 360.0) * gmEBR.m_nWaferSize_mm * pulsePerDegree * Math.PI / gmEBR.m_dRealResX_um);
 
 				if (module.Run(axisX.StartMove(gmEBR.m_nFocusX)))
 					return p_sInfo;
@@ -104,8 +104,7 @@ namespace Root_EFEM.Module.EdgesideVision
 				if (module.Run(axisR.WaitReady()))
 					return p_sInfo;
 
-				//axisR.SetTrigger(triggerStart, triggerDest, trigger, 10, true);
-				axisR.SetTrigger(triggerStart, triggerDest, trigger, true);
+                axisR.SetTrigger(triggerStart, triggerDest, 1, 10, true);
 				gmEBR.StartGrab(gmEBR.m_memoryData, new CPoint(0, 0), grabCount, gmEBR.m_GD);
                 gmEBR.Grabed += GmEBR_Grabed;
 

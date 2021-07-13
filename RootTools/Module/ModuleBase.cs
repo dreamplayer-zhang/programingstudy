@@ -684,7 +684,7 @@ namespace RootTools.Module
                 if (run == null)
                 {
                     protocol.p_sRun = "Unknown Cmd";
-                    Send(protocol);
+                    //Send(protocol);
                     return; 
                 }
                 m_memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(protocol.p_sRun));

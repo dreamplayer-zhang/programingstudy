@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_Pine2.Engineer"
+             xmlns:module="clr-namespace:Root_Pine2.Module"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -14,5 +15,15 @@
         </Grid.ColumnDefinitions>
         <local:Pine2_Process_UI x:Name="processUI"/>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="7*"/>
+            </Grid.RowDefinitions>
+            <local:Pine2_ALID_UI Grid.Row="0" x:Name="alidUI"/>
+            <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
+            <module:Summary_UI Grid.Row="2" x:Name="summaryUI"/>
+        </Grid>
     </Grid>
 </UserControl>

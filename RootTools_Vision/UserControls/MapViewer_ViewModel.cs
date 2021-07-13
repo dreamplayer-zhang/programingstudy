@@ -230,6 +230,11 @@ namespace RootTools_Vision
             }
         }
 
+        public void RefreshMap()
+        {
+            RedrawMap();
+        }
+
 
         public void Clear()
         {

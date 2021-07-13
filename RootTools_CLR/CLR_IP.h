@@ -41,11 +41,7 @@ namespace RootTools_CLR
 		static void Cpp_SelectMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH);
 		static void Cpp_FindMinDiffLoc(array<byte>^ pSrcImg, array<byte>^ pInOutTarget, int nTransX, int nTransY, int nTargetW, int nTargetH, int nTrigger);
 
-		// Create Golden Image
-		// Memory 낭비가 심함
-		static void Cpp_CreateGoldenImage_Avg(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH);
-		static void Cpp_CreateGoldenImage_MedianAvg(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH);
-		static void Cpp_CreateGoldenImage_Median(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH);
+		// Create Golden Image	
 		// 전체 이미지 포인터를 받아와 필요한 만큼 잘라서 사용 (추후 SSE 등으로 한번 더 최적화 필요)
 		static void Cpp_CreateGoldenImage_Avg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH);
 		static void Cpp_CreateGoldenImage_MedianAvg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH);

@@ -189,7 +189,39 @@ namespace RootTools_Vision
                 bitmap.Save(path + defect.m_nDefectIndex + ".bmp");
             });
         }
+        public static void SaveDefectImageParallel(String path, List<Defect> defectList, SharedBufferInfo sharedBuffer, int nByteCnt,Point size)
+        {
+            path += "\\";
+            DirectoryInfo di = new DirectoryInfo(path);
+            if (!di.Exists)
+                di.Create();
 
+            if (defectList.Count < 1)
+                return;
+
+
+            int imageSizeX = (int)size.X;
+            int imageSizeY = (int)size.Y;
+
+            int idx = 0;
+            foreach(Defect defect in defectList)
+            {
+                double cx = (defect.p_rtDefectBox.Left + defect.p_rtDefectBox.Right) / 2;
+                double cy = (defect.p_rtDefectBox.Top + defect.p_rtDefectBox.Bottom) / 2;
+                int startX = (int)cx - imageSizeX / 2;
+                int startY = (int)cy - imageSizeY / 2;
+                //int endX = startX + 640;
+                //int endY = startY + 480;
+
+                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, imageSizeX, imageSizeY));
+
+                if (System.IO.File.Exists(path + defect.m_nDefectIndex + ".bmp"))
+                    System.IO.File.Delete(path + defect.m_nDefectIndex + ".bmp");
+
+                bitmap.Save(path + idx++ + ".bmp");
+            }
+
+        }
         public static void SaveDefectImageParallel(String path, List<Measurement> measurementList, SharedBufferInfo sharedBuffer, int nByteCnt, Size size = new Size())
         {
 			path += "\\";

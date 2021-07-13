@@ -4,157 +4,58 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             xmlns:toolsVision ="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-             Background="{StaticResource PanelBackGround}">
+             d:DesignHeight="1000" d:DesignWidth="2000"
+             Background="{StaticResource MainBackGroundColor}">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="60*"/>
-            <ColumnDefinition Width="40*"/>
+            <ColumnDefinition Width="80*"/>
+            <ColumnDefinition Width="20*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
             <local:ImageViewerBase_Panel DataContext="{Binding p_BaseViewer}"/>
         </Grid>
-            <Grid Grid.Column="1">
+        <Grid Grid.Column="1">
+            <Grid Visibility="{Binding OriginInfoVisible,Converter={StaticResource BooleanToVisiblity}}">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="1.1*"/>
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="2*"/>
-                    <RowDefinition Height="15*"/>
-                </Grid.RowDefinitions>
-                <GroupBox Header="2D TDI Origin" Grid.Row="0">
-                    <StackPanel>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Origin" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
-                                <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
-                            </Grid>
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Origin Size" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
-                                <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
-                            </Grid>
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
-                <GroupBox Header="Stain Origin" Grid.Row="1">
-                    <StackPanel>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Origin" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
-                                <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
-                            </Grid>
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Origin Size" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
-                                <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
-                            </Grid>
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
-                <GroupBox Header="Side Origin" Grid.Row="2">
-                    <StackPanel>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Origin" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
-                                <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
-                            </Grid>
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Origin Size" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
-                                <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
-                            </Grid>
-                            
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
-                <GroupBox Header="Feautre Info" Grid.Row="3">
-                    <TabControl>
-                        <TabItem Header="EIP Cover Top">
-                            <local:AlignFeatureInfo/>
-                        </TabItem>
-                        <TabItem Header="EIP Cover Bottom">
-                            <local:AlignFeatureInfo/>
-                        </TabItem>
-                        <TabItem Header="EIP Base Top">
-                            <local:AlignFeatureInfo/>
-                        </TabItem>
-                        <TabItem Header="EIP Base Bottom">
-                            <local:AlignFeatureInfo/>
-                        </TabItem>
-                    </TabControl>
-                </GroupBox>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="3*"/>
 
+                </Grid.RowDefinitions>
+                <local:OriginInfo_UI Grid.Row="1" DataContext="{Binding TDIOrigin}"/>
+                <local:OriginInfo_UI Grid.Row="2" DataContext="{Binding StainOrigin}"/>
+                <local:OriginInfo_UI Grid.Row="3" DataContext="{Binding SideTBOrigin}"/>
+                <local:OriginInfo_UI Grid.Row="4" DataContext="{Binding SideLROrigin}"/>
+                <Grid Grid.Row="0" Margin="10,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.8*"/>
+                        <RowDefinition Height="0.2*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Master Image" Style="{StaticResource HeaderTextBlock}"/>
+                    <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+
+                    <UniformGrid Rows="1" Grid.Row="2" HorizontalAlignment="Center">
+                        <Button Content="Save MasterImage"  Command="{Binding p_BaseViewer.p_SubViewer.DataContext.btnSaveMasterImage}" Style="{StaticResource ImageBaseBtn}"/>
+                        <Button Content="Load MasterImage"  Command="{Binding p_BaseViewer.p_SubViewer.DataContext.btnLoadMasterImage}" Style="{StaticResource ImageBaseBtn}"/>
+                    </UniformGrid>
+                </Grid>
             </Grid>
+
+            <local:AlignFeatureInfo Visibility="{Binding RelativeSource
+                ={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.PositionInfoVisible, Converter={StaticResource BooleanToVisiblity}}"  DataContext="{Binding SelectedFeatureInfo}"/>
+
+        </Grid>
     </Grid>
 </UserControl>

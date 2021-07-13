@@ -69,6 +69,8 @@ namespace Root_Pine2.Engineer
             if (m_pine2.p_b3D) SendSortInfo(m_aBoats[Vision2D.eVision.Top3D], infoStrip);
             SendSortInfo(m_aBoats[Vision2D.eVision.Top2D], infoStrip);
             SendSortInfo(m_aBoats[Vision2D.eVision.Bottom], infoStrip);
+            string sRun = m_summary.SetSort(m_pine2.p_b3D, infoStrip); 
+            if (sRun != "OK") m_pine2.m_alidSummary.Run(true, sRun);
         }
 
         void SendSortInfo(Boats boats, InfoStrip infoStrip)
@@ -128,6 +130,7 @@ namespace Root_Pine2.Engineer
         public Loader1 m_loader1;
         public Loader2 m_loader2;
         public Loader3 m_loader3;
+        public Summary m_summary = new Summary(); 
         void InitModule()
         {
             m_swInit.Start(); 
@@ -237,6 +240,15 @@ namespace Root_Pine2.Engineer
         }
         #endregion
 
+        #region PickerSet
+        public void StartPickerSet()
+        {
+            if (EQ.p_eState != EQ.eState.Ready) return; 
+            p_moduleList.m_moduleRunList.OpenJob(m_pine2.m_sFilePickerSet);
+            p_moduleList.StartModuleRuns();
+        }
+        #endregion
+
         #region Reset
         public string Reset()
         {
@@ -333,6 +345,7 @@ namespace Root_Pine2.Engineer
 
         void RunThread()
         {
+            EQ.eState m_eEQState = EQ.eState.Init; 
             m_bThread = true;
             Thread.Sleep(100);
             while (m_bThread)
@@ -341,12 +354,15 @@ namespace Root_Pine2.Engineer
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
-                    case EQ.eState.Run: break;
+                    case EQ.eState.Run:
+                        if (m_eEQState == EQ.eState.Ready) m_summary.LotStart(m_pine2.p_sLotID);
+                        break;
                     case EQ.eState.ModuleRunList: 
 
                         break;
                 }
                 p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
+                m_eEQState = EQ.p_eState; 
             }
         }
         #endregion

@@ -84,6 +84,7 @@ namespace Root_VEGA_D.Module
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryMain;
         MemoryData m_memoryLayer;
+        MemoryData m_memoryOtherPC;
         LightSet m_lightSet;
 
         Camera_Dalsa m_CamMain;
@@ -107,6 +108,7 @@ namespace Root_VEGA_D.Module
         public MemoryGroup MemoryGroup { get => m_memoryGroup; private set => m_memoryGroup = value; }
         public MemoryData MemoryMain { get => m_memoryMain; private set => m_memoryMain = value; }
         public MemoryData MemoryLayer { get => m_memoryLayer; private set => m_memoryLayer = value; }
+        public MemoryData MemoryOtherPC { get => m_memoryOtherPC; private set => m_memoryOtherPC = value; }
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
@@ -275,6 +277,9 @@ namespace Root_VEGA_D.Module
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
             //m_memoryGroup2 = m_memoryPool2.GetGroup("group");
             //m_memoryGroup2.CreateMemory("ROI", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+
+            m_memoryOtherPC = m_memoryGroup.CreateMemory("OtherPC", 1, 3, 40000, 40000);
+            //ImageData(string sPool, string sGroup, string sMem, MemoryTool tool, int nPlane, int nByte)
         }
         #endregion
 
@@ -691,7 +696,7 @@ namespace Root_VEGA_D.Module
             }
             string strTempFile = "D:\\AlignMarkTemplateImage\\TempAreaImage.bmp";
             ImageData tempImgData = new ImageData(mem);
-            tempImgData.FileSaveGrayBMP(strTempFile, crtROI, 1);
+            tempImgData.FileSaveGrayBMP(strTempFile, crtROI, 1, ImageData.eRgbChannel.None, 4);
 
             return new Image<Gray, byte>(strTempFile);
             //ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);

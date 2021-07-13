@@ -208,6 +208,27 @@ namespace Root_WindII
                 GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eReqControl = XGem.eControl.OFFLINE;
             });
         }
+
+
+        public ICommand btnPopUpSetting
+        {
+            get => new RelayCommand(() =>
+            {
+                var viewModel = new SettingDialog_ViewModel(GlobalObjects.Instance.Get<Settings>());
+                Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+                if (result.HasValue)
+                {
+                    if (result.Value)
+                    {
+
+                    }
+                    else
+                    {
+
+                    }
+                }
+            });
+        }
         #endregion
         #endregion
 
@@ -392,7 +413,7 @@ namespace Root_WindII
 
                 if (frontImage.GetPtr() != IntPtr.Zero)
                 {
-                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4);
+                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4, true);
 
                     frontInspection.SetRecipe(recipeFront);
                     frontInspection.SetSharedBuffer(new SharedBufferInfo(
