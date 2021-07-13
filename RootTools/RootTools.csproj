@@ -509,6 +509,7 @@
     <Compile Include="RFIDs\RFID_UI.xaml.cs">
       <DependentUpon>RFID_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RnRData\RnRData.cs" />
     <Compile Include="Trees\TreeItem_FolderName.cs" />
     <Compile Include="Viewer\CustomViewer\DrawableRootViewer.xaml.cs">
       <DependentUpon>DrawableRootViewer.xaml</DependentUpon>

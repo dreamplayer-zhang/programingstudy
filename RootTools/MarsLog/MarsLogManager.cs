@@ -29,12 +29,15 @@ namespace RootTools
 
         public bool m_useLog = false;
         SSLoggerNet m_sSLoggerNet { get; set; } = null;
-
+        public FlowData m_flowData;
+        public DataFormatter m_dataFormatter;
         MarsLogManager()
         {
             try
             {
                 m_sSLoggerNet = new SSLoggerNet();
+                m_flowData = new FlowData();
+                m_dataFormatter = new DataFormatter();
             }
             catch (Exception e)
             {
