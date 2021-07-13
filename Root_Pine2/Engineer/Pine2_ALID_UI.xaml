@@ -20,14 +20,14 @@
                 <ListView Grid.Row="1" x:Name="listViewALID" Margin="5" Foreground="Black">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Width="130" Header="Time">
+                            <GridViewColumn Width="80" Header="Time">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding p_dateTime}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Width="130" Header="Module">
+                            <GridViewColumn Width="90" Header="Module">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding p_sModule}"/>

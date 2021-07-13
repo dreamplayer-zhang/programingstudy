@@ -315,14 +315,15 @@ namespace Root_Pine2.Module
         {
             if (m_transfer.m_gripper.p_infoStrip == null) return "OK";
             Run_LoadTransfer run = (Run_LoadTransfer)m_runLoadTransfer.Clone();
+            run.m_bCheckEnable = true; 
             return StartRun(run);
         }
 
-        public string RunLoadTransfer()
+        public string RunLoadTransfer(bool bCheckEnable)
         {
             Transfer.Gripper gripper = m_transfer.m_gripper;
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
-            if (gripper.p_bEnable == false) return "Load from Transfer not Enable";
+            if (bCheckEnable && (gripper.p_bEnable == false)) return "Load from Transfer not Enable";
             try
             {
                 ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
@@ -696,13 +697,14 @@ namespace Root_Pine2.Module
                 return run;
             }
 
+            public bool m_bCheckEnable = false; 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
             }
 
             public override string Run()
             {
-                return m_module.RunLoadTransfer();
+                return m_module.RunLoadTransfer(m_bCheckEnable);
             }
         }
 
