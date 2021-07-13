@@ -30,10 +30,10 @@ namespace Root_Pine2.Module
                         Unknown
                     }
                     public List<List<eResult>> m_aUnit = new List<List<eResult>>();
-                    public CPoint m_szMap = null;
+                    public CPoint m_szMap = new CPoint();
                     public void SetResult(CPoint szMap, bool bTop, string sMapResult)
                     {
-                        m_szMap = szMap;
+                        m_szMap = new CPoint(szMap);
                         InitMap(); 
                         int x = bTop ? 0 : szMap.X - 1;
                         int y = 0;
@@ -58,10 +58,9 @@ namespace Root_Pine2.Module
 
                     public string SetSort(Unit unit)
                     {
-                        if (unit.m_szMap != null) return "OK";
-                        if (m_szMap == null)
+                        if (m_szMap.X == 0)
                         {
-                            if (unit.m_szMap == null) return "OK";
+                            if (unit.m_szMap.X == 0) return "OK";
                             m_szMap = new CPoint(unit.m_szMap);
                         }
                         if (m_szMap.X != unit.m_szMap.X) return "Map Size not Same";
@@ -87,7 +86,7 @@ namespace Root_Pine2.Module
                     public void CalcCount()
                     {
                         foreach (eResult eResult in Enum.GetValues(typeof(eResult))) m_aCount[eResult] = 0;
-                        if (m_szMap == null) return; 
+                        if (m_szMap.X == 0) return; 
                         for (int y = 0; y < m_szMap.Y; y++)
                         {
                             for (int x = 0; x < m_szMap.X; x++) m_aCount[m_aUnit[y][x]]++;
@@ -175,7 +174,7 @@ namespace Root_Pine2.Module
 
             void CalcMapSize(CPoint szMap)
             {
-                if (szMap == null) szMap = new CPoint(0, 0); 
+                if (szMap.X == 0) szMap = new CPoint(0, 0); 
                 m_szMap.X = Math.Max(m_szMap.X, szMap.X);
                 m_szMap.Y = Math.Max(m_szMap.Y, szMap.Y);
             }

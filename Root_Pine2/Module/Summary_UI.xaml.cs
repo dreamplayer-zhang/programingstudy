@@ -308,18 +308,15 @@ namespace Root_Pine2.Module
 
         void OnUpdateUnitMap()
         {
-            InitUnitMap(); 
+            InitUnitMap();
             foreach (Summary.Data.Strip strip in m_summary.m_data.m_aStrip.Values)
             {
-                CPoint szMap = strip.m_unit.m_szMap; 
-                if (szMap != null)
+                CPoint szMap = strip.m_unit.m_szMap;
+                for (int y = 0; y < szMap.Y; y++)
                 {
-                    for (int y = 0; y < szMap.Y; y++)
+                    for (int x = 0; x < szMap.X; x++)
                     {
-                        for (int x = 0; x < szMap.X; x++)
-                        {
-                            m_aUnitUI[y][x].SetResult(strip.m_eVision, m_aBrush[strip.m_unit.m_aUnit[y][x]]);
-                        }
+                        m_aUnitUI[y][x].SetResult(strip.m_eVision, m_aBrush[strip.m_unit.m_aUnit[y][x]]);
                     }
                 }
             }
