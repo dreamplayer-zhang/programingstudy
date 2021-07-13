@@ -907,13 +907,20 @@ namespace Root_EFEM.Module
                 else
                 {
                     // WTR 제외 나머지 1 upper - 2 lower - 1
+                    eArm fromArm = eArm.Upper;
+                    eArm toArm = eArm.Lower;
+                    if (m_eArm == eArm.Upper)
+                    {
+                        fromArm = eArm.Lower;
+                        toArm = eArm.Upper;
+                    }
                     from.AddData(id);
                     from.AddData("WTR");
                     fromSlot.AddData(1);
-                    fromSlot.AddData((int)m_eArm + 1);
+                    fromSlot.AddData((int)fromArm + 1);
                     to.AddData("WTR");
                     to.AddData(id);
-                    toSlot.AddData((int)m_eArm + 1);
+                    toSlot.AddData((int)toArm + 1);
                     toSlot.AddData(1);
 
                     material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
@@ -1066,13 +1073,20 @@ namespace Root_EFEM.Module
                     }
                     else
                     {
+                        eArm fromArm = eArm.Upper;
+                        eArm toArm = eArm.Lower;
+                        if (m_eArm == eArm.Upper)
+                        {
+                            fromArm = eArm.Lower;
+                            toArm = eArm.Upper;
+                        }
                         from.AddData(id);
                         from.AddData("WTR");
                         fromSlot.AddData(1);
-                        fromSlot.AddData((int)m_eArm + 1);
+                        fromSlot.AddData((int)fromArm + 1);
                         to.AddData("WTR");
                         to.AddData(id);
-                        toSlot.AddData((int)m_eArm + 1);
+                        toSlot.AddData((int)toArm + 1);
                         toSlot.AddData(1);
 
                         material.AddMaterial(m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, p_nExchangeSlot + 1);

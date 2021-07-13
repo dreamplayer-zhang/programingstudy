@@ -62,7 +62,8 @@ namespace Root_CAMELLIA.Module
             DataFormatter dataFormatter = new DataFormatter();
             dataFormatter.AddData(nameof(m_InitialCal), m_InitialCal.ToString());
             dataFormatter.AddData(nameof(m_nCalibrationCnt), m_nCalibrationCnt);
-            logManager.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Background Calibration", SSLNet.STATUS.END, dataFormatter:dataFormatter);
+            logManager.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Background Calibration", STATUS.END, dataFormatter:dataFormatter);
+            dataFormatter.ClearData();
         }
 
         public override ModuleRunBase Clone()
@@ -245,9 +246,9 @@ namespace Root_CAMELLIA.Module
                                 return "Calibration Fail";
                         }
                         logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Background Calibration", SSLNet.STATUS.END, dataFormatter: dataFormatter);
-                        dataFormatter.ClearData();
                         logManager.WritePRC(EQ.p_nRunLP, deviceID, PRC_EVENTID.StepProcess, STATUS.END, MATERIAL_TYPE.WAFER, "Calibration WaferCentering", (int)BaseDefine.Process.CalbrationWaferCentering);
                     }
+                    dataFormatter.ClearData();
                 }
 
                 if (!m_useCentering)
