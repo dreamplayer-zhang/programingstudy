@@ -33,14 +33,14 @@ namespace Root_EFEM.Module.FrontsideVision
         public int m_searchOffset = 0;
         public int m_searchInterval = 0;
 
-        double m_diePitchX;
-        double m_diePitchY;
-        double m_shotOffsetX;
-        double m_shotOffsetY;
-        double m_shotSizeX;
-        double m_shotSizeY;
-        double m_scribeLineX;
-        double m_scribeLineY;
+        double m_diePitchX = 5718;
+        double m_diePitchY = 4358;
+        double m_shotOffsetX = -151.1;
+        double m_shotOffsetY = -6536.9;
+        double m_shotSizeX = 3;
+        double m_shotSizeY = 3;
+        double m_scribeLineX = 80;
+        double m_scribeLineY = 80;
 
         // New
         #region [Properties]
@@ -195,7 +195,7 @@ namespace Root_EFEM.Module.FrontsideVision
             RPoint foundShotLBPoint = new RPoint(0, 0);
 
             // Shot Center Point
-            if (m_module.Run(axisXY.StartMove(shotCenterPoint)))
+            /*if (m_module.Run(axisXY.StartMove(shotCenterPoint)))
             {
                 return p_sInfo;
             }
@@ -212,7 +212,7 @@ namespace Root_EFEM.Module.FrontsideVision
             if (m_module.Run(axisXY.WaitReady()))
             {
                 return p_sInfo;
-            }
+            }*/
 
             long outX, outY;
             long maxOutX = 0;
@@ -221,9 +221,9 @@ namespace Root_EFEM.Module.FrontsideVision
             double score = 0;
             double scoreMax = 0;
 
-            for (int y = (int)initShotLBPoint.Y - m_searchOffset; y < (int)initShotLBPoint.Y + m_searchOffset; y+=m_searchInterval)
+            for (int y = (int)centerPoint.Y - m_searchOffset; y < (int)centerPoint.Y + m_searchOffset; y+=m_searchInterval)
             {
-                for (int x = (int)initShotLBPoint.X - m_searchOffset; x < (int)initShotLBPoint.X + m_searchOffset; x += m_searchInterval)
+                for (int x = (int)centerPoint.X - m_searchOffset; x < (int)centerPoint.X + m_searchOffset; x += m_searchInterval)
                 {
                     if (m_module.Run(axisXY.StartMove(new RPoint(x, y))))
                     {
@@ -243,13 +243,15 @@ namespace Root_EFEM.Module.FrontsideVision
                         foundShotLBPoint.X = x;
                         foundShotLBPoint.Y = y;
                     }
+                    //break;
                 }
+                //break;
             }
 
-            if (scoreMax < m_score)
+            /*if (scoreMax < m_score)
             {
                 return "VRS Align Fail [Score : " + score.ToString() + "]";
-            }
+            }*/
 
             // Found Shot Point
             if (m_module.Run(axisXY.StartMove(foundShotLBPoint)))
