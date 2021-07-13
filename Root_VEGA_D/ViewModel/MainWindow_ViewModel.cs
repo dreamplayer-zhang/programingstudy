@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -134,13 +135,14 @@ namespace Root_VEGA_D
                 case Vision.LineScanStatus.AlignCompleted:
                     {
                         BitmapImage img = new BitmapImage(new Uri(moduleRun.m_grabMode.p_sTempAlignMarkerFile));
-                        // Information의 AlignMarker 표시
-                        p_bitmapAlignKeySrc = img;
+                        m_MainWindow.Dispatcher.BeginInvoke(new ThreadStart(() =>
+                        {
+                            // Information의 AlignKey 표시
+                            p_bitmapAlignKeySrc = img;
 
-                        p_recipeManager_ViewModel.p_bitmapAlignKeySrc = img;
-
-                        // RecipeManager 내 AlignMarker 표시
-                        //recipeManagerUI.~~~~~~.p_bitmapAlignKeySrc = img;
+                            // RecipeWizard의 AlignKey 표시
+                            p_recipeManager_ViewModel.p_bitmapAlignKeySrc = img;
+                        }));
                     }
                     break;
                 case Vision.LineScanStatus.LineScanStarting:
