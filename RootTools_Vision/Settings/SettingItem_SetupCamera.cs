@@ -31,6 +31,22 @@ namespace RootTools_Vision
         }
         private string featureImagePath = @"C:\Root\Setup\AlignFeatureImages";
 
+        [Category("Align Camera")]
+        [DisplayName("Illumination Index List")]
+        [Description("조명 Index를 설정합니다. 각 Index는 콤마로 구분합니다.\n ex) 0,1,3,4")]
+        public string IlluminationIndexList
+        {
+            get
+            {
+                return illuminationIndexList;
+            }
+            set
+            {
+                illuminationIndexList = value;
+            }
+        }
+        private string illuminationIndexList = "";
+
         #endregion
     }
 }

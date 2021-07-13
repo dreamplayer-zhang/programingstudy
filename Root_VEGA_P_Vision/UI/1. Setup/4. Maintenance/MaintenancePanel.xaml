@@ -6,32 +6,38 @@
              xmlns:local="clr-namespace:Root_VEGA_P_Vision"
              mc:Ignorable="d" 
              d:DesignHeight="818" d:DesignWidth="1912"
-             Background="{StaticResource PanelBackGround}">
+             Background="{StaticResource MainBackGroundColor}">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="12*"/>
+            <ColumnDefinition Width="6*"/>
             <ColumnDefinition Width="88*"/>
         </Grid.ColumnDefinitions>
-        <Border BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
+        <Border Background="{StaticResource MainThema}" BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
             <Grid>
                 <StackPanel Margin="0,10,0,0">
-                    <Button Content="Engineer"
+                    <RadioButton Content="Engineer" IsChecked="True"
                             Command="{Binding btnHandler}"
-                            Style="{StaticResource PanelBtn}"/>
-                    <Button Content="ToolBox"
+                            Style="{StaticResource SetupPannelRadioBtn}"/>
+                    <RadioButton Content="Pod Info"
+                            Command="{Binding btnPodInfo}"
+                            Style="{StaticResource SetupPannelRadioBtn}"/>
+                    <!--<RadioButton Content="ToolBox"
                             Command="{Binding btnToolBox}"
-                            Style="{StaticResource PanelBtn}"/>
-                    <Button Content="ViewerTest"
+                            Style="{StaticResource SetupPannelRadioBtn}"/>
+                    <RadioButton Content="ViewerTest"
                             Command="{Binding btnViewerTest}"
-                            Style="{StaticResource PanelBtn}"/>
+                            Style="{StaticResource SetupPannelRadioBtn}"/>-->
                 </StackPanel>
-                <Button Content="Back"
+                <RadioButton Content="Back"
                         Command="{Binding btnBack}"
-                        Style="{StaticResource PanelBtn}"
+                        Style="{StaticResource SetupPannelRadioBtn}"
                         VerticalAlignment="Bottom"/>
             </Grid>
         </Border>
-        <Grid Grid.Column="1" x:Name="SubPanel"/>
+        <!--<Grid Grid.Column="1" x:Name="SubPanel"/>-->
+        <Grid Grid.Column="1">
+            <ContentControl Content="{Binding pSubPanel}"/>
+        </Grid>
 
 
     </Grid>

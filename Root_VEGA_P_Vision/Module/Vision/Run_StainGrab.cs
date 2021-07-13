@@ -67,7 +67,7 @@ namespace Root_VEGA_P_Vision.Module
                 StainGrabMode.m_dTrigger = Convert.ToInt32(10 * StainGrabMode.m_dResY_um);  // 1pulse = 0.1um -> 20pulse = 1um
                 int nCamWidth = StainGrabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = StainGrabMode.m_camera.GetRoiSize().Y;
-                int nPodSizeY_px = Convert.ToInt32(StainGrabMode.m_nPodSize_mm * 1000 / StainGrabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
+                int nPodSizeY_px = Convert.ToInt32(StainGrabMode.m_nPodYSize_mm * 1000 / StainGrabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nPulsePerWidth = nCamWidth * StainGrabMode.m_dTrigger;
                 int nPulsePerHeight = nCamHeight * StainGrabMode.m_dTrigger;
 

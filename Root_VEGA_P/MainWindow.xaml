@@ -97,23 +97,23 @@
 
         <!--Menu-->
         <Border Grid.Row="1"
-                Background="{StaticResource ControlBackGround}"
-                BorderBrush="DimGray"
+                Background="{StaticResource MainThema}"
+                BorderBrush="{StaticResource MainThema}"
                 BorderThickness="0,0,0,0">
             <Grid>
                 <StackPanel Orientation="Horizontal">
                     <Menu Background="{StaticResource ControlBackGround}">
-                        <MenuItem Background="{StaticResource ControlBackGround}"
+                        <MenuItem Background="{StaticResource MainThema}"
                                   Width="70"
                                   Height="30"
                                   Padding="0"
-                                  BorderBrush="#FF707070"
+                                  Foreground="White"
+                                  BorderBrush="{StaticResource MainThema}"
                                   BorderThickness="0,0,0,0">
                             <MenuItem.Header>
                                 <Grid Width="70">
                                     <TextBlock Text="File"
                                                FontSize="13"
-                                               FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
@@ -131,8 +131,9 @@
 
                             </MenuItem>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  BorderBrush="{StaticResource MainThema}"   
+                                  Foreground="White"
                                   Width="70"
                                   x:Name="ViewMenu"
                                   BorderThickness="0,0,0,0"
@@ -141,7 +142,6 @@
                                 <Grid Width="70">
                                     <TextBlock Text="View"
                                                FontSize="13"
-                                               FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
@@ -154,8 +154,9 @@
                                       x:Name="viewFDC" />
 
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  BorderBrush="{StaticResource MainThema}"   
+                                  Foreground="White"
                                   Width="70"
                                   BorderThickness="0,0,0,0"
                                   Padding="0">
@@ -163,7 +164,6 @@
                                 <Grid Width="70">
                                     <TextBlock Text="Tool"
                                                FontSize="13"
-                                               FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
@@ -173,8 +173,9 @@
                             <MenuItem Header="Setting">
                             </MenuItem>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  BorderBrush="{StaticResource MainThema}"   
+                                  Foreground="White"
                                   Width="100"
                                   BorderThickness="0,0,0,0"
                                   Padding="0">
@@ -182,7 +183,6 @@
                                 <Grid Width="100">
                                     <TextBlock Text="Network"
                                                FontSize="13"
-                                               FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
@@ -200,8 +200,9 @@
                             </MenuItem>
 
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  BorderBrush="{StaticResource MainThema}"   
+                                  Foreground="White"
                                   Width="100"
                                   BorderThickness="0,0,0,0"
                                   Padding="0">
@@ -209,7 +210,6 @@
                                 <Grid Width="100">
                                     <TextBlock Text="Navigation"
                                                FontSize="13"
-                                               FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
@@ -227,8 +227,9 @@
                             <MenuItem Header="Run">
                             </MenuItem>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  BorderBrush="{StaticResource MainThema}"   
+                                  Foreground="White"
                                   Width="110"
                                   BorderThickness="0,0,0,0"
                                   Padding="0">
@@ -236,14 +237,14 @@
                                 <Grid Width="110">
                                     <TextBlock Text="Mode Select"
                                                FontSize="13"
-                                               FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
                             </MenuItem.Header>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  BorderBrush="{StaticResource MainThema}"   
+                                  Foreground="White"
                                   Width="110"
                                   BorderThickness="0,0,0,0"
                                   Padding="0">
@@ -251,7 +252,6 @@
                                 <Grid Width="100">
                                     <TextBlock Text="Setting"
                                                FontSize="13"
-                                               FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
@@ -263,16 +263,16 @@
         </Border>
 
         <!--Main Panel-->
-        <Grid Grid.Row="2"
-              x:Name="MainPanel">
-            <TabControl>
+        <Grid Grid.Row="2">
+            <ContentControl Content="{Binding MainSubPanel}"/>
+            <!--<TabControl>
                 <TabItem Header="Recipe">
                     <UI:Panel_RecipeManger />
                 </TabItem>
                 <TabItem Header="Engineer">
                     <engineer:VEGA_P_Engineer_UI x:Name="engineerUI"/>
                 </TabItem>
-            </TabControl>
+            </TabControl>-->
 
         </Grid>
 

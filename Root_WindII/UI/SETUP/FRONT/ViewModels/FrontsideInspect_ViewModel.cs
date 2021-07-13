@@ -194,8 +194,6 @@ namespace Root_WindII
             });
         }
 
-        WorkManager workManager;
-
         public RelayCommand btnStart
         {
             get => new RelayCommand(() =>

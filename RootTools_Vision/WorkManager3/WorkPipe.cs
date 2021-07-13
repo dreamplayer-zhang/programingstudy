@@ -263,7 +263,7 @@ namespace RootTools_Vision.WorkManager3
         {
             if (task != null)
             {
-                task.Dispose();
+                //task.Dispose();
             }
         }
 

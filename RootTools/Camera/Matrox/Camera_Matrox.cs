@@ -30,6 +30,8 @@ namespace RootTools.Camera.Matrox
         private MIL_ID m_MilDisplay;                         // 디스플레이
         private MIL_ID m_MilImage = MIL.M_NULL;              // MIL Image buffer identifier.
         private MIL_ID[] m_MilBuffers = new MIL_ID[c_nBuf];  // 버퍼
+
+        static int m_nTest = 0;
         
         int m_nWidth = 0;
         public int p_nWidth
@@ -138,8 +140,8 @@ namespace RootTools.Camera.Matrox
                 SetProperty(ref m_CamInfo, value);
             }
         }
-        const int c_nBuf = 400;
-        int _nBuf = 400;
+        const int c_nBuf = 40;
+        int _nBuf = 40;
         public int p_nBuf
         {
             get
@@ -277,6 +279,7 @@ namespace RootTools.Camera.Matrox
                     {
                         MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_DEFAULT, ref m_MilDigitizer);
                         //MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, MIL.M_SYSTEM_DEFAULT, MIL.M_DEFAULT, ref m_MilDigitizer);
+                        //MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_EMULATED, ref m_MilDigitizer);
 
                         p_nImgBand = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_BAND, MIL.M_NULL);
                         p_nWidth = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_X, MIL.M_NULL);
@@ -483,14 +486,15 @@ namespace RootTools.Camera.Matrox
             userObjectHandle = GCHandle.Alloc(this);
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, MIL.M_INFINITE); // Grab 대기 시간
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
-            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_SEQUENCE + MIL.M_COUNT(m_nGrabCount), MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_SEQUENCE + MIL.M_COUNT(m_nGrabCount), 
+                MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
             //MdigProcess(MilDigitizer, MilGrabBuf, GRAB_NUM, M_SEQUENCE + M_COUNT(TOTAL_FRAME_NUM), M_ASYNCHRONOUS + M_TRIGGER_FOR_FIRST_GRAB, ProcessingFunction, &UserHookData);
 
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
             m_GrabThread.Start();
             return;
         }
-        public void GrabZScan(MemoryData memory, int GrabCnt)
+        public void GrabZScan(MemoryData memory, int GrabCnt,CPoint memoffset)
         {
             m_nGrabCount = GrabCnt;
             m_nGrabTrigger = 0;
@@ -520,37 +524,60 @@ namespace RootTools.Camera.Matrox
             userObjectHandle = GCHandle.Alloc(this);
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, MIL.M_INFINITE); // Grab 대기 시간
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
-            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_SEQUENCE + MIL.M_COUNT(m_nGrabCount), MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_SEQUENCE + MIL.M_COUNT(m_nGrabCount), 
+                MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
 
             m_GrabThread = new Thread(new ParameterizedThreadStart(RunGrabZScanThread));
-            m_GrabThread.Start(memory);
+            m_GrabThread.Start(new ScanParam(memory,memoffset));
             return;
         }
-        unsafe void RunGrabZScanThread(object mem)
+        public class ScanParam
         {
+            public MemoryData mem;
+            public CPoint memoffset;
+            public ScanParam(MemoryData mem, CPoint memoffset)
+            {
+                this.mem = mem;
+                this.memoffset = memoffset;
+            }
+        }
+        unsafe void RunGrabZScanThread(object scanParam)
+        {
+            ScanParam param = (ScanParam)scanParam;
             Stopwatch swGrab = new Stopwatch();
             int DelayGrab = 1000 * m_nGrabCount;
             byte[] srcarr = new byte[p_nWidth * p_nHeight];
 
             int iBlock = 0;
-            MemoryData m = (MemoryData)mem;
-            while (iBlock<m_nGrabCount)
+            MemoryData m = param.mem;
+            Debug.WriteLine("memoffset X : " + param.memoffset.X + "memoffset Y : "+param.memoffset.Y);
+            try
             {
-                if (iBlock >= m_nGrabTrigger) continue;
-
-                m_MemPtr = m.GetPtr(iBlock);
-                MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarr);
-                Parallel.For(0, p_nHeight, (y) =>
+                while (iBlock < m_nGrabCount)
                 {
-                    fixed (byte* p = srcarr)
+                    if (iBlock >= m_nGrabTrigger) continue;
+                    Thread.Sleep(200);
+                    m_MemPtr = m.GetPtr(iBlock);
+
+                    Debug.WriteLine("line : " + iBlock);
+                    MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarr);
+                    Parallel.For(0, p_nHeight, (y) =>
                     {
-                        IntPtr srcPtr = (IntPtr)p + p_nWidth * y;
-                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + m_cpScanOffset.Y * m_Memory.W);
-                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
-                    }
-                });
-                iBlock++;
+                        fixed (byte* p = srcarr)
+                        {
+                            IntPtr srcPtr = (IntPtr)p + p_nWidth * y;
+                            IntPtr dstPtr = (IntPtr)((long)m_MemPtr + param.memoffset.X + (param.memoffset.Y + y) * m_Memory.W);
+                            Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
+                        }
+                    });
+                    iBlock++;
+                }
+            }finally
+            {
+                p_CamInfo.p_eState = eCamState.Ready;
+                userObjectHandle.Free();
             }
+
         }
         unsafe void RunGrabLineScanThread()
         {
@@ -582,7 +609,7 @@ namespace RootTools.Camera.Matrox
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;
-            userObjectHandle.Free();
+            //userObjectHandle.Free();
         }
 
         void GrabEvent()
@@ -602,10 +629,12 @@ namespace RootTools.Camera.Matrox
             {
                 GCHandle handle = (GCHandle)(UserDataPtr);
                 Camera_Matrox cam = handle.Target as Camera_Matrox;
-             //   Debug.WriteLine(cam.m_nGrabTrigger);
-
+                
                 if (cam != null)
+                {
+                    Debug.WriteLine("Trigger : " + cam.m_nGrabTrigger);
                     cam.m_nGrabTrigger++;
+                }   
             }
             return 0;
         }

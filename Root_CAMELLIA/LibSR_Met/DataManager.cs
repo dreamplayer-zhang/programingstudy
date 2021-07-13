@@ -35,7 +35,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public double[] Transmittance;
         public double[] CalcReflectance;
         public List<DCOLTransmittanceData> DCOLTransmittance;
-        public List<double> DCOLTransmittance2;
+       
 
         public RawData()
         {
@@ -48,7 +48,7 @@ namespace Root_CAMELLIA.LibSR_Met
             Transmittance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
             CalcReflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
             DCOLTransmittance = new List<DCOLTransmittanceData>();
-            DCOLTransmittance2 = new List<double>();
+            
         }
     }
     public class DCOLTransmittanceData
@@ -190,6 +190,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public bool bThickness = true;
         public bool bTransmittance = true;
         public bool bViewCalRGraph = true;
+        public bool bCalDCOLTransmittance = false;
         public int nThicknessDataNum = 0;
         public float nStartWavelegth = 0;
         public double[] BackGroundCalWavelength;
@@ -272,6 +273,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_RawData[n].Transmittance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
                     m_RawData[n].CalcReflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
                     m_RawData[n].eV = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].DCOLTransmittance = new List<DCOLTransmittanceData>();
                     m_RawData[n].Thickness.Clear();
                     m_RawData[n].dX = 0.0;
                     m_RawData[n].dY = 0.0;
@@ -472,7 +474,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.WriteLine();
                 sw.WriteLine("TOOL ID," + BaseDefine.TOOL_NAME);
                 sw.WriteLine("SOFTWARE VERSION," + BaseDefine.Configuration.Version);
-                sw.WriteLine("RECIPE," + recipeData.TeachRecipeName);
+                sw.WriteLine("RECIPE," + infoWafer.p_sRecipe);
                 sw.WriteLine("MACHINE TYPE," + "CAMELLIA");
                 sw.WriteLine();
                 sw.WriteLine();
@@ -480,10 +482,10 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.WriteLine("WAFER ID," + infoWafer.p_sWaferID);
                 sw.WriteLine("LOT ID," + infoWafer.p_sCarrierID + "_" + infoWafer.p_sLotID);
                 //sw.WriteLine("WAFER #," + sWaferNum[1]);
-                sw.WriteLine("SLOT," + infoWafer.p_sSlotID);
+                sw.WriteLine("SLOT," + (infoWafer.m_nSlot + 1).ToString());
                 sw.WriteLine("WAFER STATUS," + "Pass");
                 sw.WriteLine("DATA TYPE," + "TF");
-                sw.WriteLine("RECIPE," + recipeData.TeachRecipeName);
+                sw.WriteLine("RECIPE," + infoWafer.p_sRecipe);
                 sw.WriteLine();
                 sw.WriteLine();
                 sw.WriteLine();
@@ -574,7 +576,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     dStddevThickness[i] = StddevTmp[i].Stdev();
                     d3SigmaThickness[i] = dStddevThickness[i] * 3;
                 }
-
+                
                 string sDataMean = "MEAN";
                 string sDataMin = "MIN";
                 string sDataMax = "MAX";
@@ -585,17 +587,16 @@ namespace Root_CAMELLIA.LibSR_Met
                 sDataMean += "," + dMeanGoF.ToString("0.####");
                 sDataMin += "," + dMinGoF.ToString("0.####");
                 sDataMax += "," + dMaxGoF.ToString("0.####");
-                sDataStddev += "," + dStddevGoF.ToString("0.####");
-                sData3Sigma += "," + d3SigmaGoF.ToString("0.####");
+                sDataStddev += !double.IsNaN(dStddevGoF) ? "," + dStddevGoF.ToString("0.####") : ",0";
+                sData3Sigma += !double .IsNaN(d3SigmaGoF)? "," + d3SigmaGoF.ToString("0.####") : ",0";
                 sDataRange += "," + (dMaxGoF - dMinGoF).ToString("0.####");
-
                 for (int i = 0; i < nTHKNum; i++)
                 {
                     sDataMean += "," + dMeanThickness[i].ToString("0.####");
                     sDataMin += "," + dMinThickness[i].ToString("0.####");
                     sDataMax += "," + dMaxThickness[i].ToString("0.####");
-                    sDataStddev += "," + dStddevThickness[i].ToString("0.####");
-                    sData3Sigma += "," + d3SigmaThickness[i].ToString("0.####");
+                    sDataStddev += !double.IsNaN(dStddevGoF) ? "," + dStddevGoF.ToString("0.####") : ",0";
+                    sData3Sigma += !double.IsNaN(d3SigmaGoF) ? "," + d3SigmaGoF.ToString("0.####") : ",0";
                     sDataRange += "," + (dMaxThickness[i] - dMinThickness[i]).ToString("0.####");
                 }
 
@@ -712,7 +713,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.WriteLine();
                 sw.WriteLine("TOOL ID," + BaseDefine.TOOL_NAME);
                 sw.WriteLine("SOFTWARE VERSION," + BaseDefine.Configuration.Version);
-                sw.WriteLine("RECIPE," + recipeData.TeachRecipeName);
+                sw.WriteLine("RECIPE," + infoWafer.p_sRecipe);
                 sw.WriteLine("MACHINE TYPE," + "CAMELLIA");
                 sw.WriteLine();
                 sw.WriteLine();
@@ -723,7 +724,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.WriteLine("SLOT," + infoWafer.p_sSlotID);
                 sw.WriteLine("WAFER STATUS," + "Pass");
                 sw.WriteLine("DATA TYPE," + "TF");
-                sw.WriteLine("RECIPE," + recipeData.TeachRecipeName);
+                sw.WriteLine("RECIPE," + infoWafer.p_sRecipe);
                 sw.WriteLine();
                 sw.WriteLine();
                 sw.WriteLine();
@@ -824,8 +825,8 @@ namespace Root_CAMELLIA.LibSR_Met
                 sDataMean += "," + dMeanGoF.ToString("0.####");
                 sDataMin += "," + dMinGoF.ToString("0.####");
                 sDataMax += "," + dMaxGoF.ToString("0.####");
-                sDataStddev += "," + dStddevGoF.ToString("0.####");
-                sData3Sigma += "," + d3SigmaGoF.ToString("0.####");
+                sDataStddev += !double.IsNaN(dStddevGoF) ? "," + dStddevGoF.ToString("0.####") : ",0";
+                sData3Sigma += !double.IsNaN(d3SigmaGoF) ? "," + d3SigmaGoF.ToString("0.####") : ",0";
                 sDataRange += "," + (dMaxGoF - dMinGoF).ToString("0.####");
 
                 for (int i = 0; i < nTHKNum; i++)
@@ -833,8 +834,8 @@ namespace Root_CAMELLIA.LibSR_Met
                     sDataMean += "," + dMeanThickness[i].ToString("0.####");
                     sDataMin += "," + dMinThickness[i].ToString("0.####");
                     sDataMax += "," + dMaxThickness[i].ToString("0.####");
-                    sDataStddev += "," + dStddevThickness[i].ToString("0.####");
-                    sData3Sigma += "," + d3SigmaThickness[i].ToString("0.####");
+                    sDataStddev += !double.IsNaN(dStddevGoF) ? "," + dStddevGoF.ToString("0.####") : ",0";
+                    sData3Sigma += !double.IsNaN(d3SigmaGoF) ? "," + d3SigmaGoF.ToString("0.####") : ",0";
                     sDataRange += "," + (dMaxThickness[i] - dMinThickness[i]).ToString("0.####");
                 }
 
@@ -1079,8 +1080,10 @@ namespace Root_CAMELLIA.LibSR_Met
                 sDataMean += "," + dMeanGoF.ToString("0.####") + "," + dMeanTHKSum.ToString("0.####");
                 sDataMin += "," + dMinGoF.ToString("0.####") + "," + dMinTHKSum.ToString("0.####");
                 sDataMax += "," + dMaxGoF.ToString("0.####") + "," + dMaxTHKSum.ToString("0.####");
-                sDataStddev += "," + dStddevGoF.ToString("0.####") + "," + dStddevTHKSum.ToString("0.####");
-                sData3Sigma += "," + d3SigmaGoF.ToString("0.####") + "," + d3SigmaTHKSum.ToString("0.####");
+                sDataStddev += !double.IsNaN(dStddevGoF) ? "," + dStddevGoF.ToString("0.####")+"," : ",0";
+                sDataStddev += !double.IsNaN(dStddevTHKSum) ? "," + dStddevTHKSum.ToString("0.####") : ",0";
+                sData3Sigma += !double.IsNaN(d3SigmaGoF) ? "," + d3SigmaGoF.ToString("0.####") +",": ",0";
+                sData3Sigma += !double.IsNaN(d3SigmaTHKSum) ? "," + d3SigmaTHKSum.ToString("0.####") : ",0";
                 sDataRange += "," + (dMaxGoF - dMinGoF).ToString("0.####") + "," + dRangeTHKSum.ToString("0.####");
 
                 for (int i = 0; i < nTHKNum; i++)
@@ -1088,8 +1091,8 @@ namespace Root_CAMELLIA.LibSR_Met
                     sDataMean += "," + dMeanThickness[i].ToString("0.####");
                     sDataMin += "," + dMinThickness[i].ToString("0.####");
                     sDataMax += "," + dMaxThickness[i].ToString("0.####");
-                    sDataStddev += "," + dStddevThickness[i].ToString("0.####");
-                    sData3Sigma += "," + d3SigmaThickness[i].ToString("0.####");
+                    sDataStddev += !double.IsNaN(dStddevThickness[i]) ? "," + dStddevThickness[i].ToString("0.####") : ",0";
+                    sData3Sigma += !double.IsNaN(d3SigmaThickness[i]) ? "," + d3SigmaThickness[i].ToString("0.####") : ",0";
                     sDataRange += "," + (dMaxThickness[i] - dMinThickness[i]).ToString("0.####");
                 }
 
@@ -1364,8 +1367,10 @@ namespace Root_CAMELLIA.LibSR_Met
                 sDataMean += "," + dMeanGoF.ToString("0.####") + "," + dMeanTHKSum.ToString("0.####");
                 sDataMin += "," + dMinGoF.ToString("0.####") + "," + dMinTHKSum.ToString("0.####");
                 sDataMax += "," + dMaxGoF.ToString("0.####") + "," + dMaxTHKSum.ToString("0.####");
-                sDataStddev += "," + dStddevGoF.ToString("0.####") + "," + dStddevTHKSum.ToString("0.####");
-                sData3Sigma += "," + d3SigmaGoF.ToString("0.####") + "," + d3SigmaTHKSum.ToString("0.####");
+                sDataStddev += !double.IsNaN(dStddevGoF) ? "," + dStddevGoF.ToString("0.####") + "," : ",0";
+                sDataStddev += !double.IsNaN(dStddevTHKSum) ? "," + dStddevTHKSum.ToString("0.####") : ",0";
+                sData3Sigma += !double.IsNaN(d3SigmaGoF) ? "," + d3SigmaGoF.ToString("0.####") + "," : ",0";
+                sData3Sigma += !double.IsNaN(d3SigmaTHKSum) ? "," + d3SigmaTHKSum.ToString("0.####") : ",0";
                 sDataRange += "," + (dMaxGoF - dMinGoF).ToString("0.####") + "," + dRangeTHKSum.ToString("0.####");
 
                 for (int i = 0; i < nTHKNum; i++)
@@ -1373,8 +1378,8 @@ namespace Root_CAMELLIA.LibSR_Met
                     sDataMean += "," + dMeanThickness[i].ToString("0.####");
                     sDataMin += "," + dMinThickness[i].ToString("0.####");
                     sDataMax += "," + dMaxThickness[i].ToString("0.####");
-                    sDataStddev += "," + dStddevThickness[i].ToString("0.####");
-                    sData3Sigma += "," + d3SigmaThickness[i].ToString("0.####");
+                    sDataStddev += !double.IsNaN(dStddevThickness[i]) ? "," + dStddevThickness[i].ToString("0.####") : ",0";
+                    sData3Sigma += !double.IsNaN(d3SigmaThickness[i]) ? "," + d3SigmaThickness[i].ToString("0.####") : ",0";    
                     sDataRange += "," + (dMaxThickness[i] - dMinThickness[i]).ToString("0.####");
                 }
 

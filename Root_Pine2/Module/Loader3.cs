@@ -357,13 +357,12 @@ namespace Root_Pine2.Module
         #region PickerSet
         double m_mmPickerSetUp = 10;
         double m_secPickerSet = 7;
-        public string RunPickerSet()
+        public string RunPickerSet(Vision2D.eWorks eWorks)
         {
             StopWatch sw = new StopWatch();
             long msPickerSet = (long)(1000 * m_secPickerSet);
             try
             {
-                Vision2D.eWorks eWorks = Vision2D.eWorks.A; 
                 while (true)
                 {
                     if (Run(RunMoveZ(eWorks, 0))) return p_sInfo;
@@ -627,19 +626,22 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
+            Vision2D.eWorks m_eWorks = Vision2D.eWorks.B;
             public override ModuleRunBase Clone()
             {
                 Run_PickerSet run = new Run_PickerSet(m_module);
+                run.m_eWorks = m_eWorks; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_eWorks = (Vision2D.eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "Select Boat", bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunPickerSet();
+                return m_module.RunPickerSet(m_eWorks);
             }
         }
         #endregion

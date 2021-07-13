@@ -132,7 +132,7 @@ namespace Root_VEGA_D_IPU.Module
             }
 
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
-            m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
+            m_memoryMain = m_memoryGroup.CreateMemory("OtherPC", 3, 1, 40000, 40000);
         }
         #endregion
 

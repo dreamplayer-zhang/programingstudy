@@ -14,6 +14,12 @@ namespace Root_VEGA_P_Vision.Module
             nDegree = 0;
             InitModuleRun(module);
         }
+        public Run_Rotate(Vision module,int nDegree)
+        {
+            m_module = module;
+            this.nDegree = nDegree;
+            InitModuleRun(module);
+        }
         public override ModuleRunBase Clone()
         {
             Run_Rotate run = new Run_Rotate(m_module);

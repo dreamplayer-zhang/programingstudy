@@ -64,11 +64,11 @@ namespace RootTools.Comm
         string _sIP = "127.0.0.1";
         public string p_sIP
         {
-            get { return _sIP; } 
-            set 
-            { 
+            get { return _sIP; }
+            set
+            {
                 _sIP = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
 
@@ -76,8 +76,8 @@ namespace RootTools.Comm
         public int p_nPort
         {
             get { return _nPort; }
-            set 
-            { 
+            set
+            {
                 _nPort = value;
                 OnPropertyChanged();
             }
@@ -87,8 +87,8 @@ namespace RootTools.Comm
         public int p_nConnectInterval
         {
             get { return _nConnectInterval; }
-            set 
-            { 
+            set
+            {
                 _nConnectInterval = (value < 1000) ? 3000 : value;
                 OnPropertyChanged();
             }
@@ -120,8 +120,8 @@ namespace RootTools.Comm
                 m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
                 if (m_socket != null) m_socket.BeginConnect(p_sIP, p_nPort, new AsyncCallback(CallBack_Connect), m_socket);
-                OnPropertyChanged("p_bConnect"); 
-                return "OK"; 
+                OnPropertyChanged("p_bConnect");
+                return "OK";
             }
             catch (SocketException eX) { return "Connect :" + eX.Message; }
         }
@@ -130,15 +130,15 @@ namespace RootTools.Comm
         {
             try
             {
-                if (ar == null) return; 
-                Socket socket = (Socket)ar.AsyncState; 
+                if (ar == null) return;
+                Socket socket = (Socket)ar.AsyncState;
                 if (socket.Connected == false) return;
                 socket.EndConnect(ar);
 
                 if (EventConnect != null) EventConnect(socket);
 
                 socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
-                p_sInfo = p_id + " is Connect !!"; 
+                p_sInfo = p_id + " is Connect !!";
             }
             catch (SocketException eX) { p_sInfo = "CallBack_Connect : " + eX.Message; }
         }
@@ -150,44 +150,48 @@ namespace RootTools.Comm
         {
             Socket socket = (Socket)ar.AsyncState;
             try
+            {
+                if (ar == null || !socket.Connected)
                 {
-                    if (ar == null || !socket.Connected)
-                    {
-                        // 연결에 문제 있음을 확인
-                        m_commLog.Add(CommLog.eType.Info, "Disconnect !!");
+                    // 연결에 문제 있음을 확인
+                    m_commLog.Add(CommLog.eType.Info, "Disconnect !!");
 
-                        if (EventReciveData != null) EventReciveData(m_aBufRead, 0, socket);
-                        socket.Close();
+                    if (EventReciveData != null) EventReciveData(m_aBufRead, 0, socket);
+                    socket.Close();
 
-                        return;
-                    }
-
-                    int nReadLength = socket.EndReceive(ar);
-                    if (nReadLength > 0)
-                    {
-                        m_commLog.Add(CommLog.eType.Receive, (nReadLength < 1024) ? Encoding.ASCII.GetString(m_aBufRead, 0, nReadLength) : "...");
-
-                        socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
-                        if (EventReciveData != null) EventReciveData(m_aBufRead, nReadLength, socket);
-                    }
-                    else m_commLog.Add(CommLog.eType.Info, "CallBack_Receive Close");
+                    return;
                 }
-                catch (SocketException ex)
+
+                int nReadLength = socket.EndReceive(ar);
+                if (nReadLength > 0)
                 {
-                    // SocketException 발생
-                    m_commLog.Add(CommLog.eType.Info, "Receive SocketException : " + ex.Message);
+                    m_commLog.Add(CommLog.eType.Receive, (nReadLength < 1024) ? Encoding.ASCII.GetString(m_aBufRead, 0, nReadLength) : "...");
 
-                    if (ex.SocketErrorCode == SocketError.ConnectionReset)
-                    {
-                        if (EventReciveData != null) EventReciveData(m_aBufRead, 0, socket);
-                        socket.Close();
-                    }
+                    socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
+                    if (EventReciveData != null) EventReciveData(m_aBufRead, nReadLength, socket);
                 }
-                catch (Exception eX)
+                else m_commLog.Add(CommLog.eType.Info, "CallBack_Receive Close");
+            }
+            catch (SocketException ex)
+            {
+                // SocketException 발생
+                if (ex.SocketErrorCode == SocketError.ConnectionReset)
                 {
-                    // Exception 발생
-                    m_commLog.Add(CommLog.eType.Info, "Receive Exception : " + eX.Message);
+                    m_commLog.Add(CommLog.eType.Info, "Disconnected from server !!");
+
+                    if (EventReciveData != null) EventReciveData(m_aBufRead, 0, socket);
+                    socket.Close();
                 }
+                else
+                {
+                    m_commLog.Add(CommLog.eType.Info, "Receive SocketException : " + ex.Message + ex.StackTrace);
+                }
+            }
+            catch (Exception eX)
+            {
+                // Exception 발생
+                m_commLog.Add(CommLog.eType.Info, "Receive Exception : " + eX.Message);
+            }
         }
 
         Queue<byte[]> m_qSendByte = new Queue<byte[]>();
@@ -195,7 +199,7 @@ namespace RootTools.Comm
         public string Send(string sMsg)
         {
             m_qSend.Enqueue(sMsg);
-            return "OK"; 
+            return "OK";
         }
         public string Send(byte[] sMsg)
         {
@@ -256,13 +260,12 @@ namespace RootTools.Comm
         #endregion
 
         #region Thread
-        bool m_bThread = false; 
-        Thread m_thread; 
+        bool m_bThread = false;
+        Thread m_thread;
 
         void RunThread()
         {
             m_bThread = true;
-            Thread.Sleep(3000);
             while (m_bThread)
             {
                 Thread.Sleep(10);
@@ -270,7 +273,7 @@ namespace RootTools.Comm
                 {
                     if (p_bConnect == false)
                     {
-                        Thread.Sleep(1000);
+                        Thread.Sleep(5000);
                         p_sInfo = Connect();
                     }
                     else if (m_qSend.Count > 0)
@@ -278,7 +281,7 @@ namespace RootTools.Comm
                         string sMsg = m_qSend.Peek();
                         string sSend = SendMsg(sMsg);
                         if (sSend == "OK") m_qSend.Dequeue();
-                        else m_commLog.Add(CommLog.eType.Info, sSend); 
+                        else m_commLog.Add(CommLog.eType.Info, sSend);
                     }
                     else if (m_qSendByte.Count > 0)
                     {
@@ -299,7 +302,7 @@ namespace RootTools.Comm
         {
             p_id = id;
             m_log = log;
-            m_aBufRead = new byte[(nBufReceive > 0) ? nBufReceive : 4096]; 
+            m_aBufRead = new byte[(nBufReceive > 0) ? nBufReceive : 4096];
 
             m_commLog = new CommLog(this, m_log);
 

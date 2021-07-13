@@ -17,7 +17,8 @@ namespace Root_VEGA_P_Vision.Module
         public double m_dResX_um = 1;                   // Camera Resolution X
         public double m_dResY_um = 1;                   // Camera Resolution Y
         public int m_nFocusPosZ = 0;                    // Focus Position Z
-        public int m_nPodSize_mm = 1000;                // Pod Size (mm)
+        public int m_nPodYSize_mm = 1000;                // Pod Size Y (mm)
+        public int m_nPodXSize_mm = 1000;                // Pod Size X (mm)
         public int m_nReverseOffsetY = 800;
 
         void RunTreeOption(Tree tree, bool bVisible)
@@ -26,12 +27,13 @@ namespace Root_VEGA_P_Vision.Module
             m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam X Resolution", "X Resolution (um)", bVisible);
             m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Y Resolution", "Y Resolution (um)", bVisible);            
             m_nFocusPosZ = tree.Set(m_nFocusPosZ, m_nFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
-            m_nPodSize_mm = tree.Set(m_nPodSize_mm, m_nPodSize_mm, "Pod Size Y", "Pod Size Y", bVisible);            
+            m_nPodYSize_mm = tree.Set(m_nPodYSize_mm, m_nPodYSize_mm, "Pod Size Y", "Pod Size Y", bVisible);
+            m_nPodXSize_mm = tree.Set(m_nPodXSize_mm, m_nPodXSize_mm, "Pod Size X", "Pod Size X", bVisible);
         }
         public void RunTreeLinescanOption(Tree tree,bool bVisible)
         {
             m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
-            m_GD.m_nFovStart = tree.Set(m_GD.m_nFovStart, m_GD.m_nFovStart, "Cam Fov Star Pxl", "Pixel", bVisible);
+            m_GD.m_nFovStart = tree.Set(m_GD.m_nFovStart, m_GD.m_nFovStart, "Cam Fov Start Pxl", "Pixel", bVisible);
             m_GD.m_nFovSize = tree.Set(m_GD.m_nFovSize, m_GD.m_nFovSize, "Cam Fov Size Pxl", "Pixel", bVisible);
             m_GD.m_nOverlap = tree.Set(m_GD.m_nOverlap, m_GD.m_nOverlap, "Cam Overlap Size Pxl", "Pixel", bVisible);
             m_nYOffset = tree.Set(m_nYOffset, m_nYOffset, "Cam Y Offset", "Y Tilt(pxl)", bVisible);
@@ -86,9 +88,9 @@ namespace Root_VEGA_P_Vision.Module
         }
 
 
-        public void StartZGrab(MemoryData memory,int nGrabcnt)
+        public void StartZGrab(MemoryData memory,int nGrabcnt,CPoint memOffset)
         {
-            ((Camera_Matrox)m_camera).GrabZScan(memory, nGrabcnt);
+            ((Camera_Matrox)m_camera).GrabZScan(memory, nGrabcnt,memOffset);
             m_camera.Grabed += m_camera_Grabed;
         }
     }

@@ -78,6 +78,15 @@ namespace Root_Pine2.Module
             return true; 
         }
 
+        public bool IsMagazineUp()
+        {
+            foreach (MagazineEV ev in m_aEV.Values)
+            {
+                if (ev.m_elevator.IsMagazineUp()) return true; 
+            }
+            return false; 
+        }
+
         string m_sInfo = "OK";
         bool Run(string sRun)
         {

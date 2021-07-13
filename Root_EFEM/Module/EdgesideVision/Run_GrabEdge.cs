@@ -111,7 +111,7 @@ namespace Root_EFEM.Module.EdgesideVision
 				double moveStart = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;  // Y 축 이동 끝 지점
 				double moveEnd = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;   //y 축 이동 시작 지점
 
-                int grabCount = Convert.ToInt32((gmTop.m_nScanDegree / 360) * gmTop.m_nWaferSize_mm * pulsePerDegree * Math.PI / gmTop.m_dRealResX_um); // m_nWaferSize_mm = 300
+                int grabCount = Convert.ToInt32((gmTop.m_nScanDegree / 360.0) * gmTop.m_nWaferSize_mm * pulsePerDegree * Math.PI / gmTop.m_dRealResX_um); // m_nWaferSize_mm = 300
 
 				if (module.Run(axisEdgeX.StartMove(gmTop.m_nFocusX)))
 					return p_sInfo;

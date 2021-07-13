@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.ConditionItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="400" Background="{StaticResource MainThema}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <UniformGrid Rows="4" Grid.Row="0" Margin="5,0,0,5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Foreground="White" Text="Condition " HorizontalAlignment="Right" Margin="3"/>
+                <TextBlock Grid.Column="1" Foreground="White" Text="{Binding ConditionCnt}" Margin="3"/>
+
+            </Grid>
+            <Button Content="Delete" Command="{Binding btnDelete}"/>
+            <TextBlock Foreground="White" Text="Enable" Margin="3"/>
+            <CheckBox IsChecked="{Binding IsEnable}" Margin="3"/>
+            <TextBlock Foreground="White" Text="DefectCode" Margin="3"/>
+            <TextBox Foreground="Black" Text="{Binding DefectCode}" Margin="3"/>
+            <TextBlock Foreground="White" Text="DefectName" Margin="3"/>
+            <TextBox Foreground="Black" Text="{Binding DefectName}" Margin="3"/>
+        </UniformGrid>
+        <Button Grid.Row="1" Content="Image &amp; ROI"  Command="{Binding btnImagenROI}" Style="{StaticResource ImageROIBtn}"/>
+    </Grid>
+
+</UserControl>

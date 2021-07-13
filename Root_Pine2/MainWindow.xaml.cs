@@ -22,9 +22,9 @@ namespace Root_Pine2
         {
             if (!Directory.Exists(@"C:\Recipe\Pine2")) Directory.CreateDirectory(@"C:\Recipe\Pine2");
             m_engineer.Init("Pine2");
-            engineerUI.Init(m_engineer);
             m_handler = (Pine2_Handler)m_engineer.ClassHandler();
-            mainUI.Init(m_handler); 
+            engineerUI.Init(m_engineer);
+            mainUI.Init(m_engineer); 
         }
         #endregion
 

@@ -119,7 +119,6 @@ namespace Root_VEGA_P.Module
 
             MachineCheck();
             DoorCheck();
-            ////TapeloadCheck(); // ??
         }
         private void MachineCheck()
         {

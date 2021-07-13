@@ -115,7 +115,7 @@ namespace RootTools.Comm
             }
             catch (Exception e)
             {
-                if (m_socket != null) m_commLog.Add(CommLog.eType.Info, "CallBackReceive Exception : " + e.Message);
+                if (m_socket != null) m_commLog.Add(CommLog.eType.Info, "CallBackReceive Exception : " + e.Message+e.StackTrace);
                 m_socket.Close();
                 InitServer();
             }

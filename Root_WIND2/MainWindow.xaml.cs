@@ -427,6 +427,7 @@ namespace Root_WIND2
                 dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
                 dialogService.Register<TK4S, TK4SModuleUI>();
                 dialogService.Register<FFUModule, FFUModuleUI>();
+                dialogService.Register<ManualAlignViewer_ViewModel, ManualAlignViewer>();
                 //dialogService.Register<Dialog_PortSelect_ViewModel, Dialog_PortSelect>();
                 dialogService.Register<Dialog_MapCreator_ViewModel, Dialog_MapCreator>();
 

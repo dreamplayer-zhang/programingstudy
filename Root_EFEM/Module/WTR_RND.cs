@@ -1075,7 +1075,7 @@ namespace Root_EFEM.Module
                     {
                         eArm fromArm = eArm.Upper;
                         eArm toArm = eArm.Lower;
-                        if (m_eArm == eArm.Upper)
+                        if (m_eArm == eArm.Lower)
                         {
                             fromArm = eArm.Lower;
                             toArm = eArm.Upper;
