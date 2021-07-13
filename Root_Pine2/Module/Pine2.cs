@@ -134,6 +134,12 @@ namespace Root_Pine2.Module
             sec = sw.ElapsedMilliseconds / 1000.0;
             return "OK"; 
         }
+
+        public string m_sFilePickerSet = "c:\\Recipe\\PickerSet.RunPine2";
+        void RunTreePickerSet(Tree tree)
+        {
+            m_sFilePickerSet = tree.SetFile(m_sFilePickerSet, m_sFilePickerSet, "RunPine2", "File", "PickerSet ModuleRun File"); 
+        }
         #endregion
 
         #region Emergency
@@ -587,7 +593,8 @@ namespace Root_Pine2.Module
             p_lStack = tree.GetTree("Stack").Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
             p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
             RunTreeVisionOption(tree.GetTree("VisionOption"));
-            m_printer.RunTree(tree.GetTree("Printer")); 
+            m_printer.RunTree(tree.GetTree("Printer"));
+            RunTreePickerSet(tree.GetTree("PickerSet")); 
         }
         #endregion
 
@@ -627,6 +634,7 @@ namespace Root_Pine2.Module
             }
         }
 
+        Registry m_reg = new Registry("Pine2");
         string _sLotID = "";
         public string p_sLotID
         {
@@ -635,12 +643,11 @@ namespace Root_Pine2.Module
             {
                 if (_sLotID == value) return; 
                 _sLotID = value;
-                OnPropertyChanged(); 
-
+                OnPropertyChanged();
+                m_reg.Write("LotID", value);
             }
         }
 
-        Registry m_reg = new Registry("Pine2");
         int _iBundle = 0;
         public int p_iBundle
         {
@@ -737,10 +744,12 @@ namespace Root_Pine2.Module
                 public string m_sBundle;
                 public InfoStrip m_InfoStrip = null;
                 public int m_nStrip = 0;
+                public InfoStrip.eResult m_eResult = InfoStrip.eResult.Init; 
                 public DateTime m_dtNow = DateTime.Now; 
 
-                public Doc(int iSorter, int iBundle, int nStrip)
+                public Doc(int iSorter, int iBundle, int nStrip, InfoStrip.eResult eResult)
                 {
+                    m_eResult = eResult; 
                     for (int n = 0; n < 8; n++) m_sSorter += ((n == iSorter) ? n.ToString() : "+");
                     m_sBundle = iBundle.ToString("00");
                     m_nStrip = nStrip; 
@@ -750,8 +759,15 @@ namespace Root_Pine2.Module
 
             public void AddPrint(int iSorter, int iBundle, int nStrip)
             {
-                Doc doc = new Doc(iSorter, iBundle, nStrip);
+                Doc doc = new Doc(iSorter, iBundle, nStrip, InfoStrip.eResult.Init);
                 m_qDoc.Enqueue(doc); 
+            }
+
+            public void AddPrint(int iSorter, int iBundle, int nStrip, InfoStrip.eResult eResult)
+            {
+                if (eResult == InfoStrip.eResult.Init) return; 
+                Doc doc = new Doc(iSorter, iBundle, nStrip, eResult);
+                m_qDoc.Enqueue(doc);
             }
 
             public DispatcherTimer m_timer = new DispatcherTimer();
@@ -774,12 +790,13 @@ namespace Root_Pine2.Module
                 m_srp350.Start("Print Bundle");
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "Machine ID : " + m_sMachine);
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "--------------------------------");
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "Operator : " + m_handler.m_pine2.p_sOperator);
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "Recipe : " + m_handler.p_sRecipe);
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "Lot ID : " + m_handler.m_pine2.p_sLotID);
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "Operator : " + m_handler.m_pine2.p_sOperator);
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "3D Inspect : " + m_handler.m_pine2.p_b3D.ToString());
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "VS File : " + sVS);
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "--------------------------------");
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "3D Inspect : " + m_handler.m_pine2.p_b3D.ToString());
+                if (doc.m_eResult != InfoStrip.eResult.Init) m_srp350.Write(0, 0, m_eFont, m_szFont, "Result : " + doc.m_eResult.ToString());
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "Bundle : " + doc.m_sBundle);
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "Sorter : " + doc.m_sSorter);
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "Strip Count : " + doc.m_nStrip.ToString());
@@ -820,9 +837,10 @@ namespace Root_Pine2.Module
             InitVisionOption(); 
             p_id = id;
             m_handler = (Pine2_Handler)engineer.ClassHandler();
-            m_printer = new Printer(m_handler); 
+            m_printer = new Printer(m_handler);
+            p_sLotID = m_reg.Read("LotID", ""); 
             p_iBundle = m_reg.Read("Bundle", 0); 
-            InitBase(id, engineer);
+            InitBase(id, engineer); 
 
             InitThread();
         }

@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="Root_JEDI.Engineer.JEDI_Handler_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_JEDI.Engineer"
+             xmlns:module="clr-namespace:RootTools.Module;assembly=RootTools"
+             xmlns:gaf="clr-namespace:RootTools.GAFs;assembly=RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <TabControl>
+        <TabItem Header="Handler" Background="{Binding p_brushHandler}">
+            <TabControl>
+                <TabItem Header="ModuleList" Background="{Binding p_brushHandler}">
+                    <module:ModuleList_UI x:Name="moduleListUI"/>
+                </TabItem>
+                <TabItem Header="GAF" Background="{Binding p_brushHandler}">
+                    <gaf:GAF_UI x:Name="gafUI"/>
+                </TabItem>
+            </TabControl>
+        </TabItem>
+        <TabItem Header="Module" Background="{Binding p_brushModule}">
+            <TabControl x:Name="tabModule"/>
+        </TabItem>
+    </TabControl>
+</UserControl>

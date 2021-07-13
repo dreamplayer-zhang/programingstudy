@@ -8,7 +8,7 @@
              xmlns:gaf="clr-namespace:RootTools.GAFs;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <TabControl >
+    <TabControl>
         <TabItem Header="Handler" Background="{Binding p_brushHandler}">
             <TabControl>
                 <TabItem Header="ModuleList" Background="{Binding p_brushHandler}">
