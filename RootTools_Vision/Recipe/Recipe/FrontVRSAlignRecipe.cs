@@ -12,13 +12,11 @@ namespace RootTools_Vision
         #region [Parameter]
         private List<RecipeType_ImageData> alignFeatureVRSList;
 
-        private long firstSearchPointX;
-        private long firstSearchPointY;
+        private long shotOffsetX;
+        private long shotOffsetY;
 
-        private long secondSearchPointX;
-        private long secondSearchPointY;
-
-
+        private long mapOffsetX;
+        private long mapOffsetY;
         #endregion
 
         #region [Getter Setter]
@@ -27,22 +25,19 @@ namespace RootTools_Vision
         //[XmlIgnore]
         public List<RecipeType_ImageData> AlignFeatureVRSList { get => alignFeatureVRSList; set => alignFeatureVRSList = value; }
 
-        public long FirstSearchPointX { get => this.firstSearchPointX; set => this.firstSearchPointY = value; }
-        public long FirstSearchPointY { get => this.firstSearchPointY; set => this.firstSearchPointY = value; }
+        public long MapOffsetX { get => this.mapOffsetX; set => this.mapOffsetX = value; }
+        public long MapOffsetY { get => this.mapOffsetY; set => this.mapOffsetY = value; }
 
-        public long SecondSearchPointX { get => this.secondSearchPointX; set => this.secondSearchPointX = value; }
-        public long SecondSearchPointY { get => this.secondSearchPointY; set => this.secondSearchPointY = value; }
-
-
-
+        public long ShotOffsetX { get => this.shotOffsetX; set => this.shotOffsetX = value; }
+        public long ShotOffsetY { get => this.shotOffsetY; set => this.shotOffsetY = value; }
         #endregion
 
         public FrontVRSAlignRecipe()
         {
-            this.FirstSearchPointX = 0;
-            this.FirstSearchPointY = 0;
-            this.SecondSearchPointX = 0;
-            this.SecondSearchPointY = 0;
+            this.MapOffsetX = 0;
+            this.MapOffsetY = 0;
+            this.ShotOffsetX = 0;
+            this.ShotOffsetY = 0;
 
             this.alignFeatureVRSList = new List<RecipeType_ImageData>();
         }
@@ -105,10 +100,10 @@ namespace RootTools_Vision
         {
             this.alignFeatureVRSList.Clear();
 
-            this.FirstSearchPointX = 0;
-            this.FirstSearchPointY = 0;
-            this.SecondSearchPointX = 0;
-            this.SecondSearchPointY = 0;
+            this.MapOffsetX = 0;
+            this.MapOffsetY = 0;
+            this.ShotOffsetX = 0;
+            this.ShotOffsetY = 0;
         }
     }
 }

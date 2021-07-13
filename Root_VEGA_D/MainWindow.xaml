@@ -831,7 +831,8 @@
                                                             <RowDefinition/>
                                                         </Grid.RowDefinitions>
                                                         <Border Background="Black" Margin="3">
-                                                            <TextBlock Foreground="White">Key 1</TextBlock>
+                                                            <!--<TextBlock Foreground="White">Key 1</TextBlock>-->
+                                                            <Image x:Name="imageAlignKey" Source="{Binding p_bitmapAlignKeySrc}"/>
                                                         </Border>
                                                         <Border Background="Black" Grid.Row="1" Margin="3">
                                                             <TextBlock Foreground="White">Key 1</TextBlock>
@@ -931,9 +932,9 @@
                                                         <Grid>
                                                             <ProgressBar x:Name="pbSnap"
                                                                          Height="30"
-                                                                         Value="0" />
+                                                                         Value="{Binding p_SnapProgressValue}" />
                                                             <TextBlock x:Name="tbSnap"
-                                                                       Text="0%"
+                                                                       Text="{Binding p_SnapDispText}"
                                                                        Foreground="Black"
                                                                        FontWeight="Bold" />
                                                         </Grid>
@@ -946,10 +947,10 @@
                                                         <Grid>
                                                             <ProgressBar x:Name="pbInsp"
                                                                          Height="30"
-                                                                         Value="0"
+                                                                         Value="{Binding p_InspProgressValue}"
                                                                          Grid.ColumnSpan="2" />
                                                             <TextBlock x:Name="tbInsp"
-                                                                       Text="0%"
+                                                                       Text="{Binding p_InspDispText}"
                                                                        Foreground="Black" />
                                                         </Grid>
                                                     </StackPanel>
@@ -1580,7 +1581,7 @@
                         </TabItem>-->
                         <TabItem Header="Recipe Manager" x:Name="RecipeManagerTab"
                                  Style="{StaticResource ResourceKey=WizardTabItem}" Visibility="Visible">
-                            <local:RecipeManager_UI DataContext="{Binding p_recipeManager_ViewModel}" />
+                            <local:RecipeManager_UI x:Name="recipeManagerUI" DataContext="{Binding p_recipeManager_ViewModel}" />
 
                             <!--<ScrollViewer Background="White">
                                 <StackPanel>

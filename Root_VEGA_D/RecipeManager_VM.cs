@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 namespace Root_VEGA_D
 {
@@ -83,6 +84,12 @@ namespace Root_VEGA_D
             }
         }
 
+        BitmapSource m_bitmapAlignKeySrc;
+        public BitmapSource p_bitmapAlignKeySrc
+        {
+            get => m_bitmapAlignKeySrc;
+            set => SetProperty(ref m_bitmapAlignKeySrc, value);
+        }
         #endregion
 
         #region Function
