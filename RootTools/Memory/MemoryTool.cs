@@ -48,14 +48,14 @@ namespace RootTools.Memory
         const int nSize = 1920 * 1080 * 3;
 
         #region Setting
-        int port;
+        int m_port = 5000;
         Socket mainSock;
         Log m_log;
         string p_id;
 
         void RunTreeSetting(Tree tree)
         {
-            port = tree.Set(port, 5000, "Port", "Port Number");
+            m_port = tree.Set(m_port, m_port, "Port", "Port Number");
         }
         #endregion
         
@@ -87,35 +87,76 @@ namespace RootTools.Memory
         #endregion
         public MemServer(Log log,string id)
         {
-            mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+            //mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
             this.m_log = log;
             this.p_id = id;
             InitTree();
         }
         public void Start()
-        {            
-            IPEndPoint serverEP = new IPEndPoint(IPAddress.Any, port);
-            mainSock.Bind(serverEP);
-            mainSock.Listen(10);
-            mainSock.BeginAccept(AcceptCallback, null);            
+        {
+            try
+            {
+                mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+
+                IPEndPoint serverEP = new IPEndPoint(IPAddress.Any, m_port);
+                mainSock.Bind(serverEP);
+                mainSock.Listen(10);
+                mainSock.BeginAccept(AcceptCallback, null);
+            }
+            catch(Exception e)
+            {
+                m_log?.Error(p_id + " Server Bind & Listen Fail !!");
+                m_log?.Error(p_id + " Exception : " + e.Message);
+            }
+        }
+        public void Close()
+        {
+            if(mainSock != null)
+            {
+                mainSock.Close();
+                mainSock.Dispose();
+            }
+
+            foreach(Socket socket in connectedClients)
+            {
+                socket.Close();
+                socket.Dispose();
+            }
+            connectedClients.Clear();
+
+            //mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+        }
+        public bool IsConnected()
+        {
+            return (connectedClients.Count > 0);
         }
         List<Socket> connectedClients = new List<Socket>();
         void AcceptCallback(IAsyncResult ar)
         {
-            // 클라이언트의 연결 요청을 수락한다.
-            Socket client = mainSock.EndAccept(ar);
+            try
+            {
+                // 클라이언트의 연결 요청을 수락한다.
+                Socket client = mainSock.EndAccept(ar);
 
-            // 또 다른 클라이언트의 연결을 대기한다.
-            mainSock.BeginAccept(AcceptCallback, null);
+                // 또 다른 클라이언트의 연결을 대기한다.
+                mainSock.BeginAccept(AcceptCallback, null);
 
-            AsyncObject obj = new AsyncObject(nSize);
-            obj.WorkingSocket = client;
+                AsyncObject obj = new AsyncObject(nSize);
+                obj.WorkingSocket = client;
 
-            // 연결된 클라이언트 리스트에 추가해준다.
-            connectedClients.Add(client);
-                        
-            // 클라이언트의 데이터를 받는다.
-            client.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj);
+                m_log.Info(p_id + " is Accepted !!");
+
+                // 연결된 클라이언트 리스트에 추가해준다.
+                connectedClients.Add(client);
+
+                // 클라이언트의 데이터를 받는다.
+                client.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj);
+            }
+            catch(Exception e)
+            {
+                m_log.Info("AcceptCallback : " + e.Message);
+            }
+            
         }
         void DataReceived(IAsyncResult ar)
         {          
@@ -123,22 +164,34 @@ namespace RootTools.Memory
 
             try
             {
-            int received = obj.WorkingSocket.EndReceive(ar);
+                if (obj.WorkingSocket.Connected == false)
+                {
+                    connectedClients.Remove(obj.WorkingSocket);
 
-            if (received <= 0)
-            {
-                obj.WorkingSocket.Close();
-                return;
+                    m_log.Warn("Server : Disconnected from the client");
+                    obj.WorkingSocket.Close();
+                    return;
+                }
+                int received = obj.WorkingSocket.EndReceive(ar);
+                if (received <= 0)
+                {
+                    connectedClients.Remove(obj.WorkingSocket);
+
+                    m_log.Warn("Server : Received nothing from the client");
+                    obj.WorkingSocket.Close();
+                    return;
+                }
+
+                EventReciveData(obj.Buffer, received);
+
+                obj.ClearBuffer();
+
+                obj.WorkingSocket.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj);
             }
-
-            EventReciveData(obj.Buffer, received);
-                       
-            obj.ClearBuffer();
-
-            obj.WorkingSocket.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj);
-        }
-            catch (Exception)
+            catch (Exception e)
             {
+                connectedClients.Remove(obj.WorkingSocket);
+
                 m_log.Warn("Server : Disconnected from the client");
                 obj.WorkingSocket.Close();
 
@@ -157,7 +210,7 @@ namespace RootTools.Memory
                 {
                     socket.Send(p);
                 }
-                catch
+                catch (Exception e)
                 {
                     // 오류 발생하면 전송 취소하고 리스트에서 삭제한다.
                     try
@@ -179,7 +232,7 @@ namespace RootTools.Memory
                     byte[] b = Encoding.ASCII.GetBytes(p);
                     socket.Send(b);
                 }
-                catch
+                catch (Exception e)
                 {
                     // 오류 발생하면 전송 취소하고 리스트에서 삭제한다.
                     try
@@ -200,16 +253,17 @@ namespace RootTools.Memory
         #region Setting
         Socket mainSock;
         IPAddress serverAddr;
-        string strAddr= "127.0.0.1";
-        int port;
-        Log log;
+        string m_strAddr= "10.0.0.10";
+        int m_port = 5000;
+        Log m_log;
+        string p_id;
         public TreeRoot m_treeRoot;
 
         void RunTreeSetting(Tree tree)
         {
-            strAddr = tree.Set(strAddr, "10.0.0.10", "IP", "IP Address");
-            serverAddr = IPAddress.Parse(strAddr);
-            port = tree.Set(port, 5000, "Port", "Port Number");
+            m_strAddr = tree.Set(m_strAddr, m_strAddr, "IP", "IP Address");
+            serverAddr = IPAddress.Parse(m_strAddr);
+            m_port = tree.Set(m_port, m_port, "Port", "Port Number");
         }
         #endregion
 
@@ -233,30 +287,60 @@ namespace RootTools.Memory
         #endregion
         public MemClient(Log log,string id)
         {
-            this.log = log;
-            mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+            this.m_log = log;
+            this.p_id = id;
+            //mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
             m_treeRoot = new TreeRoot(id, log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);
         }
         public void Connect()
         {
-            IPEndPoint clientEP = new IPEndPoint(serverAddr, port);
-            mainSock.BeginConnect(clientEP, new AsyncCallback(ConnectCallback), mainSock);
+            try
+            {
+                if(mainSock == null)
+                    mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+
+                IPEndPoint clientEP = new IPEndPoint(serverAddr, m_port);
+                mainSock.BeginConnect(clientEP, new AsyncCallback(ConnectCallback), mainSock);
+            }
+            catch (Exception e)
+            {
+                m_log.Info("Connect : " + e.Message);
+            }
+        }
+        public void Close()
+        {
+            if(mainSock != null)
+            {
+                mainSock.Close();
+                mainSock.Dispose();
+            }
+
+            //mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+        }
+        public bool IsConnected()
+        {
+            return mainSock.Connected;
         }
         void ConnectCallback(IAsyncResult ar)
         {
             try
             {
                 Socket client = (Socket)ar.AsyncState;
+                if (client.Connected == false) return;
                 client.EndConnect(ar);
+
+                m_log.Info(p_id + " is connected !!");
 
                 AsyncObject obj = new AsyncObject(4096);
                 obj.WorkingSocket = mainSock;
                 mainSock.BeginReceive(obj.Buffer, 0, obj.BufferSize, 0, DataReceived, obj);
             }
-            catch(Exception)
+            catch(Exception e)
             {
+                m_log.Info("ConnectCallback : " + e.Message);
+
                 Connect();
             }
         }
@@ -283,13 +367,19 @@ namespace RootTools.Memory
                 // 수신 대기
                 obj.WorkingSocket.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
             }
-            catch(Exception)
+            catch(SocketException e)
             {
-                log.Warn("Client : Disconnected from the server");
-                obj.WorkingSocket.Disconnect(true);
+                m_log.Warn("Client : Disconnected from the server");
+                //obj.WorkingSocket.Disconnect(true);
+                Close();
 
                 Connect();
-                return;
+            }
+            catch(Exception e)
+            {
+                m_log.Warn("Client : Disconnected from the server");
+                //obj.WorkingSocket.Disconnect(true);
+                Close();
             }
             
         }
@@ -464,7 +554,52 @@ namespace RootTools.Memory
         //TCPAsyncClient m_Client;
         //TCPAsyncServer m_Server;
 
-        bool bServer = true;
+        bool m_bChanged = true;
+        bool m_bServer = true;
+        bool p_bServer
+        {
+            get => m_bServer;
+            set
+            {
+                if (!m_bChanged && m_bServer == value) return;
+                m_bChanged = false;
+                
+                m_bServer = value;
+                if(m_bUseServer)
+                {
+                    if(m_bServer)
+                    {
+                        if (m_Client != null)
+                        {
+                            m_Client.Close();
+                        }
+                        m_Client = new MemClient(m_log, p_id);
+                        m_Client.EventReciveData += M_Client_EventReciveData;
+
+                        m_Server.Start();
+                    }
+                    else
+                    {
+                        if (m_Server != null)
+                        {
+                            m_Server.Close();
+                        }
+                        m_Server = new MemServer(m_log, p_id);
+                        m_Server.EventReciveData += M_Server_EventReciveData;
+
+                        m_Client.Connect();
+                    }
+                }
+                else
+                {
+                    if (m_Client != null)
+                        m_Client.Close();
+
+                    if (m_Server != null)
+                        m_Server.Close();
+                }
+            }
+        }
         //int nPort = 5000;
 
         public void InitThreadProcess()
@@ -505,44 +640,39 @@ namespace RootTools.Memory
             m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "Memory Process ID", bVisible && m_bStartProcess);
             m_sProcessFile = tree.SetFile(m_sProcessFile, m_sProcessFile, "exe", "File", "Process File Name", bVisible && m_bStartProcess);
         }
-        bool bUseServer = false;
+        bool m_bUseServer = false;
+
         void RunTreeTCPSetup(Tree tree)
         {
-            bUseServer = tree.Set(bUseServer, bUseServer, "Use Memory Server", "Use Mem Server");
+            bool bUseServer = tree.Set(m_bUseServer, m_bUseServer, "Use Memory Server", "Use Mem Server");
 
-            if (!bUseServer) return;
-
-            bServer = tree.Set(bServer, bServer, "MemServer", "Memory Tool Server");
-            if(bServer)
+            bool bServer = false;
+            if (bUseServer)
             {
-                if(m_Server!=null)
-                    m_Server.RunTree(tree);
+                bServer = tree.Set(p_bServer, p_bServer, "MemServer", "Memory Tool Server");
+                if (bServer)
+                {
+                    if (m_Server != null)
+                        m_Server.RunTree(tree);
+                }
+                else
+                {
+                    if (m_Client != null)
+                        m_Client.RunTree(tree);
+                }
             }
             else
             {
-                if(m_Client!=null)
-                    m_Client.RunTree(tree);
+                if (m_Client != null)
+                    m_Client.Close();
+
+                if (m_Server != null)
+                    m_Server.Close();
             }
 
-            if (bServer && m_Server != null)
-            {
-              //  m_ServerTree.RunTree(tree);
-            }
-            if (!bServer && m_Client != null)
-            {
-                //  m_ClientTree.RunTree(tree);
-            }
+            m_bUseServer = bUseServer;
 
-            //if (bServer && m_Server != null)
-            //{
-            //    m_Server.RunTree(tree);
-            //    //m_ServerTree.RunTree(tree);
-            //}
-            //if (!bServer && m_Client != null)
-            //{
-            //    m_Client.RunTree(tree);
-            //    //m_ClientTree.RunTree(tree);
-            //}
+            p_bServer = bServer;
         }
 
         #endregion
@@ -636,16 +766,19 @@ namespace RootTools.Memory
             KillInspectProcess();
             if (bMaster == false) InitTimer();
 
-            if (!bUseServer) return;
+            //if (!bUseServer) return;
 
             m_Server = new MemServer(m_log,id);
-            m_Client = new MemClient(m_log,id);
+            m_Server.EventReciveData += M_Server_EventReciveData;
+            
+            m_Client = new MemClient(m_log, id);
+            m_Client.EventReciveData += M_Client_EventReciveData;
 
-            if (bServer)
+            if (m_bServer)
             {
-                m_Server.RunTree(Tree.eMode.RegRead);
-                m_Server.Start();
-                m_Server.EventReciveData += M_Server_EventReciveData;
+                //m_Server.RunTree(Tree.eMode.RegRead);
+                //m_Server.Start();
+                //m_Server.EventReciveData += M_Server_EventReciveData;
                 //m_Server = new MemServer(m_log);
                 //RunTreeRun(Tree.eMode.RegRead);
                 //m_Server.Start(nPort);
@@ -653,9 +786,9 @@ namespace RootTools.Memory
             }
             else
             {
-                m_Client.RunTree(Tree.eMode.RegRead);
-                m_Client.Connect();
-                m_Client.EventReciveData += M_Client_EventReciveData;
+                //m_Client.RunTree(Tree.eMode.RegRead);
+                //m_Client.Connect();
+                //m_Client.EventReciveData += M_Client_EventReciveData;
             }
             RunTreeRun(Tree.eMode.RegRead);
 
@@ -682,19 +815,25 @@ namespace RootTools.Memory
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
            
             _bRecieve = true;
-            if (m_Server != null)
+            if (m_Server == null)
+                return m_abuf;
+
+            if(m_Server.IsConnected())
                 m_Server.Send(str);
             else
                 return m_abuf;
         
             while (_bRecieve)
             {
+                if (!m_Server.IsConnected())
+                    break;
+
                 Thread.Sleep(5);
                 if (watch.ElapsedMilliseconds > 10000)
                     return m_abuf;
             }
             _bRecieve = false;
-              m_log.Warn(watch.ElapsedMilliseconds.ToString());
+            m_log.Warn(watch.ElapsedMilliseconds.ToString());
             return m_abuf;
         }
 
@@ -706,11 +845,19 @@ namespace RootTools.Memory
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool + Splitter + sGourp + Splitter + sMem + Splitter + nByte;
 
             _bRecieve = true;
-            if (m_Server != null)
+            if (m_Server == null)
+                return m_abuf;
+
+            if (m_Server.IsConnected())
                 m_Server.Send(str);
+            else
+                return m_abuf;
 
             while (_bRecieve)
             {
+                if (!m_Server.IsConnected())
+                    break;
+
                 await Task.Delay(5);
                 if (watch.ElapsedMilliseconds > 10000)
                     return m_abuf;
@@ -877,6 +1024,9 @@ namespace RootTools.Memory
 
             //Image<Gray, byte> view = new Image<Gray, byte>(CanvasWidth, CanvasHeight);
             MemoryData memdata = GetMemory(sPool, sGroup, sMem);
+            if (memdata == null)
+                return new byte[(long)CanvasWidth * CanvasHeight * nByte];
+
             IntPtr ptrMem = memdata.GetPtr();
             IntPtr ptrMem2 = memdata.GetPtr(1); // G
             IntPtr ptrMem3 = memdata.GetPtr(2); // B
@@ -911,6 +1061,10 @@ namespace RootTools.Memory
                     }
                 });
             }
+            if(nByte == 2)
+            {
+
+            }
             else if (nByte == 3)
             {
                 int nTerm = CanvasWidth * CanvasHeight;
@@ -935,7 +1089,7 @@ namespace RootTools.Memory
 
         public void SendTest()
         {
-            if (bServer)
+            if (m_bServer)
             {
               //  m_Server.Send("testserver");
             }

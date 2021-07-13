@@ -274,35 +274,88 @@ namespace Root_VEGA_D.Module
         }
 
         public event OnGrabLineScanEvent AlignCompleted;
-        string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY, bool bFindBotAlignMarker, out CRect rectBotMarker)
+        string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY, out CRect rectBotMarker)
         {
             rectBotMarker = new CRect(0, 0, 0, 0);
 
             if (m_grabMode.m_bUseAlign == false)
                 return "OK";
 
+            m_log.Info("Align Start");
+
             m_grabMode.SetLight(true);
 
-            m_log.Info("Align Start");
+            bool bOk = false;
 
             try
             {
                 double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5 - (m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5) * m_grabMode.m_dResX_um * 0.001;
 
-                CPoint memOffset = new CPoint(0, 0);
-                if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
-                    return p_sInfo;
-
                 Image<Gray, byte> imgTop = new Image<Gray, byte>(m_grabMode.p_sTopTemplateFile);
                 Image<Gray, byte> imgBot = new Image<Gray, byte>(m_grabMode.p_sBottomTemplateFile);
+                Image<Gray, byte> imgTop_div4 = imgTop.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
+                Image<Gray, byte> imgBot_div4 = imgBot.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
 
+                CPoint memOffset = new CPoint(0, 0);
+
+                double dRotateTheta = 0;
+
+                // 1차 Align
+                if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
+                    return p_sInfo;
+                if (m_module.Run(Align(mem, imgTop, imgBot, imgTop_div4, imgBot_div4, ref dRotateTheta)))
+                    return p_sInfo;
+
+                m_log.Info(string.Format("Align Success (1), theta difference = {0}", dRotateTheta));
+
+
+                // 2차 Align
+                if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
+                    return p_sInfo;
+                if (m_module.Run(Align(mem, imgTop, imgBot, imgTop_div4, imgBot_div4, ref dRotateTheta)))
+                    return p_sInfo;
+
+                m_log.Info(string.Format("Align Success (2), theta difference = {0}", dRotateTheta));
+
+
+                // 좌하단 Align Marker 찾기
+                if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
+                    return p_sInfo;
+                if (m_module.Run(FindLeftBottomAlignMarker(mem, imgBot, imgBot_div4, out rectBotMarker)))
+                    return p_sInfo;
+
+                rectBotMarker.Left += m_grabMode.m_ptBotAlignMarkerOffset.X;
+                rectBotMarker.Top += m_grabMode.m_ptBotAlignMarkerOffset.Y;
+                rectBotMarker.Right += m_grabMode.m_ptBotAlignMarkerOffset.X;
+                rectBotMarker.Bottom += m_grabMode.m_ptBotAlignMarkerOffset.Y;
+                m_log.Info(string.Format("LeftBottom Align Marker is found - {0}, {1}", rectBotMarker.Left, rectBotMarker.Bottom));
+
+                bOk = true;
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+            finally
+            {
+                m_grabMode.SetLight(false);
+
+                if (bOk && AlignCompleted != null) AlignCompleted(this, null);
+            }
+
+            m_log.Info("Align Ended");
+
+            return "OK";
+        }
+
+        string Align(MemoryData mem, Image<Gray, byte> imgTop, Image<Gray, byte> imgBot, Image<Gray, byte> imgTop_div4, Image<Gray, byte> imgBot_div4, ref double dRotateTheta)
+        {
+            try
+            {
                 CRect searchTopArea = new CRect(0, (int)(m_grabMode.m_nTopCenterY - m_grabMode.m_nSearchAreaSize * 0.5), m_grabMode.m_GD.m_nFovSize, (int)(m_grabMode.m_nTopCenterY + m_grabMode.m_nSearchAreaSize * 0.5));
                 CRect searchBotArea = new CRect(0, (int)(m_grabMode.m_nBottomCenterY - m_grabMode.m_nSearchAreaSize * 0.5), m_grabMode.m_GD.m_nFovSize, (int)(m_grabMode.m_nBottomCenterY + m_grabMode.m_nSearchAreaSize * 0.5));
                 Image<Gray, byte> imgTopArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchTopArea);
                 Image<Gray, byte> imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
-
-                Image<Gray, byte> imgTop_div4 = imgTop.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
-                Image<Gray, byte> imgBot_div4 = imgBot.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
                 Image<Gray, byte> imgTopArea_div4 = imgTopArea.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
                 Image<Gray, byte> imgBotArea_div4 = imgBotArea.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
 
@@ -311,141 +364,133 @@ namespace Root_VEGA_D.Module
                 CPoint ptCenterBot = new CPoint();
                 bool bTopResult = TemplateMatch(imgTopArea_div4, imgTop_div4, m_grabMode.m_dMatchScore, out ptCenterTop);
                 bool bBotResult = TemplateMatch(imgBotArea_div4, imgBot_div4, m_grabMode.m_dMatchScore, out ptCenterBot);
-                if (bTopResult && bBotResult)
+
+                if (!bTopResult || !bBotResult)
+                    return "Cannot find Align Marker";
+
+                ptCenterTop.X *= 4;
+                ptCenterTop.Y *= 4;
+                ptCenterBot.X *= 4;
+                ptCenterBot.Y *= 4;
+
+                searchTopArea = new CRect(new CPoint(searchTopArea.Left + ptCenterTop.X, searchTopArea.Top + ptCenterTop.Y), imgTop.Width + 8, imgTop.Height + 8);
+                searchBotArea = new CRect(new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y), imgBot.Width + 8, imgBot.Height + 8);
+
+                imgTopArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchTopArea);
+                imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
+
+                // 좁혀진 영역에서 다시 템플릿 매칭
+                bTopResult = TemplateMatch(imgTopArea, imgTop, m_grabMode.m_dMatchScore, out ptCenterTop);
+                bBotResult = TemplateMatch(imgBotArea, imgBot, m_grabMode.m_dMatchScore, out ptCenterBot);
+
+                if (!bTopResult || !bBotResult)
+                    return "Cannot find Align Marker";
+
+                ptCenterTop = new CPoint(searchTopArea.Left + ptCenterTop.X, searchTopArea.Top + ptCenterTop.Y);
+                ptCenterBot = new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y);
+
+                double dThetaRadian = Math.Atan2((double)(ptCenterBot.Y - ptCenterTop.Y), (double)(ptCenterBot.X - ptCenterTop.X));
+                double dThetaDegree = dThetaRadian * (180 / Math.PI);
+                dThetaDegree -= 90;
+
+                // Rotate 축 Theta만큼 회전
+                Axis axisRotate = m_module.AxisRotate;
+                if (m_module.Run(axisRotate.StartMove(axisRotate.p_posActual + dThetaDegree * -1, 0.05)))
+                    return p_sInfo;
+                if (m_module.Run(axisRotate.WaitReady()))
+                    return p_sInfo;
+
+                dRotateTheta = dThetaDegree * -1;
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+
+            return "OK";
+        }
+
+        string FindLeftBottomAlignMarker(MemoryData mem, Image<Gray, byte> imgBot, Image<Gray, byte> imgBot_div4, out CRect rectBotMarker)
+        {
+            rectBotMarker = new CRect(0, 0, 0, 0);
+
+            if (m_grabMode.m_GD.m_nFovSize < m_grabMode.m_nSearchAreaSize)
+                return "SearchAreaSize must be shorter than fov size.";
+
+            // Align Marker Search Area
+            CRect searchBotArea = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5 - m_grabMode.m_nSearchAreaSize * 0.5),
+                                            (int)(m_grabMode.m_nBottomCenterY - m_grabMode.m_nSearchAreaSize * 0.5),
+                                            (int)(m_grabMode.m_GD.m_nFovSize * 0.5 + m_grabMode.m_nSearchAreaSize * 0.5),
+                                            (int)(m_grabMode.m_nBottomCenterY + m_grabMode.m_nSearchAreaSize * 0.5)
+                                            );
+
+            // Create Images for Template Match
+            Image<Gray, byte> imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
+            Image<Gray, byte> imgBotArea_div4 = imgBotArea.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
+
+            // Template Match on Search Area
+            CPoint ptCenterBot = new CPoint();
+            bool bBotResult = TemplateMatch(imgBotArea_div4, imgBot_div4, m_grabMode.m_dMatchScore, out ptCenterBot);
+            if (!bBotResult)
+                return "Cannot get Bottom Align Marker Position";
+
+            ptCenterBot.X *= 4;
+            ptCenterBot.Y *= 4;
+
+            searchBotArea = new CRect(new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y), imgBot.Width + 8, imgBot.Height + 8);
+            searchBotArea.Left = Math.Max(searchBotArea.Left, 0);
+            searchBotArea.Top = Math.Max(searchBotArea.Top, 0);
+
+            imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
+
+            bBotResult = TemplateMatch(imgBotArea, imgBot, m_grabMode.m_dMatchScore, out ptCenterBot);
+            if (!bBotResult)
+                return "Cannot get Bottom Align Marker Position";
+
+            // AlignMarker 좌상단 위치 (Align위한 Scan 영역 이미지 기준)
+            int nAlignMarkerX = (int)(searchBotArea.Left + ptCenterBot.X - imgBot.Width * 0.5);
+            int nAlignMarkerY = (int)(searchBotArea.Top + ptCenterBot.Y - imgBot.Height * 0.5);
+
+            // 화면 표시위한 Align Marker 이미지 파일로 저장
+            CRect rectAreaOnAlignScan = new CRect(new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y), imgBot.Width, imgBot.Height);
+            ImageData img = new ImageData(mem);
+            img.FileSaveGrayBMP(m_grabMode.p_sTempAlignMarkerFile, rectAreaOnAlignScan, 1, ImageData.eRgbChannel.None, 4);
+
+            if (m_grabMode.m_bUseFindEdge)
+            {
+                // FindEdge 함수 사용하여 정확한 위치 보정
+                int nEdgeCheckMargin = 10;
+                CRect rectROI = new CRect(rectAreaOnAlignScan);
+                rectROI.Left -= nEdgeCheckMargin;
+                rectROI.Top -= nEdgeCheckMargin;
+                rectROI.Right += nEdgeCheckMargin;
+                rectROI.Bottom += nEdgeCheckMargin;
+
+                unsafe
                 {
-                    ptCenterTop.X *= 4;
-                    ptCenterTop.Y *= 4;
-                    ptCenterBot.X *= 4;
-                    ptCenterBot.Y *= 4;
+                    IntPtr intPtr = mem.GetPtr();
+                    byte* ptrImg = (byte*)intPtr.ToPointer();
 
-                    searchTopArea = new CRect(new CPoint(searchTopArea.Left + ptCenterTop.X, searchTopArea.Top + ptCenterTop.Y), imgTop.Width + 8, imgTop.Height + 8);
-                    searchBotArea = new CRect(new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y), imgBot.Width + 8, imgBot.Height + 8);
+                    int centerX = (rectROI.Left + rectROI.Right) / 2;
+                    int centerY = (rectROI.Top + rectROI.Bottom) / 2;
+                    int width = rectROI.Width;
+                    int height = rectROI.Height;
 
-                    imgTopArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchTopArea);
-                    imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
+                    int nOffsetX_LtoR = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, rectROI.Left, (int)(centerY - height * 0.1 * 0.5), (int)(rectROI.Left + width * 0.1), (int)(centerY + height * 0.1 * 0.5), 0, 100);
+                    int nOffsetY_BtoT = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, (int)(centerX - width * 0.1 * 0.5), (int)(rectROI.Bottom - height * 0.1), (int)(centerX + width * 0.1 * 0.5), rectROI.Bottom, 3, 100);
 
-                    // 좁혀진 영역에서 다시 템플릿 매칭
-                    bTopResult = TemplateMatch(imgTopArea, imgTop, m_grabMode.m_dMatchScore, out ptCenterTop);
-                    bBotResult = TemplateMatch(imgBotArea, imgBot, m_grabMode.m_dMatchScore, out ptCenterBot);
-
-                    if (bTopResult && bBotResult)
-                    {
-                        ptCenterTop = new CPoint(searchTopArea.Left + ptCenterTop.X, searchTopArea.Top + ptCenterTop.Y);
-                        ptCenterBot = new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y);
-
-                        double dThetaRadian = Math.Atan2((double)(ptCenterBot.Y - ptCenterTop.Y), (double)(ptCenterBot.X - ptCenterTop.X));
-                        double dThetaDegree = dThetaRadian * (180 / Math.PI);
-                        dThetaDegree -= 90;
-
-                        // Rotate 축 Theta만큼 회전
-                        Axis axisRotate = m_module.AxisRotate;
-                        if (m_module.Run(axisRotate.StartMove(axisRotate.p_posActual + dThetaDegree * -1, 0.05)))
-                            return p_sInfo;
-                        if (m_module.Run(axisRotate.WaitReady()))
-                            return p_sInfo;
-
-                        // IPU 연결된 상태라면 좌하단 Align Marker 위치 전달을 위해 찾아야함
-                        if (bFindBotAlignMarker)
-                        {
-                            if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
-                                return p_sInfo;
-
-                            searchBotArea = new CRect(0, (int)(m_grabMode.m_nBottomCenterY - m_grabMode.m_nSearchAreaSize * 0.5), m_grabMode.m_GD.m_nFovSize, (int)(m_grabMode.m_nBottomCenterY + m_grabMode.m_nSearchAreaSize * 0.5));
-                            imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
-                            imgBotArea_div4 = imgBotArea.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
-
-                            ptCenterBot = new CPoint();
-                            bBotResult = TemplateMatch(imgBotArea_div4, imgBot_div4, m_grabMode.m_dMatchScore, out ptCenterBot);
-
-                            if (!bBotResult)
-                                return "Cannot get Bottom Align Marker Position";
-
-                            int botMarkerX = (int)(0 + m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5 + (ptCenterBot.X - imgBot_div4.Width * 0.5) * 4 - 4);
-                            int botMarkerY = (int)(m_grabMode.m_nBottomCenterY - m_grabMode.m_nSearchAreaSize * 0.5 + (ptCenterBot.Y - imgBot_div4.Height * 0.5) * 4 - 4);
-
-                            ptCenterBot.X *= 4;
-                            ptCenterBot.Y *= 4;
-
-                            searchBotArea = new CRect(new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y), imgBot.Width + 8, imgBot.Height + 8);
-
-                            imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
-
-                            bBotResult = TemplateMatch(imgBotArea, imgBot, m_grabMode.m_dMatchScore, out ptCenterBot);
-
-                            if (!bBotResult)
-                                return "Cannot get Bottom Align Marker Position";
-
-                            botMarkerX += (int)(ptCenterBot.X - imgBot.Width * 0.5);
-                            botMarkerY += (int)(ptCenterBot.Y - imgBot.Height * 0.5);
-
-                            rectBotMarker.Left = botMarkerX;
-                            rectBotMarker.Top = botMarkerY;
-                            rectBotMarker.Right = rectBotMarker.Left + imgBot.Width;
-                            rectBotMarker.Bottom = rectBotMarker.Top + imgBot.Height;
-
-                            if(m_grabMode.m_bUseFindEdge)
-                            {
-                                // FindEdge 함수 사용하여 정확한 위치 보정
-                                int nEdgeCheckMargin = 10;
-
-                                CRect rectROI = new CRect(
-                                    rectBotMarker.Left - nEdgeCheckMargin - (int)(m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5),
-                                    rectBotMarker.Top - nEdgeCheckMargin,
-                                    rectBotMarker.Right + nEdgeCheckMargin - (int)(m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5),
-                                    rectBotMarker.Bottom + nEdgeCheckMargin);
-
-                                unsafe
-                                {
-                                    IntPtr intPtr = mem.GetPtr();
-                                    byte* ptrImg = (byte*)intPtr.ToPointer();
-
-                                    int centerX = (rectROI.Left + rectROI.Right) / 2;
-                                    int centerY = (rectROI.Top + rectROI.Bottom) / 2;
-                                    int width = rectROI.Width;
-                                    int height = rectROI.Height;
-
-                                    int nOffsetX_LtoR = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, rectROI.Left, (int)(centerY - height * 0.1 * 0.5), (int)(rectROI.Left + width * 0.1), (int)(centerY + height * 0.1 * 0.5), 0, 100);
-                                    int nOffsetY_BtoT = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, (int)(centerX - width * 0.1 * 0.5), (int)(rectROI.Bottom - height * 0.1), (int)(centerX + width * 0.1 * 0.5), rectROI.Bottom, 3, 100);
-
-                                    botMarkerX += nOffsetX_LtoR - nEdgeCheckMargin - rectROI.Left;
-                                    botMarkerY += nOffsetY_BtoT + nEdgeCheckMargin - rectROI.Bottom;
-                                }
-
-                                rectBotMarker.Left = botMarkerX;
-                                rectBotMarker.Top = botMarkerY;
-                                rectBotMarker.Right = rectBotMarker.Left + imgBot.Width;
-                                rectBotMarker.Bottom = rectBotMarker.Top + imgBot.Height;
-                            }
-
-                            // offset 적용
-                            rectBotMarker.Left += m_grabMode.m_ptBotAlignMarkerOffset.X;
-                            rectBotMarker.Top += m_grabMode.m_ptBotAlignMarkerOffset.Y;
-                            rectBotMarker.Right += m_grabMode.m_ptBotAlignMarkerOffset.X;
-                            rectBotMarker.Bottom += m_grabMode.m_ptBotAlignMarkerOffset.Y;
-
-                            m_log.Info(string.Format("LeftBottom Align Marker is found - {0}, {1}", rectBotMarker.Left, rectBotMarker.Bottom));
-                        }
-
-                        m_log.Info(string.Format("Align Success, theta difference = {0}", dThetaDegree * -1));
-
-                        return "OK";
-                    }
+                    nAlignMarkerX = /*rectROI.Left + */nOffsetX_LtoR;
+                    nAlignMarkerY = /*rectROI.Bottom - */nOffsetY_BtoT - imgBot.Height;
                 }
             }
-            catch (Exception ex)
-            {
-                m_log.Info(ex.Message);
-            }
-            finally
-            {
-                m_grabMode.SetLight(false);
 
-                if(AlignCompleted != null) AlignCompleted(this, rectBotMarker);
-            }
+            // 전체 이미지 좌표 기준 좌하단 Align Marker 영역 계산
+            rectBotMarker.Left = (int)(m_grabMode.m_nCenterX - m_grabMode.m_nSearchAreaSize * 0.5 + nAlignMarkerX);
+            rectBotMarker.Top = nAlignMarkerY;
+            rectBotMarker.Right = rectBotMarker.Left + imgBot.Width;
+            rectBotMarker.Bottom = rectBotMarker.Top + imgBot.Height;
 
-            m_log.Info("Align Failed");
-
-            return "Align Failed";
+            return "OK";
         }
 
         bool TemplateMatch(Image<Gray, byte> imgTargetArea, Image<Gray, byte> imgTemplate, double dMatchScore, out CPoint ptResult)
@@ -573,9 +618,11 @@ namespace Root_VEGA_D.Module
 
                 // 얼라인
                 CRect rectBotMarker = new CRect(0, 0, 0, 0);
-                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, false, out rectBotMarker)))
-                    return p_sInfo;
-                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, true, out rectBotMarker)))
+                //if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, false, out rectBotMarker)))
+                //    return p_sInfo;
+                //if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, true, out rectBotMarker)))
+                //    return p_sInfo;
+                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, out rectBotMarker)))
                     return p_sInfo;
 
                 // IPU 접속 대기

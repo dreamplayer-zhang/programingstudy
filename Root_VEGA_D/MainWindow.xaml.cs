@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace Root_VEGA_D
@@ -91,17 +92,20 @@ namespace Root_VEGA_D
         OHTs_UI m_ohts= new OHTs_UI();
         Login.eLevel m_level;
 
-        RecipeWizard_VM recipeWizardVM;
+        MainWindow_ViewModel m_mainWindowViewModel; 
+
         public MainWindow()
         {
             InitializeComponent();
-
+            
             Init();
-            this.DataContext = new MainWindow_ViewModel(this);
         }
 
         void Init()
         {
+            m_mainWindowViewModel = new MainWindow_ViewModel(this);
+            this.DataContext = m_mainWindowViewModel;
+
             m_engineer = App.m_engineer;
 
             m_engineer.Init("VEGA_D");
@@ -128,7 +132,7 @@ namespace Root_VEGA_D
             //RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
 
-            m_handler.m_vision.LineScanStatusChanged += M_vision_LineScanStatusChanged;
+            m_handler.m_vision.LineScanStatusChanged += m_mainWindowViewModel.M_vision_LineScanStatusChanged;
         }
 
         //bool m_blogin = false;
@@ -317,65 +321,6 @@ namespace Root_VEGA_D
             }
             else m_ohts.Show();
 
-        }
-
-        private void M_vision_LineScanStatusChanged(Vision vision, Run_GrabLineScan moduleRun, Vision.LineScanStatus status, object data)
-        {
-            switch(status)
-            {
-                case Vision.LineScanStatus.Init:
-                    {
-                        Dispatcher.Invoke(delegate
-                        {
-                            pbSnap.Value = 0;
-                            tbSnap.Text = "0%";
-                            pbInsp.Value = 0;
-                            tbInsp.Text = "0%";
-                        });
-                    }
-                    break;
-                case Vision.LineScanStatus.AlignCompleted:
-                    break;
-                case Vision.LineScanStatus.LineScanStarting:
-                    break;
-                case Vision.LineScanStatus.LineScanCompleted:
-                    {
-                        int[] arrData = (int[])data;
-                        int nTotalScanNum = arrData[0];
-                        int nCurScanNum = arrData[1];
-                        Dispatcher.Invoke(delegate
-                        {
-                            double val = (double)nCurScanNum / nTotalScanNum;
-                            pbSnap.Value = val;
-                            tbSnap.Text = val.ToString(".0%");
-                        });
-                    }
-                    break;
-                case Vision.LineScanStatus.LineInspCompleted:
-                    {
-                        int[] arrData = (int[])data;
-                        int nTotalScanNum = arrData[0];
-                        int nCurScanNum = arrData[1];
-                        Dispatcher.Invoke(delegate
-                        {
-                            double val = (double)nCurScanNum / nTotalScanNum;
-                            pbInsp.Value = val;
-                            tbInsp.Text = val.ToString(".0%");
-                        });
-                    }
-                    break;
-                case Vision.LineScanStatus.End:
-                    {
-                        Dispatcher.Invoke(delegate
-                        {
-                            pbSnap.Value = 100;
-                            tbSnap.Text = "100%";
-                        });
-                    }
-                    break;
-                default: break;
-
-            }
         }
     }
 	public class StateToColorConverter : IValueConverter
