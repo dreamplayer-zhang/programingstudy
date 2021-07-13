@@ -70,5 +70,21 @@ namespace RootTools_Vision
         {
             return true;
         }
+
+        public void SetPreGoldenImage(byte[] preGolden, int W, int H)
+        {
+            _preGoldenH = H;
+            _preGoldenW = W;
+
+            Parallel.For(0, this._preGoldenH, i =>
+            {
+                for (int j = 0; j < this._preGoldenW; j++)
+                {
+                    _preGolden[0][(Int64)i * this._preGoldenW + j] = preGolden[(Int64)i * this._preGoldenW * 3 + j * 3 + 0];
+                    _preGolden[1][(Int64)i * this._preGoldenW + j] = preGolden[(Int64)i * this._preGoldenW * 3 + j * 3 + 1];
+                    _preGolden[2][(Int64)i * this._preGoldenW + j] = preGolden[(Int64)i * this._preGoldenW * 3 + j * 3 + 2];
+                }
+            });
+        }
     }
 }

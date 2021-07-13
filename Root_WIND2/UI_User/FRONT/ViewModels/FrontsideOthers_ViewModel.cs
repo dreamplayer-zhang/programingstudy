@@ -812,6 +812,7 @@ namespace Root_WIND2.UI_User
                     });
 
                     Tools.SaveRawdataToBitmap(path, goldenImageColor, originRecipe.OriginWidth, originRecipe.OriginHeight, 3);
+                    GlobalObjects.Instance.Get<RecipeFront>().GetItem<D2DRecipe>().SetPreGoldenImage(goldenImageColor, originRecipe.OriginWidth, originRecipe.OriginHeight);
                 }
             });
         }
