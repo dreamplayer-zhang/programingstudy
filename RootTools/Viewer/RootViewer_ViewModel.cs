@@ -753,6 +753,15 @@ namespace RootTools
 								p_ImgSource = ImageHelper.ToBitmapSource(view);
 							}
 						}
+                        else if(p_ImageData.GetBytePerPixel() == 2)
+                        {
+                            if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
+                            {
+                                Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+                                byte[,,] viewptr = view.Data;
+                                byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+                            }
+                        }
 						else if (p_ImageData.GetBytePerPixel() == 3)
 						{
 							if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))

@@ -477,7 +477,7 @@
                                             </Grid.RowDefinitions>
                                             <Border Background="Black" Margin="3">
                                                 <TextBlock Foreground="White">
-                                                    Align Key
+                                                    <Image x:Name="imageAlignKey" Source="{Binding p_bitmapAlignKeySrc}" />
                                                 </TextBlock>
                                             </Border>
                                             <Border Background="Black" Margin="3" Grid.Row="1">

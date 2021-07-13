@@ -1079,7 +1079,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqWorksConnect(eWorks eWorks, bool bConnect)
         {
-            string sSend = m_nReq.ToString("000") + "," + eWorks.ToString() + "," + Works2D.eProtocol.WorksConnect.ToString() + "," + (bConnect ? "1" : "0");
+            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.WorksConnect.ToString() + "," + eWorks.ToString() + "," + (bConnect ? "1" : "0");
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             return "OK";
