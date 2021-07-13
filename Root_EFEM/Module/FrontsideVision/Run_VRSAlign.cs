@@ -146,20 +146,20 @@ namespace Root_EFEM.Module.FrontsideVision
 
             //Recipe Open
             RecipeAlign recipe = GlobalObjects.Instance.Get<RecipeAlign>();
-            //FrontVRSAlignRecipe alignRecipe = recipe.GetItem<FrontVRSAlignRecipe>();
+            FrontVRSAlignRecipe alignRecipe = recipe.GetItem<FrontVRSAlignRecipe>();
 
-            //if (alignRecipe == null)
-            //{
-            //    return "FrontAlignVRSRecipe == null";
-            //}
-            ///*if (!recipe.Read(m_sRecipeName))
-            //{
-            //    return "Recipe Open Fail";
-            //}*/
-            //if (alignRecipe.AlignFeatureVRSList.Count == 0)
-            //{
-            //    return "Align Feature Count == 0";
-            //}
+            if (alignRecipe == null)
+            {
+                return "FrontAlignVRSRecipe == null";
+            }
+            /*if (!recipe.Read(m_sRecipeName))
+            {
+                return "Recipe Open Fail";
+            }*/
+            if (alignRecipe.AlignFeatureVRSList.Count == 0)
+            {
+                return "Align Feature Count == 0";
+            }
 
             // Move Z
             double dPos = m_focusPosZ;
@@ -195,7 +195,7 @@ namespace Root_EFEM.Module.FrontsideVision
             RPoint foundShotLBPoint = new RPoint(0, 0);
 
             // Shot Center Point
-            /*if (m_module.Run(axisXY.StartMove(shotCenterPoint)))
+            if (m_module.Run(axisXY.StartMove(shotCenterPoint)))
             {
                 return p_sInfo;
             }
@@ -212,7 +212,7 @@ namespace Root_EFEM.Module.FrontsideVision
             if (m_module.Run(axisXY.WaitReady()))
             {
                 return p_sInfo;
-            }*/
+            }
 
             long outX, outY;
             long maxOutX = 0;
@@ -234,12 +234,12 @@ namespace Root_EFEM.Module.FrontsideVision
                         return p_sInfo;
                     }
 
-                    //score = TemplateMatching(alignRecipe, out outX, out outY, out featureIndex);
+                    score = TemplateMatching(alignRecipe, out outX, out outY, out featureIndex);
                     if (score > scoreMax)
                     {
                         scoreMax = score;
-                        //maxOutX = outX;
-                        //maxOutY = outY;
+                        maxOutX = outX;
+                        maxOutY = outY;
                         foundShotLBPoint.X = x;
                         foundShotLBPoint.Y = y;
                     }
@@ -330,115 +330,115 @@ namespace Root_EFEM.Module.FrontsideVision
             return "OK";
         }
 
-        //private double TemplateMatching(FrontVRSAlignRecipe alignRecipe, out long maxOutX, out long maxOutY, out int featureIndex)
-        //{
-        //    ImageData camImage = m_CamVRS.p_ImageViewer.p_ImageData;
-        //    IntPtr camImagePtr = camImage.GetPtr();
-        //    double maxScore = double.MinValue;
-        //    maxOutX = 0;
-        //    maxOutY = 0;
-        //    int index = 0;
-        //    featureIndex = 0;
-        //    foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureVRSList)
-        //    {
-        //        byte[] rawdata = feature.RawData;
-        //        double result;
-        //        int outX = 0, outY = 0;
-        //        unsafe
-        //        {
-        //            result = CLR_IP.Cpp_TemplateMatching(
-        //                (byte*)(camImagePtr.ToPointer()),
-        //                rawdata,
-        //                &outX,
-        //                &outY,
-        //                camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
-        //                feature.Width, feature.Height,
-        //                0,
-        //                0,
-        //                camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
-        //                5, 3, 0);
-        //        }
+        private double TemplateMatching(FrontVRSAlignRecipe alignRecipe, out long maxOutX, out long maxOutY, out int featureIndex)
+        {
+            ImageData camImage = m_CamVRS.p_ImageViewer.p_ImageData;
+            IntPtr camImagePtr = camImage.GetPtr();
+            double maxScore = double.MinValue;
+            maxOutX = 0;
+            maxOutY = 0;
+            int index = 0;
+            featureIndex = 0;
+            foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureVRSList)
+            {
+                byte[] rawdata = feature.RawData;
+                double result;
+                int outX = 0, outY = 0;
+                unsafe
+                {
+                    result = CLR_IP.Cpp_TemplateMatching(
+                        (byte*)(camImagePtr.ToPointer()),
+                        rawdata,
+                        &outX,
+                        &outY,
+                        camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
+                        feature.Width, feature.Height,
+                        0,
+                        0,
+                        camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
+                        5, 3, 0);
+                }
 
-        //        if (maxScore < result)
-        //        {
-        //            maxScore = result;
-        //            maxOutX = outX;
-        //            maxOutY = outY;
-        //            featureIndex = index;
-        //        }
-        //        index++;
-        //    }
+                if (maxScore < result)
+                {
+                    maxScore = result;
+                    maxOutX = outX;
+                    maxOutY = outY;
+                    featureIndex = index;
+                }
+                index++;
+            }
 
-        //    return maxScore;
-        //}
+            return maxScore;
+        }
 
-        //private double TemplateMatchingWithSelectedFeature(FrontVRSAlignRecipe alignRecipe, int featureIndex, out long maxOutX, out long maxOutY)
-        //{
-        //    ImageData camImage = m_CamVRS.p_ImageViewer.p_ImageData;
-        //    IntPtr camImagePtr = camImage.GetPtr();
-        //    double maxScore = double.MinValue;
-        //    maxOutX = 0;
-        //    maxOutY = 0;
-        //    int index = 0;
-        //    RecipeType_ImageData feature = alignRecipe.AlignFeatureVRSList[featureIndex];
+        private double TemplateMatchingWithSelectedFeature(FrontVRSAlignRecipe alignRecipe, int featureIndex, out long maxOutX, out long maxOutY)
+        {
+            ImageData camImage = m_CamVRS.p_ImageViewer.p_ImageData;
+            IntPtr camImagePtr = camImage.GetPtr();
+            double maxScore = double.MinValue;
+            maxOutX = 0;
+            maxOutY = 0;
+            int index = 0;
+            RecipeType_ImageData feature = alignRecipe.AlignFeatureVRSList[featureIndex];
 
-        //    byte[] rawdata = feature.RawData;
-        //    double result;
-        //    int outX = 0, outY = 0;
-        //    unsafe
-        //    {
-        //        result = CLR_IP.Cpp_TemplateMatching(
-        //            (byte*)(camImagePtr.ToPointer()),
-        //            rawdata,
-        //            &outX,
-        //            &outY,
-        //            camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
-        //            feature.Width, feature.Height,
-        //            0,
-        //            0,
-        //            camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
-        //            5, 3, 0);
-        //    }
+            byte[] rawdata = feature.RawData;
+            double result;
+            int outX = 0, outY = 0;
+            unsafe
+            {
+                result = CLR_IP.Cpp_TemplateMatching(
+                    (byte*)(camImagePtr.ToPointer()),
+                    rawdata,
+                    &outX,
+                    &outY,
+                    camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
+                    feature.Width, feature.Height,
+                    0,
+                    0,
+                    camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
+                    5, 3, 0);
+            }
 
-        //    if (maxScore < result)
-        //    {
-        //        maxScore = result;
-        //        maxOutX = outX;
-        //        maxOutY = outY;
-        //    }
+            if (maxScore < result)
+            {
+                maxScore = result;
+                maxOutX = outX;
+                maxOutY = outY;
+            }
 
-        //    index++;
+            index++;
 
-        //    return maxScore;
-        //}
+            return maxScore;
+        }
 
-        //private double CalcAngle(long posX, long posY, long posX2, long posY2)
-        //{
-        //    FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
+        private double CalcAngle(long posX, long posY, long posX2, long posY2)
+        {
+            FrontVRSAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontVRSAlignRecipe>();
 
-        //    int camWidth = m_CamVRS.GetRoiSize().X;
-        //    int camHeight = m_CamVRS.GetRoiSize().Y;
-        //    double cx = alignRecipe.MapOffsetX / PULSE_TO_UM - ((camWidth / 2) + posX) * m_grabMode.m_dRealResX_um;
-        //    double cy = alignRecipe.MapOffsetY / PULSE_TO_UM - ((camHeight / 2) + posY) * m_grabMode.m_dRealResX_um;
+            int camWidth = m_CamVRS.GetRoiSize().X;
+            int camHeight = m_CamVRS.GetRoiSize().Y;
+            double cx = alignRecipe.MapOffsetX / PULSE_TO_UM - ((camWidth / 2) + posX) * m_grabMode.m_dRealResX_um;
+            double cy = alignRecipe.MapOffsetY / PULSE_TO_UM - ((camHeight / 2) + posY) * m_grabMode.m_dRealResX_um;
 
-        //    double cx2 = alignRecipe.ShotOffsetX / PULSE_TO_UM - ((camWidth / 2) + posX2) * m_grabMode.m_dRealResX_um;
-        //    double cy2 = alignRecipe.ShotOffsetY / PULSE_TO_UM - ((camHeight / 2) + posY2) * m_grabMode.m_dRealResX_um;
+            double cx2 = alignRecipe.ShotOffsetX / PULSE_TO_UM - ((camWidth / 2) + posX2) * m_grabMode.m_dRealResX_um;
+            double cy2 = alignRecipe.ShotOffsetY / PULSE_TO_UM - ((camHeight / 2) + posY2) * m_grabMode.m_dRealResX_um;
 
 
-        //    double radian = Math.Atan2(cy2 - cy, cx2 - cx);
-        //    double angle = radian * (180 / Math.PI);
-        //    double resAngle;
-        //    if (cy2 - cy < 0)
-        //    {
-        //        resAngle = angle + 180;
+            double radian = Math.Atan2(cy2 - cy, cx2 - cx);
+            double angle = radian * (180 / Math.PI);
+            double resAngle;
+            if (cy2 - cy < 0)
+            {
+                resAngle = angle + 180;
 
-        //    }
-        //    else
-        //    {
-        //        resAngle = angle - 180;
-        //    }
+            }
+            else
+            {
+                resAngle = angle - 180;
+            }
 
-        //    return resAngle;
-        //}
+            return resAngle;
+        }
     }
 }
