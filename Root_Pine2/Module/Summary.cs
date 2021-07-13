@@ -288,6 +288,7 @@ namespace Root_Pine2.Module
         public bool m_bUpdated = false; 
         public string SetSort(bool b3D, InfoStrip infoStrip)
         {
+            return "OK";
             m_data = infoStrip.m_summnayData;
             m_data.m_sStripID = infoStrip.p_id; 
             string sRun = m_data.SetSort(b3D);

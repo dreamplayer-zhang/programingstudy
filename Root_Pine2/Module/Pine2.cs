@@ -805,8 +805,8 @@ namespace Root_Pine2.Module
                 QRCodeData data = m_qrGenerator.CreateQrCode(sVS, QRCodeGenerator.ECCLevel.Q);
                 QRCode code = new QRCode(data);
                 Bitmap bitmap = code.GetGraphic(20);
-                bitmap.Save(EQ.c_sPathRecipe + "\\QRcode.bmp");
-                m_srp350.Write(0, 0, EQ.c_sPathRecipe + "\\QRcode.bmp"); 
+                //bitmap.Save(EQ.c_sPathRecipe + "\\QRcode.bmp");
+                //m_srp350.Write(0, 0, EQ.c_sPathRecipe + "\\QRcode.bmp"); 
                 m_srp350.Cut(m_srp350.p_bCutFeeding);
                 m_srp350.End(); 
             }

@@ -326,6 +326,7 @@ namespace Root_Pine2.Module
         string StartUnloadTurnover()
         {
             if (m_handler.m_loader2.p_eState != eState.Ready) return "OK";
+            if (m_handler.m_loader2.p_infoStrip != null) return "OK"; 
             return StartRun(m_runUnloadTurnover);
         }
 
