@@ -335,7 +335,8 @@ namespace Root_Pine2_Vision.Module
 
         public class CalibrationData
         {
-            public DalsaParameterSet.eFlatFieldUserSet m_eCalUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
+            public DalsaParameterSet.eFlatFieldUserSet m_eForwardUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
+            public DalsaParameterSet.eFlatFieldUserSet m_eBackwardUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
             public DalsaParameterSet.eAnalogGain m_eAnalogGain = DalsaParameterSet.eAnalogGain.One;
             public string _sAnalogGain = "1";
             public string m_sAnalogGain
@@ -396,7 +397,8 @@ namespace Root_Pine2_Vision.Module
 
             public void RunTree(Tree tree)
             {
-                m_eCalUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eCalUserSet, m_eCalUserSet, "Flat Field Correction UserSet", "Select Flat Field Correction UserSet");
+                m_eForwardUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eForwardUserSet, m_eForwardUserSet, "Forward UserSet", "Select Flat Field Correction UserSet");
+                m_eBackwardUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eBackwardUserSet, m_eBackwardUserSet, "Reverse UserSet", "Select Flat Field Correction UserSet");
                 m_sAnalogGain = tree.Set(m_sAnalogGain, m_sAnalogGain, DalsaParameterSet.m_aAnalogGain, "Analog Gain", "Analog Gain");
                 m_dSystemGain = tree.Set(m_dSystemGain, m_dSystemGain, "System Gain", "System Gain");
                 m_dAllRowsGain = tree.Set(m_dAllRowsGain, m_dAllRowsGain, "AllRows Gain", "AllRows Gain");
@@ -805,6 +807,12 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region RunSnap
+        bool m_bCanChangeUserSet = true;
+        bool m_bUserSetThreadOn = false;
+        bool m_bDoneChangeUserSet = true;
+        int nWaitTime = 3 * 1000;
+        int nWaitInterval = 10;
+        int nTimeCount = 0;
         public string StartSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
@@ -823,7 +831,7 @@ namespace Root_Pine2_Vision.Module
             int nYOffset = m_aGrabData[eWorks].m_nYOffset;
             Recipe.eSnapMode nSnapMode = m_RunningRecipe[eWorks].p_eSnapMode;
             int nTotalSnap = m_RunningRecipe[eWorks].p_lSnap;
-            int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? iSnap % (nTotalSnap / 2) : iSnap % (nTotalSnap);
+            int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? iSnap % (nTotalSnap / 2) : iSnap;
 
             // 이미지 시작점 설정
             CPoint cpOffset;    
@@ -844,34 +852,56 @@ namespace Root_Pine2_Vision.Module
             GrabData grabData = recipe.GetGrabData(eWorks, cpOffset, nOverlap);
             grabData.nScanOffsetY = (nSnapLineIndex) * nYOffset;
 
-            DalsaParameterSet.eUserSet nUserset = m_eCamUserSet;
-
+            grabData.nUserSet = (int)m_eCamUserSet;
             try
             {
-                if (m_camera.p_CamParam.p_eUserSetCurrent != nUserset)
-                    m_camera.p_CamParam.p_eUserSetCurrent = nUserset;
-
-               
-
+                m_log.Info("Start");
+                // Set Camera Gain (When first snap line)
                 if (nSnapLineIndex == 0)
                 {
                     if (nSnapMode == Recipe.eSnapMode.ALL)
                     {
                         if (iSnap == 0)
-                        {
-                            SetCalibration(eCalMode.RGB, recipe.m_eDirection);
-                        }
+                            SetCameraGain(eCalMode.RGB, recipe.m_eDirection);
                         else
-                        {
-                            SetCalibration(eCalMode.APS, recipe.m_eDirection);
-                        }
+                            SetCameraGain(eCalMode.APS, recipe.m_eDirection);
                     }
                     else
+                        SetCameraGain((eCalMode)nSnapMode, recipe.m_eDirection);
+                }
+
+                if (iSnap == 0)
+                {
+                    if (nSnapMode == Recipe.eSnapMode.ALL || nSnapMode == Recipe.eSnapMode.RGB)
                     {
-                        SetCalibration((eCalMode)nSnapMode, recipe.m_eDirection);
+                        if(recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
+                            m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.RGB].m_eForwardUserSet;
+                        else
+                            m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.RGB].m_eBackwardUserSet;
+                    }
+                    else if (nSnapMode == Recipe.eSnapMode.APS)
+                    {
+                        if (recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
+                            m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.APS].m_eForwardUserSet;
+                        else
+                            m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.APS].m_eBackwardUserSet;
                     }
                 }
 
+                m_log.Info("Set Gain Done");
+                // Check Userset Change Thread
+                nTimeCount = 0;
+                while (m_bDoneChangeUserSet == false && nTimeCount < nWaitTime)
+                {
+                    nTimeCount += nWaitInterval;
+                    Thread.Sleep(nWaitInterval);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+
+                m_log.Info("Check Userset Thread Done");
+                // Set Camera GrabThread On
+                m_bCanChangeUserSet = false;
+                m_bUserSetThreadOn = false;
                 m_camera.m_bGrabThreadOn = false;
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 while (m_camera.m_bGrabThreadOn != true)
@@ -879,27 +909,111 @@ namespace Root_Pine2_Vision.Module
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
                 }
+                m_log.Info("Grab Thread On Done");
                 ReqSnapReady(eWorks);
+
+                m_log.Info("Send Snap Ready Done");
+                // Wait for Grab
                 while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
+                    if(m_bCanChangeUserSet == true)
+                    {
+                        m_bCanChangeUserSet = false;
+                        m_bUserSetThreadOn = true;
+
+                        if (iSnap < nTotalSnap - 1)
+                        {
+                            Recipe.Snap nextRecipe = m_RunningRecipe[eWorks].m_aSnap[iSnap + 1];
+                            System.Threading.Thread thUpdate = new Thread(new ParameterizedThreadStart(UpdateCalUserset));
+                            int nNextSnap = iSnap + 1;
+                            int nNextSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? nNextSnap % (nTotalSnap / 2) : nNextSnap;
+                            m_bDoneChangeUserSet = false;
+
+                            if (nSnapMode == Recipe.eSnapMode.ALL)
+                            {
+                                if (nNextSnap < (nTotalSnap / 2))       // RGB
+                                {
+                                    if (nNextSnapLineIndex % 2 == 0)
+                                        thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+                                    else
+                                        thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
+                                }
+                                else    // APS
+                                {
+                                    if (nNextSnapLineIndex % 2 == 0)
+                                        thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
+                                    else
+                                        thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
+                                }
+                            }
+                            else if (nSnapMode == Recipe.eSnapMode.RGB)
+                            {
+                                if (nNextSnapLineIndex % 2 == 0)
+                                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+                                else
+                                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
+                            }
+                            else if (nSnapMode == Recipe.eSnapMode.APS)
+                            {
+                                if (nNextSnapLineIndex % 2 == 0)
+                                    thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
+                                else
+                                    thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
+                            }
+                        }
+                    }
                 }
-                // Root Vision -> VisionWorks2
+
+                m_log.Info("Grab Done");
+                // Send Snap Done to VisionWorks2
                 if (m_aWorks[eWorks].IsProcessRun())
                     m_aWorks[eWorks].SendSnapDone(iSnap);
 
-                if (recipe.m_eDirection != Recipe.Snap.eDirection.Forward)
-                    m_camera.p_CamParam.SetFlatFieldUserSet(DalsaParameterSet.eFlatFieldUserSet.UserSet2);
-                else
-                    m_camera.p_CamParam.SetFlatFieldUserSet(DalsaParameterSet.eFlatFieldUserSet.UserSet1);
+                m_log.Info("Send Snap Done Done");
+                // Set Next Snap Userset
+                if (m_bUserSetThreadOn == false && iSnap < nTotalSnap - 1)
+                {
+                    Recipe.Snap nextRecipe = m_RunningRecipe[eWorks].m_aSnap[iSnap + 1];
+                    System.Threading.Thread thUpdate = new Thread(new ParameterizedThreadStart(UpdateCalUserset));
+                    int nNextSnap = iSnap + 1;
+                    int nNextSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? nNextSnap % (nTotalSnap / 2) : nNextSnap;
+                    m_bDoneChangeUserSet = false;
 
-
-              //  if (nSnapMode == Recipe.eSnapMode.ALL && (nTotalSnap/2-1) == iSnap) // 미리 체인지 하기위함
-             //    {
-                     System.Threading.Thread th = new Thread(UpdateUserset);
-                     th.Start();
-                //    }
+                    if (nSnapMode == Recipe.eSnapMode.ALL)
+                    {
+                        if (nNextSnap < (nTotalSnap / 2))       // RGB
+                        {
+                            if (nNextSnapLineIndex % 2 == 0)
+                                thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+                            else
+                                thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
+                        }
+                        else    // APS
+                        {
+                            if (nNextSnapLineIndex % 2 == 0)
+                                thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
+                            else
+                                thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
+                        }
+                    }
+                    else if (nSnapMode == Recipe.eSnapMode.RGB)
+                    {
+                        if (nNextSnapLineIndex % 2 == 0)
+                            thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+                        else
+                            thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
+                    }
+                    else if (nSnapMode == Recipe.eSnapMode.APS)
+                    {
+                        if (nNextSnapLineIndex % 2 == 0)
+                            thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
+                        else
+                            thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
+                    }
+                }
+                m_log.Info("Userset Thread Done");
             }
             catch (Exception ex)
             {
@@ -909,20 +1023,15 @@ namespace Root_Pine2_Vision.Module
             return "OK";
         }
 
-        private void UpdateUserset()
+        private void UpdateCalUserset(object param)
         {
-            m_camera.p_CamParam.LoadCalibration();
+            m_camera.p_CamParam.p_eFlatFieldCorrection = (DalsaParameterSet.eFlatFieldUserSet)param;
+            m_bDoneChangeUserSet = true;
         }
 
-        private void SetCalibration(eCalMode eMode, Recipe.Snap.eDirection eDir)
+        private void SetCameraGain(eCalMode eMode, Recipe.Snap.eDirection eDir)
         {
             CalibrationData data = m_aCalData[eMode];
-            //if (eDir == Recipe.Snap.eDirection.Forward)
-            //    m_camera.p_CamParam.SetFlatFieldUserSet(DalsaParameterSet.eFlatFieldUserSet.UserSet2);
-            //else
-            //    m_camera.p_CamParam.SetFlatFieldUserSet(DalsaParameterSet.eFlatFieldUserSet.UserSet1);
-
-            //m_camera.p_CamParam.LoadCalibration();
             m_camera.p_CamParam.SetAnalogGain(data.m_eAnalogGain);
             m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.System);
             m_camera.p_CamParam.SetGain(data.m_dSystemGain);
@@ -946,6 +1055,18 @@ namespace Root_Pine2_Vision.Module
         private void M_tcpRequest_EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
             m_sReceive = Encoding.Default.GetString(aBuf, 0, nSize);
+            if (m_sReceive.Length <= 0) return;
+            ReadReceive(m_sReceive);
+        }
+
+        void ReadReceive(string sReceive)
+        {
+            string[] asRead = sReceive.Split(',');
+            if (asRead.Length < 2) return;
+            if (asRead[1] == Works2D.eProtocol.ChangeUserset.ToString())
+            {
+                m_bCanChangeUserSet = true;
+            }
         }
 
         public string ReqSnap(string sRecipe, eWorks eWorks)

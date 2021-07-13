@@ -85,7 +85,8 @@ namespace Root_Pine2_Vision.Module
             LotInfo,
             InspDone,
             SortingData,
-            WorksConnect
+            WorksConnect,
+            ChangeUserset,
         }
 
         public class Protocol
