@@ -149,6 +149,26 @@ namespace Root_WindII
             }
         }
 
+        private string dataScribeLineX = "";
+        public string DataScribeLineX
+        {
+            get => this.dataScribeLineX;
+            set
+            {
+                SetProperty<string>(ref this.dataScribeLineX, value);
+            }
+        }
+
+        private string dataScribeLineY = "";
+        public string DataScribeLineY
+        {
+            get => this.dataScribeLineY;
+            set
+            {
+                SetProperty<string>(ref this.dataScribeLineY, value);
+            }
+        }
+
         private string dataShotOffsetX = "";
         public string DataShotOffsetX
         {
@@ -298,6 +318,9 @@ namespace Root_WindII
             this.DataSizeY = data.GetUnitSize().Height.ToString();
             this.DataDiePitchX = data.DiePitchX.ToString();
             this.DataDiePitchY = data.DiePitchY.ToString();
+            this.DataScribeLineX = data.ScribeLineX.ToString();
+            this.DataScribeLineY = data.ScribeLineY.ToString();
+
             if (this.IsBacksideChecked == false)
             {
                 this.DataShotOffsetX = Math.Round(data.ShotOffsetX, 1).ToString();
@@ -332,6 +355,8 @@ namespace Root_WindII
             this.DataSizeY = "";
             this.DataDiePitchX = "";
             this.DataDiePitchY = "";
+            this.DataScribeLineX = "";
+            this.DataScribeLineY = "";
             this.DataShotOffsetX = "";
             this.DataShotOffsetY = "";
             this.DataMapOffsetX = "";
