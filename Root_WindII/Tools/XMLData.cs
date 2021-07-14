@@ -34,7 +34,7 @@ namespace Root_WindII
 
     public class XMLData
     {
-#region [Variables]
+        #region [Variables]
         // Xml data
         public string RecipeName { get; set; }
         public string Description { get; set; }
@@ -57,12 +57,30 @@ namespace Root_WindII
         public string EvenOdd { get; set; }
         public List<Point> DieList { get; set; }
 
+        public int[] MapData
+        {
+            get;
+            set;
+        }
+        public int MapSizeX
+        {
+            get;
+            set;
+        }
+
+        public int MapSizeY
+        {
+            get;
+            set;
+        }
+
+
         //Backside
         public double MapOffsetX_Backside { get; set; }
         public double ShotOffsetX_Backside { get; set; }
         public double SMIOffsetX_Backside { get; set; }
 
-#endregion
+        #endregion
 
         public XMLData()
         {
@@ -109,7 +127,7 @@ namespace Root_WindII
                 if (maxY < valY) maxY = valY;
             }
 
-            return new Size(maxX - minX + 1 , maxY - minY + 1);
+            return new Size(maxX - minX + 1, maxY - minY + 1);
         }
 
         //public List<Point> GetUnitDieListCenter() // 중심 기준 좌표
@@ -136,10 +154,10 @@ namespace Root_WindII
                 int valY = (int)(pt.Y);
 
                 if (minX > valX) minX = valX;
-                if (minY > valY) minY = valY;          
+                if (minY > valY) minY = valY;
 
                 if (maxX < valX) maxX = valX;
-                if (maxY < valY) maxY = valY;       
+                if (maxY < valY) maxY = valY;
             }
 
             foreach (Point pt in DieList)
@@ -201,7 +219,7 @@ namespace Root_WindII
                 orgX = OriginDieX - minValidX;
                 orgY = OriginDieY - minValidY;
             }
-            else 
+            else
             {
                 orgX = maxValidX - OriginDieX;
                 orgY = maxValidX - OriginDieY;
@@ -210,7 +228,7 @@ namespace Root_WindII
 
         // 좌상단 기준 좌표
         // ExclusionEdge
-        public void GetUnitDieListWithExclusionEdge(double edgeLen, ref List<Point> dieList, ref Size mapSize, ref List<Point> dieValidList, ref Size mapValidSize, ref List<Point> edgeList, bool bBackside = false) 
+        public void GetUnitDieListWithExclusionEdge(double edgeLen, ref List<Point> dieList, ref Size mapSize, ref List<Point> dieValidList, ref Size mapValidSize, ref List<Point> edgeList, bool bBackside = false)
         {
             int minX = OriginDieX, minY = OriginDieY;
             int maxX = OriginDieX, maxY = OriginDieY;
@@ -261,7 +279,7 @@ namespace Root_WindII
                 }
             }
 
-            for (int i = 0; i < dieValidList.Count; i++ )
+            for (int i = 0; i < dieValidList.Count; i++)
             {
                 dieValidList[i] = new Point(dieValidList[i].X - minValidX, dieValidList[i].Y - minValidY);
             }
@@ -310,7 +328,7 @@ namespace Root_WindII
             //        map[(int)(pt.Y * mapSize.Width + (mapSize.Width - pt.X - 1))] = 1;
             //    }
             //}
-            
+
             return map;
         }
         //public static int[] MakeReversWaferMap(List<Point> dieList, Size mapSize)
@@ -331,7 +349,7 @@ namespace Root_WindII
             double[] map = new double[(int)(unitSize.Width * unitSize.Height)];
             List<Point> dieList = GetUnitDieList();
 
-            foreach(Point pt in dieList)
+            foreach (Point pt in dieList)
             {
                 map[(int)(pt.Y * unitSize.Width + pt.X)] = 1;
             }
