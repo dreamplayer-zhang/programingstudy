@@ -856,7 +856,8 @@ namespace Root_Pine2.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_SendSortInfo(this), false, "Move Boat");
+            AddModuleRunList(new Run_SendSortInfo(this), false, "Send Sort Info");
+            AddModuleRunList(new Run_SortTest(this), false, "Sort Test");
         }
 
         public class Run_SendSortInfo : ModuleRunBase
@@ -889,6 +890,50 @@ namespace Root_Pine2.Module
             {
                 m_module.m_handler.SendSortInfo(m_infoStrip);
                 return "OK";
+            }
+        }
+
+        public class Run_SortTest : ModuleRunBase
+        {
+            Pine2 m_module;
+            public Run_SortTest(Pine2 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            CPoint m_szMap = new CPoint(2, 3);
+            InfoStrip.eResult m_eResultTop = InfoStrip.eResult.GOOD;
+            InfoStrip.eResult m_eResultBottom = InfoStrip.eResult.GOOD;
+            string m_sMapTop = "111111";
+            string m_sMapBottom = "111111";
+            InfoStrip m_infoStrip = new InfoStrip(0);
+            public override ModuleRunBase Clone()
+            {
+                Run_SortTest run = new Run_SortTest(m_module);
+                run.m_szMap = new CPoint(m_szMap); 
+                run.m_eResultTop = m_eResultTop;
+                run.m_eResultBottom = m_eResultBottom;
+                run.m_sMapTop = m_sMapTop;
+                run.m_sMapBottom = m_sMapBottom;
+                run.m_infoStrip = m_infoStrip;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_szMap = tree.Set(m_szMap, m_szMap, "MapSize", "MapSize", bVisible);
+                m_eResultTop = (InfoStrip.eResult)tree.Set(m_eResultTop, m_eResultTop, "Top Result", "Top Result", bVisible);
+                m_sMapTop = tree.Set(m_sMapTop, m_sMapTop, "Top Unit", "Top Unit", bVisible); 
+                m_eResultBottom = (InfoStrip.eResult)tree.Set(m_eResultBottom, m_eResultBottom, "Bottom Result", "Bottom Result", bVisible);
+                m_sMapBottom = tree.Set(m_sMapBottom, m_sMapBottom, "Bottom Unit", "Bottom Unit", bVisible);
+            }
+
+            public override string Run()
+            {
+                m_infoStrip.SetResult(Vision2D.eVision.Top2D, m_eResultTop.ToString(), m_szMap.X.ToString(), m_szMap.Y.ToString(), m_sMapTop);
+                m_infoStrip.SetResult(Vision2D.eVision.Bottom, m_eResultBottom.ToString(), m_szMap.X.ToString(), m_szMap.Y.ToString(), m_sMapBottom);
+                return m_module.m_handler.m_summary.SetSort(false, m_infoStrip); 
             }
         }
         #endregion

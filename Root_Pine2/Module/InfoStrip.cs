@@ -18,17 +18,6 @@ namespace Root_Pine2.Module
             BCD,
             Paper,
         }
-        eResult _eResult = eResult.Init;
-        public eResult p_eResult
-        {
-            get { return _eResult; }
-            set
-            {
-                if (_eResult == value) return;
-                _eResult = value;
-                OnPropertyChanged();
-            }
-        }
 
         Dictionary<Vision2D.eVision, bool> m_bInspect = new Dictionary<Vision2D.eVision, bool>();
         void InitInspect()
@@ -47,7 +36,7 @@ namespace Root_Pine2.Module
             get { return m_bInspect[Vision2D.eVision.Top3D] || m_bInspect[Vision2D.eVision.Top2D] || m_bInspect[Vision2D.eVision.Bottom]; }
         }
 
-        public Summary.Data m_summnayData = new Summary.Data(); 
+        public Summary.Data m_summary = new Summary.Data(); 
         public string SetResult(Vision2D.eVision eVision, string sStripResult, string sX, string sY, string sMapResult)
         {
             string sResult = "OK";
@@ -55,14 +44,25 @@ namespace Root_Pine2.Module
             {
                 eResult eResult = GetResult(sStripResult);
                 if (eResult == eResult.Init) return "Invalid Result"; 
-                if (p_eResult < eResult) p_eResult = eResult; 
                 int szX = Convert.ToInt32(sX);
                 int szY = Convert.ToInt32(sY);
-                m_summnayData.SetResult(eVision, eResult, new CPoint(szX, szY), sMapResult); 
+                m_summary.SetResult(eVision, eResult, new CPoint(szX, szY), sMapResult); 
             }
             catch (Exception e) { sResult = "SetResult Exception : " + e.Message; }
             m_bInspect[eVision] = false; 
             return sResult;
+        }
+
+        public eResult GetResult()
+        {
+            switch (m_summary.GetResult())
+            {
+                case Summary.Data.Strip.eResult.Good: return eResult.GOOD;
+                case Summary.Data.Strip.eResult.Defect: return eResult.DEF;
+                case Summary.Data.Strip.eResult.Barcode: return eResult.BCD;
+                case Summary.Data.Strip.eResult.PosError: return eResult.POS; 
+            }
+            return eResult.POS; 
         }
 
         eResult GetResult(string sStripResult)
