@@ -262,7 +262,7 @@ namespace Root_Pine2.Module
         {
             DateTime dt = DateTime.Now;
             TimeSpan ts = (dt - m_dtLotStart); 
-            m_sLotTime = ts.ToString();
+            m_sLotTime = ts.Hours.ToString("00") + ":" + ts.Minutes.ToString("00") + ":" + ts.Seconds.ToString("00");
             AddDateTime(dt);
             if (m_aTime.Count < 2) return;
             int nTime = m_aTime.Count - 1;
@@ -319,12 +319,6 @@ namespace Root_Pine2.Module
                 m_countStrip.Add(eVision, new CountStrip());
                 m_countUnit.Add(eVision, new CountUnit());
             }
-
-            DateTime dt0 = DateTime.Now;
-            DateTime dt1 = DateTime.Now;
-            TimeSpan ts = (dt1 - dt0);
-            m_sLotTime = ts.ToString();
-
         }
     }
 }
