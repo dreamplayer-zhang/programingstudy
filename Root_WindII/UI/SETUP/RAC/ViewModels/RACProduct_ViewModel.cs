@@ -305,7 +305,16 @@ namespace Root_WindII
         private void UpdateProductInfo(string path)
         {
             XMLData data = new XMLData();
-            XMLParser.ParseMapInfo(path, data);
+
+            if (path.ToLower().Contains(".xml"))
+            {
+                XMLParser.ParseMapInfo(path, data);
+            }
+            else if (path.ToLower().Contains(".smf") || path.ToLower().Contains(".001"))
+            {
+                StreamReader sr = new StreamReader(path);
+                KlarfFileReader.OpenKlarfMapData(sr, ref data);
+            }
 
             double[] tempMap = data.GetWaferMap();
             this.MapViewerVM.CreateMap((int)data.GetUnitSize().Width, (int)data.GetUnitSize().Height, tempMap.Select(d => (int)d).ToArray());
@@ -410,6 +419,7 @@ namespace Root_WindII
                         string sFileNameCopy = "";
                         string sFullPathCopy = "";
                         bool isDuplicatedName = false;
+                        bool isCopied = false;
 
                         DirectoryInfo di = new DirectoryInfo(this.MapFileListViewerVM.MapFileRootPath);
                         di.Create();
@@ -445,10 +455,21 @@ namespace Root_WindII
                                         {
                                             this.MapFileListViewerVM.MapFileListViewerItems.Add(new MapFileListViewerItem() { MapFileName = sFileNameCopy, MapFilePath = sFullPathCopy });
                                         });
+                                        isCopied = true;
                                         break;
                                     }
                                 }
                             }
+                        }
+
+                        if (isCopied == false)
+                        {
+                            sFullPathCopy = di.FullName + "\\" + sFileName;
+                            System.IO.File.Copy(sFullPath, sFullPathCopy, true);
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                this.MapFileListViewerVM.MapFileListViewerItems.Add(new MapFileListViewerItem() { MapFileName = sFileName, MapFilePath = sFullPathCopy });
+                            });
                         }
                         this.CurrentFilePath = sFullPath;
                         UpdateProductInfo(this.CurrentFilePath);

@@ -256,6 +256,8 @@
     <Compile Include="MvvmTools\RelayCommand.cs" />
     <Compile Include="MvvmTools\SizeObserver.cs" />
     <Compile Include="Recipe\RecipeFront.cs" />
+    <Compile Include="Tools\KlarfFileReader.cs" />
+    <Compile Include="Tools\XMLCreator.cs" />
     <Compile Include="UI\Dialog\Dialog_PortSelect.xaml.cs">
       <DependentUpon>Dialog_PortSelect.xaml</DependentUpon>
     </Compile>
