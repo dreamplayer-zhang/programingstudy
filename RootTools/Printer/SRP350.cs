@@ -1,6 +1,4 @@
-﻿using RootTools.Trees;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Runtime.InteropServices;
 using System.Windows.Controls;
 
 namespace RootTools.Printer
