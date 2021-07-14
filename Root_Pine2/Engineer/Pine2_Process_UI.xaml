@@ -21,8 +21,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0" x:Name="gridEQ">
                 <GroupBox BorderBrush="Black" BorderThickness="1" Margin="3">
@@ -52,24 +51,13 @@
                     <Button x:Name="buttonPickerSet" Content="PickerSet" Margin="3,13,3,3" Click="buttonPickerSet_Click"/>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="3">
+            <GroupBox Grid.Column="2" x:Name="groupBoxRecipe" BorderBrush="Black" BorderThickness="1" Margin="3">
                 <GroupBox.Header>
                     <TextBlock Text="Recipe" Foreground="Black" FontWeight="Bold" />
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
                     <ComboBox x:Name="comboRecipe" Margin="3" HorizontalContentAlignment="Center" SelectedItem="{Binding p_sRecipe}" ItemsSource="{Binding p_asRecipe}"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" x:Name="buttonSave" Content="Save" Margin="3" Click="buttonRecipeSave_Click"/>
-                        <Button Grid.Column="1" x:Name="buttonSend" Content="ReSend" Margin="3" Click="buttonSend_Click"/>
-                    </Grid>
-                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                        <Label Content="Mode :" Margin="3" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="textBlockMode" Text="{Binding p_eMode}" Margin="3" VerticalAlignment="Center" PreviewMouseDown="textBlockMode_PreviewMouseDown"/>
-                    </StackPanel>
+                    <Button x:Name="buttonSave" Content="Save" Margin="3" Click="buttonRecipeSave_Click"/>
                     <StackPanel Orientation="Horizontal">
                         <Label Content="Width :" Margin="3" VerticalAlignment="Center"/>
                         <TextBox x:Name="textBoxWidth" Text="{Binding p_widthStrip}" Margin="3" MinWidth="40" VerticalAlignment="Center" TextAlignment="Center"/>
@@ -81,7 +69,7 @@
                     <CheckBox x:Name="checkBox3D" IsChecked="{Binding p_b3D}" Content="3D Inspect" Margin="3"/>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Grid.Column="3" BorderBrush="Black" BorderThickness="1" Margin="3">
+            <GroupBox Grid.Column="3" x:Name="groupBoxLot" BorderBrush="Black" BorderThickness="1" Margin="3">
                 <GroupBox.Header>
                     <TextBlock Text="Lot" Foreground="Black" FontWeight="Bold" />
                 </GroupBox.Header>
@@ -177,6 +165,12 @@
                         <TextBox Grid.Column="1" x:Name="textBoxBarcodeLengthBottom" Text="{Binding p_lBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
                     </Grid>
                 </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Column="6" x:Name="groupBoxMode" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Mode" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <TextBlock x:Name="textBlockMode" Text="{Binding p_eMode}" Margin="3" FontSize="70" VerticalAlignment="Center" HorizontalAlignment="Center" PreviewMouseDown="textBlockMode_PreviewMouseDown"/>
             </GroupBox>
         </Grid>
         <Grid Grid.Row="1" x:Name="gridBoat">

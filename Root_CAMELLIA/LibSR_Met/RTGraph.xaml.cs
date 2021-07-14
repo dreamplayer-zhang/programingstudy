@@ -32,6 +32,7 @@ namespace Root_CAMELLIA.LibSR_Met
         ScottPlot.PlottableScatterHighlight m_ReflectancePlotTable;
         ScottPlot.PlottableScatterHighlight m_ReflectancePlotTable_Calc;
         ScottPlot.PlottableScatterHighlight m_TransmittancePlotTable;
+        ScottPlot.PlottableScatter m_DCOLTranmittancePoitTable;
 
         public RTGraph()
         {
@@ -176,30 +177,47 @@ namespace Root_CAMELLIA.LibSR_Met
                 RawData data = m_DM.m_RawData[nPointIndex];
                 if (xvalues == null || yvalues == null)
                 {
-                    if (m_DM.bTransmittance == true)
+                    if (m_DM.bTransmittance)
                     {
-                        if (m_DM.bExcept_NIR)
+                        if (!m_DM.bCalDCOLTransmittance)
                         {
-                            double[] VIS_Wavelength = new double[m_DM.nThicknessDataNum];
-                            double[] VIS_Transmittance = new double[m_DM.nThicknessDataNum];
-                            for (int n = 0; n < m_DM.nThicknessDataNum; n++)
+                            if (m_DM.bExcept_NIR)
                             {
-                                VIS_Wavelength[n] = data.VIS_Wavelength[n];
-                                VIS_Transmittance[n] = data.Transmittance[n];
+                                double[] VIS_Wavelength = new double[m_DM.nThicknessDataNum];
+                                double[] VIS_Transmittance = new double[m_DM.nThicknessDataNum];
+                                for (int n = 0; n < m_DM.nThicknessDataNum; n++)
+                                {
+                                    VIS_Wavelength[n] = data.VIS_Wavelength[n];
+                                    VIS_Transmittance[n] = data.Transmittance[n];
+                                }
+                                m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(VIS_Wavelength, VIS_Transmittance, markerSize: 2.5);
+                                GraphT.plt.Axis(350, 950, -10, 100);
                             }
-                            m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(VIS_Wavelength, VIS_Transmittance, markerSize: 2.5);
-                            GraphT.plt.Axis(350, 950, -10, 100);
+                            else
+                            {
+                                double[] NIR_Wavelength = new double[data.nNIRDataNum];
+                                double[] NIR_Transmittance = new double[data.nNIRDataNum];
+                                for (int n = 0; n < data.nNIRDataNum; n++)
+                                {
+                                    NIR_Wavelength[n] = data.Wavelength[n];
+                                    NIR_Transmittance[n] = data.Transmittance[n];
+                                }
+                                m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(NIR_Wavelength, NIR_Transmittance, markerSize: 2.5);
+                                GraphT.plt.Axis(350, 1550, -10, 100);
+                            }
                         }
                         else
                         {
-                            double[] NIR_Wavelength = new double[data.nNIRDataNum];
-                            double[] NIR_Transmittance = new double[data.nNIRDataNum];
-                            for (int n = 0; n < data.nNIRDataNum; n++)
+                            int DCOLWavelengthCount = m_DM.m_ScalesListT.Count;
+                            double[] DCOL_Wavelength = new double[DCOLWavelengthCount];
+                            double[] DCOL_Transmittance = new double[DCOLWavelengthCount];
+
+                            for ( int n=0; n< DCOLWavelengthCount; n++)
                             {
-                                NIR_Wavelength[n] = data.Wavelength[n];
-                                NIR_Transmittance[n] = data.Transmittance[n];
+                                DCOL_Wavelength[n] = data.DCOLTransmittance[n].Wavelength;
+                                DCOL_Transmittance[n] = data.DCOLTransmittance[n].RawTransmittance;
+                                m_DCOLTranmittancePoitTable = GraphT.plt.PlotPoint(DCOL_Wavelength[n], DCOL_Transmittance[n]);
                             }
-                            m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(NIR_Wavelength, NIR_Transmittance, markerSize: 2.5);
                             GraphT.plt.Axis(350, 1500, -10, 100);
                         }
                     }
@@ -277,6 +295,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     if (m_DM.bTransmittance)
                     {
                         DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Transmittance [%]");
+
                     }
                 }
             }));
@@ -362,16 +381,33 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     if (m_DM.bTransmittance)
                     {
-                        var mousePos = e.MouseDevice.GetPosition(GraphT);
-                        double mouseX = GraphT.plt.CoordinateFromPixelX(mousePos.X);
-                        double mouseY = GraphT.plt.CoordinateFromPixelY(mousePos.Y);
+                        if (!m_DM.bCalDCOLTransmittance)
+                        {
+                            var mousePos = e.MouseDevice.GetPosition(GraphT);
+                            double mouseX = GraphT.plt.CoordinateFromPixelX(mousePos.X);
+                            double mouseY = GraphT.plt.CoordinateFromPixelY(mousePos.Y);
 
-                        m_TransmittancePlotTable.HighlightClear();
-                        var (x, y, index) = m_TransmittancePlotTable.HighlightPointNearest(mouseX, mouseY);
-                        GraphT.Render();
+                            m_TransmittancePlotTable.HighlightClear();
+                            var (x, y, index) = m_TransmittancePlotTable.HighlightPointNearest(mouseX, mouseY);
+                            GraphT.Render();
 
-                        labelT.Visibility = Visibility.Visible;
-                        labelT.Content = $"(Wavelength[nm], Reflectance[%]) = ({x:N1}, {y:N3})";
+                            labelT.Visibility = Visibility.Visible;
+                            labelT.Content = $"(Wavelength[nm], Transmittance[%]) = ({x:N1}, {y:N3})";
+                        }
+                        else
+                        {
+                            var mousePos = e.MouseDevice.GetPosition(GraphT);
+                            double mouseX = GraphT.plt.CoordinateFromPixelX(mousePos.X);
+                            double mouseY = GraphT.plt.CoordinateFromPixelY(mousePos.Y);
+
+                            m_TransmittancePlotTable.HighlightClear();
+                            //var (x, y, index) = m_TransmittancePlotTable.HighlightPointNearest(mouseX, mouseY);
+                            //var (x,y,index) = m_DCOLTranmittancePoitTable.
+                            //GraphT.Render();
+
+                            //labelT.Visibility = Visibility.Visible;
+                            //labelT.Content = $"(Wavelength[nm], Transmittance[%]) = ({x:N1}, {y:N3})";
+                        }
                     }
                 }
             }));

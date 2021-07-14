@@ -49,6 +49,12 @@ namespace Root_Pine2.Module
             textBlockStepA.Text = m_boats.m_aBoat[Vision2D.eWorks.A].p_eStep.ToString();
             textBlockStepB.Text = m_boats.m_aBoat[Vision2D.eWorks.B].p_eStep.ToString();
             OnRunTree();
+
+            if (m_boats.m_vision.m_remote.m_client.p_bConnect == false)
+            {
+                m_boats.m_aBoat[Vision2D.eWorks.A].p_bWorksConnect = false;
+                m_boats.m_aBoat[Vision2D.eWorks.B].p_bWorksConnect = false;
+            }
         }
 
         int[] m_nQueue = new int[2] { 0, 0 };

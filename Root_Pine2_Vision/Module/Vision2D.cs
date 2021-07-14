@@ -262,8 +262,11 @@ namespace Root_Pine2_Vision.Module
                 m_lBarcode = lBarcode;
             }
         }
+
+        public LotInfo m_lotInfo = null;
         public string SendLotInfo(LotInfo lotInfo)
         {
+            m_lotInfo = lotInfo; 
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendLotInfo, eRemote.Client, lotInfo);
             else
             {
@@ -1079,7 +1082,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqWorksConnect(eWorks eWorks, bool bConnect)
         {
-            string sSend = m_nReq.ToString("000") + "," + eWorks.ToString() + "," + Works2D.eProtocol.WorksConnect.ToString() + "," + (bConnect ? "1" : "0");
+            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.WorksConnect.ToString() + "," + eWorks.ToString() + "," + (bConnect ? "1" : "0");
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             return "OK";
@@ -1103,15 +1106,23 @@ namespace Root_Pine2_Vision.Module
             while (m_bThreadCheck)
             {
                 Thread.Sleep(200); 
-                if (m_bWorksConnect[0] != m_aWorks[eWorks.A].m_tcpip.p_bConnect)
+                if (m_tcpRequest.p_bConnect == false)
                 {
-                    ReqWorksConnect(eWorks.A, m_aWorks[eWorks.A].m_tcpip.p_bConnect);
-                    m_bWorksConnect[0] = m_aWorks[eWorks.A].m_tcpip.p_bConnect; 
+                    m_bWorksConnect[0] = false;
+                    m_bWorksConnect[1] = false;
                 }
-                if (m_bWorksConnect[1] != m_aWorks[eWorks.B].m_tcpip.p_bConnect)
+                else
                 {
-                    ReqWorksConnect(eWorks.B, m_aWorks[eWorks.B].m_tcpip.p_bConnect);
-                    m_bWorksConnect[1] = m_aWorks[eWorks.B].m_tcpip.p_bConnect;
+                    if (m_bWorksConnect[0] != m_aWorks[eWorks.A].m_tcpip.p_bConnect)
+                    {
+                        ReqWorksConnect(eWorks.A, m_aWorks[eWorks.A].m_tcpip.p_bConnect);
+                        m_bWorksConnect[0] = m_aWorks[eWorks.A].m_tcpip.p_bConnect;
+                    }
+                    if (m_bWorksConnect[1] != m_aWorks[eWorks.B].m_tcpip.p_bConnect)
+                    {
+                        ReqWorksConnect(eWorks.B, m_aWorks[eWorks.B].m_tcpip.p_bConnect);
+                        m_bWorksConnect[1] = m_aWorks[eWorks.B].m_tcpip.p_bConnect;
+                    }
                 }
             }
         }

@@ -273,6 +273,7 @@ namespace Root_CAMELLIA
             {
                 m_qRNRSequence.Enqueue(aSequence.Dequeue());
             }
+
         }
 
         public string ReCalcSequence()

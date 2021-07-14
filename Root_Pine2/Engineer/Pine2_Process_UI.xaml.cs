@@ -188,7 +188,11 @@ namespace Root_Pine2.Engineer
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Error);
             buttonHome.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Error);
             buttonPickerSet.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
-            groupBoxStack.IsEnabled = m_pine2.p_eMode == Pine2.eRunMode.Stack; 
+            groupBoxRecipe.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
+            groupBoxLot.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
+            groupBoxStack.IsEnabled = m_pine2.p_eMode == Pine2.eRunMode.Stack && (EQ.p_eState == EQ.eState.Ready);
+            groupBoxVision.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
+            groupBoxMode.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
         }
 
         private void buttonRecipeSave_Click(object sender, RoutedEventArgs e)
@@ -248,13 +252,6 @@ namespace Root_Pine2.Engineer
         private void M_bgwNewLot_DoWork(object sender, DoWorkEventArgs e)
         {
             m_handler.NewLot();
-        }
-
-        private void buttonSend_Click(object sender, RoutedEventArgs e)
-        {
-            string sRecipe = m_handler.p_sRecipe;
-            m_handler._sRecipe = "";
-            m_handler.p_sRecipe = sRecipe;
         }
         #endregion
     }

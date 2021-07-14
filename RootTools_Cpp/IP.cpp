@@ -365,95 +365,171 @@ float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nM
     return (chMax * 100 > 1) ? chMax * 100 : 1; // Matching Score
 }
 
-    float IP::TemplateMatching_LargeTrigger(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt, int nChIdx)
+float IP::TemplateMatching_VRS(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt)
+{
+    int64 roiW = (ptRB.x - (int64)ptLT.x);
+    int64 roiH = (ptRB.y - (int64)ptLT.y);
+
+    PBYTE imgROI = new BYTE[roiW * roiH];
+    for (int64 r = ptLT.y; r < ptRB.y; r++)
     {
-        int nROIW = ptRB.x - ptLT.x;
-        int nROIH = ptRB.y - ptLT.y;
-
-        float fScale = 0.1;//(nTempW < nTempH) ? 300.0 / (float)nTempW : 300.0 / (float)nTempH;
-
-        cv::Size szROI = cv::Size(nROIW, nROIH);
-        LPBYTE imgROI = new BYTE[szROI.width * szROI.height];
-
-        for (int64 r = ptLT.y; r < ptRB.y; r++)
-        {
-            BYTE* pImg = &pSrc[r * nMemW + ptLT.x];
-            memcpy(&imgROI[(int64)nROIW * (r - ptLT.y)], pImg, nROIW);
-        }
-
-        Mat matSrc = Mat(szROI.height, szROI.width, CV_8UC1, imgROI);
-        Mat matFeature;
-        
-        if (nByteCnt == 1)
-        {
-            matFeature = Mat(nTempH, nTempW, CV_8UC1, pTemp);
-        }
-        else if (nByteCnt == 3)
-        {
-            Mat imgTemp = Mat(nTempH, nTempW, CV_8UC3, pTemp);
-            Mat bgr[3];
-            split(imgTemp, bgr);
-
-            matFeature = bgr[2 - nChIdx].clone();
-        }
-
-        // 2. Image Resize
-        cv::Size szDownSrc = cv::Size(szROI.width * fScale, szROI.height * fScale);
-        cv::Size szDownFeature = cv::Size(nTempW * fScale, nTempH * fScale);
-        LPBYTE pSrc_Down = new BYTE[szDownSrc.width * szDownSrc.height];
-        LPBYTE pFeature_Down = new BYTE[szDownFeature.width * szDownFeature.height];
-        Mat matSrc_Down, matFeature_Down;
-
-        cv::resize(matSrc, matSrc_Down, szDownSrc, 0, CV_INTER_LINEAR);
-        cv::resize(matFeature, matFeature_Down, szDownFeature, 0, 0, CV_INTER_LINEAR);
-
-        // 3. Rough Position
-        Mat matResult;
-        double maxVal;
-        cv::Point maxLoc;
-
-        cv::matchTemplate(matSrc_Down, matFeature_Down, matResult, method);
-        cv::minMaxLoc(matResult, NULL, &maxVal, NULL, &maxLoc, Mat());
-
-        cv::Point ptRoughTrans = cv::Point(maxLoc.x / fScale, maxLoc.y / fScale);
-
-        delete[] pSrc_Down;
-        delete[] pFeature_Down;
-        matResult.release();
-
-        // 4. Detail Position 
-        int nRoughPosMargin = 25;
-        cv::Size szDetailROI = cv::Size(nTempW + nRoughPosMargin * 2, nTempH + nRoughPosMargin * 2);
-
-        int nROIStartX = ptRoughTrans.x - nRoughPosMargin;
-        nROIStartX = (nROIStartX < 0) ? 0 : nROIStartX;
-        nROIStartX = (nROIStartX + szDetailROI.width + nRoughPosMargin > szROI.width) ? szROI.width - (szDetailROI.width + nRoughPosMargin) : nROIStartX;
-        int nROIStartY = ptRoughTrans.y - nRoughPosMargin;
-        nROIStartY = (nROIStartX < 0) ? 0 : nROIStartY;
-        nROIStartY = (nROIStartY + szDetailROI.height + nRoughPosMargin > szROI.height) ? szROI.height - (szDetailROI.height + nRoughPosMargin) : nROIStartY;
-
-        Mat matDetailROI = matSrc(cv::Rect(nROIStartX, nROIStartY, szDetailROI.width, szDetailROI.height));
-
-        cv::matchTemplate(matDetailROI, matFeature, matResult, method);
-        cv::minMaxLoc(matResult, NULL, &maxVal, NULL, &maxLoc, Mat());
-
-        
-        float fMatchingScore = (maxVal * 100);
-
-        outMatchPoint = Point(maxLoc.x + nROIStartX + ptLT.x, maxLoc.y + nROIStartY + ptLT.y);
-
-        // 5. ~Memory Free~
-        matDetailROI.release();
-        matResult.release();
-        matSrc.release();
-        matFeature.release();
-        matSrc_Down.release();
-        matFeature_Down.release();
-
-        delete[] pSrc;
-
-        return fMatchingScore;
+        BYTE* pImg = &pSrc[r * nMemW + ptLT.x];
+        memcpy(&imgROI[roiW * (r - (int64)ptLT.y)], pImg, roiW);
     }
+
+    Mat imgTemp;
+    double chMax = 0;
+    int nChIdx = 0;
+
+    Mat bgrSrc[3];
+    Mat imgSrc = Mat(nMemH, nMemW, CV_8UC3, pSrc);
+    split(imgSrc, bgrSrc);
+
+    // Adaptive Channel Selection will be added later
+    /*if (sum(bgrSrc[0]). > sum(bgrSrc[1]))
+    {
+        if (sum(bgrSrc[0]) > sum(bgrSrc[2]))
+        {
+            nChIdx = 0;
+        }
+        else
+        {
+            nChIdx = 2;
+        }
+    }
+    else
+    {
+        if (sum(bgrSrc[1]) > sum(bgrSrc[2]))
+        {
+            nChIdx = 1;
+        }
+        else
+        {
+            nChIdx = 2;
+        }
+    }*/
+
+    if (nByteCnt == 1)
+    {
+        imgTemp = Mat(nTempH, nTempW, CV_8UC1, pTemp);
+
+        Mat result;
+
+        Point minLoc, maxLoc;
+
+        matchTemplate(imgSrc, imgTemp, result, method);
+
+        minMaxLoc(result, NULL, &chMax, NULL, &outMatchPoint); // 완벽하게 매칭될 경우 1
+    }
+    else if (nByteCnt == 3)
+    {
+        imgTemp = Mat(nTempH, nTempW, CV_8UC3, pTemp);
+
+        Mat bgr[3];
+        split(imgTemp, bgr);
+
+        Mat result;
+        Point minLoc, maxLoc;
+
+        matchTemplate(bgrSrc[nChIdx], bgr[2 - nChIdx], result, method);
+
+        minMaxLoc(result, NULL, &chMax, NULL, &outMatchPoint); // 완벽하게 매칭될 경우 1
+    }
+
+    delete[] imgROI;
+
+    return (chMax * 100 > 1) ? chMax * 100 : 1; // Matching Score
+}
+
+float IP::TemplateMatching_LargeTrigger(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt, int nChIdx)
+{
+    int nROIW = ptRB.x - ptLT.x;
+    int nROIH = ptRB.y - ptLT.y;
+
+    float fScale = 0.1;//(nTempW < nTempH) ? 300.0 / (float)nTempW : 300.0 / (float)nTempH;
+
+    cv::Size szROI = cv::Size(nROIW, nROIH);
+    LPBYTE imgROI = new BYTE[szROI.width * szROI.height];
+
+    for (int64 r = ptLT.y; r < ptRB.y; r++)
+    {
+        BYTE* pImg = &pSrc[r * nMemW + ptLT.x];
+        memcpy(&imgROI[(int64)nROIW * (r - ptLT.y)], pImg, nROIW);
+    }
+
+    Mat matSrc = Mat(szROI.height, szROI.width, CV_8UC1, imgROI);
+    Mat matFeature;
+        
+    if (nByteCnt == 1)
+    {
+        matFeature = Mat(nTempH, nTempW, CV_8UC1, pTemp);
+    }
+    else if (nByteCnt == 3)
+    {
+        Mat imgTemp = Mat(nTempH, nTempW, CV_8UC3, pTemp);
+        Mat bgr[3];
+        split(imgTemp, bgr);
+
+        matFeature = bgr[2 - nChIdx].clone();
+    }
+
+    // 2. Image Resize
+    cv::Size szDownSrc = cv::Size(szROI.width * fScale, szROI.height * fScale);
+    cv::Size szDownFeature = cv::Size(nTempW * fScale, nTempH * fScale);
+    LPBYTE pSrc_Down = new BYTE[szDownSrc.width * szDownSrc.height];
+    LPBYTE pFeature_Down = new BYTE[szDownFeature.width * szDownFeature.height];
+    Mat matSrc_Down, matFeature_Down;
+
+    cv::resize(matSrc, matSrc_Down, szDownSrc, 0, CV_INTER_LINEAR);
+    cv::resize(matFeature, matFeature_Down, szDownFeature, 0, 0, CV_INTER_LINEAR);
+
+    // 3. Rough Position
+    Mat matResult;
+    double maxVal;
+    cv::Point maxLoc;
+
+    cv::matchTemplate(matSrc_Down, matFeature_Down, matResult, method);
+    cv::minMaxLoc(matResult, NULL, &maxVal, NULL, &maxLoc, Mat());
+
+    cv::Point ptRoughTrans = cv::Point(maxLoc.x / fScale, maxLoc.y / fScale);
+
+    delete[] pSrc_Down;
+    delete[] pFeature_Down;
+    matResult.release();
+
+    // 4. Detail Position 
+    int nRoughPosMargin = 25;
+    cv::Size szDetailROI = cv::Size(nTempW + nRoughPosMargin * 2, nTempH + nRoughPosMargin * 2);
+
+    int nROIStartX = ptRoughTrans.x - nRoughPosMargin;
+    nROIStartX = (nROIStartX < 0) ? 0 : nROIStartX;
+    nROIStartX = (nROIStartX + szDetailROI.width + nRoughPosMargin > szROI.width) ? szROI.width - (szDetailROI.width + nRoughPosMargin) : nROIStartX;
+    int nROIStartY = ptRoughTrans.y - nRoughPosMargin;
+    nROIStartY = (nROIStartX < 0) ? 0 : nROIStartY;
+    nROIStartY = (nROIStartY + szDetailROI.height + nRoughPosMargin > szROI.height) ? szROI.height - (szDetailROI.height + nRoughPosMargin) : nROIStartY;
+
+    Mat matDetailROI = matSrc(cv::Rect(nROIStartX, nROIStartY, szDetailROI.width, szDetailROI.height));
+
+    cv::matchTemplate(matDetailROI, matFeature, matResult, method);
+    cv::minMaxLoc(matResult, NULL, &maxVal, NULL, &maxLoc, Mat());
+
+        
+    float fMatchingScore = (maxVal * 100);
+
+    outMatchPoint = Point(maxLoc.x + nROIStartX + ptLT.x, maxLoc.y + nROIStartY + ptLT.y);
+
+    // 5. ~Memory Free~
+    matDetailROI.release();
+    matResult.release();
+    matSrc.release();
+    matFeature.release();
+    matSrc_Down.release();
+    matFeature_Down.release();
+
+    delete[] pSrc;
+
+    return fMatchingScore;
+}
 
 // D2D 
 void IP::SubtractAbs(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)

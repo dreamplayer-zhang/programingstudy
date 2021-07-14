@@ -38,15 +38,15 @@
                     </WindowsFormsHost>
                     <DataGrid x:Name="dgPMResult" Grid.Row="2" Margin="3" CanUserAddRows="False" AutoGenerateColumns="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Date" Binding="{Binding Path=Date}" Width="100"/>
-                            <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" Width="100"/>
-                            <DataGridTextColumn Header="PM_Success" Binding="{Binding Path=PM_Success}" Width="100"/>
-                            <DataGridTextColumn Header="Coaxial_Result" Binding="{Binding Path=Coaxial_Result}" Width="100"/>
+                            <DataGridTextColumn Header="Date" Binding="{Binding Path=Date}" Width="80"/>
+                            <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" Width="80"/>
+                            <DataGridTextColumn Header="PM_Success" Binding="{Binding Path=PM_Success}" Width="80"/>
+                            <DataGridTextColumn Header="Coaxial_Result" Binding="{Binding Path=Coaxial_Result}" Width="90"/>
                             <DataGridTextColumn Header="Transmitted_Result" Binding="{Binding Path=Transmitted_Result}" Width="100"/>
-                            <DataGridTextColumn Header="Coaxial_Avg" Binding="{Binding Path=Coaxial_Avg}" Width="100"/>
+                            <DataGridTextColumn Header="Coaxial_Avg" Binding="{Binding Path=Coaxial_Avg}" Width="75"/>
                             <DataGridTextColumn Header="Transmitted_Avg" Binding="{Binding Path=Transmitted_Avg}" Width="100"/>
-                            <DataGridTextColumn Header="USL" Binding="{Binding Path=USL}" Width="100"/>
-                            <DataGridTextColumn Header="LSL" Binding="{Binding Path=LSL}" Width="100"/>
+                            <DataGridTextColumn Header="USL" Binding="{Binding Path=USL}" Width="35"/>
+                            <DataGridTextColumn Header="LSL" Binding="{Binding Path=LSL}" Width="35"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>

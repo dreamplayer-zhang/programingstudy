@@ -263,6 +263,7 @@ namespace Root_VEGA_D.Module
         public string p_sBottomTemplateFile = "";
         public CPoint m_ptBotAlignMarkerOffset = new CPoint();
         public bool m_bUseFindEdge = true;
+        public string p_sTempAlignMarkerFile = "";
 
         void RunTreeAlign(Tree tree, bool bVisible, bool bReadOnly)
         {
@@ -277,6 +278,7 @@ namespace Root_VEGA_D.Module
 
             p_sTopTemplateFile = tree.SetFile(p_sTopTemplateFile, p_sTopTemplateFile, "bmp", "Top File", "TopTemplate File");
             p_sBottomTemplateFile = tree.SetFile(p_sBottomTemplateFile, p_sBottomTemplateFile, "bmp", "Bottom File", "BottomTemplate File");
+            p_sTempAlignMarkerFile = tree.SetFile(p_sTempAlignMarkerFile, p_sTempAlignMarkerFile, "bmp", "AlignMarker File", "Left bottom AlignMarker image saved temporarily to display image");
         }
         #endregion
 

@@ -209,6 +209,23 @@ namespace RootTools_CLR
 		return score;
 	}
 
+	float CLR_IP::Cpp_TemplateMatching(array<byte>^ pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pTemp = &pTempImg[0];
+		Point Pos;
+
+		float score = IP::TemplateMatching_VRS(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod, nByteCnt);
+
+		outPosX = Pos.x;
+		outPosY = Pos.y;
+
+		pSrc = nullptr;
+		pTemp = nullptr;
+
+		return score;
+	}
+
 	float CLR_IP::Cpp_TemplateMatching(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt, int nChIdx)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];

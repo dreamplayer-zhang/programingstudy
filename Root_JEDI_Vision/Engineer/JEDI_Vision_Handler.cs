@@ -149,5 +149,15 @@ namespace Root_JEDI_Vision.Engineer
             p_moduleList.ThreadStop();
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
         }
+
+        public RnRData GetRnRData()
+        {
+            return new RnRData();
+        }
+
+        public void UpdateEvent()
+        {
+            return;
+        }
     }
 }

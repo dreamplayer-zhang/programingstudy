@@ -110,23 +110,12 @@ namespace Root_JEDI_Sorter.Engineer
         #endregion
 
         #region IHandler
-        public void CheckFinish()
-        {
-        }
-
-        public dynamic GetGemSlot(string sSlot)
-        {
-            return null;
-        }
-
-        public string AddSequence(dynamic infoSlot)
-        {
-            return "OK";
-        }
-
-        public void CalcSequence()
-        {
-        }
+        public void CheckFinish() { }
+        public dynamic GetGemSlot(string sSlot) { return null; }
+        public string AddSequence(dynamic infoSlot) { return "OK"; }
+        public void CalcSequence() { }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         string m_id;

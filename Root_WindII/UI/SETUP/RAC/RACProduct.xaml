@@ -86,16 +86,18 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                                 <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Text="Device" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <TextBlock Grid.Row="1" Text="Size(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <TextBlock Grid.Row="2" Text="Die Pitch(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="3" Text="Shot Offset(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="4" Text="Map Offset(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="5" Text="SMI Offset(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="6" Text="Origin Die(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="7" Text="Shot Size(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="8" Text="Edge Exclusion" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="3" Text="Scribe Line(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="4" Text="Shot Offset(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="5" Text="Map Offset(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="6" Text="SMI Offset(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="7" Text="Origin Die(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="8" Text="Shot Size(X/Y)" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="9" Text="Edge Exclusion" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                             <Grid Grid.Column="1" Grid.Row="0">
                                 <Label Content="{Binding DataDevice}" FontSize="15" Foreground="#FF4468C7" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -126,11 +128,21 @@
                                     <ColumnDefinition Width="10*"/>
                                     <ColumnDefinition Width="45*"/>
                                 </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Content="{Binding DataScribeLineX}" FontSize="15" Foreground="#FF4468C7" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Label Grid.Column="2" Content="{Binding DataScribeLineY}" FontSize="15" Foreground="#FF4468C7" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="/" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                            <Grid Grid.Column="1" Grid.Row="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="45*"/>
+                                    <ColumnDefinition Width="10*"/>
+                                    <ColumnDefinition Width="45*"/>
+                                </Grid.ColumnDefinitions>
                                 <Label Grid.Column="0" Content="{Binding DataShotOffsetX}" FontSize="15" Foreground="#FF4468C7" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <Label Grid.Column="2" Content="{Binding DataShotOffsetY}" FontSize="15" Foreground="#FF4468C7" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" Text="/" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
-                            <Grid Grid.Column="1" Grid.Row="4">
+                            <Grid Grid.Column="1" Grid.Row="5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="45*"/>
                                     <ColumnDefinition Width="10*"/>
@@ -140,7 +152,7 @@
                                 <Label Grid.Column="2" Content="{Binding DataMapOffsetY}" FontSize="15" Foreground="#FF4468C7" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" Text="/" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
-                            <Grid Grid.Column="1" Grid.Row="5">
+                            <Grid Grid.Column="1" Grid.Row="6">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="45*"/>
                                     <ColumnDefinition Width="10*"/>
@@ -150,7 +162,7 @@
                                 <Label Grid.Column="2" Content="{Binding DataSmiOffsetY}" FontSize="15" Foreground="#FF4468C7" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" Text="/" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
-                            <Grid Grid.Column="1" Grid.Row="6">
+                            <Grid Grid.Column="1" Grid.Row="7">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="45*"/>
                                     <ColumnDefinition Width="10*"/>
@@ -160,7 +172,7 @@
                                 <Label Grid.Column="2" Content="{Binding DataOriginDieY}" FontSize="15" Foreground="#FF4468C7" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" Text="/" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
-                            <Grid Grid.Column="1" Grid.Row="7">
+                            <Grid Grid.Column="1" Grid.Row="8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="45*"/>
                                     <ColumnDefinition Width="10*"/>
@@ -170,7 +182,7 @@
                                 <Label Grid.Column="2" Content="{Binding DataShotSizeY}" FontSize="15" Foreground="#FF4468C7" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" Text="/" FontSize="17" Foreground="Black" Background="White" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
-                            <Grid Grid.Column="1" Grid.Row="8">
+                            <Grid Grid.Column="1" Grid.Row="9">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="66*"/>
                                     <ColumnDefinition Width="33*"/>

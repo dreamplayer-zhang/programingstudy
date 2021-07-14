@@ -63,7 +63,7 @@ namespace Root_MarsLogView
             int index = sVision.IndexOf("LogType:");
             string logtype = "";
             if (index == -1) logtype = "PRC";
-            else sVision.Substring(index+8,3);//check 필요
+            else logtype = sVision.Substring(index+8,3);//check 필요
 			string[] asVision = sVision.Split(',');
 			GetDateTime(asMars);
 
@@ -90,6 +90,7 @@ namespace Root_MarsLogView
             string[] asMars = new string[14] { "", "", "", "'PRC'", "", "", "", "'Wafer'", "1", "", "", "$", "0", "$" };
             string[] asVision = sVision.Split(',');
             GetDateTime(asMars);
+            
             foreach (string sCmd in asVision)
             {
                 string[] asCmd = sCmd.Split(':');
@@ -111,17 +112,37 @@ namespace Root_MarsLogView
                         case "RecipeName": asMars[10] = '\'' + asCmd[1] + '\''; break;
                         case "StepNumber": asMars[11] = asCmd[1]; break;
                         case "StepSeq": asMars[12] = asCmd[1]; break;
-                        case "StepName": 
-                            if (asCmd[1] == "$") asMars[13] = asCmd[1]; 
-                            else asMars[13] = '\'' + asCmd[1] + '\''; 
+                        case "StepName":
+                            if (asCmd[1] == "$") asMars[13] = asCmd[1];
+                            else asMars[13] = '\'' + asCmd[1] + '\'';
                             break;
-
                     }
                 }
             }
-            string sLog = asMars[0];
-            for (int n = 1; n < 14; n++) sLog += '\t' + asMars[n];
-            return sLog;
+            for (int i = 0; i < asMars.Length; i++) {
+                aasMars[i] = asMars[i];
+            }
+        }
+        void CFG_stringArrange(string[] asVision, ref string[] asMars)
+        {
+            foreach (string sCmd in asVision)
+            {
+                string[] asCmd = sCmd.Split(':');
+                if (asCmd.Length >= 2)
+                {
+                    switch (asCmd[0])
+                    {
+                        case "ModuleID": asMars[2] = '\'' + asCmd[1] + '\''; break;     // ex. wtr
+                        case "LogType": asMars[3] = '\'' + asCmd[1] + '\''; break;      // ex. prc, leh
+                        case "Category": asMars[4] = asCmd[1] ; break;
+                        case "CfgID": asMars[5] = '\'' + asCmd[1] + '\''; break;
+                        case "VersionValue": asMars[6] = '\'' + asCmd[1] + '\''; break;
+                        case "Unit": asMars[7] = asCmd[1]; break;
+                        case "ECID": asMars[8] = asCmd[1]; break;
+                    }
+                }
+            }
+
         }
 
         void GetDateTime(string[] asMars)
