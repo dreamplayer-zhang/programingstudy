@@ -280,12 +280,6 @@ namespace Root_Pine2.Module
                 _sRecipe = value;
                 m_aBoat[Vision2D.eWorks.A].p_sRecipe = value;
                 m_aBoat[Vision2D.eWorks.B].p_sRecipe = value;
-                string sRun = m_vision.SendRecipe(value); 
-                if (sRun != "OK")
-                {
-                    p_sInfo = sRun;
-                    p_eState = eState.Error;
-                }
             }
         }
         #endregion

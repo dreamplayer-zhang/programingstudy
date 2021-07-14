@@ -54,7 +54,8 @@ namespace Root_Pine2.Engineer
         {
             Pine2.VisionOption option = m_pine2.m_aVisionOption[boats.m_vision.m_eVision];
             Vision2D.LotInfo lotInfo = new Vision2D.LotInfo(nMode, p_sRecipe, m_pine2.p_sLotID, option.p_bLotMix, option.p_bBarcode, option.p_nBarcode, option.p_lBarcode);
-            boats.m_vision.SendLotInfo(lotInfo);
+            string sRun = boats.m_vision.SendLotInfo(lotInfo);
+            if (sRun == "OK") boats.p_sInfo = lotInfo.m_sLotID; 
         }
 
         BackgroundWorker m_bgwSendSort = new BackgroundWorker(); 
