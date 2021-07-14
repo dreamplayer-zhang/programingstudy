@@ -201,6 +201,16 @@ namespace Root_WIND2.UI_User
             get { return this.m_DataViewer_VM; }
             set { SetProperty(ref m_DataViewer_VM, value); }
         }
+
+        private string inspectionID;
+        public string InspectionID
+        {
+            get => this.inspectionID;
+            set
+            {
+                SetProperty(ref this.inspectionID, value);
+            }
+        }
         #endregion
 
         #region [Command]
@@ -257,6 +267,8 @@ namespace Root_WIND2.UI_User
 
                    RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
                    GlobalObjects.Instance.GetNamed<WorkManager>("backInspection").Start();
+
+                   this.InspectionID = DatabaseManager.Instance.GetInspectionID();
                 }
             });
         }
@@ -352,6 +364,14 @@ namespace Root_WIND2.UI_User
                        settings_backside.OutputImageSizeY, polygon, (int)(settings_backside.SaveWaferSize * 1000 / grabMode.m_dRealResX_um), (int)(settings_backside.SaveWaferSize * 1000 / grabMode.m_dRealResY_um),
                        backRecipe.CenterX,
                        backRecipe.CenterY);
+            });
+        }
+
+        public RelayCommand btnInspectionIDSearchCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                m_DataViewer_VM.pDataTable = DatabaseManager.Instance.SelectTablewithInspectionID("defect", this.inspectionID);
             });
         }
         #endregion
