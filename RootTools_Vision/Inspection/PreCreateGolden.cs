@@ -81,6 +81,10 @@ namespace RootTools_Vision
             byte[] goldenImage = new byte[originW * originH];
             unsafe {
 
+                // Processing Time Debug
+                //Stopwatch watch = new Stopwatch();
+                //watch.Start();
+
                 switch (_parameterGolden.CreateRefImage)
                 {
                     case CreateRefImageMethod.Average:
@@ -105,6 +109,10 @@ namespace RootTools_Vision
                             _chipLTPos, originW, originH);
                         break;
                 }
+
+                //watch.Stop();
+                //string msg = "Tac Time : " + watch.Elapsed.TotalSeconds.ToString();
+                //MessageBox.Show(msg, "Title");
             }
 
             return goldenImage;
