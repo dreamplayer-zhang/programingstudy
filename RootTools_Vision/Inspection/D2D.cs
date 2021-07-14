@@ -193,8 +193,16 @@ namespace RootTools_Vision
             int endY;
 
             bool isRefNotEnough = false;
-            if (mapYIdx.Count() <= 2) // Line에 Ref Chip이 한개면 Golden Image 생성시 현재 칩까지 넣어서 average로 만듦 
-            {                
+            if (mapYIdx.Count() <= 2) 
+            {
+                // PreCreate Golden Image가 있으면 대신 사용
+                if (recipeD2D.PreGoldenW == this.currentWorkplace.Width && recipeD2D.PreGoldenH == this.currentWorkplace.Height)
+                {
+                    GoldenImage = recipeD2D.PreGolden[(int)parameterD2D.IndexChannel];
+                    return;
+                }
+
+                // Line에 Ref Chip이 한개면 Golden Image 생성시 현재 칩까지 넣어서 average로 만듦 
                 isRefNotEnough = true;
             }
 
@@ -500,6 +508,14 @@ namespace RootTools_Vision
             bool isRefNotEnough = false;
             if (mapYIdx.Count() <= 2) // Line에 Ref Chip이 한개면 Golden Image 생성시 현재 칩까지 넣어서 average로 만듦 
             {
+                // PreCreate Golden Image가 있으면 대신 사용
+                if (recipeD2D.PreGoldenW == this.currentWorkplace.Width && recipeD2D.PreGoldenH == this.currentWorkplace.Height)
+                {
+                    GoldenImage = recipeD2D.PreGolden[(int)parameterD2D.IndexChannel];
+                    return;
+                }
+
+                // Line에 Ref Chip이 한개면 Golden Image 생성시 현재 칩까지 넣어서 average로 만듦 
                 isRefNotEnough = true;
             }
 

@@ -30,10 +30,10 @@ namespace Root_Pine2.Module
                         Unknown
                     }
                     public List<List<eResult>> m_aUnit = new List<List<eResult>>();
-                    public CPoint m_szMap = null;
+                    public CPoint m_szMap = new CPoint();
                     public void SetResult(CPoint szMap, bool bTop, string sMapResult)
                     {
-                        m_szMap = szMap;
+                        m_szMap = new CPoint(szMap);
                         InitMap(); 
                         int x = bTop ? 0 : szMap.X - 1;
                         int y = 0;
@@ -58,15 +58,19 @@ namespace Root_Pine2.Module
 
                     public string SetSort(Unit unit)
                     {
-                        if (m_szMap == null) m_szMap = new CPoint(unit.m_szMap); 
+                        if (m_szMap.X == 0)
+                        {
+                            if (unit.m_szMap.X == 0) return "OK";
+                            m_szMap = new CPoint(unit.m_szMap);
+                        }
                         if (m_szMap.X != unit.m_szMap.X) return "Map Size not Same";
                         if (m_szMap.Y != unit.m_szMap.Y) return "Map Size not Same";
-                        InitMap(); 
+                        InitMap();
                         for (int y = 0; y < m_szMap.Y; y++)
                         {
-                            for (int x = 0; x < m_szMap.X; x++) m_aUnit[y][x] = (eResult)Math.Max((int)m_aUnit[y][x], (int)unit.m_aUnit[y][x]); 
+                            for (int x = 0; x < m_szMap.X; x++) m_aUnit[y][x] = (eResult)Math.Max((int)m_aUnit[y][x], (int)unit.m_aUnit[y][x]);
                         }
-                        return "OK"; 
+                        return "OK";
                     }
 
                     void InitMap()
@@ -82,6 +86,7 @@ namespace Root_Pine2.Module
                     public void CalcCount()
                     {
                         foreach (eResult eResult in Enum.GetValues(typeof(eResult))) m_aCount[eResult] = 0;
+                        if (m_szMap.X == 0) return; 
                         for (int y = 0; y < m_szMap.Y; y++)
                         {
                             for (int x = 0; x < m_szMap.X; x++) m_aCount[m_aUnit[y][x]]++;
@@ -169,6 +174,7 @@ namespace Root_Pine2.Module
 
             void CalcMapSize(CPoint szMap)
             {
+                if (szMap.X == 0) szMap = new CPoint(0, 0); 
                 m_szMap.X = Math.Max(m_szMap.X, szMap.X);
                 m_szMap.Y = Math.Max(m_szMap.Y, szMap.Y);
             }
@@ -255,7 +261,8 @@ namespace Root_Pine2.Module
         public void CheckTime()
         {
             DateTime dt = DateTime.Now;
-            m_sLotTime = (dt - m_dtLotStart).ToString();
+            TimeSpan ts = (dt - m_dtLotStart); 
+            m_sLotTime = ts.ToString();
             AddDateTime(dt);
             if (m_aTime.Count < 2) return;
             int nTime = m_aTime.Count - 1;
@@ -281,6 +288,7 @@ namespace Root_Pine2.Module
         public bool m_bUpdated = false; 
         public string SetSort(bool b3D, InfoStrip infoStrip)
         {
+            return "OK";
             m_data = infoStrip.m_summnayData;
             m_data.m_sStripID = infoStrip.p_id; 
             string sRun = m_data.SetSort(b3D);

@@ -45,10 +45,10 @@
                     <TextBlock Text="Run" Foreground="Black" FontWeight="Bold" />
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
-                    <Button x:Name="buttonStart" Content="Start" Margin="3" Click="buttonStart_Click"/>
-                    <Button x:Name="buttonStop" Content="Stop" Margin="3" Click="buttonStop_Click"/>
-                    <Button x:Name="buttonReset" Content="Reset" Margin="3" Click="buttonReset_Click"/>
-                    <Button x:Name="buttonHome" Content="Home" Margin="3" Click="buttonHome_Click"/>
+                    <Button x:Name="buttonStart" Content="Start" Margin="3" Height="27" Click="buttonStart_Click"/>
+                    <Button x:Name="buttonStop" Content="Stop" Margin="3" Height="27" Click="buttonStop_Click"/>
+                    <Button x:Name="buttonReset" Content="Reset" Margin="3" Height="27" Click="buttonReset_Click"/>
+                    <Button x:Name="buttonHome" Content="Home" Margin="3" Height="27" Click="buttonHome_Click"/>
                     <Button x:Name="buttonPickerSet" Content="PickerSet" Margin="3,13,3,3" Click="buttonPickerSet_Click"/>
                 </StackPanel>
             </GroupBox>

@@ -403,7 +403,7 @@ namespace RootTools.Light
                 Light light = new Light(p_id, eChannel, this);
                 p_aLight.Add(light);
 
-                
+                light.p_bOn = true;
             }
         }
 

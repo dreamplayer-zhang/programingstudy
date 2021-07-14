@@ -404,7 +404,7 @@ namespace RootTools.Gem
         #region Property
         public string p_sLocID { get; set; }
 
-        string _sLotID = "LotID";
+        string _sLotID = "";
         public string p_sLotID 
         {
             get { return _sLotID; }

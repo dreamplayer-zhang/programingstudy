@@ -282,13 +282,21 @@ namespace Root_CAMELLIA
             dialogService = main.dialogService;
 
             m_handler.OnRnRDone += M_handler_OnRnRDone;
+            m_handler.OnListUpdate += M_handler_OnListUpdate;
         }
 
         #region Event
 
+        private void M_handler_OnListUpdate()
+        {
+            if (this.p_loadport.p_id == App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_id)
+                UpdateList();
+        }
+
         private void M_handler_OnRnRDone()
         {
-            p_currentRNR++;
+            if(this.p_loadport.p_id == App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_id)
+                p_currentRNR++;
         }
 
         private void StateChange(object sender, EventArgs e)
@@ -449,7 +457,6 @@ namespace Root_CAMELLIA
                         var dialog = dialogService.GetDialog(viewModel) as Dlg_ManualJob;
                         Nullable<bool> result = dialog.ShowDialog();
 
-                        int firstIdx = 0;
                         if (result.HasValue)
                         {
                             if (!result.Value)
@@ -472,30 +479,7 @@ namespace Root_CAMELLIA
                                     p_totalRNR = 0;
                                 }
                                 m_handler.p_process.MakeRnRSeq();
-                                int idx = 1;
-                                ObservableCollection<DataGridWaferInfo> temp = new ObservableCollection<DataGridWaferInfo>();
-
-                                foreach (InfoWafer val in p_infoCarrier.m_aGemSlot)
-                                {
-                                    if (val != null)
-                                    {
-                                        temp.Insert(0, new DataGridWaferInfo(idx++, val.p_sWaferID, val.p_sRecipe, val.p_eState));
-                                        if(val.p_eState == GemSlotBase.eState.Select)
-                                        {
-                                            p_totalSelect++;
-                                        }
-                                        if(p_CurrentRecipeID == "" && val.p_sRecipe != "")
-                                        {
-                                            p_CurrentRecipeID = val.p_sRecipe.Replace(Path.GetExtension(val.p_sRecipe), "");
-                                            firstIdx = idx - 1;
-                                        }
-                                        //object[] obj = { val.m_nSlot, val.p_sWaferID, val.p_sRecipe, val.p_eState };
-                                        //datagridSlot.Items.Add(obj);
-                                    }
-                                }
-                                p_waferList = temp;
-
-                                p_dataSelectIndex = 24 - firstIdx + 1;
+                                UpdateList();
                             }
                         }
                     }
@@ -529,6 +513,35 @@ namespace Root_CAMELLIA
             {
                 CustomMessageBox.Show("Error", "Module is Not Ready!", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
             }
+        }
+
+        void UpdateList()
+        {
+            int firstIdx = 0;
+            int idx = 1;
+            ObservableCollection<DataGridWaferInfo> temp = new ObservableCollection<DataGridWaferInfo>();
+
+            foreach (InfoWafer val in p_infoCarrier.m_aGemSlot)
+            {
+                if (val != null)
+                {
+                    temp.Insert(0, new DataGridWaferInfo(idx++, val.p_sWaferID, val.p_sRecipe, val.p_eState));
+                    if (val.p_eState == GemSlotBase.eState.Select)
+                    {
+                        p_totalSelect++;
+                    }
+                    if (p_CurrentRecipeID == "" && val.p_sRecipe != "")
+                    {
+                        p_CurrentRecipeID = val.p_sRecipe.Replace(Path.GetExtension(val.p_sRecipe), "");
+                        firstIdx = idx - 1;
+                    }
+                    //object[] obj = { val.m_nSlot, val.p_sWaferID, val.p_sRecipe, val.p_eState };
+                    //datagridSlot.Items.Add(obj);
+                }
+            }
+            p_waferList = temp;
+
+            p_dataSelectIndex = 24 - firstIdx + 1;
         }
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)

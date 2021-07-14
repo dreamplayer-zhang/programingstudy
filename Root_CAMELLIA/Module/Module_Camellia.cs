@@ -294,14 +294,22 @@ namespace Root_CAMELLIA.Module
         ALID m_alid_WaferExist;
         public void SetAlarm()
         {
+            if (m_homeExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Exist");
+            else if (p_infoWafer != null && !m_homeExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Not Exist");
+            else if (m_loadExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Load Position Wafer Exist");
+            else if (p_infoWafer != null && !m_loadExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Load Position Wafer Not Exist!");
+        }
+
+        public void SetAlarmLoad()
+        {
             if (m_loadExistWafer.p_bIn)
                 m_alid_WaferExist.Run(true, "Vision Load Position Wafer Exist");
             else if (p_infoWafer != null && !m_loadExistWafer.p_bIn)
                 m_alid_WaferExist.Run(true, "Vision Load Position Wafer Not Exist!");
-            else if (m_homeExistWafer.p_bIn)
-                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Exist");
-            else if (p_infoWafer != null && !m_homeExistWafer.p_bIn)
-                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Not Exist");
         }
 
 
@@ -743,6 +751,14 @@ namespace Root_CAMELLIA.Module
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;
+
+            if (m_loadExistWafer.p_bIn)
+            {
+                SetAlarmLoad();
+                return "Check Vision Load Position";
+            }
+
+
             return "OK";
         }
 
