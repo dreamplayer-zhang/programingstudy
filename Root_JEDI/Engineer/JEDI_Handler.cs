@@ -110,23 +110,12 @@ namespace Root_JEDI.Engineer
         #endregion
 
         #region IHandler
-        public void CheckFinish()
-        {
-        }
-
-        public dynamic GetGemSlot(string sSlot)
-        {
-            return null;
-        }
-
-        public string AddSequence(dynamic infoSlot)
-        {
-            return "OK";
-        }
-
-        public void CalcSequence()
-        {
-        }
+        public void CheckFinish() { }
+        public dynamic GetGemSlot(string sSlot) { return null; }
+        public string AddSequence(dynamic infoSlot) { return "OK"; }
+        public void CalcSequence() { }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         string m_id;
@@ -148,16 +137,6 @@ namespace Root_JEDI.Engineer
         {
             p_moduleList.ThreadStop();
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
-        }
-
-        public RnRData GetRnRData()
-        {
-            return new RnRData();
-        }
-
-        public void UpdateEvent()
-        {
-            return;
         }
     }
 }

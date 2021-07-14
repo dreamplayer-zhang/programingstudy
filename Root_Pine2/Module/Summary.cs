@@ -288,7 +288,6 @@ namespace Root_Pine2.Module
         public bool m_bUpdated = false; 
         public string SetSort(bool b3D, InfoStrip infoStrip)
         {
-            return "OK";
             m_data = infoStrip.m_summnayData;
             m_data.m_sStripID = infoStrip.p_id; 
             string sRun = m_data.SetSort(b3D);
@@ -320,6 +319,12 @@ namespace Root_Pine2.Module
                 m_countStrip.Add(eVision, new CountStrip());
                 m_countUnit.Add(eVision, new CountUnit());
             }
+
+            DateTime dt0 = DateTime.Now;
+            DateTime dt1 = DateTime.Now;
+            TimeSpan ts = (dt1 - dt0);
+            m_sLotTime = ts.ToString();
+
         }
     }
 }

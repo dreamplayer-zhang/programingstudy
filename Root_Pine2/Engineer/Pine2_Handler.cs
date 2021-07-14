@@ -321,6 +321,8 @@ namespace Root_Pine2.Engineer
         public void CalcSequence()
         {
         }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         #region Thread
