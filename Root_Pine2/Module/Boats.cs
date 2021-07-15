@@ -111,7 +111,7 @@ namespace Root_Pine2.Module
             m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
             if (Run(m_aBoat[eWorks].RunMove(p_ePosUnload))) return p_sInfo;
             m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
-            if (m_aBoat[eWorks].p_infoStrip != null) m_aBoat[eWorks].p_infoStrip.p_eResult = InfoStrip.eResult.POS; 
+            if (m_aBoat[eWorks].p_infoStrip != null) m_aBoat[eWorks].p_infoStrip.SetResult(m_vision.m_eVision, InfoStrip.eResult.POS.ToString(), "1", "1", "4"); 
             return "OK";
         }
         #endregion
@@ -280,12 +280,6 @@ namespace Root_Pine2.Module
                 _sRecipe = value;
                 m_aBoat[Vision2D.eWorks.A].p_sRecipe = value;
                 m_aBoat[Vision2D.eWorks.B].p_sRecipe = value;
-                string sRun = m_vision.SendRecipe(value); 
-                if (sRun != "OK")
-                {
-                    p_sInfo = sRun;
-                    p_eState = eState.Error;
-                }
             }
         }
         #endregion

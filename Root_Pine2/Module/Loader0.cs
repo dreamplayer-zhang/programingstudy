@@ -241,8 +241,13 @@ namespace Root_Pine2.Module
 
         public string RunMoveUp(bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(c_sPosUp);
-            return bWait ? m_axis.WaitReady() : "OK";
+            try
+            {
+                m_axis.p_axisZ.m_bCheckStop = false;
+                m_axis.p_axisZ.StartMove(c_sPosUp);
+                return bWait ? m_axis.WaitReady() : "OK";
+            }
+            finally { m_axis.p_axisZ.m_bCheckStop = true; }
         }
 
         public string RunShakeUp(int nShake, int dzPulse)

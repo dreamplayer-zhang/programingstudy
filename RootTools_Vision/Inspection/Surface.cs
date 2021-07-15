@@ -114,6 +114,12 @@ namespace RootTools_Vision
                 {
                     if (Label[i].area > nDefectSz)
                     {
+                        if(parameterSurface.SizeLimit > 0)
+                        {
+                            if(parameterSurface.SizeLimit < Label[i].area)
+                                continue;
+                        }
+
                         this.currentWorkplace.AddDefect(sInspectionID,
                             1000 + (int)this.parameterSurface.IndexChannel * 100 + this.parameterSurface.MaskIndex,
                             Label[i].area,

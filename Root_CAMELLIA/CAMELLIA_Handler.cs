@@ -135,14 +135,6 @@ namespace Root_CAMELLIA
             //            if (child.IsWaferExist(0) == false) return false;
             //            if (child.IsWaferExist(0) == true) return true;
             //        }
-            //        else
-            //        {
-            //            //if (!child.IsWaferExist(0))
-            //            //{
-            //            //    child.SetAlarm();
-            //            //    return false;
-            //            //}
-            //        }
             //    }
             //    else if (child.p_infoWafer == null)
             //    {
@@ -155,20 +147,14 @@ namespace Root_CAMELLIA
             //            }
             //        }
             //    }
-            //    else if (child.p_infoWafer != null)
-            //    {
-            //        //if (!child.p_id.Contains("Loadport"))
-            //        //{
-            //        //    if (!child.IsWaferExist(0))
-            //        //    {
-            //        //        child.SetAlarm();
-            //        //        return false;
-            //        //    }
-            //        //}
-            //    }
+            //}
+            //bool isRecovery = m_bIsPossible_Recovery;
+            //if (m_IsCheckWTR)
+            //{
+            //    isRecovery = iWTR.IsEnableRecovery();
             //}
 
-            return m_bIsPossible_Recovery && iWTR.IsEnableRecovery();
+            return m_bIsPossible_Recovery;
         }
         #endregion
 
@@ -305,6 +291,7 @@ namespace Root_CAMELLIA
 
         #region StateHome
         public bool m_bIsPossible_Recovery = false;
+        public bool m_IsCheckWTR = false;
         public string StateHome()
         {
             m_HomeProgress.Reset();
@@ -323,10 +310,11 @@ namespace Root_CAMELLIA
                 m_gem.DeleteAllJobInfo();
             }
 
-            m_bIsPossible_Recovery = true;
+            //m_bIsPossible_Recovery = false;
             IWTR iWTR = (IWTR)m_wtr;
             //m_bIsPossible_Recovery = iWTR.IsEnableRecovery();
 
+            bool needRecovery = false;
             foreach (IWTRChild child in iWTR.p_aChild)
             {
                 if (child.p_infoWafer != null)
@@ -338,6 +326,10 @@ namespace Root_CAMELLIA
                             child.SetAlarm();
                             m_bIsPossible_Recovery = false;
                             return "Wafer Check Error";
+                        }
+                        else
+                        {
+                            needRecovery = true;
                         }
                     }
                 }
@@ -355,7 +347,13 @@ namespace Root_CAMELLIA
                 }
             }
 
-            //m_bIsPossible_Recovery = true;
+
+            bool wtrRecovery = false;
+            if (!needRecovery)
+                wtrRecovery = iWTR.IsEnableRecovery();
+
+            m_bIsPossible_Recovery = needRecovery || wtrRecovery;
+            //m_bIsPossible_Recovery = ExistWaferInfoRecovery && NotExistWaferInfoRecovery;
             return sInfo;
         }
 

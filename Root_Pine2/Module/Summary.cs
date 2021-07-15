@@ -47,11 +47,23 @@ namespace Root_Pine2.Module
                                 case '5': m_aUnit[y][x] = eResult.XOut; break;
                                 default: m_aUnit[y][x] = eResult.Unknown; break;
                             }
-                            if (bTop) x++; else x--; 
-                            if (x >= m_szMap.X)
+                            if (bTop)
                             {
-                                x = x = bTop ? 0 : szMap.X - 1;
-                                y++;
+                                x++;
+                                if (x >= m_szMap.X)
+                                {
+                                    x = x = bTop ? 0 : szMap.X - 1;
+                                    y++;
+                                }
+                            }
+                            else
+                            {
+                                x--;
+                                if (x < 0)
+                                {
+                                    x = x = bTop ? 0 : szMap.X - 1;
+                                    y++;
+                                }
                             }
                         }
                     }
@@ -71,6 +83,14 @@ namespace Root_Pine2.Module
                             for (int x = 0; x < m_szMap.X; x++) m_aUnit[y][x] = (eResult)Math.Max((int)m_aUnit[y][x], (int)unit.m_aUnit[y][x]);
                         }
                         return "OK";
+                    }
+
+                    public void ClearSort()
+                    {
+                        for (int y = 0; y < m_szMap.Y; y++)
+                        {
+                            for (int x = 0; x < m_szMap.X; x++) m_aUnit[y][x] = eResult.Good;
+                        }
                     }
 
                     void InitMap()
@@ -113,17 +133,12 @@ namespace Root_Pine2.Module
                 {
                     switch (result)
                     {
-                        case InfoStrip.eResult.GOOD: 
-                            m_eResult = eResult.Good;
-                            m_unit.SetResult(szMap, bTop, sMapResult); 
-                            break;
-                        case InfoStrip.eResult.DEF: 
-                            m_eResult = eResult.Defect;
-                            m_unit.SetResult(szMap, bTop, sMapResult); 
-                            break;
+                        case InfoStrip.eResult.GOOD: m_eResult = eResult.Good; break;
+                        case InfoStrip.eResult.DEF: m_eResult = eResult.Defect; break;
                         case InfoStrip.eResult.POS: m_eResult = eResult.PosError; break;
                         case InfoStrip.eResult.BCD: m_eResult = eResult.Barcode; break; 
                     }
+                    m_unit.SetResult(szMap, bTop, sMapResult);
                 }
 
                 public string SetSort(Strip strip)
@@ -149,6 +164,16 @@ namespace Root_Pine2.Module
                     case Vision2D.eVision.Bottom: eVision = eVision.Bottom; break;
                 }
                 m_aStrip[eVision].SetResult(result, szMap, vision != Vision2D.eVision.Bottom, sMapResult); 
+            }
+
+            public Strip.eResult GetResult()
+            {
+                Strip.eResult eResult = Strip.eResult.Good; 
+                foreach (eVision eVision in Enum.GetValues(typeof(eVision)))
+                {
+                    eResult = (Strip.eResult)Math.Max((int)eResult, (int)m_aStrip[eVision].m_eResult); 
+                }
+                return eResult; 
             }
 
             public CPoint m_szMap = new CPoint(); 
@@ -262,7 +287,7 @@ namespace Root_Pine2.Module
         {
             DateTime dt = DateTime.Now;
             TimeSpan ts = (dt - m_dtLotStart); 
-            m_sLotTime = ts.ToString();
+            m_sLotTime = ts.Hours.ToString("00") + ":" + ts.Minutes.ToString("00") + ":" + ts.Seconds.ToString("00");
             AddDateTime(dt);
             if (m_aTime.Count < 2) return;
             int nTime = m_aTime.Count - 1;
@@ -288,22 +313,23 @@ namespace Root_Pine2.Module
         public bool m_bUpdated = false; 
         public string SetSort(bool b3D, InfoStrip infoStrip)
         {
-            return "OK";
-            m_data = infoStrip.m_summnayData;
-            m_data.m_sStripID = infoStrip.p_id; 
+            m_data = infoStrip.m_summary;
+            m_data.m_sStripID = infoStrip.p_id;
+            m_data.m_aStrip[Data.eVision.Total].m_eResult = Data.Strip.eResult.Good; 
+            m_data.m_aStrip[Data.eVision.Total].m_unit.ClearSort(); 
             string sRun = m_data.SetSort(b3D);
             if (sRun != "OK") return sRun;
             foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision)))
             {
                 m_countStrip[eVision].AddResult(m_data.m_aStrip[eVision].m_eResult);
             }
+            foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision))) m_data.m_aStrip[eVision].m_unit.CalcCount();
             switch (m_data.m_aStrip[Data.eVision.Total].m_eResult)
             {
                 case Data.Strip.eResult.Good:
                 case Data.Strip.eResult.Defect:
                     foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision)))
                     {
-                        m_data.m_aStrip[eVision].m_unit.CalcCount(); 
                         m_countUnit[eVision].AddResult(m_data.m_aStrip[eVision].m_unit);
                     }
                     break; 

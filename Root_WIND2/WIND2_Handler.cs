@@ -695,5 +695,15 @@ namespace Root_WIND2
                     m_vision.ThreadStop();
             }
         }
+
+        public RnRData GetRnRData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateEvent()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
