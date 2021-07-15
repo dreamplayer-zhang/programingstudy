@@ -471,6 +471,12 @@ namespace RootTools_Vision
             {
                 if (Label[i].area > parameterD2D.Size)
                 {
+                    if (parameterD2D.SizeLimit > 0)
+                    {
+                        if (parameterD2D.SizeLimit < Label[i].area)
+                            continue;
+                    }
+
                     this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
 
                     this.currentWorkplace.AddDefect(sInspectionID,
