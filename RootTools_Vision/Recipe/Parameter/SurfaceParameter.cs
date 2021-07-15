@@ -19,6 +19,7 @@ namespace RootTools_Vision
         #region [Parameter]
         private int intensity = 0;
         private int size = 0;
+        private int sizeLimit = 0;
         private bool isBright = false;
         private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
         #endregion
@@ -42,7 +43,16 @@ namespace RootTools_Vision
                 SetProperty<int>(ref this.size, value);
             }
         }
-
+        [Category("Parameter")]
+        [DisplayName("Size Limit")]
+        public int SizeLimit
+        {
+            get => this.sizeLimit;
+            set
+            {
+                SetProperty<int>(ref this.sizeLimit, value);
+            }
+        }
         [Category("Option")]
         public bool IsBright
         {

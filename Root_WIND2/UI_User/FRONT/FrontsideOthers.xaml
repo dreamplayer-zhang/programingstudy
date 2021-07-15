@@ -7,7 +7,6 @@
              xmlns:local="clr-namespace:Root_WIND2"
              xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:convert="clr-namespace:ViewConverter"
              xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="1200"

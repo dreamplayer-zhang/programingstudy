@@ -45,6 +45,7 @@ namespace RootTools_Vision
         #region [Parameters]
         private int intensity = 0;
         private int size = 0;
+        private int sizeLimit = 0;
         private bool isBright = false;
         private bool scaleMap = false;
         private bool histWeightMap = false;
@@ -71,6 +72,16 @@ namespace RootTools_Vision
             set
             {
                 SetProperty<int>(ref this.size, value);
+            }
+        }
+        [Category("Parameter")]
+        [DisplayName("Size Limit")]
+        public int SizeLimit
+        {
+            get => this.sizeLimit;
+            set
+            {
+                SetProperty<int>(ref this.sizeLimit, value);
             }
         }
         [Category("Option")]
