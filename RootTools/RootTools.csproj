@@ -492,6 +492,7 @@
     <Compile Include="ParticleCounter\ParticleCounterBase_UI.xaml.cs">
       <DependentUpon>ParticleCounterBase_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Printer\BXLAPI.cs" />
     <Compile Include="Printer\SRP350.cs" />
     <Compile Include="Printer\SRP350_UI.xaml.cs">
       <DependentUpon>SRP350_UI.xaml</DependentUpon>

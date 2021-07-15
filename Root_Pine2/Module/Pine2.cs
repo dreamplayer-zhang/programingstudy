@@ -787,37 +787,30 @@ namespace Root_Pine2.Module
             void PrintDoc(Doc doc)
             {
                 string sVS = m_handler.m_pine2.p_sLotID + "_S00_C" + doc.m_sBundle; 
-                m_srp350.Start("Print Bundle");
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "Machine ID : Pine2 #" + m_iMachine.ToString());
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "--------------------------------");
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "Operator : " + m_handler.m_pine2.p_sOperator);
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "Recipe : " + m_handler.p_sRecipe);
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "Lot ID : " + m_handler.m_pine2.p_sLotID);
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "3D Inspect : " + m_handler.m_pine2.p_b3D.ToString());
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "VS File : " + sVS);
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "--------------------------------");
-                if (doc.m_eResult != InfoStrip.eResult.Init) m_srp350.Write(0, 0, m_eFont, m_szFont, "Result : " + doc.m_eResult.ToString());
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "Bundle : " + doc.m_sBundle);
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "Sorter : " + doc.m_sSorter);
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "Strip Count : " + doc.m_nStrip.ToString());
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "");
-                m_srp350.Write(0, 0, m_eFont, m_szFont, doc.m_dtNow.ToString("yyyy-MM-dd HH:mm:ss"));
-                QRCodeData data = m_qrGenerator.CreateQrCode(sVS, QRCodeGenerator.ECCLevel.Q);
-                QRCode code = new QRCode(data);
-                Bitmap bitmap = code.GetGraphic(20);
-                //bitmap.Save(EQ.c_sPathRecipe + "\\QRcode.bmp");
-                //m_srp350.Write(0, 0, EQ.c_sPathRecipe + "\\QRcode.bmp"); 
-                m_srp350.Cut(m_srp350.p_bCutFeeding);
+                m_srp350.Start();
+                m_srp350.WriteText("Machine ID : Pine2 #" + m_iMachine.ToString());
+                m_srp350.WriteText("--------------------------------");
+                m_srp350.WriteText("Operator : " + m_handler.m_pine2.p_sOperator);
+                m_srp350.WriteText("Recipe : " + m_handler.p_sRecipe);
+                m_srp350.WriteText("Lot ID : " + m_handler.m_pine2.p_sLotID);
+                m_srp350.WriteText("3D Inspect : " + m_handler.m_pine2.p_b3D.ToString());
+                m_srp350.WriteText("VS File : " + sVS);
+                m_srp350.WriteText("--------------------------------");
+                if (doc.m_eResult != InfoStrip.eResult.Init) m_srp350.WriteText("Result : " + doc.m_eResult.ToString());
+                m_srp350.WriteText("Bundle : " + doc.m_sBundle);
+                m_srp350.WriteText("Sorter : " + doc.m_sSorter);
+                m_srp350.WriteText("Strip Count : " + doc.m_nStrip.ToString());
+                m_srp350.WriteText("");
+                m_srp350.WriteText(doc.m_dtNow.ToString("yyyy-MM-dd HH:mm:ss"));
+                m_srp350.WriteQR(sVS); 
                 m_srp350.End(); 
             }
 
             int m_iMachine = 1;
-            SRP350.eFontKoean m_eFont = SRP350.eFontKoean.Korean2x2;
             int m_szFont = 9;
             public void RunTree(Tree tree)
             {
                 m_iMachine = tree.Set(m_iMachine, m_iMachine, "Machine", "Machine ID");
-                m_eFont = (SRP350.eFontKoean)tree.Set(m_eFont, m_eFont, "Type", "Font Type");
                 m_szFont = tree.Set(m_szFont, m_szFont, "Size", "Fonr Size");
             }
 
