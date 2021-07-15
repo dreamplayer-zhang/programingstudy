@@ -149,6 +149,7 @@ namespace Root_Pine2.Module
             get { return _bEmergency; }
             set
             {
+                m_alidEMG.p_bSet = value;
                 if (_bEmergency == value) return;
                 _bEmergency = value;
                 if (value)
@@ -167,6 +168,7 @@ namespace Root_Pine2.Module
             get { return _bCDA; }
             set
             {
+                m_alidCDA.p_bSet = value; 
                 if (_bCDA == value) return;
                 _bCDA = value; 
                 if (value)
@@ -182,15 +184,23 @@ namespace Root_Pine2.Module
         {
             p_bEmergency = m_diEmergency.p_bIn;
             EQ.p_bDoorOpen = m_diDoorOpen.p_bIn;
+            m_alidDoorOpen.p_bSet = m_diDoorOpen.p_bIn;
             p_bCDA = m_diCDA.p_bIn;
         }
         #endregion
 
         #region GAF
+        ALID m_alidEMG;
+        ALID m_alidCDA;
+        ALID m_alidDoorOpen;
         public ALID m_alidNewLot;
         public ALID m_alidSummary;
         void InitALID()
         {
+            m_alidEMG = m_gaf.GetALID(this, "Emergency", "Emergency Button Pressed");
+            m_alidCDA = m_gaf.GetALID(this, "CDA", "Check CDA");
+            m_alidDoorOpen = m_gaf.GetALID(this, "DoorOpen", "Door Open");
+            m_alidDoorOpen.p_bEQError = false; 
             m_alidNewLot = m_gaf.GetALID(this, "NewLot", "New Lot Communication Error");
             m_alidSummary = m_gaf.GetALID(this, "Summary", "Summary Error");
         }

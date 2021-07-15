@@ -500,11 +500,11 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Pusher Safe
-        public bool IsPusherOff()
+        public string IsPusherOff()
         {
-            if (m_loaderPusher.IsPusherOff() == false) return false;
-            if (m_pusher.m_dioPusher.m_aBitDI[0].p_bOn == false) return false; 
-            return true; 
+            if (m_loaderPusher.IsPusherOff() == false) return "Check Loader Pusher";
+            if (m_pusher.m_dioPusher.m_aBitDI[0].p_bOn == false) return "Check Transfer Pusher";
+            return "OK"; 
         }
         #endregion
 

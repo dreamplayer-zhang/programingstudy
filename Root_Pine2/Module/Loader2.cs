@@ -2,6 +2,7 @@
 using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
 using System.Threading;
@@ -21,7 +22,17 @@ namespace Root_Pine2.Module
             m_toolBox.GetDIO(ref m_dioTurnUp, this, "Turn", "Down", "Up");
             m_toolBox.GetDIO(ref m_doVacuum, this, "Vacuum");
             m_toolBox.GetDIO(ref m_diCrash, this, "Crash");
-            if (bInit) InitPosition();
+            if (bInit)
+            {
+                InitPosition();
+                InitALID();
+            }
+        }
+
+        ALID m_alidCrash;
+        void InitALID()
+        {
+            m_alidCrash = m_gaf.GetALID(this, "Crash", "Crash with Loader1");
         }
 
         const string c_sReady = "Ready";
@@ -123,6 +134,7 @@ namespace Root_Pine2.Module
                     m_axisXZ.p_axisX.ServoOn(false);
                     p_loader1.m_axisXZ.p_axisX.ServoOn(false);
                 }
+                m_alidCrash.p_bSet = m_diCrash.p_bIn; 
             }
         }
         #endregion

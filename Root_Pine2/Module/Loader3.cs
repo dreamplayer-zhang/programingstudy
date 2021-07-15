@@ -2,6 +2,7 @@
 using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -19,7 +20,20 @@ namespace Root_Pine2.Module
             m_toolBox.GetAxis(ref m_axis, this, "Loader3");
             m_toolBox.GetDIO(ref m_diCrash, this, "Crash"); 
             m_picker.GetTools(m_toolBox, this, bInit);
-            if (bInit) InitPosition();
+            if (bInit)
+            {
+                InitPosition();
+                InitALID(); 
+            }
+        }
+
+        ALID m_alidCrash;
+        ALID m_alidSorter;
+        void InitALID()
+        {
+            m_alidCrash = m_gaf.GetALID(this, "Crash", "Crash with Loader0");
+            m_alidSorter = m_gaf.GetALID(this, "Sorter", "Sorter Bin not Enable");
+            m_alidSorter.p_bEQError = false; 
         }
 
         public enum ePosTransfer
@@ -80,6 +94,7 @@ namespace Root_Pine2.Module
                     m_axis.p_axisX.ServoOn(false);
                     p_loader0.m_axis.p_axisX.ServoOn(false); 
                 }
+                m_alidCrash.p_bSet = m_diCrash.p_bIn; 
             }
         }
         #endregion
@@ -299,9 +314,11 @@ namespace Root_Pine2.Module
                 {
                     EQ.p_eState = EQ.eState.Ready;
                     m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Warning);
-                    Thread.Sleep(200); 
+                    m_alidSorter.p_bSet = true; 
+                    Thread.Sleep(1000); 
                     return "OK";
                 }
+                m_alidSorter.p_bSet = false;
                 foreach (MagazineEV magazineEV in m_handler.m_magazineEVSet.m_aEV.Values) magazineEV.m_conveyor.m_bInv = false;
                 MagazineEV magazine = m_handler.m_magazineEVSet.m_aEV[(InfoStrip.eMagazine)ePosTray];
                 magazine.m_conveyor.m_bInv = true; 
