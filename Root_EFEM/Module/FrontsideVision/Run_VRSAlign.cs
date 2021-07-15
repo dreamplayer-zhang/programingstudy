@@ -32,6 +32,7 @@ namespace Root_EFEM.Module.FrontsideVision
         string m_sGrabMode = "";
         public int m_searchOffset = 0;
         public int m_searchInterval = 0;
+        public double m_VRSCamResolution = 0.75;
 
         double m_diePitchX = 5718;
         double m_diePitchY = 4358;
@@ -88,6 +89,7 @@ namespace Root_EFEM.Module.FrontsideVision
 
             run.m_searchOffset = this.m_searchOffset;
             run.m_searchInterval = this.m_searchInterval;
+            run.m_VRSCamResolution = this.m_VRSCamResolution;
 
             return run;
         }
@@ -109,6 +111,7 @@ namespace Root_EFEM.Module.FrontsideVision
 
             m_searchOffset = tree.Set(m_searchOffset, m_searchOffset, "Search Offset", "Search Offset", bVisible);
             m_searchInterval = tree.Set(m_searchInterval, m_searchInterval, "Search Interval", "Search Interval", bVisible);
+            m_VRSCamResolution = tree.Set(m_VRSCamResolution, m_VRSCamResolution, "VRS Camera Resolution", "VRS Camera Resolution", bVisible);
         }
 
         public override string Run()
@@ -243,18 +246,22 @@ namespace Root_EFEM.Module.FrontsideVision
                         foundShotLBPoint.X = x;
                         foundShotLBPoint.Y = y;
                     }
-                    //break;
+                    //break; // for debugging
                 }
-                //break;
+                //break; // for debugging
             }
 
-            /*if (scoreMax < m_score)
+            if (scoreMax < m_score)
             {
                 return "VRS Align Fail [Score : " + score.ToString() + "]";
-            }*/
+            }
 
             // Found Shot Point
             // Need to correct foundShotLBPoint with maxOutX and maxOutY before moving
+            ImageData camImage = m_CamVRS.p_ImageViewer.p_ImageData;
+            foundShotLBPoint.X = foundShotLBPoint.X + ((maxOutX - camImage.p_Size.X / 2) * m_VRSCamResolution * PULSE_TO_UM);
+            foundShotLBPoint.Y = foundShotLBPoint.Y + ((maxOutY - camImage.p_Size.Y / 2) * m_VRSCamResolution * PULSE_TO_UM);
+
             if (m_module.Run(axisXY.StartMove(foundShotLBPoint)))
             {
                 return p_sInfo;
