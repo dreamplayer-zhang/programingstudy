@@ -788,7 +788,7 @@ namespace Root_Pine2.Module
             {
                 string sVS = m_handler.m_pine2.p_sLotID + "_S00_C" + doc.m_sBundle; 
                 m_srp350.Start("Print Bundle");
-                m_srp350.Write(0, 0, m_eFont, m_szFont, "Machine ID : " + m_sMachine);
+                m_srp350.Write(0, 0, m_eFont, m_szFont, "Machine ID : Pine2 #" + m_iMachine.ToString());
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "--------------------------------");
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "Operator : " + m_handler.m_pine2.p_sOperator);
                 m_srp350.Write(0, 0, m_eFont, m_szFont, "Recipe : " + m_handler.p_sRecipe);
@@ -811,12 +811,12 @@ namespace Root_Pine2.Module
                 m_srp350.End(); 
             }
 
-            string m_sMachine = "Pine2 #1";
+            int m_iMachine = 1;
             SRP350.eFontKoean m_eFont = SRP350.eFontKoean.Korean2x2;
             int m_szFont = 9;
             public void RunTree(Tree tree)
             {
-                m_sMachine = tree.Set(m_sMachine, m_sMachine, "Machine", "Machine ID");
+                m_iMachine = tree.Set(m_iMachine, m_iMachine, "Machine", "Machine ID");
                 m_eFont = (SRP350.eFontKoean)tree.Set(m_eFont, m_eFont, "Type", "Font Type");
                 m_szFont = tree.Set(m_szFont, m_szFont, "Size", "Fonr Size");
             }

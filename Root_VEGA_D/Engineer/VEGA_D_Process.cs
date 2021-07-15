@@ -387,7 +387,7 @@ namespace Root_VEGA_D.Engineer
         #endregion
 
         #region RunSequence
-
+        int m_nCount = 0;
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
         public string RunNextSequence()
         {
@@ -401,7 +401,15 @@ namespace Root_VEGA_D.Engineer
             Sequence sequence = m_qSequence.Peek();
             if (sequence.m_moduleRun.p_id.Contains(".Docking") && !EQ.p_bRecovery)
             {
-                if (handler.m_bIsRNR) handler.m_interlock.m_log.Info("<<<<<<<Lot Start>>>>>>>");
+                if (handler.m_bIsRNR)
+                {
+                    m_nCount = EQ.p_nRnR < 1 ? 0 : EQ.p_nRnR;
+                    handler.m_interlock.m_log.Info("RNR Start, RNR Count : " + m_nCount);
+                }
+                else
+				{
+                    handler.m_interlock.m_log.Info("<<<<<<<Lot Start>>>>>>>");
+				}
                 ModuleRunBase VisionPM = handler.m_vision.m_runPM.Clone();
                 handler.m_vision.StartRun(VisionPM);
                 while (handler.m_vision.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
