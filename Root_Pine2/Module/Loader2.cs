@@ -167,8 +167,10 @@ namespace Root_Pine2.Module
             }
             finally
             {
+                m_axisXZ.p_axisY.m_bCheckStop = false;
                 RunMove(c_sReady);
                 RunTurnUp(true);
+                m_axisXZ.p_axisY.m_bCheckStop = true;
             }
             return "OK";
         }

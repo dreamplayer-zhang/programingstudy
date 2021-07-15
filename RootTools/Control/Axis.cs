@@ -438,6 +438,7 @@ namespace RootTools.Control
             return StartMove(fPos, sSpeed);
         }
 
+        public bool m_bCheckStop = true; 
         public double m_posDst = 0;
         int m_msMoveTime = 0;
         public virtual string StartMove(double fPos, string sSpeed = null)
@@ -445,7 +446,7 @@ namespace RootTools.Control
             m_posDst = fPos;
             m_speedNow = (sSpeed != null) ? GetSpeedValue(sSpeed) : GetSpeedValue(EQ.p_bDoorOpen ? eSpeed.Move_DoorOpen : eSpeed.Move);
             m_swMove.Start();
-            if (EQ.IsStop()) return p_id + " EQ Stop";
+            if (m_bCheckStop && EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
             if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
             double dPos = fPos - p_posCommand;
