@@ -795,6 +795,7 @@ namespace Root_Pine2.Module
 
             void PrintDoc(Doc doc)
             {
+                return; 
                 string sVS = m_handler.m_pine2.p_sLotID + "_S00_C" + doc.m_sBundle; 
                 m_srp350.Start();
                 m_srp350.WriteText("Machine ID : Pine2 #" + m_iMachine.ToString());
