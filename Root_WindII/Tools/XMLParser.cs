@@ -98,7 +98,7 @@ namespace Root_WindII
                 if (xmlNodeList.Count > 0)
                 {
                     xmlNodeList = xmlDoc.SelectNodes("/XMLCONTENTS/BASIC_TAB/DIE_LIST/DIE_INFO");
-                    foreach(XmlNode node in xmlNodeList)
+                    foreach (XmlNode node in xmlNodeList)
                     {
                         Point pt = new Point();
                         pt.X = Convert.ToInt32(node["DIE_X"].InnerText);
@@ -106,7 +106,7 @@ namespace Root_WindII
 
                         xmlData.DieList.Add(pt);
                     }
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -162,7 +162,7 @@ namespace Root_WindII
                     for (int i = 0; i < xmlNodeList.Count; i++)
                     {
                         Names.Add(xmlNodeList[i].ChildNodes[0].InnerText);
-                   }
+                    }
                 }
                 return Names.ToArray();
             }
@@ -173,7 +173,7 @@ namespace Root_WindII
             }
         }
         static public string GetMasterProductName(string filePath)
-        {           
+        {
             if (filePath == string.Empty)
             {
                 return null;
@@ -188,12 +188,12 @@ namespace Root_WindII
                 string sSlave = xmlNodeList[0].ChildNodes[1].InnerText;
                 return sMaster;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 MessageBox.Show("Invalid XML File", "RAC SERVER", MessageBoxButton.OK, MessageBoxImage.Asterisk);
             }
             return null;
-           
+
         }
         //static public bool StepMatchingTableParse(string filePath, StepTableData stepData)  // StepMatchingFilePath : StepMatchingTable file (ex) ~~\Product_B.xml
         //{
@@ -208,7 +208,7 @@ namespace Root_WindII
 
         //        XmlNodeList xmlNodeList = null;
         //        xmlNodeList = StepTableDoc.GetElementsByTagName("LayerCnt");
-                
+
         //        if (xmlNodeList.Count > 0)
         //        {
         //            for (int i = 0; i < xmlNodeList.Count; i++)

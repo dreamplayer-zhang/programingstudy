@@ -256,6 +256,8 @@ namespace Root_AOP01_Packing
             //            }
             return null;
         }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         #region Thread

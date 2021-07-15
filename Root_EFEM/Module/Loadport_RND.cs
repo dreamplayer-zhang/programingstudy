@@ -218,6 +218,17 @@ namespace Root_EFEM.Module
             return p_infoCarrier.GetTeachWTR(infoWafer);
         }
 
+
+        public void CopySlotInfo(InfoWafer infoWafer, GemSlotBase gemSlot)
+        {
+            infoWafer.p_sRecipe = gemSlot.p_sRecipe;
+            infoWafer.p_sCarrierID = gemSlot.p_sCarrierID;
+            infoWafer.p_sLocID = gemSlot.p_sLocID;
+            infoWafer.p_sLotID = gemSlot.p_sLotID;
+            infoWafer.p_eState = gemSlot.p_eState;
+            infoWafer.p_sSlotID = gemSlot.p_sSlotID;
+        }
+
         public string IsGetOK(int nID)
         {
             if (p_eState != eState.Ready)
@@ -246,7 +257,8 @@ namespace Root_EFEM.Module
 
             MarsLogManager marsLogManager = MarsLogManager.Instance;
             marsLogManager.ChangeMaterial(EQ.p_nRunLP, wafer.m_nSlot + 1, wafer.p_sLotID, wafer.p_sCarrierID, wafer.p_sRecipe);
-
+            if(wafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer || wafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer)
+                MarsLogManager.Instance.WriteLEH(EQ.p_nRunLP, this.p_id, SSLNet.LEH_EVENTID.PROCESS_JOB_START, MarsLogManager.Instance.m_flowData, MarsLogManager.Instance.m_dataFormatter);
             return IsRunOK();
         }
 
@@ -861,7 +873,7 @@ namespace Root_EFEM.Module
                     return p_sInfo + " SendCarrierID : " + m_infoCarrier.p_sCarrierID;
 
 
-                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Load", SSLNet.STATUS.START, type:SSLNet.MATERIAL_TYPE.FOUP);
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "CarrierLoad", SSLNet.STATUS.START, type:SSLNet.MATERIAL_TYPE.FOUP);
 
                 while (m_infoCarrier.p_eStateCarrierID != GemCarrierBase.eGemState.VerificationOK)
                 {
@@ -919,10 +931,39 @@ namespace Root_EFEM.Module
                         return p_sInfo + " infoCarrier.p_eStateSlotMap = " + m_infoCarrier.p_eStateSlotMap.ToString();
                 }
 
+                RnRData rnrData = m_module.m_engineer.ClassHandler().GetRnRData();
+                int firstIdx = -1;
+                int lastIdx = -1;
                 
+                foreach (int sel in rnrData.SelectSlot)
+                {
+                    m_infoCarrier.m_aGemSlot[sel].p_eState = GemSlotBase.eState.Select;
+                    m_infoCarrier.m_aGemSlot[sel].p_sCarrierID = rnrData.CarrierID;
+                    m_infoCarrier.m_aGemSlot[sel].p_sLotID = rnrData.LotID;
+                    if (firstIdx == -1)
+                        firstIdx = sel;
+
+                    m_module.CopySlotInfo(m_infoCarrier.m_aInfoWafer[sel], m_infoCarrier.m_aGemSlot[sel]);
+
+                    lastIdx = sel;
+                }
+                if(rnrData.SelectSlot.Count != 0)
+                {
+                    if (firstIdx == lastIdx)
+                        m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstLastWafer;
+                    else
+                    {
+                        m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstWafer;
+                        m_infoCarrier.m_aInfoWafer[lastIdx].p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
+                    }
+                    m_infoCarrier.p_sCarrierID = rnrData.CarrierID;
+                    m_infoCarrier.p_sLotID = rnrData.LotID;
+                }
+
+
                 SSLNet.DataFormatter dataformatter = new SSLNet.DataFormatter();
                 dataformatter.AddData("MapID", m_infoCarrier.GetMapData());
-                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Load", SSLNet.STATUS.END, SSLNet.MATERIAL_TYPE.FOUP, dataformatter);
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "CarrierLoad", SSLNet.STATUS.END, SSLNet.MATERIAL_TYPE.FOUP, dataformatter);
                 dataformatter.ClearData();
                 return "OK";
             }
@@ -964,7 +1005,7 @@ namespace Root_EFEM.Module
                         return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 }
 
-                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Unload", SSLNet.STATUS.START, type: SSLNet.MATERIAL_TYPE.FOUP);
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "CarrierUnload", SSLNet.STATUS.START, type: SSLNet.MATERIAL_TYPE.FOUP);
 
                 if (bUseXGem && !m_gem.p_bOffline)
                 {
@@ -992,7 +1033,8 @@ namespace Root_EFEM.Module
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                 m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
-                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Unload", SSLNet.STATUS.END, type: SSLNet.MATERIAL_TYPE.FOUP);
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "CarrierUnload", SSLNet.STATUS.END, SSLNet.MATERIAL_TYPE.FOUP);
+                marsLogManager.WriteLEH(EQ.p_nRunLP, m_module.p_id, SSLNet.LEH_EVENTID.CARRIER_UNLOAD, MarsLogManager.Instance.m_flowData);
                 //m_module.m_ceidUnDocking.Send();
                 return sResult;
             }
@@ -1060,7 +1102,7 @@ namespace Root_EFEM.Module
                         if (firstIdx == -1)
                             firstIdx = i;
 
-                        CopySlotInfo(m_infoCarrier.m_aInfoWafer[i], m_infoCarrier.m_aGemSlot[i]);
+                        m_module.CopySlotInfo(m_infoCarrier.m_aInfoWafer[i], m_infoCarrier.m_aGemSlot[i]);
                         m_infoCarrier.StartProcess(m_infoCarrier.m_aGemSlot[i].p_id);
                         lastIdx = i;
                     }
@@ -1072,16 +1114,8 @@ namespace Root_EFEM.Module
                     m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstWafer;
                     m_infoCarrier.m_aInfoWafer[lastIdx].p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
                 }
+                m_module.m_engineer.ClassHandler().UpdateEvent();
                 return sResult;
-            }
-            void CopySlotInfo(InfoWafer infoWafer, GemSlotBase gemSlot)
-            {
-                infoWafer.p_sRecipe = gemSlot.p_sRecipe;
-                infoWafer.p_sCarrierID = gemSlot.p_sCarrierID;
-                infoWafer.p_sLocID = gemSlot.p_sLocID;
-                infoWafer.p_sLotID = gemSlot.p_sLotID;
-                infoWafer.p_eState = gemSlot.p_eState;
-                infoWafer.p_sSlotID = gemSlot.p_sSlotID;
             }
         }
         #endregion

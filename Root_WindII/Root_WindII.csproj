@@ -256,6 +256,8 @@
     <Compile Include="MvvmTools\RelayCommand.cs" />
     <Compile Include="MvvmTools\SizeObserver.cs" />
     <Compile Include="Recipe\RecipeFront.cs" />
+    <Compile Include="Tools\KlarfFileReader.cs" />
+    <Compile Include="Tools\XMLCreator.cs" />
     <Compile Include="UI\Dialog\Dialog_PortSelect.xaml.cs">
       <DependentUpon>Dialog_PortSelect.xaml</DependentUpon>
     </Compile>
@@ -270,6 +272,10 @@
     <Compile Include="UI\Dialog\ManualAlignViewer_ViewModel.cs" />
     <Compile Include="Tools\PositionConverter.cs" />
     <Compile Include="Tools\StepTableData.cs" />
+    <Compile Include="UI\OPERATION\OperationPanel.xaml.cs">
+      <DependentUpon>OperationPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OPERATION\OperationPanel_VieModel.cs" />
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
@@ -463,6 +469,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Dialog\ManualAlignViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\OPERATION\OperationPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

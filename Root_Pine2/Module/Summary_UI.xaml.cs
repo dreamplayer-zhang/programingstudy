@@ -125,12 +125,12 @@ namespace Root_Pine2.Module
             m_labelMapSize.Content = m_summary.m_data.m_szMap.X.ToString() + ", " + m_summary.m_data.m_szMap.Y.ToString(); 
             foreach (Summary.Data.eVision eVision in Enum.GetValues(typeof(Summary.Data.eVision)))
             {
-                int y = (int)eVision;
+                int x = (int)eVision;
                 Summary.Data.Strip.Unit unit = m_summary.m_data.m_aStrip[eVision].m_unit;
                 foreach (Summary.Data.Strip.Unit.eResult eResult in Enum.GetValues(typeof(Summary.Data.Strip.Unit.eResult)))
                 {
-                    int x = (int)eResult;
-                    m_labelStripInfo[x, y].Content = unit.m_aCount[eResult].ToString(); 
+                    int y = (int)eResult;
+                    if (eResult != Summary.Data.Strip.Unit.eResult.Unknown) m_labelStripInfo[x, y].Content = unit.m_aCount[eResult].ToString(); 
                 }
             }
         }
@@ -169,11 +169,11 @@ namespace Root_Pine2.Module
         {
             foreach (Summary.Data.eVision eVision in Enum.GetValues(typeof(Summary.Data.eVision)))
             {
-                int y = (int)eVision;
+                int x = (int)eVision;
                 Summary.CountStrip countStrip = m_summary.m_countStrip[eVision]; 
                 foreach (Summary.Data.Strip.eResult eResult in Enum.GetValues(typeof(Summary.Data.Strip.eResult)))
                 {
-                    int x = (int)eResult;
+                    int y = (int)eResult;
                     m_labelCountStrip[x, y].Content = countStrip.m_aCount[eResult].ToString(); 
                 }
             }
@@ -213,12 +213,12 @@ namespace Root_Pine2.Module
         {
             foreach (Summary.Data.eVision eVision in Enum.GetValues(typeof(Summary.Data.eVision)))
             {
-                int y = (int)eVision;
+                int x = (int)eVision;
                 Summary.CountUnit countUnit = m_summary.m_countUnit[eVision];
                 foreach (Summary.Data.Strip.Unit.eResult eResult in Enum.GetValues(typeof(Summary.Data.Strip.Unit.eResult)))
                 {
-                    int x = (int)eResult;
-                    m_labelCountUnit[x, y].Content = countUnit.m_aCount[eResult].ToString();
+                    int y = (int)eResult;
+                    if (eResult != Summary.Data.Strip.Unit.eResult.Unknown) m_labelCountUnit[x, y].Content = countUnit.m_aCount[eResult].ToString();
                 }
             }
         }
@@ -249,74 +249,41 @@ namespace Root_Pine2.Module
         #endregion
 
         #region UnitMap
-        public class UnitUI
-        {
-            public Dictionary<Summary.Data.eVision, Grid> m_aGrid = new Dictionary<Summary.Data.eVision, Grid>();
-
-            public void SetResult(Summary.Data.eVision eVision, Brush brush)
-            {
-                m_aGrid[eVision].Background = brush; 
-            }
-
-            public UnitUI(CPoint cp)
-            {
-                foreach (Summary.Data.eVision eVision in Enum.GetValues(typeof(Summary.Data.eVision))) m_aGrid.Add(eVision, new Grid());
-
-                Grid grid = m_aGrid[Summary.Data.eVision.Total]; 
-                grid.Margin = new Thickness(1);
-                grid.Children.Clear();
-                grid.RowDefinitions.Clear();
-                for (int x = 0; x < 2; x++) grid.RowDefinitions.Add(new RowDefinition());
-                grid.ColumnDefinitions.Clear();
-                for (int x = 0; x < 2; x++) grid.ColumnDefinitions.Add(new ColumnDefinition());
-                Grid.SetColumn(grid, cp.X);
-                Grid.SetRow(grid, cp.Y);
-
-                InitGrid(m_aGrid[Summary.Data.eVision.Top3D], 0, 0);
-                InitGrid(m_aGrid[Summary.Data.eVision.Top2D], 1, 0);
-                InitGrid(m_aGrid[Summary.Data.eVision.Top3D], 1, 1);
-            }
-
-            void InitGrid(Grid grid, int x, int y)
-            {
-                grid.Margin = new Thickness(2);
-                Grid.SetColumn(grid, x);
-                Grid.SetRow(grid, y);
-                m_aGrid[Summary.Data.eVision.Total].Children.Add(grid); 
-            }
-        }
-
-        public List<List<UnitUI>> m_aUnitUI = new List<List<UnitUI>>();
+        public List<List<SummaryUnit_UI>> m_aUnitUI = new List<List<SummaryUnit_UI>>();
         CPoint m_szMap = new CPoint(); 
         void InitUnitMap()
         {
             if (m_szMap == m_summary.m_data.m_szMap) return;
             gridUnit.Children.Clear();
             m_aUnitUI.Clear();
-            m_szMap = m_summary.m_data.m_szMap; 
-            while (m_aUnitUI.Count < m_szMap.Y) m_aUnitUI.Add(new List<UnitUI>());
+            m_szMap = m_summary.m_data.m_szMap;
+            for (int x = 0; x < m_szMap.X; x++) gridUnit.ColumnDefinitions.Add(new ColumnDefinition());
+            for (int y = 0; y < m_szMap.Y; y++) gridUnit.RowDefinitions.Add(new RowDefinition());
+            while (m_aUnitUI.Count < m_szMap.Y) m_aUnitUI.Add(new List<SummaryUnit_UI>());
             for (int yp = 0; yp < m_szMap.Y; yp++)
             {
                 while (m_aUnitUI[yp].Count < m_szMap.X)
                 {
-                    UnitUI ui = new UnitUI(new CPoint(m_aUnitUI[yp].Count, yp)); 
+                    SummaryUnit_UI ui = new SummaryUnit_UI();
+                    Grid.SetColumn(ui, m_aUnitUI[yp].Count);
+                    Grid.SetRow(ui, yp); 
                     m_aUnitUI[yp].Add(ui);
-                    gridUnit.Children.Add(ui.m_aGrid[Summary.Data.eVision.Total]); 
+                    gridUnit.Children.Add(ui); 
                 }
             }
         }
 
         void OnUpdateUnitMap()
         {
-            InitUnitMap(); 
+            InitUnitMap();
             foreach (Summary.Data.Strip strip in m_summary.m_data.m_aStrip.Values)
             {
-                CPoint szMap = strip.m_unit.m_szMap; 
+                CPoint szMap = strip.m_unit.m_szMap;
                 for (int y = 0; y < szMap.Y; y++)
                 {
                     for (int x = 0; x < szMap.X; x++)
                     {
-                        m_aUnitUI[y][x].SetResult(strip.m_eVision, m_aBrush[strip.m_unit.m_aUnit[y][x]]); 
+                        m_aUnitUI[y][x].SetResult(strip.m_eVision, m_aBrush[strip.m_unit.m_aUnit[y][x]]);
                     }
                 }
             }

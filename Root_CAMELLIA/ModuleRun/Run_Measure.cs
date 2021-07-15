@@ -125,28 +125,28 @@ namespace Root_CAMELLIA.Module
                     if (m_DataManager.recipeDM.MeasurementRD.UseThickness)
                     {
                         Thread.Sleep(1);
+                        string sMeasurePoint = string.Empty;
                         if (nRepeatCount == 1)
                         {
                             nTotalRawDataIndex = (item.m_index + 1);
+                            sMeasurePoint = nTotalRawDataIndex.ToString();
                         }
                         else
                         {
                             // 여기서의 nPointIndex는 Repeat * WaferMeasure Point 개수라는 뜻 (다시 확인해서 수정 필요)
                             nTotalRawDataIndex++;
-
+                            sMeasurePoint += (item.m_index + 1);
+                            sMeasurePoint += "-" + (item.m_repeat + 1).ToString();
                         }
                         nDataIndex = nTotalRawDataIndex - 1;
                         //nDataIndex = item.m_index;
 
-                        Met.Nanoview.ERRORCODE_NANOVIEW rst = App.m_nanoView.GetThickness(nDataIndex, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor, useAlphafit);
+                        Met.Nanoview.ERRORCODE_NANOVIEW rst = App.m_nanoView.GetThickness(nDataIndex, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor, sMeasurePoint, m_mwvm.SettingViewModel.p_ExceptNIR, useAlphafit);
                         if (rst != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                         {
-                            //isEQStop = false;
-
-                            // "Get Thickness Error";
+                            //string NANOVIEWERRORCODE =  rst.ToString();
                             m_log.Warn(Enum.GetName(typeof(Met.Nanoview.ERRORCODE_NANOVIEW), rst));
                         }
-
                         if (m_isPM)
                         {
                             m_mwvm.EngineerViewModel.p_pmParameter.p_alpha1 = App.m_nanoView.GetAlphaFit();
@@ -154,7 +154,7 @@ namespace Root_CAMELLIA.Module
                     }
 
                     m_mwvm.p_Progress = (double)(item.m_index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count * 100;
-                    SaveRawData(item.m_index);
+                    //SaveRawData(item.m_index);
                     //.DataManager MetData = LibSR_Met.DataManager.GetInstance();
                     // Spectrum data Thread 추가 두개두개두개
                     //LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(@"C:\Users\ATI\Desktop\SaveTest\" + index + "_" + DateTime.Now.ToString("HHmmss") + "test.csv", m_module.p_infoWafer.p_sCarrierID,
@@ -386,26 +386,63 @@ namespace Root_CAMELLIA.Module
                     }
 
                     for(int cnt = 0; cnt < m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount; cnt++)
-                    {  
+                    {
+                        string sMeasureIndex = string.Empty;
                         if (m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount == 1)
                         {
                             nTotalRawDataIndex = i+1;
+                            sMeasureIndex = nTotalRawDataIndex.ToString();
                         }
                         else
                         {
                             // 여기서의 nPointIndex는 Repeat * WaferMeasure Point 개수라는 뜻 (다시 확인해서 수정 필요)
                             nTotalRawDataIndex++;
-                            
+                            sMeasureIndex += (i + 1).ToString();
+                            sMeasureIndex += "-" + (cnt + 1).ToString();
                         }
-
+                        
                         dataFormatter.AddData("Measure Repeat", m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount);
                         marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Measure", SSLNet.STATUS.START);
+                        Thread.Sleep(10);
                         Met.Nanoview.ERRORCODE_NANOVIEW rst = App.m_nanoView.SampleMeasure((nTotalRawDataIndex-1), x, y,
         m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
-        m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength);
+        m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength, sMeasureIndex);
                         if (rst != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                         {
-                            m_log.Warn(Enum.GetName(typeof(Met.Nanoview.ERRORCODE_NANOVIEW), rst));
+
+                            if ((int)rst == 10)
+                            {
+                                m_log.Warn("Unknown Error");
+                            }
+                            else if(rst == Met. Nanoview.ERRORCODE_NANOVIEW.NANOVIEW_ERROR)
+                            {
+                                m_log.Warn("NANOVIEW_ERROR_NOT_FOUND_BETA_FILE");
+                                // Init Calibration 시퀀스 추가 필요
+                            }
+                            else
+                            {
+                                m_log.Warn(Enum.GetName(typeof(Met.Nanoview.ERRORCODE_NANOVIEW), rst));
+                            }
+                           
+                            for (int re = 0; re < 5; re++)
+                            {
+                                rst = App.m_nanoView.SampleMeasure((nTotalRawDataIndex - 1), x, y,
+       m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
+       m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength, sMeasureIndex);
+                                
+                                if (rst != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                                {
+                                    
+                                    string NANOVIEWERRORCODE = rst.ToString();
+                                    m_log.Warn(sMeasureIndex + " RE-SNAP FAIL" + ":" + (re+1).ToString() + NANOVIEWERRORCODE);
+                                }
+                                else
+                                {
+                                    m_log.Warn(sMeasureIndex + " RE-SNAP DONE" + ":" +(re+1).ToString());
+                                    break;
+                                }
+                            }
+                           
                         }
                         marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Measure", SSLNet.STATUS.END);
                         dataFormatter.ClearData();
@@ -978,7 +1015,7 @@ namespace Root_CAMELLIA.Module
 
             //int nVID = ((XGem300Data)m_aSV[(int)eSV.ResultList]).m_nID;
 
-            //p_xGem.GEMSetVariables(nObject, 8100);
+            p_xGem.GEMSetVariables(nObject, 1110);
         }
 
         public void SetResultInfomation(long nObject)
@@ -1007,7 +1044,7 @@ namespace Root_CAMELLIA.Module
 
             for (int i = 1; i <= nOS; i++)
             {
-                p_xGem.SetListItem(nObject, 11);
+                p_xGem.SetListItem(nObject, 8);
                 SetFloatData(nObject, eDcolData_OS.OS_X_Position, i);
                 SetFloatData(nObject, eDcolData_OS.OS_X_Position_Offset, i);
                 SetFloatData(nObject, eDcolData_OS.OS_Y_Position, i);
@@ -1015,10 +1052,11 @@ namespace Root_CAMELLIA.Module
                 SetFloatData(nObject, eDcolData_OS.Total_Thickness, i);
                 SetFloatData(nObject, eDcolData_OS.Thickness_Detail, i);
                 SetFloatData(nObject, eDcolData_OS.GOF, i);
-                SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Reflectance, 0);
                 SetFloatData(nObject, eDcolData_OS.Reflectance, i);
-                SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Transmittance, 0);
-                SetFloatData(nObject, eDcolData_OS.Transmittance, i);
+                //이부분 수정 필요
+                //SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Reflectance, 0);
+                //SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Transmittance, 0);
+                //SetFloatData(nObject, eDcolData_OS.Transmittance, i);
                 //m_log.Add("Site #" + i.ToString() + "  Data Set Done");
             }
         }

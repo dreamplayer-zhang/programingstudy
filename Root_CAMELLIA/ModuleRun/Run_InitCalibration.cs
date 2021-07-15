@@ -84,6 +84,7 @@ namespace Root_CAMELLIA.Module
                         return "Load Parameter Error";
                     }
                     LibSR_Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
+                    LibSR_Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
                 }
                 m_dataManager.m_calibration.Run(m_InitialCal, m_isPM, false, m_nCalibrationCnt);
                 //App.m_nanoView.Calibration(m_InitialCal);

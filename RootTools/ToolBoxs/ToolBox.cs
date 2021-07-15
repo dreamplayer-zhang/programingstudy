@@ -112,6 +112,19 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
+        public string GetDIO(ref DIO_I4O value, ModuleBase module, string id, string sFalse, string sTrue, bool bLog = true, bool bEnableRun = false)
+        {
+            if (value == null) value = new DIO_I4O(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sFalse, sTrue);
+            string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
+            if (sInfo != "OK") return sInfo;
+            module.m_listDI.AddBit(value.m_aBitDIA[0]);
+            module.m_listDI.AddBit(value.m_aBitDIB[0]);
+            module.m_listDI.AddBit(value.m_aBitDIA[1]);
+            module.m_listDI.AddBit(value.m_aBitDIB[1]);
+            module.m_listDO.AddBit(value.m_bitDO);
+            return "OK";
+        }
+
         public string GetDIO(ref DIO_I2O2 value, ModuleBase module, string id, string sFalse, string sTrue, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_I2O2(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sFalse, sTrue);

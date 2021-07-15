@@ -128,6 +128,8 @@ namespace Root_Pine2_Vision.Engineer
         public void CalcSequence()
         {
         }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         string m_id;

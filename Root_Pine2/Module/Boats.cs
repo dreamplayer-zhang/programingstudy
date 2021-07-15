@@ -111,7 +111,7 @@ namespace Root_Pine2.Module
             m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
             if (Run(m_aBoat[eWorks].RunMove(p_ePosUnload))) return p_sInfo;
             m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
-            if (m_aBoat[eWorks].p_infoStrip != null) m_aBoat[eWorks].p_infoStrip.p_eResult = InfoStrip.eResult.POS; 
+            if (m_aBoat[eWorks].p_infoStrip != null) m_aBoat[eWorks].p_infoStrip.SetResult(m_vision.m_eVision, InfoStrip.eResult.POS.ToString(), "1", "1", "4"); 
             return "OK";
         }
         #endregion
@@ -222,13 +222,14 @@ namespace Root_Pine2.Module
                     if (Run(RunMoveSnapStart(eWorks, snap, i % xLine))) return p_sInfo;
                     while (m_bSnapReady == false)
                     {
-                        Thread.Sleep(2);
+                        Thread.Sleep(10);
                         if (EQ.IsStop()) return "EQ Stop";
                     }
 
                     if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (i < m_aBoat[eWorks].m_recipe.m_aSnap.Count-1)
                     {
+                        SendChangeUserSet();
                         if (Run(RunMoveSnapStart(eWorks, m_aBoat[eWorks].m_recipe.m_aSnap[i + 1], i % xLine))) return p_sInfo;
                     }
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
@@ -279,12 +280,6 @@ namespace Root_Pine2.Module
                 _sRecipe = value;
                 m_aBoat[Vision2D.eWorks.A].p_sRecipe = value;
                 m_aBoat[Vision2D.eWorks.B].p_sRecipe = value;
-                string sRun = m_vision.SendRecipe(value); 
-                if (sRun != "OK")
-                {
-                    p_sInfo = sRun;
-                    p_eState = eState.Error;
-                }
             }
         }
         #endregion
@@ -337,6 +332,14 @@ namespace Root_Pine2.Module
                 bool bConnect = (asRead[3] == "1");
                 m_aBoat[eWorks].p_bWorksConnect = bConnect; 
             }
+        }
+
+        int m_nReq = 0;
+        public string SendChangeUserSet()
+        {
+            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.ChangeUserset.ToString() ;
+            m_tcpRequest.Send(sSend);
+            return "OK";
         }
         #endregion
 

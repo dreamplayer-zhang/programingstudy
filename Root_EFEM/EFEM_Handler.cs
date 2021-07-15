@@ -489,5 +489,15 @@ namespace Root_EFEM
             p_moduleList.ThreadStop();
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
         }
+
+        public void UpdateEvent()
+        {
+            return;
+        }
+
+        public RnRData GetRnRData()
+        {
+            return new RnRData();
+        }
     }
 }
