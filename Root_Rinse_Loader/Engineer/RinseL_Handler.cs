@@ -154,6 +154,8 @@ namespace Root_Rinse_Loader.Engineer
         {
             throw new NotImplementedException();
         }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         #region Thread

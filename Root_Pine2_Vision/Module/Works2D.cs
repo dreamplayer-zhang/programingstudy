@@ -310,7 +310,8 @@ namespace Root_Pine2_Vision.Module
 
                             //Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
                             m_nProcessID = process.Id;
-                            Thread.Sleep(2000); 
+                            Thread.Sleep(2000);
+                            if (m_vision.m_lotInfo != null) SendLotInfo(m_vision.m_lotInfo); 
                         }
                         else if (m_tcpip.p_bConnect == false)
                         {

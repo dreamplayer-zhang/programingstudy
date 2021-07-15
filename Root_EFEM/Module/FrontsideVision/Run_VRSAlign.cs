@@ -32,6 +32,7 @@ namespace Root_EFEM.Module.FrontsideVision
         string m_sGrabMode = "";
         public int m_searchOffset = 0;
         public int m_searchInterval = 0;
+        public double m_VRSCamResolution = 0.75;
 
         double m_diePitchX = 5718;
         double m_diePitchY = 4358;
@@ -88,6 +89,7 @@ namespace Root_EFEM.Module.FrontsideVision
 
             run.m_searchOffset = this.m_searchOffset;
             run.m_searchInterval = this.m_searchInterval;
+            run.m_VRSCamResolution = this.m_VRSCamResolution;
 
             return run;
         }
@@ -109,6 +111,7 @@ namespace Root_EFEM.Module.FrontsideVision
 
             m_searchOffset = tree.Set(m_searchOffset, m_searchOffset, "Search Offset", "Search Offset", bVisible);
             m_searchInterval = tree.Set(m_searchInterval, m_searchInterval, "Search Interval", "Search Interval", bVisible);
+            m_VRSCamResolution = tree.Set(m_VRSCamResolution, m_VRSCamResolution, "VRS Camera Resolution", "VRS Camera Resolution", bVisible);
         }
 
         public override string Run()
@@ -195,7 +198,7 @@ namespace Root_EFEM.Module.FrontsideVision
             RPoint foundShotLBPoint = new RPoint(0, 0);
 
             // Shot Center Point
-            /*if (m_module.Run(axisXY.StartMove(shotCenterPoint)))
+            if (m_module.Run(axisXY.StartMove(shotCenterPoint)))
             {
                 return p_sInfo;
             }
@@ -212,11 +215,14 @@ namespace Root_EFEM.Module.FrontsideVision
             if (m_module.Run(axisXY.WaitReady()))
             {
                 return p_sInfo;
-            }*/
+            }
 
             long outX, outY;
             long maxOutX = 0;
             long maxOutY = 0;
+            long outOffsetX, outOffsetY;
+            long centerOutOffsetX = 0;
+            long centerOutOffsetY = 0;
             int featureIndex;
             double score = 0;
             double scoreMax = 0;
@@ -234,26 +240,31 @@ namespace Root_EFEM.Module.FrontsideVision
                         return p_sInfo;
                     }
 
-                    score = TemplateMatching(alignRecipe, out outX, out outY, out featureIndex);
+                    score = TemplateMatching(alignRecipe, out outX, out outY, out featureIndex, out outOffsetX, out outOffsetY);
                     if (score > scoreMax)
                     {
                         scoreMax = score;
                         maxOutX = outX;
                         maxOutY = outY;
+                        centerOutOffsetX = outOffsetX;
+                        centerOutOffsetY = outOffsetY;
                         foundShotLBPoint.X = x;
                         foundShotLBPoint.Y = y;
                     }
-                    //break;
+                    //break; // for debugging
                 }
-                //break;
+                //break; // for debugging
             }
 
-            /*if (scoreMax < m_score)
+            if (scoreMax < m_score)
             {
                 return "VRS Align Fail [Score : " + score.ToString() + "]";
-            }*/
+            }
 
             // Found Shot Point
+            foundShotLBPoint.X = foundShotLBPoint.X + centerOutOffsetX;
+            foundShotLBPoint.Y = foundShotLBPoint.Y + centerOutOffsetY;
+
             if (m_module.Run(axisXY.StartMove(foundShotLBPoint)))
             {
                 return p_sInfo;
@@ -330,15 +341,17 @@ namespace Root_EFEM.Module.FrontsideVision
             return "OK";
         }
 
-        private double TemplateMatching(FrontVRSAlignRecipe alignRecipe, out long maxOutX, out long maxOutY, out int featureIndex)
+        private double TemplateMatching(FrontVRSAlignRecipe alignRecipe, out long maxOutX, out long maxOutY, out int featureIndex, out long offsetX, out long offsetY)
         {
             ImageData camImage = m_CamVRS.p_ImageViewer.p_ImageData;
-            IntPtr camImagePtr = camImage.GetPtr();
+            byte[] rawdataCamImage = camImage.m_aBuf;
             double maxScore = double.MinValue;
             maxOutX = 0;
             maxOutY = 0;
             int index = 0;
             featureIndex = 0;
+            offsetX = 0;
+            offsetY = 0;
             foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureVRSList)
             {
                 byte[] rawdata = feature.RawData;
@@ -347,7 +360,7 @@ namespace Root_EFEM.Module.FrontsideVision
                 unsafe
                 {
                     result = CLR_IP.Cpp_TemplateMatching(
-                        (byte*)(camImagePtr.ToPointer()),
+                        rawdataCamImage,
                         rawdata,
                         &outX,
                         &outY,
@@ -356,7 +369,7 @@ namespace Root_EFEM.Module.FrontsideVision
                         0,
                         0,
                         camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
-                        5, 3, 0);
+                        5, 3);
                 }
 
                 if (maxScore < result)
@@ -365,49 +378,12 @@ namespace Root_EFEM.Module.FrontsideVision
                     maxOutX = outX;
                     maxOutY = outY;
                     featureIndex = index;
+                    // Need to correct center point with maxOutX and maxOutY before moving
+                    offsetX = (long)(((maxOutX + feature.Width / 2) - camImage.p_Size.X / 2) * m_VRSCamResolution * PULSE_TO_UM);
+                    offsetY = (long)(((maxOutY + feature.Height / 2) - camImage.p_Size.Y / 2) * m_VRSCamResolution * PULSE_TO_UM);
                 }
                 index++;
             }
-
-            return maxScore;
-        }
-
-        private double TemplateMatchingWithSelectedFeature(FrontVRSAlignRecipe alignRecipe, int featureIndex, out long maxOutX, out long maxOutY)
-        {
-            ImageData camImage = m_CamVRS.p_ImageViewer.p_ImageData;
-            IntPtr camImagePtr = camImage.GetPtr();
-            double maxScore = double.MinValue;
-            maxOutX = 0;
-            maxOutY = 0;
-            int index = 0;
-            RecipeType_ImageData feature = alignRecipe.AlignFeatureVRSList[featureIndex];
-
-            byte[] rawdata = feature.RawData;
-            double result;
-            int outX = 0, outY = 0;
-            unsafe
-            {
-                result = CLR_IP.Cpp_TemplateMatching(
-                    (byte*)(camImagePtr.ToPointer()),
-                    rawdata,
-                    &outX,
-                    &outY,
-                    camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
-                    feature.Width, feature.Height,
-                    0,
-                    0,
-                    camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
-                    5, 3, 0);
-            }
-
-            if (maxScore < result)
-            {
-                maxScore = result;
-                maxOutX = outX;
-                maxOutY = outY;
-            }
-
-            index++;
 
             return maxScore;
         }

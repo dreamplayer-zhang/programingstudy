@@ -7,12 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="400">
     <StackPanel Orientation="Vertical" Width="200" HorizontalAlignment="Left">
-        <ComboBox x:Name="comboPrinter" SelectedValue="{Binding p_sPrinter}" MinWidth="60" Margin="4"/>
         <CheckBox Content="Connect" IsChecked="{Binding p_bConnect}" Margin="4" VerticalAlignment="Center"/>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-            <Button x:Name="buttonCut" Content="Cut" Margin="4" MinWidth="60" IsEnabled="{Binding p_bConnect}" Click="buttonCut_Click"/>
-            <CheckBox Content="Feeding" IsChecked="{Binding p_bCutFeeding}" Margin="4" VerticalAlignment="Center"/>
-        </StackPanel>
         <Button x:Name="buttonWrite" Content="Test Print" Margin="4" IsEnabled="{Binding p_bConnect}" Click="buttonWrite_Click"/>
     </StackPanel>
 </UserControl>

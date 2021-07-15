@@ -63,8 +63,13 @@ namespace Root_Pine2.Module
 
         public string RunMoveUp(bool bWait = true)
         {
-            m_axisXZ.p_axisY.StartMove(c_sUp);
-            return bWait ? m_axisXZ.WaitReady() : "OK";
+            try
+            {
+                m_axisXZ.p_axisY.m_bCheckStop = false;
+                m_axisXZ.p_axisY.StartMove(c_sUp);
+                return bWait ? m_axisXZ.WaitReady() : "OK";
+            }
+            finally { m_axisXZ.p_axisY.m_bCheckStop = true; }
         }
         #endregion
 

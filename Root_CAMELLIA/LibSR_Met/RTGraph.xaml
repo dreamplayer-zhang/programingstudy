@@ -22,6 +22,7 @@
                 <RowDefinition Height="0.7*"/>
                 <RowDefinition Height="7*"/>
                 <RowDefinition Height="7*"/>
+                <RowDefinition Height="10"/>
                 <RowDefinition Height="4*"/>
         </Grid.RowDefinitions>
             <Grid Grid.Row="0">
@@ -47,6 +48,11 @@
                 <ComboBox Name="comboBoxDataIndex" Grid.Column="3" Margin="3" SelectionChanged="comboBoxDataIndex_SelectionChanged" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" DropDownOpened="comboBoxDataIndex_DropDownOpened">
                 </ComboBox>
             </Grid>
+        <Grid Grid.Row="1" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
             <GroupBox Header="Reflectance" Grid.Row="1">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -58,28 +64,30 @@
                     </WpfPlot>
                 </Grid>
             </GroupBox>
-        <GroupBox x:Name="GroupTransmittance" Header="Transmittance" Grid.Row="2" IsEnabled="False">
-            <GroupBox.Style >
-                <Style>
-                    <Style.Triggers>
-                        <Trigger Property="ItemsControl.IsEnabled" Value="False">
-                            <Setter Property="ItemsControl.Foreground" Value="LightGray">
+            <GroupBox x:Name="GroupTransmittance" Header="Transmittance" IsEnabled="False">
+                <GroupBox.Style >
+                    <Style>
+                        <Style.Triggers>
+                            <Trigger Property="ItemsControl.IsEnabled" Value="False">
+                                <Setter Property="ItemsControl.Foreground" Value="LightGray">
 
-                            </Setter>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </GroupBox.Style>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1.5*"/>
-                    <RowDefinition Height="10*"/>
-                </Grid.RowDefinitions>
-                <Label Name="labelT" Grid.Row="0" VerticalContentAlignment="Center" FontStretch="SemiExpanded" FontFamily="Consolas"/>
-                <WpfPlot Name="GraphT" MouseMove="GraphT_MouseMove" Grid.Row="1"/>
-            </Grid>
-        </GroupBox>
-        <GroupBox x:Name="GroupThicknessResult" Header="Result" Grid.Row="3" IsEnabled="False">
+                                </Setter>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </GroupBox.Style>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1.5*"/>
+                        <RowDefinition Height="10*"/>
+                    </Grid.RowDefinitions>
+                    <Label Name="labelT" Grid.Row="0" VerticalContentAlignment="Center" FontStretch="SemiExpanded" FontFamily="Consolas"/>
+                    <WpfPlot Name="GraphT" MouseMove="GraphT_MouseMove" Grid.Row="1"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+        <GridSplitter Grid.Row="3" ShowsPreview="True" Width="auto" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Gray"/>
+        <GroupBox x:Name="GroupThicknessResult" Header="Result" Grid.Row="4" IsEnabled="False">
             <GroupBox.Style >
                 <Style>
                     <Style.Triggers>

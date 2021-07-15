@@ -991,6 +991,8 @@ namespace RootTools.Gem.XGem
 
         void RunTreeProcessJob(Tree tree)
         {
+            if (m_aPJ.Count == 0)
+                return;
             foreach (GemPJ pj in m_aPJ) pj.RunTree(tree.GetTree(pj.m_sPJobID));
         }
 
@@ -1102,6 +1104,8 @@ namespace RootTools.Gem.XGem
 
         void RunTreeControlJob(Tree tree)
         {
+            if (m_qCJ.Count == 0)
+                return;
             foreach (GemCJ cj in m_qCJ) cj.RunTree(tree.GetTree(cj.m_sCJobID));
         }
         #endregion

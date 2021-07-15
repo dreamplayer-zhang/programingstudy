@@ -292,6 +292,7 @@
     </Compile>
     <Compile Include="Control\Axis3D.cs" />
     <Compile Include="Control\DIO_I4O.cs" />
+    <Compile Include="Control\DIO_I8O2.cs" />
     <Compile Include="Control\Xenax\Xenax.cs" />
     <Compile Include="Control\Xenax\XenaxAxis.cs" />
     <Compile Include="Control\Xenax\XenaxAxis_UI.xaml.cs">
@@ -492,6 +493,7 @@
     <Compile Include="ParticleCounter\ParticleCounterBase_UI.xaml.cs">
       <DependentUpon>ParticleCounterBase_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Printer\BXLAPI.cs" />
     <Compile Include="Printer\SRP350.cs" />
     <Compile Include="Printer\SRP350_UI.xaml.cs">
       <DependentUpon>SRP350_UI.xaml</DependentUpon>

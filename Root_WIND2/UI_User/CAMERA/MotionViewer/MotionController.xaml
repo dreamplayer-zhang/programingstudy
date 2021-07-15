@@ -9,7 +9,7 @@
              d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
         <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
-        
+
         <Style x:Key="button_selectmode" TargetType="Button">
             <Setter Property="Background" Value="#333366"/>
             <Setter Property="Foreground" Value="{StaticResource groupbox_button_text}"/>
@@ -177,9 +177,11 @@
                         <TextBlock Text="Z" Margin="4" Style="{StaticResource group_box_item_name_text}"></TextBlock>
                         <TextBox Width="64" Text="{Binding AxisZSpeed}" TextAlignment="Right" Padding="0,0,4,0" VerticalContentAlignment="Center" Margin="4" Height="26" PreviewKeyDown="TextBox_PreviewKeyDown"/>
                     </StackPanel>
-                    
+
                     <Border Grid.Row="1" Grid.Column="4" Grid.RowSpan="2" BorderBrush="White" BorderThickness="1"/>
-                    <Button Grid.Row="1" Grid.Column="1" Margin="3" Style="{StaticResource button_selectmode}">
+                    <Button Grid.Row="1" Grid.Column="1" Margin="3" 
+                            FontSize="30" Content="▲"
+                            Style="{StaticResource button_selectmode}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding CmdAxisYMoveUp}" />
@@ -189,7 +191,9 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>
-                    <Button Grid.Row="2" Grid.Column="0" Margin="3" Style="{StaticResource button_selectmode}">
+                    <Button Grid.Row="2" Grid.Column="0" Margin="3" 
+                            FontSize="30" Content="◀"
+                            Style="{StaticResource button_selectmode}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding CmdAxisXMoveLeft}" />
@@ -199,7 +203,9 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>
-                    <Button Grid.Row="2" Grid.Column="1" Margin="3" Style="{StaticResource button_selectmode}">
+                    <Button Grid.Row="2" Grid.Column="1" Margin="3" 
+                            FontSize="30" Content="▼"
+                            Style="{StaticResource button_selectmode}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding CmdAxisYMoveDown}" />
@@ -209,7 +215,9 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>
-                    <Button Grid.Row="2" Grid.Column="2" Margin="3" Style="{StaticResource button_selectmode}">
+                    <Button Grid.Row="2" Grid.Column="2" 
+                            FontSize="30" Content="▶"
+                            Margin="3" Style="{StaticResource button_selectmode}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding CmdAxisXMoveRight}" />
@@ -219,7 +227,9 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>
-                    <Button Grid.Row="1" Grid.Column="4" Margin="3" Style="{StaticResource button_selectmode}">
+                    <Button Grid.Row="1" Grid.Column="4" Margin="3" 
+                            FontSize="30" Content="▲"
+                            Style="{StaticResource button_selectmode}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding CmdAxisZMoveUp}" />
@@ -229,7 +239,9 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>
-                    <Button Grid.Row="2" Grid.Column="4" Margin="3" Style="{StaticResource button_selectmode}">
+                    <Button Grid.Row="2" Grid.Column="4" Margin="3" 
+                            FontSize="30" Content="▼"
+                            Style="{StaticResource button_selectmode}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding CmdAxisZMoveDown}" />
@@ -241,7 +253,9 @@
                     </Button>
 
                     <!-- Theta -->
-                    <Button Grid.Row="1" Grid.Column="0" Margin="3" Style="{StaticResource button_selectmode_circle}">
+                    <Button Grid.Row="1" Grid.Column="0" Margin="3" 
+                            FontSize="30" Content="↓ ↑"
+                            Style="{StaticResource button_selectmode_circle}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding CmdAxisThetaMoveUp}" />
@@ -253,7 +267,9 @@
                     </Button>
 
 
-                    <Button Grid.Row="1" Grid.Column="2" Margin="3" Style="{StaticResource button_selectmode_circle}">
+                    <Button Grid.Row="1" Grid.Column="2" Margin="3" 
+                            FontSize="30" Content="↑ ↓"
+                            Style="{StaticResource button_selectmode_circle}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding CmdAxisThetaMoveDown}" />

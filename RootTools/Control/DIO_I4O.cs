@@ -8,17 +8,34 @@ namespace RootTools.Control
     public class DIO_I4O : IDIO
     {
         List<string> m_asID = new List<string>();
-        public List<BitDI> m_aBitDIA = new List<BitDI>();
-        public List<BitDI> m_aBitDIB = new List<BitDI>();
+        public List<BitDI> m_aBitDI = new List<BitDI>();
         public BitDO m_bitDO = new BitDO();
 
         public bool p_bDone
         {
             get
             {
-                if (p_bOut) return (m_aBitDIA[0].p_bOn == false) && (m_aBitDIB[0].p_bOn == false) && m_aBitDIA[1].p_bOn && m_aBitDIA[1].p_bOn;
-                else return m_aBitDIA[0].p_bOn && m_aBitDIB[0].p_bOn && (m_aBitDIA[1].p_bOn == false) && (m_aBitDIB[1].p_bOn == false);
+                if (p_bOut) return (IsOff() == false) && IsOn();
+                else return IsOff() && (IsOn() == false);
             }
+        }
+
+        bool IsOff()
+        {
+            for (int n = 0; n < 2; n++)
+            {
+                if (m_aBitDI[n].p_bOn == false) return false;
+            }
+            return true;
+        }
+
+        bool IsOn()
+        {
+            for (int n = 2; n < 4; n++)
+            {
+                if (m_aBitDI[n].p_bOn == false) return false;
+            }
+            return true;
         }
 
         public int m_secTimeout = 7;
@@ -55,10 +72,7 @@ namespace RootTools.Control
             p_bEnableRun = bEnableRun;
             m_asID.Add(sFalse);
             m_asID.Add(sTrue);
-            m_aBitDIA.Add(new BitDI());
-            m_aBitDIA.Add(new BitDI());
-            m_aBitDIB.Add(new BitDI());
-            m_aBitDIB.Add(new BitDI());
+            for (int n = 0; n < 4; n++) m_aBitDI.Add(new BitDI());
             tool.p_listIDIO.Add(this);
 
             InitBackgroundWorker();
@@ -66,33 +80,34 @@ namespace RootTools.Control
 
         public string RunTree(Tree tree)
         {
-            string sDIA0 = RunTreeDI(tree, m_aBitDIA, "InputA", 0);
-            string sDIB0 = RunTreeDI(tree, m_aBitDIB, "InputB", 0);
-            string sDIA1 = RunTreeDI(tree, m_aBitDIA, "InputA", 1);
-            string sDIB1 = RunTreeDI(tree, m_aBitDIB, "InputB", 1);
+            string[] sDI = new string[4]; 
+            sDI[0] = RunTreeDI(tree, m_aBitDI[0], m_asID[0] + "0");
+            sDI[1] = RunTreeDI(tree, m_aBitDI[1], m_asID[0] + "1");
+            sDI[2] = RunTreeDI(tree, m_aBitDI[2], m_asID[1] + "0");
+            sDI[3] = RunTreeDI(tree, m_aBitDI[3], m_asID[1] + "1");
             string sDO = RunTreeDO(tree);
-            if (sDIA0 != "OK") return sDIA0;
-            if (sDIB0 != "OK") return sDIB0;
-            if (sDIA1 != "OK") return sDIA1;
-            if (sDIB1 != "OK") return sDIB1;
+            for (int n = 0; n < 4; n++)
+            {
+                if (sDI[n] != "OK") return sDI[n]; 
+            }
             if (sDO != "OK") return sDO;
             m_secTimeout = tree.Set(m_secTimeout, m_secTimeout, "Timeout", "DIO WaitDone Timeout (sec)");
             m_eRun = (eRun)tree.Set(m_eRun, eRun.Nothing, "Run", "DIO Run Mode", p_bEnableRun);
             return "OK";
         }
 
-        string RunTreeDI(Tree tree, List<BitDI> aBitDI, string sID, int nIndex)
+        string RunTreeDI(Tree tree, BitDI bitDI, string sID)
         {
-            int nDI = tree.Set(aBitDI[nIndex].m_nID, -1, sID + m_asID[nIndex], "DIO Input Number");
-            if (nDI != aBitDI[nIndex].m_nID)
+            int nDI = tree.Set(bitDI.m_nID, -1, "Input." + sID, "DIO Input Number");
+            if (nDI != bitDI.m_nID)
             {
                 if (IsUsedDI(nDI)) return "Can't Assign Exist DIO_I Input : " + m_id;
-                aBitDI[nIndex].SetID(m_log, "Input");
-                if (nDI < 0) aBitDI[nIndex] = new BitDI();
+                bitDI.SetID(m_log, "Input");
+                if (nDI < 0) bitDI = new BitDI();
                 else
                 {
-                    aBitDI[nIndex] = m_listDI.m_aDIO[nDI];
-                    aBitDI[nIndex].SetID(m_log, m_id + "." + m_asID[nIndex]);
+                    bitDI = m_listDI.m_aDIO[nDI];
+                    bitDI.SetID(m_log, m_id + "." + sID);
                 }
             }
             return "OK";

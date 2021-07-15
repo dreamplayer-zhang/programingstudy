@@ -1,6 +1,7 @@
 ﻿using Root_Pine2.Engineer;
 using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -178,7 +179,15 @@ namespace Root_Pine2.Module
                 if (bInit)
                 {
                     InitPos();
+                    InitALID(module);
                 }
+            }
+
+            ALID m_alidProtrude; 
+            void InitALID(ModuleBase module)
+            {
+                m_alidProtrude = module.m_gaf.GetALID(module, "Protrude", "Check Strip Protrude");
+                m_alidProtrude.p_bEQError = false; 
             }
 
             #region Elevator
@@ -197,7 +206,9 @@ namespace Root_Pine2.Module
 
             string MoveElevator(Enum ePos, double fOffset = 0)
             {
-                if (m_handler.m_transfer.IsPusherOff() == false) return "Check Transfer Pusher";
+                if (m_bProtrude) return "Strip Protrude"; 
+                string sRun = m_handler.m_transfer.IsPusherOff(); 
+                if (sRun != "OK") return sRun;
                 if (m_bProduct[InfoStrip.eMagazinePos.Down])
                 {
                     double fPos = m_axis.GetPosValue(ePos) + fOffset;
@@ -210,6 +221,7 @@ namespace Root_Pine2.Module
 
             public string MoveToConveyor(InfoStrip.eMagazinePos eMagazinePos, double mmUp, bool bWait = true)
             {
+                if (m_bProtrude) return "Strip Protrude";
                 if (m_conveyor.IsCheck(Conveyor.eCheck.Inside)) return "Conveyer Inside Sensor Checked";
                 m_infoStripPos = null;
                 string sRun = MoveElevator((eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.ConveyorUp : ePos.ConveyorDown, 1000 * mmUp);
@@ -220,6 +232,7 @@ namespace Root_Pine2.Module
 
             public string MoveStack(bool bWait = true)
             {
+                if (m_bProtrude) return "Strip Protrude";
                 if (m_conveyor.IsCheck(Conveyor.eCheck.Inside)) return "Conveyer Inside Sensor Checked";
                 m_infoStripPos = null;
                 string sRun = MoveElevator(ePos.Stack);
@@ -233,6 +246,7 @@ namespace Root_Pine2.Module
             public int m_iSlotTransfer = 0;
             public string MoveToTransfer(InfoStrip infoStrip)
             {
+                if (m_bProtrude) return "Strip Protrude";
                 if (m_conveyor.IsCheck(Conveyor.eCheck.Inside)) return "Conveyer Inside Sensor Checked";
                 m_infoStripPos = null;
                 m_ePosTransfer = (infoStrip.p_eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.TransferUp : ePos.TransferDown;
@@ -310,6 +324,7 @@ namespace Root_Pine2.Module
                 m_bProduct[InfoStrip.eMagazinePos.Up] = m_diProduct.ReadDI(InfoStrip.eMagazinePos.Up);
                 m_bProduct[InfoStrip.eMagazinePos.Down] = m_diProduct.ReadDI(InfoStrip.eMagazinePos.Down);
                 m_bProtrude = m_diProtrude.p_bIn;
+                m_alidProtrude.p_bSet = m_bProtrude; 
             }
             #endregion
 
@@ -566,6 +581,8 @@ namespace Root_Pine2.Module
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             p_sLED = "MGZ" + ((int)p_eMagazine).ToString();
+            if (m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down]) StartUnload();
+            if (m_elevator.m_bProduct[InfoStrip.eMagazinePos.Up]) StartUnload();
             return p_sInfo;
         }
         #endregion
