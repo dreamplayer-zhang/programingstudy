@@ -178,6 +178,19 @@ namespace Root_CAMELLIA
             }
         }
 
+        string m_CurrentLotID = "";
+        public string p_CurrentLotID
+        {
+            get
+            {
+                return m_CurrentLotID;
+            }
+            set
+            {
+                SetProperty(ref m_CurrentLotID, value);
+            }
+        }
+
         int m_totalSelect = 0;
         public int p_totalSelect
         {
@@ -289,6 +302,13 @@ namespace Root_CAMELLIA
 
         private void M_handler_OnListUpdate()
         {
+            p_waferList.Clear();
+            p_isRNR = false;
+            p_CurrentRecipeID = "";
+            p_dataSelectIndex = 0;
+            p_totalSelect = 0;
+            p_totalDone = 0;
+            p_progressValue = 0;
             if (this.p_loadport.p_id == App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_id)
                 UpdateList();
         }
@@ -533,6 +553,7 @@ namespace Root_CAMELLIA
                     if (p_CurrentRecipeID == "" && val.p_sRecipe != "")
                     {
                         p_CurrentRecipeID = val.p_sRecipe.Replace(Path.GetExtension(val.p_sRecipe), "");
+                        p_CurrentLotID = val.p_sCarrierID;
                         firstIdx = idx - 1;
                     }
                     //object[] obj = { val.m_nSlot, val.p_sWaferID, val.p_sRecipe, val.p_eState };
