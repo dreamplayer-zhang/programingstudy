@@ -25,6 +25,36 @@ namespace Root_WindII
 
             tmp = stdFile.ReadLine();
             tmp.Trim();
+
+            // Device
+            while (tmp.IndexOf("DeviceID ") == -1)
+            {
+                tmp = stdFile.ReadLine();
+            }
+            tmp.Trim();
+            tmp = tmp.Substring(tmp.IndexOf(' ') + 1, tmp.Length - tmp.IndexOf(' ') - 1);
+            xmldata.Device = tmp.Substring(0, tmp.IndexOf(';'));
+
+            // Die Pitch
+            while (tmp.IndexOf("DiePitch ") == -1)
+            {
+                tmp = stdFile.ReadLine();
+            }
+            tmp.Trim();
+            tmp = tmp.Substring(tmp.IndexOf(' ') + 1, tmp.Length - tmp.IndexOf(' ') - 1);
+            xmldata.DiePitchX = Double.Parse(tmp.Substring(0, tmp.Length - tmp.IndexOf(' ') - 1));
+            xmldata.DiePitchY = Double.Parse(tmp.Substring(tmp.IndexOf(' ') + 1, tmp.IndexOf(';') - tmp.IndexOf(' ') - 1));
+
+            // Origin Die
+            while (tmp.IndexOf("DieOrigin ") == -1)
+            {
+                tmp = stdFile.ReadLine();
+            }
+            tmp.Trim();
+            tmp = tmp.Substring(tmp.IndexOf(' ') + 1, tmp.Length - tmp.IndexOf(' ') - 1);
+            xmldata.OriginDieX = (Int32)Double.Parse(tmp.Substring(0, tmp.Length - tmp.IndexOf(' ') - 1));
+            xmldata.OriginDieY = (Int32)Double.Parse(tmp.Substring(tmp.IndexOf(' ') + 1, tmp.IndexOf(';') - tmp.IndexOf(' ') - 1));
+
             while (tmp.IndexOf("SampleTestPlan ") == -1)
             {
                 tmp = stdFile.ReadLine();

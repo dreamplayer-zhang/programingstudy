@@ -103,10 +103,15 @@ namespace RootTools.Trees
         public void RunTreeInit()
         {
             m_aChildRunInit.Clear();
-            foreach (Tree tree in p_aChild)
+            //foreach (Tree tree in p_aChild)
+            //{
+            //    m_aChildRunInit.Add(tree);
+            //    tree.RunTreeInit(); 
+            //}
+            for(int i = 0; i < p_aChild.Count; i++)
             {
-                m_aChildRunInit.Add(tree);
-                tree.RunTreeInit(); 
+                m_aChildRunInit.Add(p_aChild[i]);
+                p_aChild[i].RunTreeInit();
             }
         }
 

@@ -1367,9 +1367,9 @@ namespace Root_CAMELLIA.LibSR_Met
                 sDataMean += "," + dMeanGoF.ToString("0.####") + "," + dMeanTHKSum.ToString("0.####");
                 sDataMin += "," + dMinGoF.ToString("0.####") + "," + dMinTHKSum.ToString("0.####");
                 sDataMax += "," + dMaxGoF.ToString("0.####") + "," + dMaxTHKSum.ToString("0.####");
-                sDataStddev += !double.IsNaN(dStddevGoF) ? "," + dStddevGoF.ToString("0.####") + "," : ",0";
+                sDataStddev += !double.IsNaN(dStddevGoF) ? "," + dStddevGoF.ToString("0.####") : ",0";
                 sDataStddev += !double.IsNaN(dStddevTHKSum) ? "," + dStddevTHKSum.ToString("0.####") : ",0";
-                sData3Sigma += !double.IsNaN(d3SigmaGoF) ? "," + d3SigmaGoF.ToString("0.####") + "," : ",0";
+                sData3Sigma += !double.IsNaN(d3SigmaGoF) ? "," + d3SigmaGoF.ToString("0.####") : ",0";
                 sData3Sigma += !double.IsNaN(d3SigmaTHKSum) ? "," + d3SigmaTHKSum.ToString("0.####") : ",0";
                 sDataRange += "," + (dMaxGoF - dMinGoF).ToString("0.####") + "," + dRangeTHKSum.ToString("0.####");
 

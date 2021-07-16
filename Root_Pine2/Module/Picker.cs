@@ -87,7 +87,6 @@ namespace Root_Pine2.Module
             {
                 Thread.Sleep(10);
                 m_alidDrop.p_bSet = ((p_infoStrip != null) && m_dioVacuum.p_bOut && (m_dioVacuum.p_bIn == false));
-                if (m_alidDrop.p_bSet) p_infoStrip = null; 
             }
         }
         #endregion

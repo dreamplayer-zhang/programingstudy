@@ -25,14 +25,14 @@ namespace Root_Pine2.Module
         void InitPosition()
         {
             m_axisXZ.AddPos(c_sTurnover);
-            m_axisXZ.AddPos(GetPosString(Vision2D.eVision.Top3D, Vision2D.eWorks.A));
-            m_axisXZ.AddPos(GetPosString(Vision2D.eVision.Top3D, Vision2D.eWorks.B));
-            m_axisXZ.AddPos(GetPosString(Vision2D.eVision.Top2D, Vision2D.eWorks.A));
-            m_axisXZ.AddPos(GetPosString(Vision2D.eVision.Top2D, Vision2D.eWorks.B));
+            m_axisXZ.AddPos(GetPosString(eVision.Top3D, eWorks.A));
+            m_axisXZ.AddPos(GetPosString(eVision.Top3D, eWorks.B));
+            m_axisXZ.AddPos(GetPosString(eVision.Top2D, eWorks.A));
+            m_axisXZ.AddPos(GetPosString(eVision.Top2D, eWorks.B));
             m_axisXZ.p_axisY.AddPos(c_sUp);
         }
 
-        string GetPosString(Vision2D.eVision eVision, Vision2D.eWorks eVisionWorks)
+        string GetPosString(eVision eVision, eWorks eVisionWorks)
         {
             return eVision.ToString() + eVisionWorks.ToString();
         }
@@ -43,7 +43,7 @@ namespace Root_Pine2.Module
             return bWait ? m_axisXZ.p_axisX.WaitReady() : "OK";
         }
 
-        public string RunMoveX(Vision2D.eVision eVision, Vision2D.eWorks ePos, bool bWait = true)
+        public string RunMoveX(eVision eVision, eWorks ePos, bool bWait = true)
         {
             m_axisXZ.p_axisX.StartMove(GetPosString(eVision, ePos));
             return bWait ? m_axisXZ.p_axisX.WaitReady() : "OK";
@@ -55,7 +55,7 @@ namespace Root_Pine2.Module
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 
-        public string RunMoveZ(Vision2D.eVision eVision, Vision2D.eWorks ePos, double dPos, bool bWait = true)
+        public string RunMoveZ(eVision eVision, eWorks ePos, double dPos, bool bWait = true)
         {
             m_axisXZ.p_axisY.StartMove(GetPosString(eVision, ePos), -dPos);
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
@@ -63,8 +63,13 @@ namespace Root_Pine2.Module
 
         public string RunMoveUp(bool bWait = true)
         {
-            m_axisXZ.p_axisY.StartMove(c_sUp);
-            return bWait ? m_axisXZ.WaitReady() : "OK";
+            try
+            {
+                m_axisXZ.p_axisY.m_bCheckStop = false;
+                m_axisXZ.p_axisY.StartMove(c_sUp);
+                return bWait ? m_axisXZ.WaitReady() : "OK";
+            }
+            finally { m_axisXZ.p_axisY.m_bCheckStop = true; }
         }
         #endregion
 
@@ -74,13 +79,13 @@ namespace Root_Pine2.Module
             Top3D,
             Top2D,
         }
-        public string RunLoad(eLoad eLoad, Vision2D.eWorks eWorks)
+        public string RunLoad(eLoad eLoad, eWorks eWorks)
         {
-            Vision2D.eVision eVision = Vision2D.eVision.Top3D;
+            eVision eVision = eVision.Top3D;
             switch (eLoad)
             {
-                case eLoad.Top3D: eVision = Vision2D.eVision.Top3D; break;
-                case eLoad.Top2D: eVision = Vision2D.eVision.Top2D; break;
+                case eLoad.Top3D: eVision = eVision.Top3D; break;
+                case eLoad.Top2D: eVision = eVision.Top2D; break;
             }
             Boats boats = m_handler.m_aBoats[eVision];
             Boat boat = boats.m_aBoat[eWorks];
@@ -122,7 +127,7 @@ namespace Root_Pine2.Module
         public string RunUnloadStrip()
         {
             if (p_infoStrip == null) return "OK"; 
-            Vision2D.eVision eVision = m_picker.p_infoStrip.m_eVisionLoad;
+            eVision eVision = m_picker.p_infoStrip.m_eVisionLoad;
             Boats boats = m_handler.m_aBoats[eVision];
             if (boats.IsBusy()) return "OK";
             if (boats.p_eState != eState.Ready) return "OK";
@@ -150,16 +155,16 @@ namespace Root_Pine2.Module
 
         public string RunUnload()
         {
-            Boats boats = m_handler.m_aBoats[Vision2D.eVision.Top2D];
-            Vision2D.eWorks eWorks = p_infoStrip.m_eWorks; 
+            Boats boats = m_handler.m_aBoats[eVision.Top2D];
+            eWorks eWorks = p_infoStrip.m_eWorks; 
             Boat boat = boats.m_aBoat[eWorks];
             if (boat.p_eStep != Boat.eStep.Ready) return "Boat not Ready";
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(boats.RunMoveReady(eWorks))) return p_sInfo;
-                if (Run(RunMoveX(Vision2D.eVision.Top2D, eWorks))) return p_sInfo;
-                if (Run(RunMoveZ(Vision2D.eVision.Top2D, eWorks, 0))) return p_sInfo;
+                if (Run(RunMoveX(eVision.Top2D, eWorks))) return p_sInfo;
+                if (Run(RunMoveZ(eVision.Top2D, eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(true);
                 m_picker.RunVacuum(false);
                 if (Run(RunMoveUp(false))) return p_sInfo;
@@ -188,7 +193,7 @@ namespace Root_Pine2.Module
                 loader2.RunVacuum(true);
                 m_picker.RunVacuum(false);
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(RunMoveX(Vision2D.eVision.Top2D, Vision2D.eWorks.B))) return p_sInfo; 
+                if (Run(RunMoveX(eVision.Top2D, eWorks.B))) return p_sInfo; 
                 loader2.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
             }
@@ -203,7 +208,7 @@ namespace Root_Pine2.Module
         #region PickerSet
         double m_mmPickerSetUp = 10;
         double m_secPickerSet = 7;
-        public string RunPickerSet(Vision2D.eVision eVision, Vision2D.eWorks eWorks)
+        public string RunPickerSet(eVision eVision, eWorks eWorks)
         {
             StopWatch sw = new StopWatch();
             long msPickerSet = (long)(1000 * m_secPickerSet);
@@ -269,24 +274,24 @@ namespace Root_Pine2.Module
             {
                 switch (m_picker.p_infoStrip.m_eVisionLoad)
                 {
-                    case Vision2D.eVision.Top3D: return StartUnloadBoat();
-                    case Vision2D.eVision.Top2D: return StartUnloadTurnover(); 
+                    case eVision.Top3D: return StartUnloadBoat();
+                    case eVision.Top2D: return StartUnloadTurnover(); 
                 }
             }
             else
             {
-                Boats boats2D = m_handler.m_aBoats[Vision2D.eVision.Top2D];
-                Boats boats3D = m_handler.m_aBoats[Vision2D.eVision.Top3D];
-                foreach (Vision2D.eWorks eWorks in Enum.GetValues(typeof(Vision2D.eWorks)))
+                Boats boats2D = m_handler.m_aBoats[eVision.Top2D];
+                Boats boats3D = m_handler.m_aBoats[eVision.Top3D];
+                foreach (eWorks eWorks in Enum.GetValues(typeof(eWorks)))
                 {
                     if (boats3D.m_aBoat[eWorks].IsDone())
                     {
-                        if (boats2D.m_aBoat[eWorks].p_infoStrip == null) return StartLoad(Vision2D.eVision.Top3D, eWorks);
+                        if (boats2D.m_aBoat[eWorks].p_infoStrip == null) return StartLoad(eVision.Top3D, eWorks);
                     }
                 }
-                foreach (Vision2D.eWorks eWorks in Enum.GetValues(typeof(Vision2D.eWorks)))
+                foreach (eWorks eWorks in Enum.GetValues(typeof(eWorks)))
                 {
-                    if (boats2D.m_aBoat[eWorks].IsDone()) return StartLoad(Vision2D.eVision.Top2D, eWorks);
+                    if (boats2D.m_aBoat[eWorks].IsDone()) return StartLoad(eVision.Top2D, eWorks);
                 }
             }
             return "OK";
@@ -310,13 +315,13 @@ namespace Root_Pine2.Module
         string StartUnloadBoat()
         {
             if (p_infoStrip == null) return "p_infoStrip == null";
-            Vision2D.eWorks eWorks = p_infoStrip.m_eWorks; 
-            Boats boats = m_handler.m_aBoats[Vision2D.eVision.Top2D];
+            eWorks eWorks = p_infoStrip.m_eWorks; 
+            Boats boats = m_handler.m_aBoats[eVision.Top2D];
             if ((boats.m_aBoat[eWorks].p_eStep == Boat.eStep.Ready) && (boats.m_aBoat[eWorks].p_infoStrip == null)) return StartUnloadBoat(eWorks);
             return "OK";
         }
 
-        string StartUnloadBoat(Vision2D.eWorks eWorks)
+        string StartUnloadBoat(eWorks eWorks)
         {
             Run_Unload run = (Run_Unload)m_runUnload.Clone();
             run.m_eWorks = eWorks;
@@ -330,10 +335,10 @@ namespace Root_Pine2.Module
             return StartRun(m_runUnloadTurnover);
         }
 
-        string StartLoad(Vision2D.eVision eVision, Vision2D.eWorks eWorks)
+        string StartLoad(eVision eVision, eWorks eWorks)
         {
             Run_Load run = (Run_Load)m_runLoad.Clone();
-            run.m_eLoad = (eVision == Vision2D.eVision.Top3D) ? eLoad.Top3D : eLoad.Top2D;
+            run.m_eLoad = (eVision == eVision.Top3D) ? eLoad.Top3D : eLoad.Top2D;
             run.m_eWorks = eWorks;
             return StartRun(run);
         }
@@ -382,7 +387,7 @@ namespace Root_Pine2.Module
             }
 
             public eLoad m_eLoad = eLoad.Top3D; 
-            public Vision2D.eWorks m_eWorks = Vision2D.eWorks.A;
+            public eWorks m_eWorks = eWorks.A;
             public override ModuleRunBase Clone()
             {
                 Run_Load run = new Run_Load(m_module);
@@ -394,7 +399,7 @@ namespace Root_Pine2.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_eLoad = (eLoad)tree.Set(m_eLoad, m_eLoad, "Vision", "Select Vision", bVisible); 
-                m_eWorks = (Vision2D.eWorks)tree.Set(m_eWorks, m_eWorks, "Boat", "Select Boat", bVisible);
+                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Boat", "Select Boat", bVisible);
             }
 
             public override string Run()
@@ -437,7 +442,7 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public Vision2D.eWorks m_eWorks = Vision2D.eWorks.A;
+            public eWorks m_eWorks = eWorks.A;
             public override ModuleRunBase Clone()
             {
                 Run_Unload run = new Run_Unload(m_module);
@@ -488,8 +493,8 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            Vision2D.eVision m_eVision = Vision2D.eVision.Top3D;
-            Vision2D.eWorks m_eWorks = Vision2D.eWorks.B;
+            eVision m_eVision = eVision.Top3D;
+            eWorks m_eWorks = eWorks.B;
             public override ModuleRunBase Clone()
             {
                 Run_PickerSet run = new Run_PickerSet(m_module);
@@ -500,8 +505,8 @@ namespace Root_Pine2.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eVision = (Vision2D.eVision)tree.Set(m_eVision, m_eVision, "Vision", "Select Boat", bVisible);
-                m_eWorks = (Vision2D.eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Select Boat", bVisible); 
+                m_eVision = (eVision)tree.Set(m_eVision, m_eVision, "Vision", "Select Boat", bVisible);
+                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Select Boat", bVisible); 
             }
 
             public override string Run()

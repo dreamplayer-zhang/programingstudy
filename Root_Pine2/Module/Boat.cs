@@ -133,6 +133,30 @@ namespace Root_Pine2.Module
             }
         }
 
+        void CalcSnapPos(Vision3D.Recipe.Snap snapData, int yOffset)
+        {
+            CalcAccDist();
+            double pStart = m_axis.GetPosValue(ePos.SnapStart) + m_yScale * snapData.m_dpAxis.Y;
+            double pEnd = pStart + m_yScale * m_mmSnap;
+            //double pEnd = m_pSnap[0] + m_yScale * m_mmSnap;
+            double dpAcc = m_yScale * m_mmAcc;
+            switch (snapData.m_eDirection)
+            {
+                case Vision3D.Recipe.Snap.eDirection.Forward:
+                    m_pSnap[0] = pStart - dpAcc + yOffset;
+                    m_pSnap[1] = pEnd + dpAcc + yOffset;
+                    m_axis.m_trigger.m_aPos[0] = pStart + yOffset;
+                    m_axis.m_trigger.m_aPos[1] = pEnd + yOffset + 100;
+                    break;
+                case Vision3D.Recipe.Snap.eDirection.Backward:
+                    m_pSnap[0] = pEnd + dpAcc + yOffset;
+                    m_pSnap[1] = pStart - dpAcc + yOffset;
+                    m_axis.m_trigger.m_aPos[0] = pStart + yOffset - 100;
+                    m_axis.m_trigger.m_aPos[1] = pEnd + yOffset;
+                    break;
+            }
+        }
+
         double m_yScale = 10000;    // upulse
         double m_mmSnap = 300;
         double m_mmAcc = 20;
@@ -148,6 +172,13 @@ namespace Root_Pine2.Module
         }
 
         public string RunMoveSnapStart(Vision2D.Recipe.Snap snapData, int yOffset, bool bWait = true)
+        {
+            CalcSnapPos(snapData, yOffset);
+            m_axis.StartMove(m_pSnap[0]);
+            return bWait ? m_axis.WaitReady() : "OK";
+        }
+
+        public string RunMoveSnapStart(Vision3D.Recipe.Snap snapData, int yOffset, bool bWait = true)
         {
             CalcSnapPos(snapData, yOffset);
             m_axis.StartMove(m_pSnap[0]);
@@ -217,26 +248,28 @@ namespace Root_Pine2.Module
             get { return _sRecipe; }
             set
             {
-                if (_sRecipe == value) return; 
+                if (_sRecipe == value) return;
                 _sRecipe = value;
-                if(value != "")
-                    m_recipe.RecipeOpen(value); 
+                if (value != "")
+                {
+                    m_recipe.RecipeOpen(value);
+                }
             }
         }
-        public Vision2D.Recipe m_recipe;
+        public dynamic m_recipe;
 
-        public Vision2D.SnapInfo GetSnapInfo()
+        public SnapInfo GetSnapInfo()
         {
-            if(p_infoStrip == null)
-                return new Vision2D.SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, "", m_recipe.p_lSnap);
+            if (p_infoStrip == null)
+                return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, "", m_recipe.p_lSnap);
 
-            return new Vision2D.SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, p_infoStrip.p_id, m_recipe.p_lSnap); 
+            return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, p_infoStrip.p_id, m_recipe.p_lSnap);
         }
         #endregion
 
         #region Inspect
         public InfoStrip p_inspectStrip { get; set; }
-        public string InspectDone(Vision2D.eVision eVision, string sStripID, string sStripResult, string sX, string sY, string sMapResult)
+        public string InspectDone(eVision eVision, string sStripID, string sStripResult, string sX, string sY, string sMapResult)
         {
             if (p_inspectStrip == null) return "InspectStrip id null";
             if (p_inspectStrip.p_id != sStripID) return "Strip ID MisMatch";
@@ -280,12 +313,13 @@ namespace Root_Pine2.Module
         }
         public string p_id { get; set; }
         Boats m_boats;
-        public Boat(string id, Boats boats, Vision2D.eWorks eWorks)
+        public Boat(string id, Boats boats, eWorks eWorks, bool b3D)
         {
             m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
             p_id = id;
             m_boats = boats;
-            m_recipe = new Vision2D.Recipe(boats.m_vision, eWorks);
+            if (b3D) m_recipe = new Vision3D.Recipe((Vision3D)boats.m_vision, eWorks);
+            else m_recipe = new Vision2D.Recipe((Vision2D)boats.m_vision, eWorks);
         }
 
         public void RunThreadStop()

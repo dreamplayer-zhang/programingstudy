@@ -537,7 +537,7 @@ namespace Root_CAMELLIA.Module
             test.Stop();
             m_log.Warn("Measure End >> " + test.ElapsedMilliseconds);
 
-            p_processEndDate = DateTime.Now.ToString("MM/dd/yyyy");
+            p_processEndDate = DateTime.Now.ToString("MM\\/dd\\/yyyy");
             p_processEndTime = DateTime.Now.ToString("HH:mm:ss");
 
             if (!m_isPointMeasure)
@@ -1000,9 +1000,9 @@ namespace Root_CAMELLIA.Module
         public void SetResultList()
         {
             long nObject = 0;
-            p_xGem.MakeObject(nObject);
+            p_xGem.MakeObject(ref nObject);
 
-            m_sDcolData[(int)eDColData.Data_Upload_Date] = DateTime.Now.ToString("MM/dd/yyyy");
+            m_sDcolData[(int)eDColData.Data_Upload_Date] = DateTime.Now.ToString("MM\\/dd\\/yyyy");
             m_sDcolData[(int)eDColData.Data_Upload_Time] = DateTime.Now.ToString("hh:mm:ss");
 
             p_xGem.SetListItem(nObject, 3);
@@ -1044,7 +1044,7 @@ namespace Root_CAMELLIA.Module
 
             for (int i = 1; i <= nOS; i++)
             {
-                p_xGem.SetListItem(nObject, 8);
+                p_xGem.SetListItem(nObject, 11);
                 SetFloatData(nObject, eDcolData_OS.OS_X_Position, i);
                 SetFloatData(nObject, eDcolData_OS.OS_X_Position_Offset, i);
                 SetFloatData(nObject, eDcolData_OS.OS_Y_Position, i);
@@ -1052,11 +1052,10 @@ namespace Root_CAMELLIA.Module
                 SetFloatData(nObject, eDcolData_OS.Total_Thickness, i);
                 SetFloatData(nObject, eDcolData_OS.Thickness_Detail, i);
                 SetFloatData(nObject, eDcolData_OS.GOF, i);
+                SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Reflectance, 0);
                 SetFloatData(nObject, eDcolData_OS.Reflectance, i);
-                //이부분 수정 필요
-                //SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Reflectance, 0);
-                //SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Transmittance, 0);
-                //SetFloatData(nObject, eDcolData_OS.Transmittance, i);
+                SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Transmittance, 0);
+                SetFloatData(nObject, eDcolData_OS.Transmittance, i);
                 //m_log.Add("Site #" + i.ToString() + "  Data Set Done");
             }
         }

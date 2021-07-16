@@ -768,11 +768,7 @@ namespace Root_CAMELLIA.Module
         {
             // Make Directory
             //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END,);
-            if (m_engineer.p_bUseXGem)
-            {
-                p_processStartDate = DateTime.Now.ToString("MM/dd/yyyy");
-                p_processStartTime = DateTime.Now.ToString("HH:mm:ss");
-            }
+
             return "OK";
         }
 
@@ -783,6 +779,12 @@ namespace Root_CAMELLIA.Module
                 p_dataSavePathDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm");
                 p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe;
                 GeneralTools.MakeDirectory(p_dataSavePath);
+            }
+
+            if (m_engineer.p_bUseXGem)
+            {
+                p_processStartDate = DateTime.Now.ToString("MM\\/dd\\/yyyy");
+                p_processStartTime = DateTime.Now.ToString("HH:mm:ss");
             }
 
             MarsLogManager.Instance.ChangeMaterialSlot(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1);

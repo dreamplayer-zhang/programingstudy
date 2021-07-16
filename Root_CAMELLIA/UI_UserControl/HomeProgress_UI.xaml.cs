@@ -103,6 +103,7 @@ namespace Root_CAMELLIA
                 else
                 {
                     this.Close();
+                    return;
                 }
                 //return;
             }

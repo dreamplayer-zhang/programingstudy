@@ -1422,7 +1422,7 @@ namespace RootTools.Gem.XGem
             }
         }
 
-        public void MakeObject(long nObject)
+        public void MakeObject(ref long nObject)
         {
             m_xGem.MakeObject(ref nObject);
         }
