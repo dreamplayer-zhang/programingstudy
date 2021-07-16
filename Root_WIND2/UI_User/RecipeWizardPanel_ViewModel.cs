@@ -78,7 +78,7 @@ namespace Root_WIND2.UI_User
         public readonly UI_User.FrontsideAlignment frontsideAlignment = new UI_User.FrontsideAlignment();
         public readonly UI_User.FrontsideMask frontsideMask = new UI_User.FrontsideMask();
         public readonly UI_User.FrontsideSpec frontsideSpec = new UI_User.FrontsideSpec();
-        public readonly UI_User.FrontsideInspect frontsideInspect = new UI_User.FrontsideInspect();
+         public readonly UI_User.FrontsideInspect frontsideInspect = new UI_User.FrontsideInspect();
         public readonly UI_User.FrontsideOthers frontsideOthers = new UI_User.FrontsideOthers();
 
         // BACK
