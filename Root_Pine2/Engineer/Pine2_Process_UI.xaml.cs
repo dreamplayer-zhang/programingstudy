@@ -192,7 +192,7 @@ namespace Root_Pine2.Engineer
             groupBoxLot.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
             groupBoxStack.IsEnabled = m_pine2.p_eMode == Pine2.eRunMode.Stack && (EQ.p_eState == EQ.eState.Ready);
             groupBoxVision.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
-            groupBoxMode.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
+            groupBoxMode.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init);
         }
 
         private void buttonRecipeSave_Click(object sender, RoutedEventArgs e)
