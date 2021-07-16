@@ -15,8 +15,8 @@ namespace Root_Pine2_Vision.Module
             InitializeComponent();
         }
 
-        Vision2D m_vision;
-        public void Init(Vision2D vision)
+        dynamic m_vision;
+        public void Init(dynamic vision)
         {
             m_vision = vision;
             DataContext = vision;

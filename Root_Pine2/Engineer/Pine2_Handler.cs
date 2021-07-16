@@ -52,8 +52,8 @@ namespace Root_Pine2.Engineer
 
         void SendLotInfo(Boats boats, int nMode)
         {
-            Pine2.VisionOption option = m_pine2.m_aVisionOption[boats.m_vision.m_eVision];
-            Vision2D.LotInfo lotInfo = new Vision2D.LotInfo(nMode, p_sRecipe, m_pine2.p_sLotID, option.p_bLotMix, option.p_bBarcode, option.p_nBarcode, option.p_lBarcode);
+            Pine2.VisionOption option = m_pine2.m_aVisionOption[boats.m_vision.p_eVision];
+            LotInfo lotInfo = new LotInfo(nMode, p_sRecipe, m_pine2.p_sLotID, option.p_bLotMix, option.p_bBarcode, option.p_nBarcode, option.p_lBarcode);
             string sRun = boats.m_vision.SendLotInfo(lotInfo);
             if (sRun == "OK") boats.p_sInfo = lotInfo.m_sLotID; 
         }
@@ -76,7 +76,7 @@ namespace Root_Pine2.Engineer
 
         void SendSortInfo(Boats boats, InfoStrip infoStrip)
         {
-            Vision2D.SortInfo sortinfo = new Vision2D.SortInfo(infoStrip.m_eWorks, infoStrip.p_id, infoStrip.m_iBundle.ToString("00"));
+            SortInfo sortinfo = new SortInfo(infoStrip.m_eWorks, infoStrip.p_id, infoStrip.m_iBundle.ToString("00"));
             boats.m_vision.SendSortInfo(sortinfo); 
         }
         #endregion
@@ -125,7 +125,7 @@ namespace Root_Pine2.Engineer
         public LoadEV m_loadEV;
         public MagazineEVSet m_magazineEVSet;
         public Transfer m_transfer;
-        public Dictionary<eVision, Vision2D> m_aVision = new Dictionary<eVision, Vision2D>();
+        public Dictionary<eVision, IVision> m_aVision = new Dictionary<eVision, IVision>();
         public Dictionary<eVision, Boats> m_aBoats = new Dictionary<eVision, Boats>(); 
         public Loader0 m_loader0;
         public Loader1 m_loader1;
@@ -165,7 +165,12 @@ namespace Root_Pine2.Engineer
 
         void InitVision(eVision eVision)
         {
-            Vision2D vision = new Vision2D(eVision, m_engineer, ModuleBase.eRemote.Client); 
+            dynamic vision; 
+            switch (eVision)
+            {
+                case eVision.Top3D: vision = new Vision3D(eVision, m_engineer, ModuleBase.eRemote.Client); break;
+                default: vision = new Vision2D(eVision, m_engineer, ModuleBase.eRemote.Client); break;
+            }
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(vision);
             p_moduleList.AddModule(vision, ui);

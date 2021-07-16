@@ -24,7 +24,7 @@ namespace Root_Pine2.Module
             m_boats = boats;
             DataContext = boats;
             treeRootUI.Init(boats.m_treeRootQueue);
-            treeVisionUI.Init(boats.m_vision.m_treeRootQueue);
+            treeVisionUI.Init(boats.m_vision.p_treeRootQueue);
             textBlockInfo.DataContext = boats; 
             boats.RunTreeQueue(Tree.eMode.Init);
         }
@@ -39,7 +39,7 @@ namespace Root_Pine2.Module
                 case ModuleBase.eState.Run: Background = Brushes.Yellow; break;
                 case ModuleBase.eState.Error: Background = Brushes.OrangeRed; break;
             }
-            textBlockVision.Foreground = m_boats.m_vision.m_remote.p_bEnable ? Brushes.Red : Brushes.LightGray; 
+            textBlockVision.Foreground = m_boats.m_vision.p_remote.p_bEnable ? Brushes.Red : Brushes.LightGray; 
             textBlockA.Text = (m_boats.m_aBoat[eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[eWorks.A].p_infoStrip.p_id : "";
             textBlockB.Text = (m_boats.m_aBoat[eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[eWorks.B].p_infoStrip.p_id : "";
             gridStripA.Background = (m_boats.m_aBoat[eWorks.A].p_inspectStrip != null) ? Brushes.Orange : Brushes.Beige;
@@ -50,7 +50,7 @@ namespace Root_Pine2.Module
             textBlockStepB.Text = m_boats.m_aBoat[eWorks.B].p_eStep.ToString();
             OnRunTree();
 
-            if (m_boats.m_vision.m_remote.m_client.p_bConnect == false)
+            if (m_boats.m_vision.p_remote.m_client.p_bConnect == false)
             {
                 m_boats.m_aBoat[eWorks.A].p_bWorksConnect = false;
                 m_boats.m_aBoat[eWorks.B].p_bWorksConnect = false;
@@ -68,7 +68,7 @@ namespace Root_Pine2.Module
 
         private void Grid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            m_boats.m_vision.m_remote.p_bEnable = !m_boats.m_vision.m_remote.p_bEnable;
+            m_boats.m_vision.p_remote.p_bEnable = !m_boats.m_vision.p_remote.p_bEnable;
         }
 
         private void GridA_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
