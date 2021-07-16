@@ -95,6 +95,7 @@ namespace Root_Pine2_Vision.Module
             m_nLine = nLine;
         }
     }
+    
     public class SortInfo
     {
         public eWorks m_eWorks = eWorks.A;
