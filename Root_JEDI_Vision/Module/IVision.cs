@@ -1,22 +1,15 @@
 ﻿using RootTools;
-using RootTools.Module;
 using RootTools.Trees;
-using System.Collections.Generic;
 using System.Threading;
 
-namespace Root_Pine2_Vision.Module
+namespace Root_JEDI_Vision.Module
 {
     public enum eVision
     {
+        CCS,
         Top3D,
         Top2D,
-        Bottom
-    }
-
-    public enum eWorks
-    {
-        A,
-        B,
+        Bottom,
     }
 
     public class LotInfo
@@ -64,14 +57,13 @@ namespace Root_Pine2_Vision.Module
 
     public class SnapInfo
     {
-        public eWorks m_eWorks = eWorks.A;
         public int m_nSnapMode = 0;
         public string m_sStripID = "0000";
         public int m_nLine = 0;
 
         public SnapInfo Clone()
         {
-            return new SnapInfo(m_eWorks, m_nSnapMode, m_sStripID, m_nLine);
+            return new SnapInfo(m_nSnapMode, m_sStripID, m_nLine);
         }
 
         public string GetString()
@@ -81,30 +73,27 @@ namespace Root_Pine2_Vision.Module
 
         public void RunTree(Tree tree, bool bVisible)
         {
-            m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "eWorks", bVisible);
             m_nSnapMode = tree.Set(m_nSnapMode, m_nSnapMode, "SnapMode", "Snap Mode (0 = RGB, 1 = APS, 3 = ALL)", bVisible);
             m_sStripID = tree.Set(m_sStripID, m_sStripID, "StripID", "Strip ID", bVisible);
             m_nLine = tree.Set(m_nLine, m_nLine, "SnapLine", "Snap Line Number", bVisible);
         }
 
-        public SnapInfo(eWorks eWorks, int nSnapMode, string sStripID, int nLine)
+        public SnapInfo(int nSnapMode, string sStripID, int nLine)
         {
-            m_eWorks = eWorks;
             m_nSnapMode = nSnapMode;
             m_sStripID = sStripID;
             m_nLine = nLine;
         }
     }
-    
+
     public class SortInfo
     {
-        public eWorks m_eWorks = eWorks.A;
         public string m_sStripID = "";
         public string m_sSortID = "";
 
         public SortInfo Clone()
         {
-            return new SortInfo(m_eWorks, m_sStripID, m_sSortID);
+            return new SortInfo(m_sStripID, m_sSortID);
         }
 
         public string GetString()
@@ -114,14 +103,12 @@ namespace Root_Pine2_Vision.Module
 
         public void RunTree(Tree tree, bool bVisible)
         {
-            m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "eWorks", bVisible);
             m_sStripID = tree.Set(m_sStripID, m_sStripID, "StripID", "StripID", bVisible);
             m_sSortID = tree.Set(m_sSortID, m_sSortID, "SortID", "SortID", bVisible);
         }
 
-        public SortInfo(eWorks eWorks, string sStripID, string sSortID)
+        public SortInfo(string sStripID, string sSortID)
         {
-            m_eWorks = eWorks;
             m_sStripID = sStripID;
             m_sSortID = sSortID;
         }
@@ -131,14 +118,9 @@ namespace Root_Pine2_Vision.Module
     public enum eProtocol
     {
         SnapInfo,
-        Snap,
         SnapDone,
-        SnapReady,
         LotInfo,
-        InspDone,
         SortingData,
-        WorksConnect,
-        ChangeUserset,
     }
 
     public class Protocol
@@ -176,6 +158,13 @@ namespace Root_Pine2_Vision.Module
             return m_sInfo;
         }
 
+        public Protocol(int nID, eProtocol eProtocol, string sRecipe)
+        {
+            m_eProtocol = eProtocol;
+            m_sRecipe = sRecipe;
+            m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + ">";
+        }
+
         public int m_iSnap = 0;          // Snap Done Line Index (0 Base)
         public Protocol(int nID, eProtocol eProtocol, string sRecipe, int iSnap)
         {
@@ -183,6 +172,17 @@ namespace Root_Pine2_Vision.Module
             m_sRecipe = sRecipe;
             m_iSnap = iSnap;
             m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + "," + iSnap.ToString() + ">";
+        }
+
+        public int m_nSnapMode = 0;      // 0 : RGB 단일, 1 : PAS 단일, 2 : RGB, APS 모두
+        public int m_nLineNum = 0;
+        public Protocol(int nID, eProtocol eProtocol, string sRecipe, int nScanMode, int nLineNum)
+        {
+            m_eProtocol = eProtocol;
+            m_sRecipe = sRecipe;
+            m_nSnapMode = nScanMode;
+            m_nLineNum = nLineNum;
+            m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + "," + m_nSnapMode.ToString() + "," + m_nLineNum.ToString() + ">";
         }
 
         public SnapInfo m_snapInfo = null;
@@ -211,14 +211,11 @@ namespace Root_Pine2_Vision.Module
     }
     #endregion
 
+
     public interface IVision
     {
+        string p_id { get; set; }
         eVision p_eVision { get; set; }
-        List<string> p_asRecipe { get; set; }
-        TreeRoot p_treeRootQueue { get; }
-        ModuleBase.Remote p_remote { get; }
-        string SendSnapInfo(SnapInfo snapInfo); 
-        string SendLotInfo(LotInfo lotInfo);
-        string SendSortInfo(SortInfo sortInfo);
+        string p_sInfo { get; set; }
     }
 }
