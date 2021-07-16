@@ -52,18 +52,18 @@ namespace Root_Pine2.Engineer
             checkBoxIonBlow.DataContext = m_pine2;
             checkBoxAlignBlow.DataContext = m_pine2;
 
-            checkBoxLotMix3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
-            checkBoxBarcode3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
-            textBoxBarcode3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
-            textBoxBarcodeLength3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
-            checkBoxLotMix2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
-            checkBoxBarcode2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
-            textBoxBarcode2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
-            textBoxBarcodeLength2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
-            checkBoxLotMixBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
-            checkBoxBarcodeBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
-            textBoxBarcodeBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
-            textBoxBarcodeLengthBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
+            checkBoxLotMix3D.DataContext = m_pine2.m_aVisionOption[eVision.Top3D];
+            checkBoxBarcode3D.DataContext = m_pine2.m_aVisionOption[eVision.Top3D];
+            textBoxBarcode3D.DataContext = m_pine2.m_aVisionOption[eVision.Top3D];
+            textBoxBarcodeLength3D.DataContext = m_pine2.m_aVisionOption[eVision.Top3D];
+            checkBoxLotMix2D.DataContext = m_pine2.m_aVisionOption[eVision.Top2D];
+            checkBoxBarcode2D.DataContext = m_pine2.m_aVisionOption[eVision.Top2D];
+            textBoxBarcode2D.DataContext = m_pine2.m_aVisionOption[eVision.Top2D];
+            textBoxBarcodeLength2D.DataContext = m_pine2.m_aVisionOption[eVision.Top2D];
+            checkBoxLotMixBottom.DataContext = m_pine2.m_aVisionOption[eVision.Bottom];
+            checkBoxBarcodeBottom.DataContext = m_pine2.m_aVisionOption[eVision.Bottom];
+            textBoxBarcodeBottom.DataContext = m_pine2.m_aVisionOption[eVision.Bottom];
+            textBoxBarcodeLengthBottom.DataContext = m_pine2.m_aVisionOption[eVision.Bottom];
 
             InitMagazineEV_UI();
             InitLoaderUI(handler.m_loader0, gridLoader, 6);
@@ -117,7 +117,7 @@ namespace Root_Pine2.Engineer
         List<Boats_UI> m_aBoatsUI = new List<Boats_UI>(); 
         void InitBoatsUI()
         {
-            foreach (Vision2D.eVision eVision in Enum.GetValues(typeof(Vision2D.eVision)))
+            foreach (eVision eVision in Enum.GetValues(typeof(eVision)))
             {
                 Boats_UI ui = new Boats_UI();
                 ui.Init(m_handler.m_aBoats[eVision]);
@@ -167,12 +167,12 @@ namespace Root_Pine2.Engineer
             m_loadEVUI.OnTimer();
             OnTimerRun();
 
-            textBoxBarcode3D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D].p_bBarcode;
-            textBoxBarcodeLength3D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D].p_bBarcode;
-            textBoxBarcode2D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D].p_bBarcode;
-            textBoxBarcodeLength2D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D].p_bBarcode;
-            textBoxBarcodeBottom.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom].p_bBarcode;
-            textBoxBarcodeLengthBottom.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom].p_bBarcode;
+            textBoxBarcode3D.IsEnabled = m_pine2.m_aVisionOption[eVision.Top3D].p_bBarcode;
+            textBoxBarcodeLength3D.IsEnabled = m_pine2.m_aVisionOption[eVision.Top3D].p_bBarcode;
+            textBoxBarcode2D.IsEnabled = m_pine2.m_aVisionOption[eVision.Top2D].p_bBarcode;
+            textBoxBarcodeLength2D.IsEnabled = m_pine2.m_aVisionOption[eVision.Top2D].p_bBarcode;
+            textBoxBarcodeBottom.IsEnabled = m_pine2.m_aVisionOption[eVision.Bottom].p_bBarcode;
+            textBoxBarcodeLengthBottom.IsEnabled = m_pine2.m_aVisionOption[eVision.Bottom].p_bBarcode;
         }
 
         private void textBlockMode_PreviewMouseDown(object sender, MouseButtonEventArgs e)

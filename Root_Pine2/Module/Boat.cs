@@ -236,7 +236,7 @@ namespace Root_Pine2.Module
 
         #region Inspect
         public InfoStrip p_inspectStrip { get; set; }
-        public string InspectDone(Vision2D.eVision eVision, string sStripID, string sStripResult, string sX, string sY, string sMapResult)
+        public string InspectDone(eVision eVision, string sStripID, string sStripResult, string sX, string sY, string sMapResult)
         {
             if (p_inspectStrip == null) return "InspectStrip id null";
             if (p_inspectStrip.p_id != sStripID) return "Strip ID MisMatch";
@@ -280,7 +280,7 @@ namespace Root_Pine2.Module
         }
         public string p_id { get; set; }
         Boats m_boats;
-        public Boat(string id, Boats boats, Vision2D.eWorks eWorks)
+        public Boat(string id, Boats boats, eWorks eWorks)
         {
             m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
             p_id = id;

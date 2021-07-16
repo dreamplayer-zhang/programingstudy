@@ -21,28 +21,28 @@ namespace Root_Pine2_Vision.Module
             m_vision = vision;
             DataContext = vision;
             comboBoxOpen.ItemsSource = vision.p_asRecipe;
-            treeRootAUI.Init(vision.m_UIRecipe[Vision2D.eWorks.A].m_treeRecipe);
-            treeRootBUI.Init(vision.m_UIRecipe[Vision2D.eWorks.B].m_treeRecipe);
-            vision.m_UIRecipe[Vision2D.eWorks.A].RunTreeRecipe(Tree.eMode.Init);
-            vision.m_UIRecipe[Vision2D.eWorks.B].RunTreeRecipe(Tree.eMode.Init);
+            treeRootAUI.Init(vision.m_UIRecipe[eWorks.A].m_treeRecipe);
+            treeRootBUI.Init(vision.m_UIRecipe[eWorks.B].m_treeRecipe);
+            vision.m_UIRecipe[eWorks.A].RunTreeRecipe(Tree.eMode.Init);
+            vision.m_UIRecipe[eWorks.B].RunTreeRecipe(Tree.eMode.Init);
         }
 
         private void comboBoxOpen_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string sRecipe = (string)comboBoxOpen.SelectedItem;
             textBoxRecipe.Text = sRecipe; 
-            m_vision.m_UIRecipe[Vision2D.eWorks.A].RecipeOpen(sRecipe);
-            m_vision.m_UIRecipe[Vision2D.eWorks.B].RecipeOpen(sRecipe);
+            m_vision.m_UIRecipe[eWorks.A].RecipeOpen(sRecipe);
+            m_vision.m_UIRecipe[eWorks.B].RecipeOpen(sRecipe);
             labelInfo.Content = "Recipe Open Done : " + sRecipe;
-            m_vision.m_UIRecipe[Vision2D.eWorks.A].RunTreeRecipe(Tree.eMode.Init);
-            m_vision.m_UIRecipe[Vision2D.eWorks.B].RunTreeRecipe(Tree.eMode.Init);
+            m_vision.m_UIRecipe[eWorks.A].RunTreeRecipe(Tree.eMode.Init);
+            m_vision.m_UIRecipe[eWorks.B].RunTreeRecipe(Tree.eMode.Init);
         }
 
         private void buttonSave_Click(object sender, RoutedEventArgs e)
         {
             if (textBoxRecipe.Text == "") return; 
-            m_vision.m_UIRecipe[Vision2D.eWorks.A].RecipeSave(textBoxRecipe.Text);
-            m_vision.m_UIRecipe[Vision2D.eWorks.B].RecipeSave(textBoxRecipe.Text);
+            m_vision.m_UIRecipe[eWorks.A].RecipeSave(textBoxRecipe.Text);
+            m_vision.m_UIRecipe[eWorks.B].RecipeSave(textBoxRecipe.Text);
             comboBoxOpen.ItemsSource = m_vision.p_asRecipe;
             comboBoxOpen.SelectedItem = textBoxRecipe.Text;
             labelInfo.Content = "Recipe Save Done : " + textBoxRecipe.Text; 

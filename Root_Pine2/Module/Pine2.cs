@@ -725,19 +725,19 @@ namespace Root_Pine2.Module
                 p_lBarcode = tree.Set(p_lBarcode, p_lBarcode, "Barcode Length", "Barcode Length (pixel)", p_bBarcode);
             }
         }
-        public Dictionary<Vision2D.eVision, VisionOption> m_aVisionOption = new Dictionary<Vision2D.eVision, VisionOption>(); 
+        public Dictionary<eVision, VisionOption> m_aVisionOption = new Dictionary<eVision, VisionOption>(); 
         void InitVisionOption()
         {
-            m_aVisionOption.Add(Vision2D.eVision.Top3D, new VisionOption());
-            m_aVisionOption.Add(Vision2D.eVision.Top2D, new VisionOption());
-            m_aVisionOption.Add(Vision2D.eVision.Bottom, new VisionOption());
+            m_aVisionOption.Add(eVision.Top3D, new VisionOption());
+            m_aVisionOption.Add(eVision.Top2D, new VisionOption());
+            m_aVisionOption.Add(eVision.Bottom, new VisionOption());
         }
 
         void RunTreeVisionOption(Tree tree)
         {
-            m_aVisionOption[Vision2D.eVision.Top3D].RunTree(tree.GetTree("Top3D"));
-            m_aVisionOption[Vision2D.eVision.Top2D].RunTree(tree.GetTree("Top2D"));
-            m_aVisionOption[Vision2D.eVision.Bottom].RunTree(tree.GetTree("Bottom"));
+            m_aVisionOption[eVision.Top3D].RunTree(tree.GetTree("Top3D"));
+            m_aVisionOption[eVision.Top2D].RunTree(tree.GetTree("Top2D"));
+            m_aVisionOption[eVision.Bottom].RunTree(tree.GetTree("Bottom"));
         }
         #endregion
 
@@ -883,7 +883,7 @@ namespace Root_Pine2.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_infoStrip.m_eWorks = (Vision2D.eWorks)tree.Set(m_infoStrip.m_eWorks, m_infoStrip.m_eWorks, "eWorks", "Select Boat", bVisible);
+                m_infoStrip.m_eWorks = (eWorks)tree.Set(m_infoStrip.m_eWorks, m_infoStrip.m_eWorks, "eWorks", "Select Boat", bVisible);
                 m_infoStrip.p_id = tree.Set(m_infoStrip.p_id, m_infoStrip.p_id, "StripID", "Strip ID", bVisible);
                 m_infoStrip.m_iBundle = tree.Set(m_infoStrip.m_iBundle, m_infoStrip.m_iBundle, "Bundle", "Bundle", bVisible);
             }
@@ -933,8 +933,8 @@ namespace Root_Pine2.Module
 
             public override string Run()
             {
-                m_infoStrip.SetResult(Vision2D.eVision.Top2D, m_eResultTop.ToString(), m_szMap.X.ToString(), m_szMap.Y.ToString(), m_sMapTop);
-                m_infoStrip.SetResult(Vision2D.eVision.Bottom, m_eResultBottom.ToString(), m_szMap.X.ToString(), m_szMap.Y.ToString(), m_sMapBottom);
+                m_infoStrip.SetResult(eVision.Top2D, m_eResultTop.ToString(), m_szMap.X.ToString(), m_szMap.Y.ToString(), m_sMapTop);
+                m_infoStrip.SetResult(eVision.Bottom, m_eResultBottom.ToString(), m_szMap.X.ToString(), m_szMap.Y.ToString(), m_sMapBottom);
                 return m_module.m_handler.m_summary.SetSort(false, m_infoStrip); 
             }
         }

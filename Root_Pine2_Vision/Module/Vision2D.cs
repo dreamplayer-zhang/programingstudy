@@ -8,7 +8,6 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -19,15 +18,6 @@ namespace Root_Pine2_Vision.Module
 {
     public class Vision2D : ModuleBase
     {
-        #region Property
-        public enum eVision
-        {
-            Top3D,
-            Top2D,
-            Bottom
-        }
-        #endregion
-
         #region ToolBox
         Camera_Dalsa m_camera;
         public LightSet m_lightSet;
@@ -796,11 +786,6 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Works
-        public enum eWorks
-        {
-            A,
-            B,
-        }
         public Dictionary<eWorks, Works2D> m_aWorks = new Dictionary<eWorks, Works2D>();
         void InitVisionWorks()
         {

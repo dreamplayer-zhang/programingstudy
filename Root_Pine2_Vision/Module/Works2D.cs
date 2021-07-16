@@ -360,10 +360,10 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public Vision2D.eWorks p_eWorks { get; set; }
+        public eWorks p_eWorks { get; set; }
         public string p_id { get; set; }
         public Vision2D m_vision;
-        public Works2D(Vision2D.eWorks eWorks, Vision2D vision)
+        public Works2D(eWorks eWorks, Vision2D vision)
         {
             p_eWorks = eWorks;
             p_id = eWorks.ToString();

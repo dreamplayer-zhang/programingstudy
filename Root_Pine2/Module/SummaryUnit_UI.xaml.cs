@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using Root_Pine2_Vision.Module;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Root_Pine2.Module
@@ -13,14 +14,18 @@ namespace Root_Pine2.Module
             InitializeComponent();
         }
 
-        public void SetResult(Summary.Data.eVision eVision, Brush brush)
+        public void SetResult(Brush brush)
+        {
+            gridTotal.Background = brush;
+        }
+
+        public void SetResult(eVision eVision, Brush brush)
         {
             switch (eVision)
             {
-                case Summary.Data.eVision.Total: gridTotal.Background = brush; break;
-                case Summary.Data.eVision.Top3D: grid3D.Background = brush; break;
-                case Summary.Data.eVision.Top2D: gridTop.Background = brush; break;
-                case Summary.Data.eVision.Bottom: gridBottom.Background = brush; break;
+                case eVision.Top3D: grid3D.Background = brush; break;
+                case eVision.Top2D: gridTop.Background = brush; break;
+                case eVision.Bottom: gridBottom.Background = brush; break;
             }
         }
     }

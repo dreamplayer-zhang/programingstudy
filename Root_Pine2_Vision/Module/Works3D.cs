@@ -36,8 +36,8 @@ namespace Root_Pine2_Vision.Module
         {
         }
 
-        public Vision2D.eWorks p_eWorks { get; set; }
-        public Works3D(Vision2D.eWorks eWorks, Vision2D vision)
+        public eWorks p_eWorks { get; set; }
+        public Works3D(eWorks eWorks, Vision2D vision)
         {
             p_eWorks = eWorks; 
         }
