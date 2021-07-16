@@ -63,8 +63,8 @@ namespace Root_Pine2.Module
         {
             m_axis.AddPos(GetPosString(eWorks.A));
             m_axis.AddPos(GetPosString(eWorks.B));
-            m_axis.AddPos(Enum.GetNames(typeof(ePosTransfer)));
-            m_axis.AddPos(Enum.GetNames(typeof(ePosTray)));
+            m_axis.AddPos(ePosTransfer.Transfer7.ToString());
+            m_axis.AddPos(ePosTray.Tray7.ToString());
             m_axis.p_axisZ.AddPos(c_sPosUp);
         }
         string GetPosString(eWorks eWorks)
@@ -143,15 +143,17 @@ namespace Root_Pine2.Module
 
         public string RunMoveTransfer(ePosTransfer ePos, double xOffset, bool bWait = true)
         {
-            if (Run(StartMoveX(ePos.ToString(), xOffset))) return p_sInfo;
-            m_axis.p_axisY.StartMove(ePos);
+            xOffset -= m_transfer.m_buffer.GetXOffset((InfoStrip.eMagazine)ePos); 
+            if (Run(StartMoveX(ePosTransfer.Transfer7.ToString(), xOffset))) return p_sInfo;
+            m_axis.p_axisY.StartMove(ePosTransfer.Transfer7);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveTray(ePosTray ePos, bool bWait = true)
         {
-            if (Run(StartMoveX(ePos.ToString(), 0))) return p_sInfo;
-            m_axis.p_axisY.StartMove(ePos);
+            double xOffset = -m_transfer.m_buffer.GetXOffset((InfoStrip.eMagazine)ePos);
+            if (Run(StartMoveX(ePosTray.Tray7.ToString(), xOffset))) return p_sInfo;
+            m_axis.p_axisY.StartMove(ePosTray.Tray7);
             return bWait ? m_axis.WaitReady() : "OK";
         }
         #endregion
@@ -165,13 +167,13 @@ namespace Root_Pine2.Module
 
         public string RunMoveZ(ePosTransfer ePos, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(ePos);
+            m_axis.p_axisZ.StartMove(ePosTransfer.Transfer7);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveZ(ePosTray ePos, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(ePos);
+            m_axis.p_axisZ.StartMove(ePosTray.Tray7);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 

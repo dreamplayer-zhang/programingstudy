@@ -61,12 +61,12 @@ namespace Root_Pine2.Module
             m_axis.AddPos(c_sPosLoadEV);
             m_axis.AddPos(c_sPosPaper);
             m_axis.AddPos(c_sPosKeyence);
-            m_axis.AddPos(Enum.GetNames(typeof(ePosTransfer)));
+            m_axis.AddPos(ePosTransfer.Transfer7.ToString());
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, eWorks.B));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, eWorks.B));
-            m_axis.AddPos(Enum.GetNames(typeof(ePosTray)));
+            m_axis.AddPos(ePosTray.Tray7.ToString());
             m_axis.p_axisZ.AddPos(c_sPosUp);
         }
         string GetPosString(eUnloadVision eVision, eWorks eWorks)
@@ -164,8 +164,9 @@ namespace Root_Pine2.Module
         #region AxisXY
         public string RunMoveTransfer(ePosTransfer ePos, double xOffset, bool bWait = true)
         {
-            if (Run(StartMoveX(ePos.ToString(), xOffset))) return p_sInfo; 
-            m_axis.p_axisY.StartMove(ePos);
+            xOffset += m_transfer.m_buffer.GetXOffset((InfoStrip.eMagazine)ePos);
+            if (Run(StartMoveX(ePosTransfer.Transfer7.ToString(), xOffset))) return p_sInfo; 
+            m_axis.p_axisY.StartMove(ePosTransfer.Transfer7);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -179,8 +180,9 @@ namespace Root_Pine2.Module
 
         public string RunMoveTray(ePosTray eTray, bool bWait = true)
         {
-            if (Run(StartMoveX(eTray.ToString(), 0))) return p_sInfo;
-            m_axis.p_axisY.StartMove(eTray.ToString());
+            double xOffset = m_transfer.m_buffer.GetXOffset((InfoStrip.eMagazine)eTray);
+            if (Run(StartMoveX(ePosTray.Tray7.ToString(), xOffset))) return p_sInfo;
+            m_axis.p_axisY.StartMove(ePosTray.Tray7);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -223,7 +225,7 @@ namespace Root_Pine2.Module
 
         public string RunMoveZ(ePosTransfer ePos, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(ePos);
+            m_axis.p_axisZ.StartMove(ePosTransfer.Transfer7);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -235,7 +237,7 @@ namespace Root_Pine2.Module
 
         public string RunMoveZPaper(ePosTray eTray, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(eTray);
+            m_axis.p_axisZ.StartMove(ePosTray.Tray7);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -551,7 +553,7 @@ namespace Root_Pine2.Module
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (m_pine2.p_eMode == Pine2.eRunMode.Magazine)
             {
-                double fPos = m_axis.p_axisY.GetPosValue(ePosTransfer.Transfer0) + 5000;
+                double fPos = m_axis.p_axisY.GetPosValue(ePosTransfer.Transfer7) + 5000;
                 if (m_axis.p_axisY.p_posCommand > fPos)
                 {
                     m_axis.p_axisY.StartMove(fPos);
