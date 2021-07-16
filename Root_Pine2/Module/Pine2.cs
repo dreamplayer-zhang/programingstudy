@@ -750,6 +750,7 @@ namespace Root_Pine2.Module
             public class Doc
             {
                 public string m_sSorter = "";
+                public int m_iSorter = 0; 
                 public string m_sBundle;
                 public InfoStrip m_InfoStrip = null;
                 public int m_nStrip = 0;
@@ -758,7 +759,8 @@ namespace Root_Pine2.Module
 
                 public Doc(int iSorter, int iBundle, int nStrip, InfoStrip.eResult eResult)
                 {
-                    m_eResult = eResult; 
+                    m_eResult = eResult;
+                    m_iSorter = iSorter; 
                     for (int n = 0; n < 8; n++) m_sSorter += ((n == iSorter) ? n.ToString() : "+");
                     m_sBundle = iBundle.ToString("00");
                     m_nStrip = nStrip; 
@@ -795,13 +797,15 @@ namespace Root_Pine2.Module
 
             void PrintDoc(Doc doc)
             {
+                string sRecipe = m_handler.p_sRecipe;
+                string sLot = m_handler.m_pine2.p_sLotID; 
                 string sVS = m_handler.m_pine2.p_sLotID + "_S00_C" + doc.m_sBundle; 
                 m_srp350.Start();
                 m_srp350.WriteText("Machine ID : Pine2 #" + m_iMachine.ToString());
                 m_srp350.WriteText("--------------------------------");
                 m_srp350.WriteText("Operator : " + m_handler.m_pine2.p_sOperator);
-                m_srp350.WriteText("Recipe : " + m_handler.p_sRecipe);
-                m_srp350.WriteText("Lot ID : " + m_handler.m_pine2.p_sLotID);
+                m_srp350.WriteText("Recipe : " + sRecipe);
+                m_srp350.WriteText("Lot ID : " + sLot);
                 m_srp350.WriteText("3D Inspect : " + m_handler.m_pine2.p_b3D.ToString());
                 m_srp350.WriteText("VS File : " + sVS);
                 m_srp350.WriteText("--------------------------------");
@@ -811,7 +815,9 @@ namespace Root_Pine2.Module
                 m_srp350.WriteText("Strip Count : " + doc.m_nStrip.ToString());
                 m_srp350.WriteText("");
                 m_srp350.WriteText(doc.m_dtNow.ToString("yyyy-MM-dd HH:mm:ss"));
-                m_srp350.WriteQR(sVS); 
+                string sRecipeLot = "/" + sRecipe + "_" + sLot; 
+                string sQR = "/M" + m_iMachine.ToString() + "V2/" + sRecipe + sRecipeLot + sRecipeLot + "-S" + doc.m_iSorter.ToString("00") + "-C" + doc.m_sBundle; 
+                m_srp350.WriteQR(sQR); 
                 m_srp350.End(); 
             }
 
