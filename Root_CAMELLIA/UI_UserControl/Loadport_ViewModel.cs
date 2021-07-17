@@ -302,15 +302,17 @@ namespace Root_CAMELLIA
 
         private void M_handler_OnListUpdate()
         {
-            p_waferList.Clear();
-            p_isRNR = false;
-            p_CurrentRecipeID = "";
-            p_dataSelectIndex = 0;
-            p_totalSelect = 0;
-            p_totalDone = 0;
-            p_progressValue = 0;
-            if (this.p_loadport.p_id == App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_id)
-                UpdateList();
+            Application.Current.Dispatcher.Invoke(delegate(){
+                p_waferList.Clear();
+                p_isRNR = false;
+                p_CurrentRecipeID = "";
+                p_dataSelectIndex = 0;
+                p_totalSelect = 0;
+                p_totalDone = 0;
+                p_progressValue = 0;
+                if (this.p_loadport.p_id == App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_id)
+                    UpdateList();
+            });
         }
 
         private void M_handler_OnRnRDone()
@@ -541,7 +543,7 @@ namespace Root_CAMELLIA
             int idx = 1;
             ObservableCollection<DataGridWaferInfo> temp = new ObservableCollection<DataGridWaferInfo>();
 
-            foreach (InfoWafer val in p_infoCarrier.m_aGemSlot)
+            foreach (InfoWafer val in p_loadport.p_infoCarrier.m_aGemSlot)
             {
                 if (val != null)
                 {
@@ -553,7 +555,7 @@ namespace Root_CAMELLIA
                     if (p_CurrentRecipeID == "" && val.p_sRecipe != "")
                     {
                         p_CurrentRecipeID = val.p_sRecipe.Replace(Path.GetExtension(val.p_sRecipe), "");
-                        p_CurrentLotID = val.p_sCarrierID;
+                        p_CurrentLotID = val.p_sLotID;
                         firstIdx = idx - 1;
                     }
                     //object[] obj = { val.m_nSlot, val.p_sWaferID, val.p_sRecipe, val.p_eState };
