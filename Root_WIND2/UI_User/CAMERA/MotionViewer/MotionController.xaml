@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:local="clr-namespace:Root_WIND2"
+             xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
@@ -253,9 +254,13 @@
                     </Button>
 
                     <!-- Theta -->
-                    <Button Grid.Row="1" Grid.Column="0" Margin="3" 
-                            FontSize="30" Content="↓ ↑"
+                    <Button Grid.Row="1" Grid.Column="0" Margin="3"
                             Style="{StaticResource button_selectmode_circle}">
+                        <icon:PackIconMaterial Kind="Autorenew"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Width="45"
+                                               Height="45"/>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding CmdAxisThetaMoveUp}" />
@@ -267,9 +272,14 @@
                     </Button>
 
 
-                    <Button Grid.Row="1" Grid.Column="2" Margin="3" 
-                            FontSize="30" Content="↑ ↓"
+                    <Button Name="BtnRotateClockwise" Grid.Row="1" Grid.Column="2" Margin="3" 
                             Style="{StaticResource button_selectmode_circle}">
+                        <icon:PackIconMaterial Kind="Autorenew"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Width="45"
+                                               Height="45"
+                                               Flip="Horizontal"/>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding CmdAxisThetaMoveDown}" />

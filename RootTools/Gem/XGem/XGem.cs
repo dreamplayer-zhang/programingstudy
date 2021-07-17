@@ -1366,7 +1366,7 @@ namespace RootTools.Gem.XGem
             }
         }
 
-        public void MakeObject(long nObject)
+        public void MakeObject(ref long nObject)
         {
             throw new NotImplementedException();
         }

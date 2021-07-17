@@ -623,6 +623,7 @@ namespace Root_Pine2.Module
             return "OK";
         }
 
+        double m_secProductDelay = 0.2; 
         string RunLoad(InfoStrip.eMagazinePos eMagazinePos)
         {
             try
@@ -633,7 +634,7 @@ namespace Root_Pine2.Module
                 if (Run(m_elevator.RunAlign(false))) return p_sInfo;
                 m_conveyor.RunMove(Conveyor.eMove.Forward);
                 if (Run(m_elevator.WaitProduct(eMagazinePos))) return p_sInfo;
-                Thread.Sleep(200);
+                Thread.Sleep((int)m_secProductDelay);
                 m_conveyor.RunMoveStop();
                 if (Run(m_elevator.MoveToConveyor(eMagazinePos, (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 7 : 0))) return p_sInfo;
                 if (Run(m_elevator.RunAlign(true))) return p_sInfo;
@@ -789,6 +790,7 @@ namespace Root_Pine2.Module
             base.RunTree(tree);
             RunTreeLED(tree.GetTree("LED")); 
             m_elevator.RunTree(tree.GetTree("Elevator"));
+            m_secProductDelay = tree.GetTree("Conveyer").Set(m_secProductDelay, m_secProductDelay, "Product Delay", "Product Sensor -> Conveyer Stop (sec)");
             m_secUnload = tree.GetTree("Conveyer").Set(m_secUnload, m_secUnload, "Stack Unload", "Stack Unload Delay (sec)");
             RunTreeXOffset(tree.GetTree("X Offset")); 
         }

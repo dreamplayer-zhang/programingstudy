@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Pine2_Vision.Module;
+using RootTools;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -122,16 +123,20 @@ namespace Root_Pine2.Module
         void OnUpdateStripInfo()
         {
             m_labelStripID.Content = m_summary.m_data.m_sStripID;
-            m_labelMapSize.Content = m_summary.m_data.m_szMap.X.ToString() + ", " + m_summary.m_data.m_szMap.Y.ToString(); 
-            foreach (Summary.Data.eVision eVision in Enum.GetValues(typeof(Summary.Data.eVision)))
+            m_labelMapSize.Content = m_summary.m_data.m_szMap.X.ToString() + ", " + m_summary.m_data.m_szMap.Y.ToString();
+            OnUpdateStripInfo(0, m_summary.m_data.m_stripTotal.m_unit); 
+            foreach (eVision eVision in Enum.GetValues(typeof(eVision)))
             {
-                int x = (int)eVision;
-                Summary.Data.Strip.Unit unit = m_summary.m_data.m_aStrip[eVision].m_unit;
-                foreach (Summary.Data.Strip.Unit.eResult eResult in Enum.GetValues(typeof(Summary.Data.Strip.Unit.eResult)))
-                {
-                    int y = (int)eResult;
-                    if (eResult != Summary.Data.Strip.Unit.eResult.Unknown) m_labelStripInfo[x, y].Content = unit.m_aCount[eResult].ToString(); 
-                }
+                OnUpdateStripInfo((int)eVision + 1, m_summary.m_data.m_aStrip[eVision].m_unit);
+            }
+        }
+
+        void OnUpdateStripInfo(int x, Summary.Data.Strip.Unit unit)
+        {
+            foreach (Summary.Data.Strip.Unit.eResult eResult in Enum.GetValues(typeof(Summary.Data.Strip.Unit.eResult)))
+            {
+                int y = (int)eResult;
+                if (eResult != Summary.Data.Strip.Unit.eResult.Unknown) m_labelStripInfo[x, y].Content = unit.m_aCount[eResult].ToString();
             }
         }
         #endregion
@@ -167,15 +172,19 @@ namespace Root_Pine2.Module
 
         void OnUpdateStripCount()
         {
-            foreach (Summary.Data.eVision eVision in Enum.GetValues(typeof(Summary.Data.eVision)))
+            OnUpdateStripCount(0, m_summary.m_countStripTotal); 
+            foreach (eVision eVision in Enum.GetValues(typeof(eVision)))
             {
-                int x = (int)eVision;
-                Summary.CountStrip countStrip = m_summary.m_countStrip[eVision]; 
-                foreach (Summary.Data.Strip.eResult eResult in Enum.GetValues(typeof(Summary.Data.Strip.eResult)))
-                {
-                    int y = (int)eResult;
-                    m_labelCountStrip[x, y].Content = countStrip.m_aCount[eResult].ToString(); 
-                }
+                OnUpdateStripCount((int)eVision + 1, m_summary.m_countStrip[eVision]); 
+            }
+        }
+
+        void OnUpdateStripCount(int x, Summary.CountStrip countStrip)
+        {
+            foreach (Summary.Data.Strip.eResult eResult in Enum.GetValues(typeof(Summary.Data.Strip.eResult)))
+            {
+                int y = (int)eResult;
+                m_labelCountStrip[x, y].Content = countStrip.m_aCount[eResult].ToString();
             }
         }
         #endregion
@@ -211,15 +220,19 @@ namespace Root_Pine2.Module
 
         void OnUpdateUnitCount()
         {
-            foreach (Summary.Data.eVision eVision in Enum.GetValues(typeof(Summary.Data.eVision)))
+            OnUpdateUnitCount(0, m_summary.m_countUnitTotal); 
+            foreach (eVision eVision in Enum.GetValues(typeof(eVision)))
             {
-                int x = (int)eVision;
-                Summary.CountUnit countUnit = m_summary.m_countUnit[eVision];
-                foreach (Summary.Data.Strip.Unit.eResult eResult in Enum.GetValues(typeof(Summary.Data.Strip.Unit.eResult)))
-                {
-                    int y = (int)eResult;
-                    if (eResult != Summary.Data.Strip.Unit.eResult.Unknown) m_labelCountUnit[x, y].Content = countUnit.m_aCount[eResult].ToString();
-                }
+                OnUpdateUnitCount((int)eVision + 1, m_summary.m_countUnit[eVision]);
+            }
+        }
+
+        void OnUpdateUnitCount(int x, Summary.CountUnit countUnit)
+        {
+            foreach (Summary.Data.Strip.Unit.eResult eResult in Enum.GetValues(typeof(Summary.Data.Strip.Unit.eResult)))
+            {
+                int y = (int)eResult;
+                if (eResult != Summary.Data.Strip.Unit.eResult.Unknown) m_labelCountUnit[x, y].Content = countUnit.m_aCount[eResult].ToString();
             }
         }
         #endregion

@@ -33,12 +33,13 @@ namespace RootTools.Printer
         #region BXL Doc
         public string Start()
         {
+            if (p_bConnect == false) p_bConnect = true; 
             int nStart = BXLAPI.TransactionStart();
             if (nStart != BXLAPI.BXL_SUCCESS) return "TransactionStart Error : " + nStart.ToString();
             int nInit = BXLAPI.InitializePrinter(); 
             if (nInit != BXLAPI.BXL_SUCCESS) return "InitializePrinter Error : " + nInit.ToString();
             BXLAPI.SetCharacterSet(BXLAPI.BXL_CS_WPC1252);
-            BXLAPI.SetInterChrSet(BXLAPI.BXL_ICS_KOREA);
+            BXLAPI.SetInterChrSet(BXLAPI.BXL_ICS_USA);
             return "OK"; 
         }
 
@@ -100,7 +101,7 @@ namespace RootTools.Printer
 
         public void WriteText(string sWrite, eAlign eAlign = eAlign.Left, eAttribute eAttribute = eAttribute.Default)
         {
-            BXLAPI.PrintTextW(sWrite, GetAlign(eAlign), GetAttribute(eAttribute), BXLAPI.BXL_TS_0WIDTH | BXLAPI.BXL_TS_0HEIGHT, BXLAPI.BXL_CS_KS5601);
+            BXLAPI.PrintText(sWrite, GetAlign(eAlign), GetAttribute(eAttribute), BXLAPI.BXL_TS_0WIDTH | BXLAPI.BXL_TS_0HEIGHT);
         }
 
         public void WriteQR(string sWrite, int nSize = 4)

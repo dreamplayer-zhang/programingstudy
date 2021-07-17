@@ -91,9 +91,12 @@ namespace RootTools.GAFs
                 OnPropertyChanged();
             }
         }
+
+        public bool m_bEnableShowPopup = true;
         public ALIDList_PopupUI alidPopup;
         public void ShowPopup()
         {
+            if (m_bEnableShowPopup == false) return; 
             if (ALIDList_PopupUI.m_bShow)
             {
                 alidPopup.Init(this, m_engineer);

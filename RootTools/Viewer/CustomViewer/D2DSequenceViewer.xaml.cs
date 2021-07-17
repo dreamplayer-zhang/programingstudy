@@ -13,23 +13,26 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_WIND2.UI_User
+namespace RootTools
 {
     /// <summary>
-    /// FrontsideInspect.xaml에 대한 상호 작용 논리
+    /// D2DSequenceViewer.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class FrontsideInspect : UserControl
+    public partial class D2DSequenceViewer : Window
     {
-        public FrontsideInspect()
+        public D2DSequenceViewer()
         {
             InitializeComponent();
         }
 
-        private void PackIconMaterial_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            RootTools.D2DSequenceViewer D2DInfo = new RootTools.D2DSequenceViewer();
-            D2DInfo.Show();
-            D2DInfo.Topmost = true;
+            this.Close();
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.DragMove();
         }
     }
 }

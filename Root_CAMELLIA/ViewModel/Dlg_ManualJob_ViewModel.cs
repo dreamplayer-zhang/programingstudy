@@ -309,12 +309,27 @@ namespace Root_CAMELLIA
             int firstIdx = -1;
             int lastIdx = -1;
             List<string> moduleRunList = new List<string>();
-            MarsLogManager.Instance.m_flowData.ClearData();
+
+            SSLNet.FlowData flowData;
+            SSLNet.DataFormatter dataFormatter;
+            if(EQ.p_nRunLP == 0)
+            {
+                flowData = MarsLogManager.Instance.m_flowDataA;
+                dataFormatter = MarsLogManager.Instance.m_dataFormatterA;
+            }
+            else
+            {
+                flowData = MarsLogManager.Instance.m_flowDataB;
+                dataFormatter = MarsLogManager.Instance.m_dataFormatterB;
+
+            }
+            flowData.ClearData();
             RnRData rnrData = App.m_engineer.ClassHandler().GetRnRData();
             rnrData.ClearData();
-            moduleRunList.Add(App.m_engineer.m_handler.m_loadport[EQ.p_nRunLP].p_id);
+            moduleRunList.Add(App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_sLocID);
             rnrData.CarrierID = p_carrierID;
             rnrData.LotID = p_lotID;
+
             for (int i = 0; i < nSlot; i++)
             {
                 m_infoCarrier.m_aGemSlot[i].p_sRecipe = "";
@@ -360,7 +375,7 @@ namespace Root_CAMELLIA
                                 if (!bFind)
                                     moduleRunList.Add(module);
                             }
-                            moduleRunList.Add(App.m_engineer.m_handler.m_loadport[EQ.p_nRunLP].p_id);
+                            moduleRunList.Add(App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_sLocID);
 
                             foreach(string str in moduleRunList)
                             {
@@ -369,9 +384,10 @@ namespace Root_CAMELLIA
                                 {
                                     module = "Vision";
                                 }
-                                MarsLogManager.Instance.m_flowData.AddData(module);
+                                flowData.AddData(module);
                             }
-                            MarsLogManager.Instance.WriteLEH(EQ.p_nRunLP, moduleRunList[0], SSLNet.LEH_EVENTID.CARRIER_LOAD, MarsLogManager.Instance.m_flowData);
+                            MarsLogManager.Instance.WriteLEH(EQ.p_nRunLP, moduleRunList[0], SSLNet.LEH_EVENTID.CARRIER_LOAD, flowData);
+                            MarsLogManager.Instance.ChangeMaterial(EQ.p_nRunLP, firstIdx + 1, infoWafer.p_sLotID, m_infoCarrier.p_sCarrierID, Path.GetFileNameWithoutExtension(m_infoCarrier.m_aInfoWafer[firstIdx].p_sRecipe));
                         }
 
                         m_infoCarrier.StartProcess(infoWafer.p_id);
@@ -392,8 +408,8 @@ namespace Root_CAMELLIA
                 m_infoCarrier.m_aInfoWafer[lastIdx].p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
             }
 
-            MarsLogManager.Instance.m_dataFormatter.ClearData();
-            MarsLogManager.Instance.m_dataFormatter.AddData("RecipeID", Path.GetFileNameWithoutExtension(m_infoCarrier.m_aInfoWafer[firstIdx].p_sRecipe));
+            dataFormatter.ClearData();
+            dataFormatter.AddData("RecipeID", Path.GetFileNameWithoutExtension(m_infoCarrier.m_aInfoWafer[firstIdx].p_sRecipe));
             m_infoCarrier.SetSelectMapData(m_infoCarrier);
             
             EQ.p_nRnR = p_checkRnR ? p_RnR : 1;

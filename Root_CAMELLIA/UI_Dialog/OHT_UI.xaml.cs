@@ -202,7 +202,7 @@ namespace Root_CAMELLIA
                 }
             }
 
-            if (m_loadport.p_infoCarrier.p_eReqAccessLP == GemCarrierBase.eAccessLP.Manual)
+            if (m_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual)
             {
                 //if (m_carrier.p_eTransfer != GemCarrierBase.eTransfer.TransferBlocked)
                 //{
@@ -212,7 +212,15 @@ namespace Root_CAMELLIA
                 //{
                 //    m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                 //}
-                m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                if (App.m_engineer.ClassGem().p_bOffline)
+                {
+                    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                    m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                }
+                else
+                {
+                    m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                }
                 //blockTransferState.Text = "TransferBlocked";
             }
             bool bPodIn = p_bBlink ? !m_loadport.m_diPlaced.p_bIn : !m_loadport.p_diPresent.p_bIn;

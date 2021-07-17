@@ -456,6 +456,11 @@ namespace RootTools.Module
             return false;
         }
 
+        public virtual bool IsDocked()
+        {
+            return false;
+        }
+
         StopWatch m_swRun = new StopWatch(); 
         protected string StateRun()
         {
