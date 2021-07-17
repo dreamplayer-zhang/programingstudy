@@ -170,7 +170,7 @@
                 <GroupBox.Header>
                     <TextBlock Text="Mode" Foreground="Black" FontWeight="Bold" />
                 </GroupBox.Header>
-                <TextBlock x:Name="textBlockMode" Text="{Binding p_eMode}" Margin="3" FontSize="70" VerticalAlignment="Center" HorizontalAlignment="Center" PreviewMouseDown="textBlockMode_PreviewMouseDown"/>
+                <TextBlock x:Name="textBlockMode" Text="{Binding p_eMode}" Margin="3" FontSize="65" VerticalAlignment="Center" HorizontalAlignment="Center" PreviewMouseDown="textBlockMode_PreviewMouseDown"/>
             </GroupBox>
         </Grid>
         <Grid Grid.Row="1" x:Name="gridBoat">

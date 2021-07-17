@@ -3,6 +3,7 @@ using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
@@ -33,8 +34,8 @@ namespace Root_Pine2_Vision.Engineer
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_vision = new Vision2D("Vision", m_engineer, ModuleBase.eRemote.Server);
-            InitModule(m_vision);
+            if (m_b3D) InitModule(new Vision3D("Vision", m_engineer, ModuleBase.eRemote.Server));
+            else InitModule(new Vision2D("Vision", m_engineer, ModuleBase.eRemote.Server));
         }
 
         void InitModule(ModuleBase module)
@@ -42,6 +43,12 @@ namespace Root_Pine2_Vision.Engineer
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
             p_moduleList.AddModule(module, ui);
+        }
+
+        bool m_b3D = false; 
+        public void RunTreeSetup(Tree tree)
+        {
+            m_b3D = tree.Set(m_b3D, m_b3D, "3D", "Vision 3D"); 
         }
         #endregion
 

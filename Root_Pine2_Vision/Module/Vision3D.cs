@@ -1,6 +1,5 @@
 ﻿using RootTools;
 using RootTools.Camera;
-using RootTools.Camera.Dalsa;
 using RootTools.Comm;
 using RootTools.Light;
 using RootTools.Memory;
@@ -16,27 +15,24 @@ using System.Windows;
 
 namespace Root_Pine2_Vision.Module
 {
-    public class Vision2D : ModuleBase, IVision
+    public class Vision3D : ModuleBase, IVision
     {
         #region ToolBox
-        Camera_Dalsa m_camera;
+//        Camera_Dalsa m_camera;
         public LightSet m_lightSet;
-        RS232 m_rs232RGBW;
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)
             {
-                p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera");
+                //p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera");
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 m_aWorks[eWorks.A].GetTools(m_toolBox, bInit);
                 m_aWorks[eWorks.B].GetTools(m_toolBox, bInit);
-                p_sInfo = m_toolBox.GetComm(ref m_rs232RGBW, this, "RGBW");
                 p_sInfo = m_toolBox.GetComm(ref m_tcpRequest, this, "Request");
                 if (bInit)
                 {
                     m_tcpRequest.EventReciveData += M_tcpRequest_EventReceiveData;
-                    m_rs232RGBW.p_bConnect = true;
-                    m_camera.Connect();
+                    //m_camera.Connect();
                 }
             }
             m_remote.GetTools(bInit);
@@ -46,28 +42,25 @@ namespace Root_Pine2_Vision.Module
         #region Light
         public class LightPower
         {
-            public eRGBW m_eRGBW = eRGBW.White;
             public List<double> m_aPower = new List<double>();
 
             public LightPower Clone()
             {
                 LightPower power = new LightPower(m_vision);
-                power.m_eRGBW = m_eRGBW;
                 for (int n = 0; n < m_vision.p_lLight; n++) power.m_aPower[n] = m_aPower[n];
                 return power;
             }
 
             public void RunTree(Tree tree, bool bVisible, bool bReadOnly = false)
             {
-                m_eRGBW = (eRGBW)tree.Set(m_eRGBW, m_eRGBW, "RGBW", "Set RGBW", bVisible, bReadOnly);
                 for (int n = 0; n < m_aPower.Count; n++)
                 {
                     m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], n.ToString("00"), "Light Power (0 ~ 100)", bVisible, bReadOnly);
                 }
             }
 
-            Vision2D m_vision;
-            public LightPower(Vision2D vision)
+            Vision3D m_vision;
+            public LightPower(Vision3D vision)
             {
                 m_vision = vision;
                 while (m_aPower.Count < m_vision.p_lLight) m_aPower.Add(0);
@@ -76,13 +69,10 @@ namespace Root_Pine2_Vision.Module
             public static bool IsSameLight(LightPower lightPower1, LightPower lightPower2)
             {
                 if (lightPower1.m_aPower.Count != lightPower2.m_aPower.Count) return false;
-                if (lightPower1.m_eRGBW != lightPower2.m_eRGBW) return false;
-
                 for (int i = 0; i < lightPower1.m_aPower.Count; i++)
                 {
                     if (lightPower1.m_aPower[i] != lightPower2.m_aPower[i]) return false;
                 }
-
                 return true;
             }
         }
@@ -108,7 +98,6 @@ namespace Root_Pine2_Vision.Module
                     return;
 
                 prevLightPower = lightPower.Clone();
-                SetRGBW(lightPower.m_eRGBW);
                 for (int n = 0; n < p_lLight; n++)
                 {
                     Light light = m_lightSet.m_aLight[n];
@@ -132,27 +121,6 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        #region RGBW
-        public enum eRGBW
-        {
-            Red,
-            Green,
-            Blue,
-            White
-        }
-        string SetRGBW(eRGBW eRGBW)
-        {
-            switch (eRGBW)
-            {
-                case eRGBW.Red: m_rs232RGBW.Send("r"); break;
-                case eRGBW.Green: m_rs232RGBW.Send("g"); break;
-                case eRGBW.Blue: m_rs232RGBW.Send("b"); break;
-                case eRGBW.White: m_rs232RGBW.Send("w"); break;
-            }
-            return "OK";
-        }
-        #endregion
-
         #region Send Info
         public string SendSnapInfo(SnapInfo snapInfo)
         {
@@ -166,7 +134,7 @@ namespace Root_Pine2_Vision.Module
         public LotInfo m_lotInfo = null;
         public string SendLotInfo(LotInfo lotInfo)
         {
-            m_lotInfo = lotInfo; 
+            m_lotInfo = lotInfo;
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendLotInfo, eRemote.Client, lotInfo);
             else
             {
@@ -191,7 +159,7 @@ namespace Root_Pine2_Vision.Module
         public double m_dResolution = 3.8;
         public int m_nLine = 78800;
         public bool m_bUseBiDirectional = true;
-        public DalsaParameterSet.eUserSet m_eCamUserSet = DalsaParameterSet.eUserSet.Default;
+        //public DalsaParameterSet.eUserSet m_eCamUserSet = DalsaParameterSet.eUserSet.Default;
         public Dictionary<eCalMode, CalibrationData> m_aCalData = new Dictionary<eCalMode, CalibrationData>();
 
         public enum eCalMode
@@ -208,9 +176,9 @@ namespace Root_Pine2_Vision.Module
 
         public class CalibrationData
         {
-            public DalsaParameterSet.eFlatFieldUserSet m_eForwardUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
-            public DalsaParameterSet.eFlatFieldUserSet m_eBackwardUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
-            public DalsaParameterSet.eAnalogGain m_eAnalogGain = DalsaParameterSet.eAnalogGain.One;
+            //public DalsaParameterSet.eFlatFieldUserSet m_eForwardUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
+            //public DalsaParameterSet.eFlatFieldUserSet m_eBackwardUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
+            //public DalsaParameterSet.eAnalogGain m_eAnalogGain = DalsaParameterSet.eAnalogGain.One;
             public string _sAnalogGain = "1";
             public string m_sAnalogGain
             {
@@ -218,14 +186,14 @@ namespace Root_Pine2_Vision.Module
                 set
                 {
                     _sAnalogGain = value;
-                    for (int i = 0; i < DalsaParameterSet.m_aAnalogGain.Length; i++)
-                    {
-                        if (value == DalsaParameterSet.m_aAnalogGain[i])
-                        {
-                            m_eAnalogGain = (DalsaParameterSet.eAnalogGain)i;
-                            return;
-                        }
-                    }
+                    //for (int i = 0; i < DalsaParameterSet.m_aAnalogGain.Length; i++)
+                    //{
+                        //if (value == DalsaParameterSet.m_aAnalogGain[i])
+                        //{
+                            //m_eAnalogGain = (DalsaParameterSet.eAnalogGain)i;
+                            //return;
+                        //}
+                    //}
                 }
             }
 
@@ -262,17 +230,17 @@ namespace Root_Pine2_Vision.Module
 
             public bool CheckGainRange(double dGain)
             {
-                if (dGain >= 1 && dGain <= 9.99902) 
-                    return true; 
-                else 
+                if (dGain >= 1 && dGain <= 9.99902)
+                    return true;
+                else
                     return false;
             }
 
             public void RunTree(Tree tree)
             {
-                m_eForwardUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eForwardUserSet, m_eForwardUserSet, "Forward UserSet", "Select Flat Field Correction UserSet");
-                m_eBackwardUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eBackwardUserSet, m_eBackwardUserSet, "Reverse UserSet", "Select Flat Field Correction UserSet");
-                m_sAnalogGain = tree.Set(m_sAnalogGain, m_sAnalogGain, DalsaParameterSet.m_aAnalogGain, "Analog Gain", "Analog Gain");
+                //m_eForwardUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eForwardUserSet, m_eForwardUserSet, "Forward UserSet", "Select Flat Field Correction UserSet");
+                //m_eBackwardUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eBackwardUserSet, m_eBackwardUserSet, "Reverse UserSet", "Select Flat Field Correction UserSet");
+                //m_sAnalogGain = tree.Set(m_sAnalogGain, m_sAnalogGain, DalsaParameterSet.m_aAnalogGain, "Analog Gain", "Analog Gain");
                 m_dSystemGain = tree.Set(m_dSystemGain, m_dSystemGain, "System Gain", "System Gain");
                 m_dAllRowsGain = tree.Set(m_dAllRowsGain, m_dAllRowsGain, "AllRows Gain", "AllRows Gain");
                 m_dRedGain = tree.Set(m_dRedGain, m_dRedGain, "Red Gain", "Red Gain");
@@ -345,6 +313,7 @@ namespace Root_Pine2_Vision.Module
             m_aGrabData.Add(eWorks.B, new Grab());
         }
         #endregion
+
 
         #region Recipe
         public class Recipe
@@ -427,8 +396,8 @@ namespace Root_Pine2_Vision.Module
                     m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Overlap", "Memory Overlap Size (pixel)", bVisible, bReadOnly);
                 }
 
-                Vision2D m_vision;
-                public Snap(Vision2D vision)
+                Vision3D m_vision;
+                public Snap(Vision3D vision)
                 {
                     m_vision = vision;
                     m_lightPower = new LightPower(vision);
@@ -514,7 +483,7 @@ namespace Root_Pine2_Vision.Module
                         else  // 역방향
                         {
                             m_aSnap[i].m_eDirection = Snap.eDirection.Backward/*Forward*/;
-                          
+
                             //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
                         }
 
@@ -633,8 +602,8 @@ namespace Root_Pine2_Vision.Module
             }
             #endregion
 
-            Vision2D m_vision;
-            public Recipe(Vision2D vision, eWorks eWorks)
+            Vision3D m_vision;
+            public Recipe(Vision3D vision, eWorks eWorks)
             {
                 m_vision = vision;
                 m_eWorks = eWorks;
@@ -666,11 +635,11 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Works
-        public Dictionary<eWorks, Works2D> m_aWorks = new Dictionary<eWorks, Works2D>();
+        public Dictionary<eWorks, Works3D> m_aWorks = new Dictionary<eWorks, Works3D>();
         void InitVisionWorks()
         {
-            m_aWorks.Add(eWorks.A, new Works2D(eWorks.A, this));
-            m_aWorks.Add(eWorks.B, new Works2D(eWorks.B, this));
+            m_aWorks.Add(eWorks.A, new Works3D(eWorks.A, this));
+            m_aWorks.Add(eWorks.B, new Works3D(eWorks.B, this));
         }
         #endregion
 
@@ -702,17 +671,17 @@ namespace Root_Pine2_Vision.Module
             int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? iSnap % (nTotalSnap / 2) : iSnap;
 
             // 이미지 시작점 설정
-            CPoint cpOffset = CalcOffset(nSnapLineIndex, nFOVpx, nReverseOffset, recipe); 
+            CPoint cpOffset = CalcOffset(nSnapLineIndex, nFOVpx, nReverseOffset, recipe);
             MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
             GrabData grabData = recipe.GetGrabData(eWorks, cpOffset, nOverlap);
             grabData.nScanOffsetY = (nSnapLineIndex) * nYOffset;
-            grabData.nUserSet = (int)m_eCamUserSet;
+            //grabData.nUserSet = (int)m_eCamUserSet;
 
             try
             {
                 m_log.Info("Start");
                 // Set Camera Gain (When first snap line)
-                if(nSnapLineIndex == 0)
+                if (nSnapLineIndex == 0)
                     SetCameraGain(iSnap, nSnapMode, recipe.m_eDirection);
                 m_log.Info("Set Gain Done");
 
@@ -734,13 +703,13 @@ namespace Root_Pine2_Vision.Module
                 // Set Camera GrabThread On
                 m_bCanChangeUserSet = false;
                 m_bUserSetThreadOn = false;
-                m_camera.m_bGrabThreadOn = false;
-                m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
-                while (m_camera.m_bGrabThreadOn != true)
+                //m_camera.m_bGrabThreadOn = false;
+                //m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
+                /*while (m_camera.m_bGrabThreadOn != true)
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
-                }
+                }*/
                 m_log.Info("Grab Thread On Done");
 
                 // Send SnapReady to Handler (Handler move Axis After receive this msg)
@@ -748,7 +717,7 @@ namespace Root_Pine2_Vision.Module
                 m_log.Info("Send Snap Ready Done");
 
                 // Wait for Grab
-                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+                /*while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
@@ -761,7 +730,7 @@ namespace Root_Pine2_Vision.Module
                         if (iSnap < nTotalSnap - 1)
                             RunChangeUserSetThread(iSnap, nTotalSnap, nSnapMode, eWorks);
                     }
-                }
+                }*/
                 m_log.Info("Grab Done");
 
                 // Send Snap Done to VisionWorks2
@@ -777,14 +746,14 @@ namespace Root_Pine2_Vision.Module
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
-                m_camera.StopGrab();
+                //m_camera.StopGrab();
             }
             return "OK";
         }
 
         private void SetFirstCalUserSet(Recipe.eSnapMode nSnapMode, Recipe.Snap recipe)
         {
-            if (nSnapMode == Recipe.eSnapMode.ALL || nSnapMode == Recipe.eSnapMode.RGB)
+            /*if (nSnapMode == Recipe.eSnapMode.ALL || nSnapMode == Recipe.eSnapMode.RGB)
             {
                 if (recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
                     m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.RGB].m_eForwardUserSet;
@@ -797,7 +766,7 @@ namespace Root_Pine2_Vision.Module
                     m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.APS].m_eForwardUserSet;
                 else
                     m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.APS].m_eBackwardUserSet;
-            }
+            }*/
         }
 
         private void RunChangeUserSetThread(int iSnap, int nTotalSnap, Recipe.eSnapMode nSnapMode, eWorks eWorks)
@@ -807,7 +776,7 @@ namespace Root_Pine2_Vision.Module
             int nNextSnap = iSnap + 1;
             int nNextSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? nNextSnap % (nTotalSnap / 2) : nNextSnap;
             m_bDoneChangeUserSet = false;
-
+            /*
             if (nSnapMode == Recipe.eSnapMode.ALL)
             {
                 if (nNextSnap < (nTotalSnap / 2))       // RGB
@@ -838,7 +807,7 @@ namespace Root_Pine2_Vision.Module
                     thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
                 else
                     thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
-            }
+            }*/
         }
         private CPoint CalcOffset(int nSnapLineIndex, int nFOVpx, int nReverseOffset, Recipe.Snap recipe)
         {
@@ -861,7 +830,7 @@ namespace Root_Pine2_Vision.Module
 
         private void UpdateCalUserset(object param)
         {
-            m_camera.p_CamParam.p_eFlatFieldCorrection = (DalsaParameterSet.eFlatFieldUserSet)param;
+            //m_camera.p_CamParam.p_eFlatFieldCorrection = (DalsaParameterSet.eFlatFieldUserSet)param;
             m_bDoneChangeUserSet = true;
         }
 
@@ -881,7 +850,7 @@ namespace Root_Pine2_Vision.Module
         private void SetGain(eCalMode eMode)
         {
             CalibrationData data = m_aCalData[eMode];
-            m_camera.p_CamParam.SetAnalogGain(data.m_eAnalogGain);
+            /*m_camera.p_CamParam.SetAnalogGain(data.m_eAnalogGain);
             m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.System);
             m_camera.p_CamParam.SetGain(data.m_dSystemGain);
             m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Blue);
@@ -889,7 +858,7 @@ namespace Root_Pine2_Vision.Module
             m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Green);
             m_camera.p_CamParam.SetGain(data.m_dGreenGain);
             m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Red);
-            m_camera.p_CamParam.SetGain(data.m_dRedGain);
+            m_camera.p_CamParam.SetGain(data.m_dRedGain);*/
         }
 
         #endregion
@@ -956,7 +925,7 @@ namespace Root_Pine2_Vision.Module
 
         #region Thread Check Works Connect
         bool m_bThreadCheck = false;
-        Thread m_threadCheck; 
+        Thread m_threadCheck;
         void InitThreadCheck()
         {
             m_threadCheck = new Thread(new ThreadStart(RunThreadCheckConnect));
@@ -967,10 +936,10 @@ namespace Root_Pine2_Vision.Module
         void RunThreadCheckConnect()
         {
             m_bThreadCheck = true;
-            Thread.Sleep(3000); 
+            Thread.Sleep(3000);
             while (m_bThreadCheck)
             {
-                Thread.Sleep(200); 
+                Thread.Sleep(200);
                 if (m_tcpRequest.p_bConnect == false)
                 {
                     m_bWorksConnect[0] = false;
@@ -998,7 +967,7 @@ namespace Root_Pine2_Vision.Module
         {
             m_aWorks[eWorks.A].Reset();
             m_aWorks[eWorks.B].Reset();
-            foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true; 
+            foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true;
             base.Reset();
         }
         #endregion
@@ -1031,17 +1000,17 @@ namespace Root_Pine2_Vision.Module
 
         void RunCameraTree(Tree tree)
         {
-            m_dResolution = tree.Set(m_dResolution, m_dResolution, "Pixel Resolution", "Pixel Resolution (um/pixel)");
-            m_nLine = tree.Set(m_nLine, m_nLine, "Line", "Memory Snap Lines (pixel)");
-            m_bUseBiDirectional = tree.Set(m_bUseBiDirectional, m_bUseBiDirectional, "BiDirectional Scan", "Use BiDirectional Scan");
-            m_eCamUserSet = (DalsaParameterSet.eUserSet)tree.Set(m_eCamUserSet, m_eCamUserSet, "UserSet", "Select Camera UserSet");
+            //m_dResolution = tree.Set(m_dResolution, m_dResolution, "Pixel Resolution", "Pixel Resolution (um/pixel)");
+            //m_nLine = tree.Set(m_nLine, m_nLine, "Line", "Memory Snap Lines (pixel)");
+            //m_bUseBiDirectional = tree.Set(m_bUseBiDirectional, m_bUseBiDirectional, "BiDirectional Scan", "Use BiDirectional Scan");
+            //m_eCamUserSet = (DalsaParameterSet.eUserSet)tree.Set(m_eCamUserSet, m_eCamUserSet, "UserSet", "Select Camera UserSet");
             RunCalibrationTree(tree.GetTree("Calibration"));
         }
 
         void RunCalibrationTree(Tree tree)
         {
-            m_aCalData[eCalMode.RGB].RunTree(tree.GetTree("RGB Setting"));
-            m_aCalData[eCalMode.APS].RunTree(tree.GetTree("APS Setting"));
+            //m_aCalData[eCalMode.RGB].RunTree(tree.GetTree("RGB Setting"));
+            //m_aCalData[eCalMode.APS].RunTree(tree.GetTree("APS Setting"));
         }
 
         void RunProcessTree(Tree tree)
@@ -1052,8 +1021,8 @@ namespace Root_Pine2_Vision.Module
 
         void RunGrabDataTree(Tree tree)
         {
-            m_aGrabData[eWorks.A].RunTree(tree.GetTree("GrabData A"));
-            m_aGrabData[eWorks.B].RunTree(tree.GetTree("GrabData B"));
+            //m_aGrabData[eWorks.A].RunTree(tree.GetTree("GrabData A"));
+            //m_aGrabData[eWorks.B].RunTree(tree.GetTree("GrabData B"));
         }
         #endregion
 
@@ -1075,20 +1044,20 @@ namespace Root_Pine2_Vision.Module
         public Remote p_remote { get { return m_remote; } }
         #endregion
 
-        public Vision2D(eVision eVision, IEngineer engineer, eRemote eRemote)
+        public Vision3D(eVision eVision, IEngineer engineer, eRemote eRemote)
         {
             p_eVision = eVision;
             InitVisionWorks();
-            InitCalData();
+            //InitCalData();
             InitBase("Vision " + eVision.ToString(), engineer, eRemote);
         }
 
-        public Vision2D(string id, IEngineer engineer, eRemote eRemote)
+        public Vision3D(string id, IEngineer engineer, eRemote eRemote)
         {
-            InitGrabData();
+            //InitGrabData();
             InitVisionWorks();
-            InitCalData();
-            InitRecipe();
+            //InitCalData();
+            //InitRecipe();
             InitBase(id, engineer, eRemote);
             InitVision_Snap_UI();
             InitThreadCheck();
@@ -1099,9 +1068,9 @@ namespace Root_Pine2_Vision.Module
             if (m_bThreadCheck)
             {
                 m_bThreadCheck = false;
-                m_threadCheck.Join(); 
+                m_threadCheck.Join();
             }
-            foreach (Works2D works in m_aWorks.Values) works.ThreadStop();
+            foreach (Works3D works in m_aWorks.Values) works.ThreadStop();
             base.ThreadStop();
         }
 
@@ -1147,8 +1116,8 @@ namespace Root_Pine2_Vision.Module
 
         public class Run_Remote : ModuleRunBase
         {
-            Vision2D m_module;
-            public Run_Remote(Vision2D module)
+            Vision3D m_module;
+            public Run_Remote(Vision3D module)
             {
                 m_module = module;
                 m_lightPower = new LightPower(m_module);
@@ -1158,7 +1127,7 @@ namespace Root_Pine2_Vision.Module
             public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
             public LightPower m_lightPower;
             public eWorks m_eWorks = eWorks.A;
-            public SnapInfo m_snapInfo = new SnapInfo(eWorks.A, 0, "", 0); 
+            public SnapInfo m_snapInfo = new SnapInfo(eWorks.A, 0, "", 0);
             public LotInfo m_lotInfo = new LotInfo(0, "", "", false, false, 0, 0);
             public SortInfo m_sortInfo = new SortInfo(eWorks.A, "", "");
             public override ModuleRunBase Clone()
@@ -1215,8 +1184,8 @@ namespace Root_Pine2_Vision.Module
 
         public class Run_Delay : ModuleRunBase
         {
-            Vision2D m_module;
-            public Run_Delay(Vision2D module)
+            Vision3D m_module;
+            public Run_Delay(Vision3D module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -1244,8 +1213,8 @@ namespace Root_Pine2_Vision.Module
 
         public class Run_Snap : ModuleRunBase
         {
-            Vision2D m_module;
-            public Run_Snap(Vision2D module)
+            Vision3D m_module;
+            public Run_Snap(Vision3D module)
             {
                 m_module = module;
                 m_recipe = new Recipe.Snap(module);
@@ -1279,8 +1248,8 @@ namespace Root_Pine2_Vision.Module
 
         public class Run_ReqSnap : ModuleRunBase
         {
-            Vision2D m_module;
-            public Run_ReqSnap(Vision2D module)
+            Vision3D m_module;
+            public Run_ReqSnap(Vision3D module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -1312,8 +1281,8 @@ namespace Root_Pine2_Vision.Module
                     m_module.m_aWorks[m_eWorks].SendRecipe(m_sRecipe);                  // 2. VisionWorks2 Recipe Open 
                     int nSnapCount = m_module.m_RunningRecipe[m_eWorks].p_lSnap;               // 총 Snap 횟수
                     int nSnapMode = (int)m_module.m_RunningRecipe[m_eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
-                    SnapInfo snapInfo = new SnapInfo(m_eWorks, nSnapMode, "0000", nSnapCount); 
-                    m_module.SendSnapInfo(snapInfo); 
+                    SnapInfo snapInfo = new SnapInfo(m_eWorks, nSnapMode, "0000", nSnapCount);
+                    m_module.SendSnapInfo(snapInfo);
                 }
                 return m_module.ReqSnap(m_sRecipe, m_eWorks);
 

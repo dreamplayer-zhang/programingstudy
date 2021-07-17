@@ -127,6 +127,7 @@ namespace Root_Pine2_Vision.Engineer
         public void RunTree(Tree.eMode mode)
         {
             m_treeRoot.p_eMode = mode;
+            m_handler.RunTreeSetup(m_treeRoot.GetTree("Handler"));
             EQ.c_sPathRecipe = m_treeRoot.GetTree("Recipe").Set(EQ.c_sPathRecipe, EQ.c_sPathRecipe, "Path", "Recipe Path");
             RunTreeControl(m_treeRoot.GetTree("Control"));
             RunTreeXGem(m_treeRoot.GetTree("XGem"));
