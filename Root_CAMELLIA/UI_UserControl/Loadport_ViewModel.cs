@@ -474,6 +474,8 @@ namespace Root_CAMELLIA
                         p_totalSelect = 0;
                         p_totalDone = 0;
                         p_progressValue = 0;
+                        if (App.m_engineer.ClassGem() != null && !App.m_engineer.ClassGem().p_bOffline)
+                            return;
                         var viewModel = manualJob_ViewModel;
                         viewModel.InitData(p_infoCarrier);
                         var dialog = dialogService.GetDialog(viewModel) as Dlg_ManualJob;
@@ -588,8 +590,8 @@ namespace Root_CAMELLIA
             }
             bool bReadyLoadport = p_loadport.p_eState == ModuleBase.eState.Ready;
             bool bReadyToLoad = true;
-            if (App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
-                bReadyToLoad = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad;
+            //if (App.m_engineer.ClassGem() != null && App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
+            //    bReadyToLoad = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad;
             
             bool bReadyState = p_loadport.m_qModuleRun.Count == 0;
             bool bEQReadyState = EQ.p_eState == EQ.eState.Ready;
@@ -603,7 +605,7 @@ namespace Root_CAMELLIA
         {
             bool bReadyLoadport = p_loadport.p_eState == ModuleBase.eState.Ready;
             bool bReadyToUnload = true;
-            if (App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
+            if (App.m_engineer.ClassGem() != null && App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
                 bReadyToUnload = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload;
             bool bAccess = p_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto;
             bool bPlaced = p_loadport.CheckPlaced();
