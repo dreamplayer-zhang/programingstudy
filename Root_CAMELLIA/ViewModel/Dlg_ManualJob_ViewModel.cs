@@ -365,7 +365,7 @@ namespace Root_CAMELLIA
                             foreach(string str in moduleRunList)
                             {
                                 string module = str;
-                                if(module == "Camellia")
+                                if(module == EQ.m_sModel)
                                 {
                                     module = "Vision";
                                 }
