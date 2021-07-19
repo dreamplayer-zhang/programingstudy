@@ -263,7 +263,7 @@ namespace RootTools.Gem
                 {
 
                     case eAccess.CarrierCompleted: 
-                        m_bReqUnload = true; 
+                        //m_bReqUnload = true; 
                         break; 
                 }
             }

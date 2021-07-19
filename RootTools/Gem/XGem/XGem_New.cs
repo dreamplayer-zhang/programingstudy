@@ -789,8 +789,9 @@ namespace RootTools.Gem.XGem
             {
                 if (carrier.p_sCarrierID == sCarrierID)
                 {
-                    p_sInfo = "eReqTransfer : " + carrier.p_eReqTransfer.ToString() + " -> " + GemCarrierBase.eTransfer.ReadyToLoad.ToString();
-                    carrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                    carrier.p_sCarrierID = "";
+                    //p_sInfo = "eReqTransfer : " + carrier.p_eReqTransfer.ToString() + " -> " + GemCarrierBase.eTransfer.ReadyToLoad.ToString();
+                    //carrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                 }
             }
         }

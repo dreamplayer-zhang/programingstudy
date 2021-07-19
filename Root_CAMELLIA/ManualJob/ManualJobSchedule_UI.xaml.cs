@@ -249,7 +249,7 @@ namespace Root_CAMELLIA.ManualJob
             m_infoCarrier.p_sCarrierID = textboxCstID.Text;
             for(int i=0; i<nSlot; i++)
             {
-                InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(i); 
+                InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(i);
 
                 if (infoWafer != null)
                 {
@@ -259,7 +259,7 @@ namespace Root_CAMELLIA.ManualJob
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {
                         infoWafer.RecipeOpen("C:\\Recipe\\" + m_cbRecipe[i].Text);
-                        m_infoCarrier.StartProcess(infoWafer.p_id); 
+                        m_infoCarrier.StartProcess(infoWafer.p_id);
                     }
                 }
             }
