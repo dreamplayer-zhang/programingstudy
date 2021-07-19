@@ -584,7 +584,7 @@ namespace Root_EFEM.Module
                 {
                     if (EQ.IsStop()) return "EQ Stop";
                     //if (m_wtr.m_rs232.p_bConnect == false) return "RS232 Connection Lost !!";
-                    Thread.Sleep(10); 
+                    Thread.Sleep(10);
                 }
                 m_sRead = ""; 
                 StopWatch sw = new StopWatch(); 
@@ -1042,9 +1042,9 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
+                if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "Reticle is already exist.";
                 if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
-                m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
                 try
                 {
                     child.p_bLock = true;
@@ -1053,9 +1053,13 @@ namespace Root_EFEM.Module
                     m_log.Info("Material Location change : " + child.p_id + " -> " + "Robot");
                     child.AfterGet(m_nChildID);
                 }
-                finally
+                finally 
                 {
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist())
+                    {
+                        m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                        child.SetInfoWafer(m_nChildID, null);
+                    }
                     else m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
                 if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
@@ -1124,9 +1128,9 @@ namespace Root_EFEM.Module
                 }
                 int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
+                if (!m_module.m_dicArm[m_eArm].IsWaferExist()) return "Reticle is not exist in Robot-Arm.";
                 if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
-                child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
                 try
                 {
                     child.p_bLock = true;
@@ -1137,8 +1141,12 @@ namespace Root_EFEM.Module
                 }
                 finally
                 {
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
-                    else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    if (!m_module.m_dicArm[m_eArm].IsWaferExist())
+                    {
+                        child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
+                        m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    }
+                    else child.SetInfoWafer(m_nChildID, null);
                 }
                 if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
                 return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;
