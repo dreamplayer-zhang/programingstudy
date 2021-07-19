@@ -38,6 +38,14 @@ namespace Root_WindII
             set => SetProperty(ref this.maintVM, value);
         }
 
+        public Operation_UI OperationUI;
+        private OperationUI_ViewModel operationVM = new OperationUI_ViewModel();
+        public OperationUI_ViewModel OperationVM
+        {
+            get => this.operationVM;
+            set => SetProperty(ref this.operationVM, value);
+        }
+
         private UserControl m_CurrentPanel;
         public UserControl p_CurrentPanel
         {
@@ -51,7 +59,7 @@ namespace Root_WindII
             }
         }
 
-
+        
         Warning_UI warnui;
         private UserControl m_CurrentSubPanel;
         public UserControl p_CurrentSubPanel
@@ -148,6 +156,9 @@ namespace Root_WindII
                     SetProperty(ref this.isCheckModeSetup, false, "IsCheckModeSetup");
                     SetProperty(ref this.isCheckModeReview, false, "IsCheckModeReview");
                     SetProperty(ref this.isCheckModeEngineer, false, "IsCheckModeEngineer");
+
+                    p_CurrentPanel = OperationUI;
+                    p_CurrentPanel.DataContext = OperationVM;
                 }
                 else if (value == false && this.isCheckModeOperation == true)
                 {
@@ -311,6 +322,7 @@ namespace Root_WindII
             SettingItem_Database frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_Database>();
             DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
             DatabaseManager.Instance.ValidateDatabase();
+            OperationUI = new Operation_UI();
 
             //logView.Init(LogView._logView);
             //InitTimer();
