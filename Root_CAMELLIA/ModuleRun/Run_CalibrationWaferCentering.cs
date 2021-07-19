@@ -163,7 +163,7 @@ namespace Root_CAMELLIA.Module
 
                 StopWatch sw = new StopWatch();
 
-
+                sw.Start();
                 if (!VRS.p_CamInfo._OpenStatus)
                 {
                     logManager.WriteFNC(EQ.p_nRunLP, deviceID, "VRS Connect", SSLNet.STATUS.START);

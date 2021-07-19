@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_WindII.UI.OPERATION
+namespace Root_WindII
 {
     /// <summary>
     /// OperationPanel.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class OperationPanel : UserControl
+    public partial class Operation_UI : UserControl
     {
-        public OperationPanel()
+        public Operation_UI()
         {
             InitializeComponent();
         }

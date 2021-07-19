@@ -187,5 +187,15 @@ namespace Root_VEGA_D_IPU.Engineer
             p_moduleList.ThreadStop();
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
         }
+
+        public RnRData GetRnRData()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void UpdateEvent()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

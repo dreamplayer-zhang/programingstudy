@@ -302,15 +302,17 @@ namespace Root_CAMELLIA
 
         private void M_handler_OnListUpdate()
         {
-            p_waferList.Clear();
-            p_isRNR = false;
-            p_CurrentRecipeID = "";
-            p_dataSelectIndex = 0;
-            p_totalSelect = 0;
-            p_totalDone = 0;
-            p_progressValue = 0;
-            if (this.p_loadport.p_id == App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_id)
-                UpdateList();
+            Application.Current.Dispatcher.Invoke(delegate(){
+                p_waferList.Clear();
+                p_isRNR = false;
+                p_CurrentRecipeID = "";
+                p_dataSelectIndex = 0;
+                p_totalSelect = 0;
+                p_totalDone = 0;
+                p_progressValue = 0;
+                if (this.p_loadport.p_id == App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_id)
+                    UpdateList();
+            });
         }
 
         private void M_handler_OnRnRDone()
@@ -472,6 +474,8 @@ namespace Root_CAMELLIA
                         p_totalSelect = 0;
                         p_totalDone = 0;
                         p_progressValue = 0;
+                        if (App.m_engineer.ClassGem() != null && !App.m_engineer.ClassGem().p_bOffline)
+                            return;
                         var viewModel = manualJob_ViewModel;
                         viewModel.InitData(p_infoCarrier);
                         var dialog = dialogService.GetDialog(viewModel) as Dlg_ManualJob;
@@ -541,7 +545,7 @@ namespace Root_CAMELLIA
             int idx = 1;
             ObservableCollection<DataGridWaferInfo> temp = new ObservableCollection<DataGridWaferInfo>();
 
-            foreach (InfoWafer val in p_infoCarrier.m_aGemSlot)
+            foreach (InfoWafer val in p_loadport.p_infoCarrier.m_aGemSlot)
             {
                 if (val != null)
                 {
@@ -553,7 +557,7 @@ namespace Root_CAMELLIA
                     if (p_CurrentRecipeID == "" && val.p_sRecipe != "")
                     {
                         p_CurrentRecipeID = val.p_sRecipe.Replace(Path.GetExtension(val.p_sRecipe), "");
-                        p_CurrentLotID = val.p_sCarrierID;
+                        p_CurrentLotID = val.p_sLotID;
                         firstIdx = idx - 1;
                     }
                     //object[] obj = { val.m_nSlot, val.p_sWaferID, val.p_sRecipe, val.p_eState };
@@ -586,8 +590,8 @@ namespace Root_CAMELLIA
             }
             bool bReadyLoadport = p_loadport.p_eState == ModuleBase.eState.Ready;
             bool bReadyToLoad = true;
-            if (App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
-                bReadyToLoad = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad;
+            //if (App.m_engineer.ClassGem() != null && App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
+            //    bReadyToLoad = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad;
             
             bool bReadyState = p_loadport.m_qModuleRun.Count == 0;
             bool bEQReadyState = EQ.p_eState == EQ.eState.Ready;
@@ -601,7 +605,7 @@ namespace Root_CAMELLIA
         {
             bool bReadyLoadport = p_loadport.p_eState == ModuleBase.eState.Ready;
             bool bReadyToUnload = true;
-            if (App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
+            if (App.m_engineer.ClassGem() != null && App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
                 bReadyToUnload = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload;
             bool bAccess = p_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto;
             bool bPlaced = p_loadport.CheckPlaced();
