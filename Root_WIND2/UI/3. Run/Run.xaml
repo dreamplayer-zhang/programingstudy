@@ -705,7 +705,7 @@
                     <Grid Grid.Column="1">
                         <TabControl Background="{StaticResource PanelBackGround}"
                                     BorderThickness="1">
-                            <TabItem Header="Inspection">
+                            <TabItem Header="Inspection" Height="22" VerticalAlignment="Top">
                                 <local:View />
                             </TabItem>
                             <TabItem Header="EQ">

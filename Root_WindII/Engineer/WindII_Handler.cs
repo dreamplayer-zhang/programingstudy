@@ -1,6 +1,5 @@
 ﻿using Root_EFEM;
 using Root_EFEM.Module;
-using Root_WindII_Option.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -62,14 +61,10 @@ namespace Root_WindII.Engineer
             m_visionFront = new Vision_Frontside("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_visionFront);
             ((IWTR)m_wtr).AddChild((IWTRChild)m_visionFront);
-
-            
-
             InitVision();
             //InitBackside(ModuleBase.eRemote.Client);
             p_WIND2 = new WIND2("WIND2", m_engineer);
             InitModule(p_WIND2);
-
 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
@@ -546,6 +541,16 @@ namespace Root_WindII.Engineer
                 p_moduleList.ThreadStop();
                 foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
             }
+        }
+
+        public RnRData GetRnRData()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void UpdateEvent()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

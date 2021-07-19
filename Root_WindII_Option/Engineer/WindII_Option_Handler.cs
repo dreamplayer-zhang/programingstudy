@@ -1,5 +1,4 @@
 ﻿using Root_EFEM.Module;
-using Root_WindII_Option.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -61,17 +60,6 @@ namespace Root_WindII_Option.Engineer
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
             p_moduleList.AddModule(module, ui);
-        }
-        #endregion
-
-        #region Backside
-        bool m_bBackside = true; 
-        public Backside m_backside;
-        void InitBackside(ModuleBase.eRemote eRemote)
-        {
-            if (m_bBackside == false) return; 
-            m_backside = new Backside("Backside", m_engineer, eRemote);
-            InitModule(m_backside); 
         }
         #endregion
 
@@ -186,14 +174,6 @@ namespace Root_WindII_Option.Engineer
         }
         #endregion
 
-        #region Tree
-        public void RunTreeModule(Tree tree)
-        {
-            m_bBackside = tree.Set(m_bBackside, m_bBackside, "Backside", "Use Backside"); 
-        }
-        #endregion
-
-
         string m_id;
         public WindII_Option_Engineer m_engineer;
         public GAF m_gaf;
@@ -220,6 +200,16 @@ namespace Root_WindII_Option.Engineer
             }
             p_moduleList.ThreadStop();
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
+        }
+
+        public RnRData GetRnRData()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void UpdateEvent()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
