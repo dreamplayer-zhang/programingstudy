@@ -417,8 +417,46 @@ namespace Root_JEDI_Vision.Module
         public Grab m_grabData = new Grab();
         #endregion
 
-        #region Snap
+        #region Recipe
+        public class Recipe
+        {
+            public string m_sRecipe = ""; 
+        }
+        Recipe m_recipe = new Recipe();
 
+        public string p_sRecipe
+        {
+            get { return m_recipe.m_sRecipe; }
+            set
+            {
+                if (m_recipe.m_sRecipe == value) return;
+                RecipeOpen(value);
+                OnPropertyChanged(); 
+            }
+        }
+
+        public void RecipeOpen(string sRecipe)
+        {
+            //forget
+        }
+        #endregion
+
+        #region Snap
+        public string RunSnap(SnapInfo snapInfo, bool bReadRecipe)
+        {
+            StopWatch sw = new StopWatch();
+            try
+            {
+                if (bReadRecipe) RecipeOpen(p_sRecipe);
+                if (Run(m_process.SendSnapInfo(snapInfo))) return p_sInfo;
+
+                return "OK";
+            }
+            finally
+            {
+                
+            }
+        }
         #endregion
 
         #region override
