@@ -1,57 +1,38 @@
-﻿using RootTools;
+﻿using Root_JEDI_Sorter.Module;
+using RootTools;
 using RootTools.Trees;
 using System.Threading;
 
 namespace Root_JEDI_Vision.Module
 {
-    public enum eVision
-    {
-        CCS,
-        Top3D,
-        Top2D,
-        Bottom,
-    }
-
     public class LotInfo
     {
-        public int m_nMode = 0;
         public string m_sRecipe = "";
         public string m_sLotID = "";
-        public bool m_bLotMix = false;
-        public bool m_bBarcode = false;
-        public int m_nBarcode = 0;
-        public int m_lBarcode = 0;
+        public double m_umThickness = 1000; 
 
         public LotInfo Clone()
         {
-            return new LotInfo(m_nMode, m_sRecipe, m_sLotID, m_bLotMix, m_bBarcode, m_nBarcode, m_lBarcode);
+            return new LotInfo(m_sRecipe, m_sLotID, m_umThickness);
         }
 
         public string GetString()
         {
-            return m_nMode.ToString() + "," + m_sRecipe + "," + m_sLotID + "," + (m_bBarcode ? "1," : "0,") + (m_bLotMix ? "1," : "0,") + m_nBarcode.ToString() + "," + m_lBarcode.ToString();
+            return m_sRecipe + "," + m_sLotID;
         }
 
         public void RunTree(Tree tree, bool bVisible)
         {
-            m_nMode = tree.Set(m_nMode, m_nMode, "Mode", "Operation Mode (1 = Magazine, 0 = Stack)", bVisible);
             m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe Name", bVisible);
             m_sLotID = tree.Set(m_sLotID, m_sLotID, "LotID", "Lot Name", bVisible);
-            m_bLotMix = tree.Set(m_bLotMix, m_bLotMix, "Lot Mix", "Check Lot Mix", bVisible);
-            m_bBarcode = tree.Set(m_bBarcode, m_bBarcode, "Barcode", "Read Barcode", bVisible);
-            m_nBarcode = tree.Set(m_nBarcode, m_nBarcode, "Barcode Start", "Read Barcode Start Pos (pixel)", bVisible);
-            m_lBarcode = tree.Set(m_lBarcode, m_lBarcode, "Barcode Length", "Read Barcode Length (pixel)", bVisible);
+            m_umThickness = tree.Set(m_umThickness, m_umThickness, "Thickness", "Thickness (um)", bVisible);
         }
 
-        public LotInfo(int nMode, string sRecipe, string sLotID, bool bLotMix, bool bBarcode, int nBarcode, int lBarcode)
+        public LotInfo(string sRecipe, string sLotID, double umThickness)
         {
-            m_nMode = nMode;
             m_sRecipe = sRecipe;
             m_sLotID = sLotID;
-            m_bLotMix = bLotMix;
-            m_bBarcode = bBarcode;
-            m_nBarcode = nBarcode;
-            m_lBarcode = lBarcode;
+            m_umThickness = umThickness; 
         }
     }
 

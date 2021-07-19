@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_JEDI_Sorter.Module;
+using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.Dalsa;
 using RootTools.Comm;
@@ -376,8 +377,6 @@ namespace Root_JEDI_Vision.Module
             m_grabData.RunTree(tree.GetTree("GrabData"));
         }
         #endregion
-
-
 
         public eVision p_eVision { get; set; }
         public Vision2D(eVision eVision, IEngineer engineer)
