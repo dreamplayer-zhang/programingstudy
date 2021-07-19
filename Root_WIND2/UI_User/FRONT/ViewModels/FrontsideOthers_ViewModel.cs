@@ -659,7 +659,7 @@ namespace Root_WIND2.UI_User
             foreach(CPoint chipPos in _validChip)
             {
                 absChipX = originRecipe.OriginX + chipPos.X * originRecipe.DiePitchX;
-                absChipY = originRecipe.OriginY + (chipPos.Y - 1) * originRecipe.DiePitchY; // 기준 좌표가 좌하단인듯
+                absChipY = originRecipe.OriginY + chipPos.Y * originRecipe.DiePitchY - originRecipe.OriginHeight; // 기준 좌표가 좌하단인듯
                 absFeatureX = originRecipe.OriginX + feature[0].PositionX + chipPos.X * originRecipe.DiePitchX;
                 absFeatureY = originRecipe.OriginY + feature[0].PositionY + chipPos.Y * originRecipe.DiePitchY;
                 

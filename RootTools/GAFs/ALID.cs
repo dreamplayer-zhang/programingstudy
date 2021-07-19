@@ -111,6 +111,18 @@ namespace RootTools.GAFs
             {
                 _dateTime = value;
                 OnPropertyChanged();
+                p_sTime = value.ToString("HH:mm:ss"); 
+            }
+        }
+
+        string _sTime = "";
+        public string p_sTime
+        {
+            get { return _sTime; }
+            set
+            {
+                _sTime = value;
+                OnPropertyChanged(); 
             }
         }
 

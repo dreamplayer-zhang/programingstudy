@@ -260,6 +260,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Module\SummaryUnit_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Module\Summary_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -295,6 +299,9 @@
     <Compile Include="Module\Loader0.cs" />
     <Compile Include="Module\Pine2.cs" />
     <Compile Include="Module\Summary.cs" />
+    <Compile Include="Module\SummaryUnit_UI.xaml.cs">
+      <DependentUpon>SummaryUnit_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\Summary_UI.xaml.cs">
       <DependentUpon>Summary_UI.xaml</DependentUpon>
     </Compile>

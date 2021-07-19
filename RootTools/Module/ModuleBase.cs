@@ -456,6 +456,11 @@ namespace RootTools.Module
             return false;
         }
 
+        public virtual bool IsDocked()
+        {
+            return false;
+        }
+
         StopWatch m_swRun = new StopWatch(); 
         protected string StateRun()
         {
@@ -620,7 +625,7 @@ namespace RootTools.Module
                 }
             }
 
-            TCPIPClient m_client;
+            public TCPIPClient m_client;
             void InitClient(bool bInit)
             {
                 m_module.p_sInfo = m_module.m_toolBox.GetComm(ref m_client, m_module, "TCPIP");
@@ -661,7 +666,7 @@ namespace RootTools.Module
             #endregion
 
             #region Server
-            TCPIPServer m_server;
+            public TCPIPServer m_server;
             void InitServer(bool bInit)
             {
                 m_module.p_sInfo = m_module.m_toolBox.GetComm(ref m_server, m_module, "TCPIP");

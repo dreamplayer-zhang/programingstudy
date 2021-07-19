@@ -44,17 +44,18 @@ namespace Root_Pine2.Engineer
         {
             if (m_sLotSend == m_pine2.p_sLotID) return;
             int nMode = (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 1 : 0;
-            if (m_pine2.p_b3D) SendLotInfo(m_aBoats[Vision2D.eVision.Top3D], nMode);
-            SendLotInfo(m_aBoats[Vision2D.eVision.Top2D], nMode);
-            SendLotInfo(m_aBoats[Vision2D.eVision.Bottom], nMode);
+            if (m_pine2.p_b3D) SendLotInfo(m_aBoats[eVision.Top3D], nMode);
+            SendLotInfo(m_aBoats[eVision.Top2D], nMode);
+            SendLotInfo(m_aBoats[eVision.Bottom], nMode);
             m_sLotSend = m_pine2.p_sLotID;
         }
 
         void SendLotInfo(Boats boats, int nMode)
         {
-            Pine2.VisionOption option = m_pine2.m_aVisionOption[boats.m_vision.m_eVision];
-            Vision2D.LotInfo lotInfo = new Vision2D.LotInfo(nMode, p_sRecipe, m_pine2.p_sLotID, option.p_bLotMix, option.p_bBarcode, option.p_nBarcode, option.p_lBarcode);
-            boats.m_vision.SendLotInfo(lotInfo);
+            Pine2.VisionOption option = m_pine2.m_aVisionOption[boats.m_vision.p_eVision];
+            LotInfo lotInfo = new LotInfo(nMode, p_sRecipe, m_pine2.p_sLotID, option.p_bLotMix, option.p_bBarcode, option.p_nBarcode, option.p_lBarcode);
+            string sRun = boats.m_vision.SendLotInfo(lotInfo);
+            if (sRun == "OK") boats.p_sInfo = lotInfo.m_sLotID; 
         }
 
         BackgroundWorker m_bgwSendSort = new BackgroundWorker(); 
@@ -66,16 +67,16 @@ namespace Root_Pine2.Engineer
         private void M_bgwSendSort_DoWork(object sender, DoWorkEventArgs e)
         {
             InfoStrip infoStrip = e.Argument as InfoStrip; 
-            if (m_pine2.p_b3D) SendSortInfo(m_aBoats[Vision2D.eVision.Top3D], infoStrip);
-            SendSortInfo(m_aBoats[Vision2D.eVision.Top2D], infoStrip);
-            SendSortInfo(m_aBoats[Vision2D.eVision.Bottom], infoStrip);
+            if (m_pine2.p_b3D) SendSortInfo(m_aBoats[eVision.Top3D], infoStrip);
+            SendSortInfo(m_aBoats[eVision.Top2D], infoStrip);
+            SendSortInfo(m_aBoats[eVision.Bottom], infoStrip);
             string sRun = m_summary.SetSort(m_pine2.p_b3D, infoStrip); 
             if (sRun != "OK") m_pine2.m_alidSummary.Run(true, sRun);
         }
 
         void SendSortInfo(Boats boats, InfoStrip infoStrip)
         {
-            Vision2D.SortInfo sortinfo = new Vision2D.SortInfo(infoStrip.m_eWorks, infoStrip.p_id, infoStrip.m_iBundle.ToString("00"));
+            SortInfo sortinfo = new SortInfo(infoStrip.m_eWorks, infoStrip.p_id, infoStrip.m_iBundle.ToString("00"));
             boats.m_vision.SendSortInfo(sortinfo); 
         }
         #endregion
@@ -99,9 +100,9 @@ namespace Root_Pine2.Engineer
         private void M_bgwRecipe_DoWork(object sender, DoWorkEventArgs e)
         {
             if (m_aBoats.Count == 0) return;
-            if (m_pine2.p_b3D) m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = p_sRecipe;
-            m_aBoats[Vision2D.eVision.Top2D].p_sRecipe = p_sRecipe;
-            m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = p_sRecipe;
+            if (m_pine2.p_b3D) m_aBoats[eVision.Top3D].p_sRecipe = p_sRecipe;
+            m_aBoats[eVision.Top2D].p_sRecipe = p_sRecipe;
+            m_aBoats[eVision.Bottom].p_sRecipe = p_sRecipe;
         }
 
         public List<string> p_asRecipe
@@ -124,8 +125,8 @@ namespace Root_Pine2.Engineer
         public LoadEV m_loadEV;
         public MagazineEVSet m_magazineEVSet;
         public Transfer m_transfer;
-        public Dictionary<Vision2D.eVision, Vision2D> m_aVision = new Dictionary<Vision2D.eVision, Vision2D>();
-        public Dictionary<Vision2D.eVision, Boats> m_aBoats = new Dictionary<Vision2D.eVision, Boats>(); 
+        public Dictionary<eVision, IVision> m_aVision = new Dictionary<eVision, IVision>();
+        public Dictionary<eVision, Boats> m_aBoats = new Dictionary<eVision, Boats>(); 
         public Loader0 m_loader0;
         public Loader1 m_loader1;
         public Loader2 m_loader2;
@@ -138,12 +139,12 @@ namespace Root_Pine2.Engineer
             InitModule(m_pine2 = new Pine2("Pine2", m_engineer));
             InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer, m_pine2));
             InitMagazineEV();
-            InitVision(Vision2D.eVision.Bottom);
-            InitVision(Vision2D.eVision.Top2D);
-            InitVision(Vision2D.eVision.Top3D);
-            InitBoats(Vision2D.eVision.Bottom);
-            InitBoats(Vision2D.eVision.Top2D);
-            InitBoats(Vision2D.eVision.Top3D);
+            InitVision(eVision.Bottom);
+            InitVision(eVision.Top2D);
+            InitVision(eVision.Top3D);
+            InitBoats(eVision.Bottom);
+            InitBoats(eVision.Top2D);
+            InitBoats(eVision.Top3D);
             InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEVSet));
             InitModule(m_loader0 = new Loader0("Loader0", m_engineer, this));
             InitModule(m_loader1 = new Loader1("Loader1", m_engineer, this));
@@ -162,16 +163,21 @@ namespace Root_Pine2.Engineer
             m_msInit = ms; 
         }
 
-        void InitVision(Vision2D.eVision eVision)
+        void InitVision(eVision eVision)
         {
-            Vision2D vision = new Vision2D(eVision, m_engineer, ModuleBase.eRemote.Client); 
+            dynamic vision; 
+            switch (eVision)
+            {
+                case eVision.Top3D: vision = new Vision3D(eVision, m_engineer, ModuleBase.eRemote.Client); break;
+                default: vision = new Vision2D(eVision, m_engineer, ModuleBase.eRemote.Client); break;
+            }
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(vision);
             p_moduleList.AddModule(vision, ui);
             m_aVision.Add(eVision, vision);
         }
 
-        void InitBoats(Vision2D.eVision eVision)
+        void InitBoats(eVision eVision)
         {
             Boats boats = new Boats(m_aVision[eVision], m_engineer, m_pine2);
             ModuleBase_UI ui = new ModuleBase_UI();
@@ -291,12 +297,12 @@ namespace Root_Pine2.Engineer
             if (m_loader1.p_infoStrip != null) return false;
             if (m_loader2.p_infoStrip != null) return false;
             if (m_loader3.p_infoStrip != null) return false;
-            if (m_aBoats[Vision2D.eVision.Top3D].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
-            if (m_aBoats[Vision2D.eVision.Top3D].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
-            if (m_aBoats[Vision2D.eVision.Top2D].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
-            if (m_aBoats[Vision2D.eVision.Top2D].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
-            if (m_aBoats[Vision2D.eVision.Bottom].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
-            if (m_aBoats[Vision2D.eVision.Bottom].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
+            if (m_aBoats[eVision.Top3D].m_aBoat[eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[eVision.Top3D].m_aBoat[eWorks.B].p_infoStrip != null) return false;
+            if (m_aBoats[eVision.Top2D].m_aBoat[eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[eVision.Top2D].m_aBoat[eWorks.B].p_infoStrip != null) return false;
+            if (m_aBoats[eVision.Bottom].m_aBoat[eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[eVision.Bottom].m_aBoat[eWorks.B].p_infoStrip != null) return false;
             if (m_transfer.m_gripper.p_infoStrip != null) return false;
             if (m_transfer.m_pusher.p_infoStrip != null) return false;
             switch (m_pine2.p_eMode)
@@ -321,6 +327,8 @@ namespace Root_Pine2.Engineer
         public void CalcSequence()
         {
         }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         #region Thread
