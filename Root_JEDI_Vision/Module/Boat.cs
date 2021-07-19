@@ -22,7 +22,8 @@ namespace Root_JEDI_Vision.Module
         public void GetTools(ToolBox toolBox, ModuleBase module, bool bInit)
         {
             toolBox.GetAxis(ref m_axis, module, p_id + ".Snap");
-            m_stage.GetTools(toolBox, module, bInit); 
+            m_stage.GetTools(toolBox, module, bInit);
+            if (bInit) InitPosition(); 
         }
         #endregion
 
@@ -47,12 +48,12 @@ namespace Root_JEDI_Vision.Module
         #endregion
 
         #region Snap Position
-        double m_yScale = 10000;    // pulse / mm
+        double m_pulsemm = 10000;    // pulse / mm
         double[] m_pSnap = new double[2] { 0, 0 };
         void CalcSnapPos(eDirection eDirection, double mmSnap, double mmOffset)
         {
-            double pStart = m_axis.GetPosValue(ePos.SnapStart) + m_yScale * mmOffset;
-            double pEnd = pStart + m_yScale * mmSnap;
+            double pStart = m_axis.GetPosValue(ePos.SnapStart) + m_pulsemm * mmOffset;
+            double pEnd = pStart + m_pulsemm * mmSnap;
             double dpAcc = CalcAccDist();
             switch (eDirection)
             {
@@ -73,15 +74,15 @@ namespace Root_JEDI_Vision.Module
         public double CalcAccDist()
         {
             Axis.Speed SnapSpeed = m_axis.GetSpeedValue("Snap");
-            double dVel = SnapSpeed.m_v / m_yScale;    // 최종 속도 (등속도)       [mm/s]
+            double dVel = SnapSpeed.m_v / m_pulsemm;    // 최종 속도 (등속도)       [mm/s]
             double dSec = SnapSpeed.m_acc;             // 가속하는데 걸리는 시간   [s]
             double dAcc = dVel / dSec;
-            return m_yScale * (0.5 * dAcc * dSec * dSec);         // 가속하는 거리 [pulse]
+            return m_pulsemm * (0.5 * dAcc * dSec * dSec);         // 가속하는 거리 [pulse]
         }
         #endregion
 
         #region Snap
-        public string RunMoveSnapStart(eDirection eDirection, double mmSnap, double mmOffset, bool bWait = true)
+        public string RunMove(eDirection eDirection, double mmSnap, double mmOffset, bool bWait = true)
         {
             CalcSnapPos(eDirection, mmSnap, mmOffset);
             m_axis.StartMove(m_pSnap[0]);
@@ -104,7 +105,7 @@ namespace Root_JEDI_Vision.Module
 
         public void RunTreeAxis(Tree tree)
         {
-            m_yScale = tree.Set(m_yScale, m_yScale, "Scale", "Snap Axis Scale (pulse / mm)");
+            m_pulsemm = tree.Set(m_pulsemm, m_pulsemm, "Scale", "Snap Axis Scale (pulse / mm)");
         }
 
         public string p_id { get; set; }

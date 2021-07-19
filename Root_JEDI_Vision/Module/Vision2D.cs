@@ -3,10 +3,13 @@ using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.Dalsa;
 using RootTools.Comm;
+using RootTools.Control;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 
 namespace Root_JEDI_Vision.Module
@@ -26,6 +29,8 @@ namespace Root_JEDI_Vision.Module
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
                 p_sInfo = m_toolBox.GetComm(ref m_rs232RGBW, this, "RGBW");
+                m_boat.GetTools(m_toolBox, this, bInit); 
+                m_camAxis.GetTools(m_toolBox, this, bInit); 
                 m_process.GetTools(m_toolBox, bInit); 
                 if (bInit)
                 {
@@ -36,6 +41,81 @@ namespace Root_JEDI_Vision.Module
             }
             m_remote.GetTools(bInit);
         }
+        #endregion
+
+        #region Camera Axis
+        public enum eLine
+        {
+            Line2,
+            Line3,
+        }
+        public class CameraAxis
+        {
+            AxisXY m_axis;
+            public void GetTools(ToolBox toolBox, ModuleBase module, bool bInit)
+            {
+                toolBox.GetAxis(ref m_axis, module, "Camera");
+                if (bInit) InitPosition(); 
+            }
+
+            #region InitPosition
+            public enum ePos
+            {
+                Ready,
+                Snap
+            }
+            void InitPosition()
+            {
+                m_axis.AddPos(Enum.GetNames(typeof(ePos)));
+            }
+            #endregion
+
+            #region Offset
+            double m_pulseum = 10; 
+            double m_mmSpace = 100; 
+            Dictionary<eLine, RPoint[]> m_umOffset = new Dictionary<eLine, RPoint[]>();
+            void InitOffset()
+            {
+                m_umOffset.Add(eLine.Line2, new RPoint[2] { new RPoint(), new RPoint() });
+                m_umOffset.Add(eLine.Line3, new RPoint[3] { new RPoint(), new RPoint(), new RPoint() });
+            }
+            public void RunTree(Tree tree)
+            {
+                m_pulseum = tree.Set(m_pulseum, m_pulseum, "pulse/um", "pulse per um");
+                m_mmSpace = tree.Set(m_mmSpace, m_mmSpace, "Space", "Grab Sapce (mm)");
+                RPoint[] umOffset = m_umOffset[eLine.Line2];
+                for (int n = 0; n < 2; n++) umOffset[n] = tree.GetTree("2 Line").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
+                umOffset = m_umOffset[eLine.Line3];
+                for (int n = 0; n < 3; n++) umOffset[n] = tree.GetTree("3 Line").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
+            }
+            #endregion
+
+            #region RunMove
+            public string RunMove(ePos ePos, bool bWait = true)
+            {
+                m_axis.StartMove(ePos);
+                return bWait ? m_axis.WaitReady() : "OK";
+            }
+
+            public string RunMove(eLine eLine, int iLine, bool bWait = true)
+            {
+                RPoint umOffset = new RPoint(m_umOffset[eLine][iLine]); 
+                switch (eLine)
+                {
+                    case eLine.Line2: umOffset.X += 1000 * (iLine - 0.5); break;
+                    case eLine.Line3: umOffset.X += 1000 * (iLine - 1); break; 
+                }
+                m_axis.StartMove(ePos.Snap, new RPoint(m_pulseum * umOffset.X, m_pulseum * umOffset.Y));
+                return bWait ? m_axis.WaitReady() : "OK";
+            }
+            #endregion
+
+            public CameraAxis()
+            {
+                InitOffset(); 
+            }
+        }
+        public CameraAxis m_camAxis = new CameraAxis(); 
         #endregion
 
         #region Memory
@@ -337,12 +417,28 @@ namespace Root_JEDI_Vision.Module
         public Grab m_grabData = new Grab();
         #endregion
 
+        #region Snap
+
+        #endregion
+
         #region override
         public override void Reset()
         {
             m_process?.Reset(); 
             foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true;
             base.Reset();
+        }
+
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            string sRun = base.StateHome();
+            p_eState = (sRun == "OK") ? eState.Ready : eState.Error;
+            return sRun; 
         }
         #endregion
 
@@ -353,6 +449,7 @@ namespace Root_JEDI_Vision.Module
             if (p_eRemote == eRemote.Client) return;
             p_lLight = tree.GetTree("Light", false).Set(p_lLight, p_lLight, "Channel", "Light Channel Count");
             RunCameraTree(tree.GetTree("Camera", true));
+            m_camAxis.RunTree(tree.GetTree("Camera Axis")); 
             m_process?.RunTree(tree.GetTree("Process"));
             RunGrabDataTree(tree.GetTree("GrabData", false));
         }
@@ -379,9 +476,11 @@ namespace Root_JEDI_Vision.Module
         #endregion
 
         public eVision p_eVision { get; set; }
+        public Boat m_boat; 
         public Vision2D(eVision eVision, IEngineer engineer)
         {
             p_eVision = eVision;
+            m_boat = new Boat(eVision.ToString()); 
             InitBase("Vision " + eVision.ToString(), engineer, eRemote.Client);
         }
 
@@ -394,11 +493,6 @@ namespace Root_JEDI_Vision.Module
 
         public override void ThreadStop()
         {
-            //if (m_bThreadCheck)
-            //{
-                //m_bThreadCheck = false;
-                //m_threadCheck.Join();
-            //}
             m_process?.ThreadStop(); 
             base.ThreadStop();
         }
