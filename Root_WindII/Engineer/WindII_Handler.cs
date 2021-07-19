@@ -544,15 +544,5 @@ namespace Root_WindII.Engineer
                 foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
             }
         }
-
-        public RnRData GetRnRData()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void UpdateEvent()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }
