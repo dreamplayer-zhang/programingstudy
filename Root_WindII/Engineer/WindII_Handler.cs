@@ -312,6 +312,16 @@ namespace Root_WindII.Engineer
         #region StateHome
         public string StateHome()
         {
+            m_process.p_qSequence.Clear();
+            if (m_wtr != null)
+            {
+                m_wtr.StateHome();
+                while (m_wtr.p_eState == ModuleBase.eState.Home)
+                {
+                    Thread.Sleep(100);
+                }
+            }
+
             string sInfo = StateHome(p_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;

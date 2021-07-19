@@ -10,7 +10,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace Root_WINDII
+namespace Root_WindII
 {
     public class ImageConverter : IValueConverter
     {

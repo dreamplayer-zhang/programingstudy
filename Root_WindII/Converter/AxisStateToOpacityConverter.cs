@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using static RootTools.Control.Axis;
 
-namespace Root_WINDII
+namespace Root_WindII
 {
     public class AxisStateToOpacityConverter : IValueConverter
     {

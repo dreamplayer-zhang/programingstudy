@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace Root_WINDII
+namespace Root_WindII
 {
     class AxisBoolToBrushConverter : IValueConverter
     {
