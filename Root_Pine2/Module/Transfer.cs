@@ -450,7 +450,11 @@ namespace Root_Pine2.Module
                     if (m_gripper.IsGripped()) m_gripper.p_infoStrip = infoStrip;
                     else return "Check Strip in Gripper";
                 }
-                else infoStrip.Dispose();
+                else
+                {
+                    m_magazineEV.GetInfoStrip(false);
+                    infoStrip.Dispose();
+                }
                 return m_pusher.WaitUnlock();
             }
             finally
