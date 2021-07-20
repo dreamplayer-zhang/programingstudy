@@ -677,7 +677,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         if (m_RawData[n].Wavelength.Count() != 0)
                         {
                             sData = string.Empty;
-                            sData += m_RawData[n].dX.ToString("0.####") + "," + m_RawData[n].dY.ToString("0.####") + "," + infoWafer.p_sLotID + "," + infoWafer.p_sLotID + "," + (m + 1).ToString();
+                            sData += m_RawData[n].dX.ToString("0.####") + "," + m_RawData[n].dY.ToString("0.####") + "," + infoWafer.p_sLotID + "," + infoWafer.m_nSlot + 1 + "," + (m + 1).ToString();
                             for (int i = 0; i < m_ContourMapDataR.Count; i++)
                             {
                                 sData += "," + m_ContourMapDataR[i].HoleData[n].Value.ToString("0.####");
@@ -718,10 +718,10 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.WriteLine();
                 sw.WriteLine();
                 sw.WriteLine();
-                sw.WriteLine("WAFER ID," + infoWafer.p_sWaferID);
+                sw.WriteLine("WAFER ID," + (infoWafer.m_nSlot + 1).ToString());
                 sw.WriteLine("LOT ID," + infoWafer.p_sCarrierID + "_" + infoWafer.p_sLotID);
                 //sw.WriteLine("WAFER #," + sWaferNum[1]);
-                sw.WriteLine("SLOT," + infoWafer.p_sSlotID);
+                sw.WriteLine("SLOT," + (infoWafer.m_nSlot + 1).ToString());
                 sw.WriteLine("WAFER STATUS," + "Pass");
                 sw.WriteLine("DATA TYPE," + "TF");
                 sw.WriteLine("RECIPE," + infoWafer.p_sRecipe);
@@ -967,7 +967,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         sw.WriteLine("WAFER #," + "");
                     }
-                    sw.WriteLine("SLOT," + infoWafer.p_sSlotID);
+                    sw.WriteLine("SLOT," + (infoWafer.m_nSlot + 1).ToString());
                     sw.WriteLine("WAFER STATUS," + "Pass");
                     sw.WriteLine("DATA TYPE," + "TF");
                     sw.WriteLine("RECIPE," + recipeData.TeachRecipeName);
@@ -1254,7 +1254,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         sw.WriteLine("WAFER #," + "");
                     }
-                    sw.WriteLine("SLOT," + infoWafer.p_sSlotID);
+                    sw.WriteLine("SLOT," + (infoWafer.m_nSlot + 1).ToString());
                     sw.WriteLine("WAFER STATUS," + "Pass");
                     sw.WriteLine("DATA TYPE," + "TF");
                     sw.WriteLine("RECIPE," + recipeData.TeachRecipeName);
@@ -1553,7 +1553,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         sw.WriteLine("WAFER #," + "");
                     }
-                    sw.WriteLine("SLOT," + infoWafer.p_sSlotID);
+                    sw.WriteLine("SLOT," + (infoWafer.m_nSlot + 1).ToString());
                     sw.WriteLine();
                     sw.WriteLine("WAFER STATUS," + "Pass");
                     sw.WriteLine("DATA TYPE," + "TF");
