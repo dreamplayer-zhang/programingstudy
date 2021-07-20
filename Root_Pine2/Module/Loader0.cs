@@ -191,6 +191,9 @@ namespace Root_Pine2.Module
         {
             double dPos = m_pulsemm * (m_pine2.m_widthDefaultStrip - m_pine2.p_widthStrip);
             if (Run(StartMoveX(c_sPosLoadEV, dPos))) return p_sInfo;
+            double xDst = m_axis.p_axisX.m_posDst;
+            double yDst = m_axis.p_axisY.GetPosValue(ePosTransfer.Transfer7);
+            while (Math.Abs(m_axis.p_axisX.p_posCommand - xDst) > Math.Abs(m_axis.p_axisY.p_posCommand - yDst)) Thread.Sleep(10); 
             m_axis.p_axisY.StartMove(c_sPosLoadEV);
             return bWait ? m_axis.WaitReady() : "OK"; 
         }
@@ -580,6 +583,7 @@ namespace Root_Pine2.Module
         {
             m_picker.m_dioVacuum.Write(false);
             m_picker.p_infoStrip = null;
+            RunMoveUp(false); 
             base.Reset();
         }
 

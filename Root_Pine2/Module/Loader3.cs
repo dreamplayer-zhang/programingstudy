@@ -192,8 +192,9 @@ namespace Root_Pine2.Module
         string StartLoadBoat()
         {
             Boats boats = m_handler.m_aBoats[eVision.Bottom];
-            if (boats.m_aBoat[eWorks.A].p_eStep == Boat.eStep.Done) return StartLoadBoat(eWorks.A);
-            if (boats.m_aBoat[eWorks.B].p_eStep == Boat.eStep.Done) return StartLoadBoat(eWorks.B);
+            eWorks eWork = (1 - m_eWorksLoad); 
+            if (boats.m_aBoat[eWork].p_eStep == Boat.eStep.Done) return StartLoadBoat(eWork);
+            if (boats.m_aBoat[m_eWorksLoad].p_eStep == Boat.eStep.Done) return StartLoadBoat(m_eWorksLoad);
             return "OK";
         }
 
@@ -223,7 +224,11 @@ namespace Root_Pine2.Module
                 Thread.Sleep(500);
                 boat.RunBlow(false);
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (m_picker.IsVacuum() == false) return p_sInfo;
+                if (m_picker.IsVacuum() == false)
+                {
+                    m_picker.RunVacuum(false); 
+                    return p_sInfo;
+                }
                 m_picker.p_infoStrip = boat.p_infoStrip;
                 boat.p_infoStrip = null;
                 boat.p_eStep = Boat.eStep.RunReady;
@@ -456,6 +461,7 @@ namespace Root_Pine2.Module
         {
             m_picker.m_dioVacuum.Write(false);
             m_picker.p_infoStrip = null;
+            RunMoveUp(false); 
             base.Reset();
         }
 
