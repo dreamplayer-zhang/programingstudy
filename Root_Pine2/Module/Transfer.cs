@@ -434,29 +434,26 @@ namespace Root_Pine2.Module
                 return m_pusher.WaitUnlock();
             }
             double xOffset = m_magazineEV.CalcXOffset(infoStrip);
-            if (Run(m_loaderPusher.RunMove(infoStrip.p_eMagazine, false))) return p_sInfo; 
+            if (Run(m_loaderPusher.RunMove(infoStrip.p_eMagazine, false))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, false))) return p_sInfo;
             if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, true))) return p_sInfo;
             m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
-            try
+            if (Run(m_gripper.RunGripperReady(Gripper.eGripper.Grip))) return p_sInfo;
+            if (Run(m_loaderPusher.RunPusher(infoStrip.p_eMagazine))) return p_sInfo;
+            if (m_gripper.IsPushed())
             {
-                if (Run(m_gripper.RunGripperReady(Gripper.eGripper.Grip))) return p_sInfo;
-                if (Run(m_loaderPusher.RunPusher(infoStrip.p_eMagazine))) return p_sInfo;
-                if (m_gripper.IsPushed())
-                {
-                    if (Run(m_gripper.RunGripper())) return p_sInfo;
-                    infoStrip = m_magazineEV.GetInfoStrip(false);
-                    if (m_gripper.IsGripped()) m_gripper.p_infoStrip = infoStrip;
-                    else return "Check Strip in Gripper";
-                }
-                else infoStrip.Dispose();
-                return m_pusher.WaitUnlock();
+                if (Run(m_gripper.RunGripper())) return p_sInfo;
+                infoStrip = m_magazineEV.GetInfoStrip(false);
+                if (m_gripper.IsGripped()) m_gripper.p_infoStrip = infoStrip;
+                else return "Check Strip in Gripper";
             }
-            finally
+            else
             {
-                m_gripper.RunGripperReady(Gripper.eGripper.Ready); 
+                m_magazineEV.GetInfoStrip(false);
+                infoStrip.Dispose();
             }
+            return m_pusher.WaitUnlock();
         }
         #endregion
 

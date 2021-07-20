@@ -301,6 +301,7 @@ namespace Root_Pine2.Module
         {
             base.Reset();
             m_picker.p_infoStrip = null;
+            RunMoveUp(false); 
         }
 
         public override void RunTree(Tree tree)
