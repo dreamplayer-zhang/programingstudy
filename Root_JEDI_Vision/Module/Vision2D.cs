@@ -12,6 +12,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace Root_JEDI_Vision.Module
 {
@@ -428,7 +429,8 @@ namespace Root_JEDI_Vision.Module
             public class Snap
             {
                 public eLine m_eLine = eLine.Single;
-                public int m_iLine = 0; 
+                public int m_iLine = 0;
+                public eCalMode m_eCalMode = eCalMode.RGB; 
                 public Boat.eDirection m_eDirection = Boat.eDirection.Forward;
                 public enum eEXT
                 {
@@ -444,7 +446,8 @@ namespace Root_JEDI_Vision.Module
                 {
                     Snap snap = new Snap(m_vision);
                     snap.m_eLine = m_eLine;
-                    snap.m_iLine = m_iLine; 
+                    snap.m_iLine = m_iLine;
+                    snap.m_eCalMode = m_eCalMode; 
                     snap.m_eDirection = m_eDirection;
                     snap.m_eEXT = m_eEXT;
                     snap.m_cpMemory = new CPoint(m_cpMemory);
@@ -476,6 +479,7 @@ namespace Root_JEDI_Vision.Module
                 {
                     m_eLine = (eLine)tree.Set(m_eLine, m_eLine, "Line", "Line", bVisible, bReadOnly);
                     m_iLine = tree.Set(m_iLine, m_iLine, "Line Index", "Line Index", bVisible, bReadOnly);
+                    m_eCalMode = (eCalMode)tree.Set(m_eCalMode, m_eCalMode, "Cal Mode", "Calibration Mode", bVisible, bReadOnly); 
                     m_eDirection = (Boat.eDirection)tree.Set(m_eDirection, m_eDirection, "Direction", "Scan Direction", bVisible, false);
                 }
 
@@ -537,25 +541,27 @@ namespace Root_JEDI_Vision.Module
                     m_aSnap.Clear();
                     switch (m_eSnapMode)
                     {
-                        case eSnapMode.RGB: AddSnap(eLine, Snap.eEXT.EXT1, m_lightPowerRGB); break;
-                        case eSnapMode.APS: AddSnap(eLine, Snap.eEXT.EXT2, m_lightPowerAPS); break;
+                        case eSnapMode.RGB: AddSnap(eSnapMode.RGB, eLine, Snap.eEXT.EXT1, m_lightPowerRGB); break;
+                        case eSnapMode.APS: AddSnap(eSnapMode.APS, eLine, Snap.eEXT.EXT2, m_lightPowerAPS); break;
                         case eSnapMode.ALL:
-                            AddSnap(eLine, Snap.eEXT.EXT1, m_lightPowerRGB);
-                            AddSnap(eLine, Snap.eEXT.EXT2, m_lightPowerAPS);
+                            AddSnap(eSnapMode.RGB, eLine, Snap.eEXT.EXT1, m_lightPowerRGB);
+                            AddSnap(eSnapMode.APS, eLine, Snap.eEXT.EXT2, m_lightPowerAPS);
                             break; 
                     }
                 }
             }
 
-            void AddSnap(eLine eLine, Snap.eEXT eEXT, LightPower lightPower)
+            void AddSnap(eSnapMode eSnapMode, eLine eLine, Snap.eEXT eEXT, LightPower lightPower)
             {
                 for (int i = 0; i <= (int)eLine; i++)
                 {
                     Snap snap = new Snap(m_vision);
                     snap.m_eLine = eLine;
                     snap.m_iLine = i;
+                    snap.m_eCalMode = (eSnapMode == eSnapMode.RGB) ? eCalMode.RGB : eCalMode.APS; 
                     snap.m_nOverlap = m_vision.m_grabData.m_nOverlap;
-                    snap.m_eDirection = (i % 2 == 0) ? Boat.eDirection.Forward : Boat.eDirection.Backward;
+                    if (m_vision.m_bUseBiDirectional == false) snap.m_eDirection = Boat.eDirection.Forward;
+                    else snap.m_eDirection = (i % 2 == 0) ? Boat.eDirection.Forward : Boat.eDirection.Backward;
                     snap.m_eEXT = eEXT;
                     snap.m_lightPower = lightPower.Clone(); 
                 }
@@ -683,13 +689,20 @@ namespace Root_JEDI_Vision.Module
                     }
                     if (Run(m_boat.m_axis.WaitReady())) return p_sInfo;
                     if (Run(m_camAxis.m_axis.WaitReady())) return p_sInfo;
-                    StartSnap(snap); 
+                    if (Run(StartSnap(snap))) return p_sInfo;
+                    if (Run(m_boat.StartSnap())) return p_sInfo; 
+                    if (Run(WaitSnap())) return p_sInfo;
+                    if (Run(m_boat.WaitSnap())) return p_sInfo;
                 }
+                RunLightOff();
+                m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
+                if (Run(m_boat.RunMove(Boat.ePos.Done))) return p_sInfo;
                 return "OK";
             }
             finally
             {
-                
+                m_boat.m_axis.RunTrigger(false);
+                m_boat.RunMove(Boat.ePos.Done);
             }
         }
 
@@ -698,7 +711,18 @@ namespace Root_JEDI_Vision.Module
             try
             {
                 m_log.Info("Snap Start");
-                //forget
+                if (snap.m_iLine == 0)
+                {
+                    SetGain(snap.m_eCalMode);
+                    m_log.Info("Set Gain Done");
+                }
+                SetCalUserSet(snap);
+                m_log.Info("Set Cal Userset Done");
+
+                MemoryData memory = p_memSnap[(int)snap.m_eEXT];
+                CPoint cpOffset = CalcOffset(snap);
+                GrabData grabData = snap.GetGrabData(cpOffset, m_grabData.m_nOverlap);
+                m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 return "OK";
             }
             catch (Exception e)
@@ -706,6 +730,49 @@ namespace Root_JEDI_Vision.Module
                 m_camera.StopGrab();
                 return e.Message; 
             }
+        }
+
+        string WaitSnap()
+        {
+            while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+            }
+            return "OK";
+        }
+
+        void SetGain(eCalMode eMode)
+        {
+            CalibrationData data = m_aCalData[eMode];
+            m_camera.p_CamParam.SetAnalogGain(data.m_eAnalogGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.System);
+            m_camera.p_CamParam.SetGain(data.m_dSystemGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Blue);
+            m_camera.p_CamParam.SetGain(data.m_dBlueGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Green);
+            m_camera.p_CamParam.SetGain(data.m_dGreenGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Red);
+            m_camera.p_CamParam.SetGain(data.m_dRedGain);
+        }
+
+        void SetCalUserSet(Recipe.Snap snap)
+        {
+            switch (snap.m_eDirection)
+            {
+                case Boat.eDirection.Forward: m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[snap.m_eCalMode].m_eForwardUserSet; break;
+                case Boat.eDirection.Backward: m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[snap.m_eCalMode].m_eBackwardUserSet; break;
+            }
+        }
+
+        CPoint CalcOffset(Recipe.Snap snap)
+        {
+            switch (snap.m_eDirection)
+            {
+                case Boat.eDirection.Forward: return new CPoint(snap.m_iLine * m_grabData.m_nFovSize, m_grabData.m_nReverseOffset);
+                case Boat.eDirection.Backward: return new CPoint(snap.m_iLine * m_grabData.m_nFovSize, 0);
+            }
+            return new CPoint(snap.m_iLine * m_grabData.m_nFovSize, m_grabData.m_nReverseOffset);
         }
         #endregion
 
