@@ -49,11 +49,12 @@ namespace Root_JEDI_Vision.Module
 
         #region Snap Position
         double m_pulsemm = 10000;    // pulse / mm
+        double m_mmSnap = 300; 
         double[] m_pSnap = new double[2] { 0, 0 };
-        void CalcSnapPos(eDirection eDirection, double mmSnap, double mmOffset)
+        void CalcSnapPos(eDirection eDirection, double mmOffset)
         {
             double pStart = m_axis.GetPosValue(ePos.SnapStart) + m_pulsemm * mmOffset;
-            double pEnd = pStart + m_pulsemm * mmSnap;
+            double pEnd = pStart + m_pulsemm * m_mmSnap;
             double dpAcc = CalcAccDist();
             switch (eDirection)
             {
@@ -82,9 +83,9 @@ namespace Root_JEDI_Vision.Module
         #endregion
 
         #region Snap
-        public string RunMove(eDirection eDirection, double mmSnap, double mmOffset, bool bWait = true)
+        public string RunMove(eDirection eDirection, double mmOffset, bool bWait = true)
         {
-            CalcSnapPos(eDirection, mmSnap, mmOffset);
+            CalcSnapPos(eDirection, mmOffset);
             m_axis.StartMove(m_pSnap[0]);
             return bWait ? m_axis.WaitReady() : "OK";
         }
@@ -106,6 +107,7 @@ namespace Root_JEDI_Vision.Module
         public void RunTreeAxis(Tree tree)
         {
             m_pulsemm = tree.Set(m_pulsemm, m_pulsemm, "Scale", "Snap Axis Scale (pulse / mm)");
+            m_mmSnap = tree.Set(m_mmSnap, m_mmSnap, "Snap", "Snap Length (mm)"); 
         }
 
         public string p_id { get; set; }
