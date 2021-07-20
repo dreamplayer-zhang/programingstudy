@@ -168,13 +168,13 @@ namespace Root_CAMELLIA.Module
                     if (nRepeatCount ==1)
                     {
                         int nDataNum = item.m_index + 1;
-                        sSlotSpectraDataPath = m_resultDataSavePath[0] + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\SpectraData" + "\\" + nDataNum.ToString() + "_" + DateTime.Now.ToString("HHmmss");
+                        sSlotSpectraDataPath = m_resultDataSavePath[0] + "\\Slot." + m_module.p_infoWafer.m_nSlot + 1 + "\\SpectraData" + "\\" + nDataNum.ToString() + "_" + DateTime.Now.ToString("HHmmss");
                     }
                     else
                     {
                         int nPathIndex = item.m_repeat;
                         int nDataNum = item.m_index + 1;
-                        sSlotSpectraDataPath = m_resultDataSavePath[nPathIndex] + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\SpectraData" + "\\" + nDataNum.ToString() + "_" + DateTime.Now.ToString("HHmmss");
+                        sSlotSpectraDataPath = m_resultDataSavePath[nPathIndex] + "\\Slot." + m_module.p_infoWafer.m_nSlot + 1 + "\\SpectraData" + "\\" + nDataNum.ToString() + "_" + DateTime.Now.ToString("HHmmss");
 
                     }
                     LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(sSlotSpectraDataPath, m_module.p_infoWafer, m_DataManager.recipeDM, nDataIndex, item.m_index);
@@ -233,9 +233,9 @@ namespace Root_CAMELLIA.Module
                     m_resultPath = m_resultDataSavePath[0] + "\\ResultData";
                     GeneralTools.MakeDirectory(m_resultPath);
 
-                    m_slotContourMapPath = m_resultDataSavePath[0] + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\ContourMap";
+                    m_slotContourMapPath = m_resultDataSavePath[0] + "\\Slot." + m_module.p_infoWafer.m_nSlot + 1 + "\\ContourMap";
                     GeneralTools.MakeDirectory(m_slotContourMapPath);
-                    m_slotSpectraDataPath = m_resultDataSavePath[0] + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\SpectraData";
+                    m_slotSpectraDataPath = m_resultDataSavePath[0] + "\\Slot." + m_module.p_infoWafer.m_nSlot + 1 + "\\SpectraData";
                     GeneralTools.MakeDirectory(m_slotSpectraDataPath);
 
                     //히스토리 데이터는 데이터 저장 경로 재확인 필요
@@ -252,9 +252,9 @@ namespace Root_CAMELLIA.Module
                         GeneralTools.MakeDirectory(m_summaryPath);
                         m_resultPath = m_resultDataSavePath[n] + "\\ResultData";
                         GeneralTools.MakeDirectory(m_resultPath);
-                        m_slotContourMapPath = m_resultDataSavePath[n] + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\ContourMap";
+                        m_slotContourMapPath = m_resultDataSavePath[n] + "\\Slot." + m_module.p_infoWafer.m_nSlot + 1 + "\\ContourMap";
                         GeneralTools.MakeDirectory(m_slotContourMapPath);
-                        m_slotSpectraDataPath = m_resultDataSavePath[n] + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\SpectraData";
+                        m_slotSpectraDataPath = m_resultDataSavePath[n] + "\\Slot." + m_module.p_infoWafer.m_nSlot + 1 + "\\SpectraData";
                         GeneralTools.MakeDirectory(m_slotSpectraDataPath);
 
                         //히스토리 데이터는 데이터 저장 경로 재확인 필요
@@ -270,8 +270,12 @@ namespace Root_CAMELLIA.Module
         } 
         public override string Run()
         {
-
-
+            m_module.p_processStartDate = DateTime.Now.ToString("MM\\/dd\\/yyyy");
+            m_module.p_processStartTime = DateTime.Now.ToString("HH:mm:ss");
+            p_processEndDate = DateTime.Now.AddDays(1).ToString("MM\\/dd\\/yyyy");
+            p_processEndTime = DateTime.Now.ToString("HH:mm:ss");
+            SendDCOLMSG(@"D:\CSV DCOL FILE Repeat 2회.csv");
+            return "OK";
             MarsLogManager marsLogManager = MarsLogManager.Instance;
             DataFormatter dataFormatter = new DataFormatter();
 
@@ -537,7 +541,7 @@ namespace Root_CAMELLIA.Module
             test.Stop();
             m_log.Warn("Measure End >> " + test.ElapsedMilliseconds);
 
-            p_processEndDate = DateTime.Now.ToString("MM/dd/yyyy");
+            p_processEndDate = DateTime.Now.ToString("MM\\/dd\\/yyyy");
             p_processEndTime = DateTime.Now.ToString("HH:mm:ss");
 
             if (!m_isPointMeasure)
@@ -1000,9 +1004,9 @@ namespace Root_CAMELLIA.Module
         public void SetResultList()
         {
             long nObject = 0;
-            p_xGem.MakeObject(nObject);
+            p_xGem.MakeObject(ref nObject);
 
-            m_sDcolData[(int)eDColData.Data_Upload_Date] = DateTime.Now.ToString("MM/dd/yyyy");
+            m_sDcolData[(int)eDColData.Data_Upload_Date] = DateTime.Now.ToString("MM\\/dd\\/yyyy");
             m_sDcolData[(int)eDColData.Data_Upload_Time] = DateTime.Now.ToString("hh:mm:ss");
 
             p_xGem.SetListItem(nObject, 3);
@@ -1044,7 +1048,7 @@ namespace Root_CAMELLIA.Module
 
             for (int i = 1; i <= nOS; i++)
             {
-                p_xGem.SetListItem(nObject, 8);
+                p_xGem.SetListItem(nObject, 11);
                 SetFloatData(nObject, eDcolData_OS.OS_X_Position, i);
                 SetFloatData(nObject, eDcolData_OS.OS_X_Position_Offset, i);
                 SetFloatData(nObject, eDcolData_OS.OS_Y_Position, i);
@@ -1052,11 +1056,10 @@ namespace Root_CAMELLIA.Module
                 SetFloatData(nObject, eDcolData_OS.Total_Thickness, i);
                 SetFloatData(nObject, eDcolData_OS.Thickness_Detail, i);
                 SetFloatData(nObject, eDcolData_OS.GOF, i);
+                SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Reflectance, 0);
                 SetFloatData(nObject, eDcolData_OS.Reflectance, i);
-                //이부분 수정 필요
-                //SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Reflectance, 0);
-                //SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Transmittance, 0);
-                //SetFloatData(nObject, eDcolData_OS.Transmittance, i);
+                SetFloatData(nObject, eDcolData_OS.Wave_Length_for_Transmittance, 0);
+                SetFloatData(nObject, eDcolData_OS.Transmittance, i);
                 //m_log.Add("Site #" + i.ToString() + "  Data Set Done");
             }
         }
@@ -1150,7 +1153,7 @@ namespace Root_CAMELLIA.Module
                     for (int cnt = 0; cnt< nRepeatCount; cnt++)
                     {
                         
-                        string sSlotContourMapPath = m_resultDataSavePath[cnt] + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\ContourMap" + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + "_ContourMapData";
+                        string sSlotContourMapPath = m_resultDataSavePath[cnt] + "\\Slot." + m_module.p_infoWafer.m_nSlot + 1 + "\\ContourMap" + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + "_ContourMapData";
                         // ContourMap foder fail Save
                         foreach (LibSR_Met.ContourMapData mapdata in m_Met.m_ContourMapDataR)
                             m_Met.SaveContourMapData(sSlotContourMapPath + "_R" + mapdata.Wavelength.ToString() + ".csv", mapdata, nRepeatCount, cnt);

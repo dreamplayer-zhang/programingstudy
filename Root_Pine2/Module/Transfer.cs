@@ -138,6 +138,11 @@ namespace Root_Pine2.Module
                 m_axisWidth.AddPos(Enum.GetNames(typeof(eWidth)));
                 
             }
+
+            public double GetXOffset(InfoStrip.eMagazine eMagazine)
+            {
+                return m_axis.GetPosValue(InfoStrip.eMagazine.Magazine7) - m_axis.GetPosValue(eMagazine); 
+            }
             #endregion
 
             #region Axis

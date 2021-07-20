@@ -145,7 +145,6 @@ namespace Root_WindII_Option.Engineer
             m_treeRoot.p_eMode = mode;
             RunTreeControl(m_treeRoot.GetTree("Control"));
             RunTreeXGem(m_treeRoot.GetTree("XGem"));
-            m_handler.RunTreeModule(m_treeRoot.GetTree("Module"));
         }
         #endregion
 

@@ -119,7 +119,7 @@ namespace Root_VEGA_P.Module
         public class Dome : NotifyProperty, IRTRChild
         {
             #region ToolBox
-            Camera_Basler camDome;
+            public Camera_Basler camDome;
             public Axis m_axisRotate;
             DIO_Is m_diCheckRotate;
             DIO_Is m_diCheckDome;
@@ -930,8 +930,8 @@ namespace Root_VEGA_P.Module
         {
             if (EQ.p_bSimulate) return "OK";
             //여기
-            //m_dome.InitCamera();
-            //m_door.InitCamera();
+            m_dome.InitCamera();
+            m_door.InitCamera();
 
             if (m_dome.IsCoverDown(true))
                 RunDomeCoverDown(false);

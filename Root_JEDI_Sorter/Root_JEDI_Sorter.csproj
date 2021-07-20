@@ -86,6 +86,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\In.cs" />
+    <Compile Include="Module\InfoTray.cs" />
     <Compile Include="Module\LoadEV.cs" />
     <Compile Include="Module\Stage.cs" />
     <Compile Include="Module\UnloadEV.cs" />

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Root_WindII.UI.OPERATION
+namespace Root_JEDI_Vision.Module
 {
-    class OperationPanel_VieModel
+    class VisionCCS
     {
     }
 }

@@ -62,7 +62,7 @@ namespace RootTools.Gem
 
         eControl p_eReqControl { get; set; }
 
-        void MakeObject(long nObject);
+        void MakeObject(ref long nObject);
 
         void SetListItem(long nObject, int listCnt);
 

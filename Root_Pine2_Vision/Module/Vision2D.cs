@@ -8,7 +8,6 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -17,17 +16,8 @@ using System.Windows;
 
 namespace Root_Pine2_Vision.Module
 {
-    public class Vision2D : ModuleBase
+    public class Vision2D : ModuleBase, IVision
     {
-        #region Property
-        public enum eVision
-        {
-            Top3D,
-            Top2D,
-            Bottom
-        }
-        #endregion
-
         #region ToolBox
         Camera_Dalsa m_camera;
         public LightSet m_lightSet;
@@ -164,102 +154,12 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Send Info
-        public string SendRecipe(string sRecipe)
-        {
-            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendRecipe, eRemote.Client, sRecipe);
-            else
-            {
-                m_RunningRecipe[eWorks.A].RecipeOpen(sRecipe);
-                m_RunningRecipe[eWorks.B].RecipeOpen(sRecipe);
-                string sRunA = m_aWorks[eWorks.A].SendRecipe(sRecipe);
-                string sRunB = m_aWorks[eWorks.B].SendRecipe(sRecipe);
-                if ((sRunA == "OK") && (sRunB == "OK")) return "OK";
-                return "A = " + sRunA + ", B = " + sRunB;
-            }
-        }
-
-        public class SnapInfo
-        {
-            public eWorks m_eWorks = eWorks.A;
-            public int m_nSnapMode = 0;
-            public string m_sStripID = "0000";
-            public int m_nLine = 0; 
-
-            public SnapInfo Clone()
-            {
-                return new SnapInfo(m_eWorks, m_nSnapMode, m_sStripID, m_nLine); 
-            }
-
-            public string GetString()
-            {
-                return m_nSnapMode.ToString() + "," + m_sStripID + "," + m_nLine.ToString(); 
-            }
-
-            public void RunTree(Tree tree, bool bVisible)
-            {
-                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "eWorks", bVisible);
-                m_nSnapMode = tree.Set(m_nSnapMode, m_nSnapMode, "SnapMode", "Snap Mode (0 = RGB, 1 = APS, 3 = ALL)", bVisible);
-                m_sStripID = tree.Set(m_sStripID, m_sStripID, "StripID", "Strip ID", bVisible);
-                m_nLine = tree.Set(m_nLine, m_nLine, "SnapLine", "Snap Line Number", bVisible);
-            }
-
-            public SnapInfo(eWorks eWorks, int nSnapMode, string sStripID, int nLine)
-            {
-                m_eWorks = eWorks; 
-                m_nSnapMode = nSnapMode;
-                m_sStripID = sStripID;
-                m_nLine = nLine; 
-            }
-        }
         public string SendSnapInfo(SnapInfo snapInfo)
         {
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendSnapInfo, eRemote.Client, snapInfo);
             else
             {
                 return m_aWorks[snapInfo.m_eWorks].SendSnapInfo(snapInfo); // 3. VisionWorks2 Receive SnapInfo
-            }
-        }
-
-        public class LotInfo
-        {
-            public int m_nMode = 0;
-            public string m_sRecipe = "";
-            public string m_sLotID = "";
-            public bool m_bLotMix = false;
-            public bool m_bBarcode = false;
-            public int m_nBarcode = 0;
-            public int m_lBarcode = 0;
-
-            public LotInfo Clone()
-            {
-                return new LotInfo(m_nMode, m_sRecipe, m_sLotID, m_bLotMix, m_bBarcode, m_nBarcode, m_lBarcode);
-            }
-
-            public string GetString()
-            {
-                return m_nMode.ToString() + "," + m_sRecipe + "," + m_sLotID + "," + (m_bBarcode ? "1," : "0,") + (m_bLotMix ? "1," : "0,") + m_nBarcode.ToString() + "," + m_lBarcode.ToString();
-            }
-
-            public void RunTree(Tree tree, bool bVisible)
-            {
-                m_nMode = tree.Set(m_nMode, m_nMode, "Mode", "Operation Mode (1 = Magazine, 0 = Stack)", bVisible);
-                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe Name", bVisible);
-                m_sLotID = tree.Set(m_sLotID, m_sLotID, "LotID", "Lot Name", bVisible);
-                m_bLotMix = tree.Set(m_bLotMix, m_bLotMix, "Lot Mix", "Check Lot Mix", bVisible);
-                m_bBarcode = tree.Set(m_bBarcode, m_bBarcode, "Barcode", "Read Barcode", bVisible);
-                m_nBarcode = tree.Set(m_nBarcode, m_nBarcode, "Barcode Start", "Read Barcode Start Pos (pixel)", bVisible);
-                m_lBarcode = tree.Set(m_lBarcode, m_lBarcode, "Barcode Length", "Read Barcode Length (pixel)", bVisible);
-            }
-
-            public LotInfo(int nMode, string sRecipe, string sLotID, bool bLotMix, bool bBarcode, int nBarcode, int lBarcode)
-            {
-                m_nMode = nMode;
-                m_sRecipe = sRecipe;
-                m_sLotID = sLotID;
-                m_bLotMix = bLotMix;
-                m_bBarcode = bBarcode;
-                m_nBarcode = nBarcode;
-                m_lBarcode = lBarcode;
             }
         }
 
@@ -277,36 +177,6 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public class SortInfo
-        {
-            public eWorks m_eWorks = eWorks.A;
-            public string m_sStripID = "";
-            public string m_sSortID = "";
-
-            public SortInfo Clone()
-            {
-                return new SortInfo(m_eWorks, m_sStripID, m_sSortID);
-            }
-
-            public string GetString()
-            {
-                return m_sStripID + "," + m_sSortID;
-            }
-
-            public void RunTree(Tree tree, bool bVisible)
-            {
-                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "eWorks", bVisible);
-                m_sStripID = tree.Set(m_sStripID, m_sStripID, "StripID", "StripID", bVisible);
-                m_sSortID = tree.Set(m_sSortID, m_sSortID, "SortID", "SortID", bVisible);
-            }
-
-            public SortInfo(eWorks eWorks, string sStripID, string sSortID)
-            {
-                m_eWorks = eWorks;
-                m_sStripID = sStripID;
-                m_sSortID = sSortID;
-            }
-        }
         public string SendSortInfo(SortInfo sortInfo)
         {
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendSortInfo, eRemote.Client, sortInfo);
@@ -530,13 +400,6 @@ namespace Root_Pine2_Vision.Module
                     return data;
                 }
 
-                public CPoint GetMemoryOffset()
-                {
-                    CPoint cp = new CPoint(m_cpMemory);
-                    //if (m_eDirection == eDirection.Backward) cp.Y += m_vision.m_nLine;
-                    return cp;
-                }
-
                 public void RunTree(Tree tree, bool bVisible, bool bReadOnly = false)
                 {
                     RunTreeStage(tree.GetTree("Stage", true, bVisible), bVisible, bReadOnly);
@@ -677,23 +540,12 @@ namespace Root_Pine2_Vision.Module
 
             public eWorks m_eWorks = eWorks.A;
 
-            public Recipe Clone()
-            {
-                Recipe recipe = new Recipe(m_vision, m_eWorks);
-                recipe.m_eWorks = m_eWorks;
-                recipe.m_sRecipe = m_sRecipe;
-                recipe.m_lightPowerRGB = m_lightPowerRGB.Clone();
-                recipe.m_lightPowerAPS = m_lightPowerAPS.Clone();
-                foreach (Snap snap in m_aSnap) recipe.m_aSnap.Add(snap.Clone());
-                return recipe;
-            }
-
             const string c_sExt = ".pine2";
             public void RecipeSave(string sRecipe)
             {
                 string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
                 Directory.CreateDirectory(sPath);
-                string sFile = sPath + "\\" + m_vision.m_eVision.ToString() + m_eWorks.ToString() + c_sExt;
+                string sFile = sPath + "\\" + m_vision.p_eVision.ToString() + m_eWorks.ToString() + c_sExt;
                 m_treeRecipe.m_job = new Job(sFile, true, m_vision.m_log);
                 RunTreeRecipe(Tree.eMode.JobSave);
                 m_treeRecipe.m_job.Close();
@@ -704,7 +556,7 @@ namespace Root_Pine2_Vision.Module
                 m_sRecipe = sRecipe;
                 string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
                 Directory.CreateDirectory(sPath);
-                string sFile = sPath + "\\" + m_vision.m_eVision.ToString() + m_eWorks.ToString() + c_sExt;
+                string sFile = sPath + "\\" + m_vision.p_eVision.ToString() + m_eWorks.ToString() + c_sExt;
                 m_treeRecipe.m_job = new Job(sFile, false, m_vision.m_log);
                 RunTreeRecipe(Tree.eMode.JobOpen);
                 m_treeRecipe.m_job.Close();
@@ -796,11 +648,6 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Works
-        public enum eWorks
-        {
-            A,
-            B,
-        }
         public Dictionary<eWorks, Works2D> m_aWorks = new Dictionary<eWorks, Works2D>();
         void InitVisionWorks()
         {
@@ -1044,7 +891,7 @@ namespace Root_Pine2_Vision.Module
         {
             string[] asRead = sReceive.Split(',');
             if (asRead.Length < 2) return;
-            if (asRead[1] == Works2D.eProtocol.ChangeUserset.ToString())
+            if (asRead[1] == eProtocol.ChangeUserset.ToString())
             {
                 m_bCanChangeUserSet = true;
             }
@@ -1052,7 +899,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqSnap(string sRecipe, eWorks eWorks)
         {
-            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             while (sSend != m_sReceive)
@@ -1065,7 +912,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqSnapReady(eWorks eWorks)
         {
-            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.SnapReady.ToString() + "," + eWorks.ToString();
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.SnapReady.ToString() + "," + eWorks.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             return "OK";
@@ -1073,7 +920,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqInspDone(string sStripID, string sStripResult, string sX, string sY, string sMapResult, eWorks eWorks)
         {
-            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.InspDone.ToString() + ",";
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.InspDone.ToString() + ",";
             sSend += sStripID + "," + sStripResult + "," + sX + "," + sY + "," + sMapResult + "," + eWorks.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
@@ -1082,7 +929,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqWorksConnect(eWorks eWorks, bool bConnect)
         {
-            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.WorksConnect.ToString() + "," + eWorks.ToString() + "," + (bConnect ? "1" : "0");
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.WorksConnect.ToString() + "," + eWorks.ToString() + "," + (bConnect ? "1" : "0");
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             return "OK";
@@ -1157,7 +1004,7 @@ namespace Root_Pine2_Vision.Module
             else
             {
                 p_lLight = tree.GetTree("Light", false).Set(p_lLight, p_lLight, "Channel", "Light Channel Count");
-                m_eVision = (eVision)tree.GetTree("Vision").Set(m_eVision, m_eVision, "Type", "Vision Type");
+                p_eVision = (eVision)tree.GetTree("Vision").Set(p_eVision, p_eVision, "Type", "Vision Type");
                 RunCameraTree(tree.GetTree("Camera", true));
                 RunProcessTree(tree.GetTree("Process", false));
                 RunGrabDataTree(tree.GetTree("GrabData", false));
@@ -1204,10 +1051,15 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        public eVision m_eVision = eVision.Top2D;
+        #region IVision
+        public eVision p_eVision { get; set; }
+        public TreeRoot p_treeRootQueue { get { return m_treeRootQueue; } }
+        public Remote p_remote { get { return m_remote; } }
+        #endregion
+
         public Vision2D(eVision eVision, IEngineer engineer, eRemote eRemote)
         {
-            m_eVision = eVision;
+            p_eVision = eVision;
             InitVisionWorks();
             InitCalData();
             InitBase("Vision " + eVision.ToString(), engineer, eRemote);
@@ -1241,7 +1093,6 @@ namespace Root_Pine2_Vision.Module
             StateHome,
             RunLight,
             RunLightOff,
-            SendRecipe,
             SendSnapInfo,
             SendLotInfo,
             SendSortInfo,
@@ -1256,7 +1107,6 @@ namespace Root_Pine2_Vision.Module
             {
                 case eRemoteRun.StateHome: break;
                 case eRemoteRun.RunLight: run.m_lightPower = value; break;
-                case eRemoteRun.SendRecipe: run.m_sRecipe = value; break;
                 case eRemoteRun.SendSnapInfo: run.m_snapInfo = value; break;
                 case eRemoteRun.SendLotInfo: run.m_lotInfo = value; break;
                 case eRemoteRun.SendSortInfo: run.m_sortInfo = value; break;
@@ -1289,7 +1139,6 @@ namespace Root_Pine2_Vision.Module
 
             public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
             public LightPower m_lightPower;
-            public string m_sRecipe = "";
             public eWorks m_eWorks = eWorks.A;
             public SnapInfo m_snapInfo = new SnapInfo(eWorks.A, 0, "", 0); 
             public LotInfo m_lotInfo = new LotInfo(0, "", "", false, false, 0, 0);
@@ -1299,7 +1148,6 @@ namespace Root_Pine2_Vision.Module
                 Run_Remote run = new Run_Remote(m_module);
                 run.m_eRemoteRun = m_eRemoteRun;
                 run.m_lightPower = m_lightPower.Clone();
-                run.m_sRecipe = m_sRecipe;
                 run.m_eWorks = m_eWorks;
                 run.m_lotInfo = m_lotInfo.Clone();
                 run.m_sortInfo = m_sortInfo.Clone();
@@ -1313,7 +1161,6 @@ namespace Root_Pine2_Vision.Module
                 switch (m_eRemoteRun)
                 {
                     case eRemoteRun.RunLight: m_lightPower.RunTree(tree.GetTree("Light Power", true, bVisible), bVisible); break;
-                    case eRemoteRun.SendRecipe: m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible); break;
                     case eRemoteRun.SendSnapInfo: m_snapInfo.RunTree(tree.GetTree("SnapInfo"), bVisible); break;
                     case eRemoteRun.SendLotInfo: m_lotInfo.RunTree(tree.GetTree("LotInfo"), bVisible); break;
                     case eRemoteRun.SendSortInfo: m_sortInfo.RunTree(tree.GetTree("SortInfo"), bVisible); break;
@@ -1329,7 +1176,6 @@ namespace Root_Pine2_Vision.Module
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
                     case eRemoteRun.RunLightOff: m_module.RunLightOff(); break;
-                    case eRemoteRun.SendRecipe: return m_module.SendRecipe(m_sRecipe);
                     case eRemoteRun.SendSnapInfo: return m_module.SendSnapInfo(m_snapInfo);
                     case eRemoteRun.SendLotInfo: return m_module.SendLotInfo(m_lotInfo);
                     case eRemoteRun.SendSortInfo: return m_module.SendSortInfo(m_sortInfo);
