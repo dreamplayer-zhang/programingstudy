@@ -84,9 +84,17 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Module\Recipe_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\Boat.cs" />
     <Compile Include="Module\IVision.cs" />
+    <Compile Include="Module\Recipe_UI.xaml.cs">
+      <DependentUpon>Recipe_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\Vision2D.cs" />
     <Compile Include="Module\Vision3D.cs" />
     <Compile Include="Module\VisionCCS.cs" />

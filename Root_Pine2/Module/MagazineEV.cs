@@ -581,8 +581,8 @@ namespace Root_Pine2.Module
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             p_sLED = "MGZ" + ((int)p_eMagazine).ToString();
-            if (m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down]) StartUnload();
-            if (m_elevator.m_bProduct[InfoStrip.eMagazinePos.Up]) StartUnload();
+            //if (m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down]) StartUnload();
+            //if (m_elevator.m_bProduct[InfoStrip.eMagazinePos.Up]) StartUnload();
             return p_sInfo;
         }
         #endregion

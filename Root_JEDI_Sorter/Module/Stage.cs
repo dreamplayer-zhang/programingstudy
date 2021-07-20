@@ -2,11 +2,6 @@
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Root_JEDI_Sorter.Module
 {
@@ -44,6 +39,35 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
+        #region InfoTray
+        InfoTray _infoTray = null; 
+        public InfoTray p_infoTray
+        {
+            get { return _infoTray; }
+            set
+            {
+                _infoTray = value;
+                OnPropertyChanged(); 
+            }
+        }
+        InfoTray _inspectTray = null;
+        public InfoTray p_inspectTray
+        {
+            get { return _inspectTray; }
+            set
+            {
+                _inspectTray = value;
+                OnPropertyChanged();
+            }
+        }
+        #endregion
+
+        public void Reset()
+        {
+            p_infoTray = null;
+            p_inspectTray = null;
+        }
+
         public string p_id { get; set; }
         public Stage(string id)
         {
@@ -52,7 +76,6 @@ namespace Root_JEDI_Sorter.Module
 
         public void ThreadStop()
         {
-
         }
     }
 }

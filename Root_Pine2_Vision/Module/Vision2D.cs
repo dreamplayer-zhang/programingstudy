@@ -170,6 +170,8 @@ namespace Root_Pine2_Vision.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendLotInfo, eRemote.Client, lotInfo);
             else
             {
+                m_RunningRecipe[eWorks.A].RecipeOpen(lotInfo.m_sRecipe);
+                m_RunningRecipe[eWorks.B].RecipeOpen(lotInfo.m_sRecipe);
                 string sRunA = m_aWorks[eWorks.A].SendLotInfo(lotInfo);
                 string sRunB = m_aWorks[eWorks.B].SendLotInfo(lotInfo);
                 if ((sRunA == "OK") && (sRunB == "OK")) return "OK";
@@ -400,13 +402,6 @@ namespace Root_Pine2_Vision.Module
                     return data;
                 }
 
-                public CPoint GetMemoryOffset()
-                {
-                    CPoint cp = new CPoint(m_cpMemory);
-                    //if (m_eDirection == eDirection.Backward) cp.Y += m_vision.m_nLine;
-                    return cp;
-                }
-
                 public void RunTree(Tree tree, bool bVisible, bool bReadOnly = false)
                 {
                     RunTreeStage(tree.GetTree("Stage", true, bVisible), bVisible, bReadOnly);
@@ -546,17 +541,6 @@ namespace Root_Pine2_Vision.Module
             }
 
             public eWorks m_eWorks = eWorks.A;
-
-            public Recipe Clone()
-            {
-                Recipe recipe = new Recipe(m_vision, m_eWorks);
-                recipe.m_eWorks = m_eWorks;
-                recipe.m_sRecipe = m_sRecipe;
-                recipe.m_lightPowerRGB = m_lightPowerRGB.Clone();
-                recipe.m_lightPowerAPS = m_lightPowerAPS.Clone();
-                foreach (Snap snap in m_aSnap) recipe.m_aSnap.Add(snap.Clone());
-                return recipe;
-            }
 
             const string c_sExt = ".pine2";
             public void RecipeSave(string sRecipe)

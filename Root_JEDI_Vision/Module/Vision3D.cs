@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_JEDI_Sorter.Module;
+using RootTools;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;

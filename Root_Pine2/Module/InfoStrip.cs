@@ -93,7 +93,7 @@ namespace Root_Pine2.Module
         public int p_iStrip { get; set; }
         public InfoStrip(int iStrip)
         {
-            InitInspect(); 
+            InitInspect();
             p_eMagazine = eMagazine.Magazine0; 
             p_iStrip = iStrip;
             p_id = iStrip.ToString("0000"); 
@@ -127,6 +127,7 @@ namespace Root_Pine2.Module
         public string m_sLED; 
         public InfoStrip(eMagazine eMagazine, eMagazinePos eMagazinePos, int iBundle, int iStrip)
         {
+            InitInspect();
             p_eMagazine = eMagazine;
             p_eMagazinePos = eMagazinePos;
             m_iBundle = iBundle; 
