@@ -500,17 +500,26 @@ namespace Root_Pine2_Vision.Module
                         m_aSnap[i].m_dpAxis = new RPoint(dStageXOffset, 0);
                         m_aSnap[i].m_nOverlap = nOverlap;
 
-                        if (nSnapLineIndex % 2 == 0)  // 정방향
+                        if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen)
                         {
-                            m_aSnap[i].m_eDirection = Snap.eDirection.Forward;
-
-                            //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, 0);
+                            if (m_vision.m_bUseBiDirectional == true)
+                            {
+                                if (nSnapLineIndex % 2 == 0)  // 정방향
+                                    m_aSnap[i].m_eDirection = Snap.eDirection.Forward;
+                                else  // 역방향
+                                    m_aSnap[i].m_eDirection = Snap.eDirection.Backward;
+                            }
+                            else
+                            {
+                                m_aSnap[i].m_eDirection = Snap.eDirection.Forward;
+                            }
                         }
-                        else  // 역방향
+                        else
                         {
-                            m_aSnap[i].m_eDirection = Snap.eDirection.Backward/*Forward*/;
-                          
-                            //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
+                            if (nSnapLineIndex % 2 == 0)  // 정방향
+                                m_aSnap[i].m_eDirection = Snap.eDirection.Forward;
+                            else  // 역방향
+                                m_aSnap[i].m_eDirection = Snap.eDirection.Backward;
                         }
 
                         if (p_eSnapMode == eSnapMode.RGB)
@@ -899,9 +908,9 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public string ReqSnap(string sRecipe, eWorks eWorks)
+        public string ReqSnap(string sRecipe, eWorks eWorks, bool bBiDirectionalScan = true)
         {
-            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString() + "," + bBiDirectionalScan.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             while (sSend != m_sReceive)
@@ -1299,7 +1308,7 @@ namespace Root_Pine2_Vision.Module
                     SnapInfo snapInfo = new SnapInfo(m_eWorks, nSnapMode, "0000", nSnapCount); 
                     m_module.SendSnapInfo(snapInfo); 
                 }
-                return m_module.ReqSnap(m_sRecipe, m_eWorks);
+                return m_module.ReqSnap(m_sRecipe, m_eWorks, m_module.m_bUseBiDirectional);
 
                 //m_module.m_recipe[m_eWorks].RecipeOpen(m_sRecipe);                  // 1. Root Vision Recipe Open
 
