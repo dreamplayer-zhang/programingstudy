@@ -65,6 +65,7 @@ namespace Root_Pine2.Module
             m_axis.AddPos(GetPosString(eWorks.B));
             m_axis.AddPos(ePosTransfer.Transfer0.ToString());
             m_axis.AddPos(ePosTransfer.Transfer7.ToString());
+            m_axis.AddPos(ePosTray.Tray0.ToString());
             m_axis.AddPos(ePosTray.Tray7.ToString());
             m_axis.p_axisZ.AddPos(c_sPosUp);
         }
