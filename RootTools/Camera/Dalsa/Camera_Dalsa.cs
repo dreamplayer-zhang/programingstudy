@@ -275,8 +275,8 @@ namespace RootTools.Camera.Dalsa
 
         void RunCameraConfig(Tree tree, bool bVisible)
         {
-            //p_CamParam.p_eUserSetPowerup = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetPowerup, p_CamParam.p_eUserSetPowerup, "Power-up UserSet", "Selects the UserSet Configuration Set on camera power-up or reset", bVisible);
-            //p_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetCurrent, p_CamParam.p_eUserSetCurrent, "Current UserSet", "Selects and Current UserSet", bVisible);
+            p_CamParam.p_eUserSetPowerup = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetPowerup, p_CamParam.p_eUserSetPowerup, "Power-up UserSet", "Selects the UserSet Configuration Set on camera power-up or reset", bVisible);
+            p_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetCurrent, p_CamParam.p_eUserSetCurrent, "Current UserSet", "Selects and Current UserSet", bVisible);
             //p_CamParam.p_nRotaryEncoderMultiplier = tree.Set(p_CamParam.p_nRotaryEncoderMultiplier, p_CamParam.p_nRotaryEncoderMultiplier, "RotaryEncoderMultiplier", "Specifies a multiplication factor for the rotary encoder output pulse generator", bVisible);
             //p_CamParam.p_nRotaryEncoderDivider = tree.Set(p_CamParam.p_nRotaryEncoderDivider, p_CamParam.p_nRotaryEncoderDivider, "RotaryEncoderDivider", "Specifies a division factor for the rotary encoder output pulse generator", bVisible);
         }
@@ -538,15 +538,16 @@ namespace RootTools.Camera.Dalsa
                 m_BlueMemPtr = m_Memory.GetPtr(2);
             }
 
-            m_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)m_GD.nUserSet;
+            if (enableCameraconfig)
+                m_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)m_GD.nUserSet;
 
             if (Scandir == true) //ybkwon0113
             {
-                p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Forward);
+                //p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Forward);
             }
             else
             {
-                p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Reverse);
+                //p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Reverse);
             }
 
             m_cpScanOffset = cpScanOffset;
