@@ -89,7 +89,7 @@ namespace Root_Pine2.Module
             while (m_bThread)
             {
                 Thread.Sleep(10);
-                if ((p_infoStrip == null) || (m_dioVacuum.p_bOut == false) && m_dioVacuum.p_bIn) sw.Start(); 
+                if ((p_infoStrip == null) || (m_dioVacuum.p_bOut == false) || m_dioVacuum.p_bIn) sw.Start(); 
                 m_alidDrop.p_bSet = (sw.ElapsedMilliseconds > (int)(1000 * m_secDrop));
             }
         }

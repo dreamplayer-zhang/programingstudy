@@ -258,6 +258,10 @@
     <Compile Include="Converter\TextBoxToIntConverter.cs" />
     <Compile Include="Converter\ValueToColorConverter.cs" />
     <Compile Include="Converter\ValueToUIValueConverter.cs" />
+    <Compile Include="ManualJobSchedule.cs" />
+    <Compile Include="ManualJobSchedule_UI.xaml.cs">
+      <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\OPERATION\Loadport_UI.xaml.cs">
       <DependentUpon>Loadport_UI.xaml</DependentUpon>
     </Compile>
@@ -454,6 +458,10 @@
     <Page Include="Engineer\WindII_ToolBox_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ManualJobSchedule_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\OPERATION\Loadport_UI.xaml">
       <Generator>MSBuild:Compile</Generator>

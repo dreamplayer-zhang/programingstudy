@@ -603,7 +603,11 @@ namespace Root_Pine2.Module
             p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
             RunTreeVisionOption(tree.GetTree("VisionOption"));
             m_printer.RunTree(tree.GetTree("Printer"));
-            RunTreePickerSet(tree.GetTree("PickerSet")); 
+            RunTreePickerSet(tree.GetTree("PickerSet"));
+            if (m_handler.m_aBoats.Count == 0) return; 
+            m_handler.m_aBoats[eVision.Top3D]?.RunTreeClean(tree.GetTree("Top3D Clean"));
+            m_handler.m_aBoats[eVision.Top2D]?.RunTreeClean(tree.GetTree("Top2D Clean"));
+            m_handler.m_aBoats[eVision.Bottom]?.RunTreeClean(tree.GetTree("Bottom Clean"));
         }
         #endregion
 

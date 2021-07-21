@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Rinse_Loader.Engineer;
+using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
@@ -555,6 +556,7 @@ namespace Root_Rinse_Loader.Module
                             {
                                 m_alidUnloadError.p_bSet = true;
                                 EQ.p_eState = EQ.eState.Error;
+                                m_handler.Reset(); 
                             }
                             break;
                         case eCmd.StripReceive:
@@ -677,9 +679,11 @@ namespace Root_Rinse_Loader.Module
             base.Reset();
         }
 
+        RinseL_Handler m_handler; 
         public RinseL(string id, IEngineer engineer)
         {
             p_id = id;
+            m_handler = (RinseL_Handler)engineer.ClassHandler(); 
             InitBase(id, engineer);
 
             InitThread();

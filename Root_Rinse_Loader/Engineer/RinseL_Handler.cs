@@ -147,12 +147,11 @@ namespace Root_Rinse_Loader.Engineer
 
         public string AddSequence(dynamic infoSlot)
         {
-            throw new NotImplementedException();
+            return "OK";
         }
 
         public void CalcSequence()
         {
-            throw new NotImplementedException();
         }
         public RnRData GetRnRData() { return null; }
         public void UpdateEvent() { return; }

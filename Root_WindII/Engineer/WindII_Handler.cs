@@ -6,8 +6,11 @@ using RootTools.Gem;
 using RootTools.Module;
 using RootTools.OHTNew;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -51,6 +54,9 @@ namespace Root_WindII.Engineer
             get => m_visionFront;
             set => SetProperty(ref m_visionFront, value);
         }
+        public bool bLoad = false;
+
+
 
         void InitModule()
         {
@@ -72,7 +78,7 @@ namespace Root_WindII.Engineer
             iWTR.ReadInfoReticle_Registry();
             m_recipe = new EFEM_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR, p_aLoadport);
             CalcRecover();
         }
 
@@ -126,7 +132,20 @@ namespace Root_WindII.Engineer
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
-        List<ILoadport> m_aLoadport = new List<ILoadport>();
+        List<ILoadport> m_ILoadport = new List<ILoadport>();
+        public ObservableCollection<ILoadport> m_aLoadport = new ObservableCollection<ILoadport>();
+        public ObservableCollection<ILoadport> p_aLoadport
+        {
+            get
+            {
+                return m_aLoadport;
+            }
+            set
+            {
+                SetProperty(ref m_aLoadport, value);
+            }
+        }
+
         int m_lLoadport = 2;
         void InitLoadport()
         {
@@ -494,6 +513,10 @@ namespace Root_WindII.Engineer
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
+                    case EQ.eState.Ready:
+                        if (bLoad && !IsEnableRecovery())
+                            CheckLoad();
+                        break;
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
@@ -511,6 +534,26 @@ namespace Root_WindII.Engineer
             }
         }
         #endregion
+
+        void CheckLoad()
+        {
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+                {
+                    //Queue<EFEM_Process.Sequence> sequence = m_process.m_qSequence;
+                    if (m_process.p_qSequence.Count != 0) return;
+                    InfoCarrier infoCarrier = loadport.p_infoCarrier;
+                    Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        bLoad = false;
+                        ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
+                        manualJobSchedule.ShowPopup();
+                        m_process.MakeRnRSeq();
+                    });
+                }
+            }
+        }
 
         #region Tree
         public void RunTreeModule(Tree tree)

@@ -88,6 +88,7 @@ namespace Root_CAMELLIA.Module
             m_CalcThicknessDone = false;
             MeasureDone = false;
             MarsLogManager marsLogManager = MarsLogManager.Instance;
+            Met.Nanoview nanoView = App.m_nanoView;
             //isEQStop = false;
             StopWatch sw = new StopWatch();
             int nThicknessCnt = 0;
@@ -99,7 +100,7 @@ namespace Root_CAMELLIA.Module
             {
                 MeasureItem item;
                 bool useAlphafit = true;
-                
+
                 if (m_isPM)
                 {
                     useAlphafit = m_isAlphaFit;
@@ -141,7 +142,7 @@ namespace Root_CAMELLIA.Module
                         nDataIndex = nTotalRawDataIndex - 1;
                         //nDataIndex = item.m_index;
 
-                        Met.Nanoview.ERRORCODE_NANOVIEW rst = App.m_nanoView.GetThickness(nDataIndex, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor, sMeasurePoint, m_mwvm.SettingViewModel.p_ExceptNIR, useAlphafit);
+                        Met.Nanoview.ERRORCODE_NANOVIEW rst = nanoView.GetThickness(nDataIndex, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor, sMeasurePoint, m_mwvm.SettingViewModel.p_CalDCOLTransmittance, useAlphafit);
                         if (rst != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                         {
                             //string NANOVIEWERRORCODE =  rst.ToString();
@@ -149,7 +150,7 @@ namespace Root_CAMELLIA.Module
                         }
                         if (m_isPM)
                         {
-                            m_mwvm.EngineerViewModel.p_pmParameter.p_alpha1 = App.m_nanoView.GetAlphaFit();
+                            m_mwvm.EngineerViewModel.p_pmParameter.p_alpha1 = nanoView.GetAlphaFit();
                         }
                     }
 
@@ -165,7 +166,7 @@ namespace Root_CAMELLIA.Module
                     //    m_DataManager.recipeDM.MeasurementRD.LowerWaveLength,
                     //    m_DataManager.recipeDM.MeasurementRD.UpperWaveLength);
                     string sSlotSpectraDataPath = string.Empty;
-                    if (nRepeatCount ==1)
+                    if (nRepeatCount == 1)
                     {
                         int nDataNum = item.m_index + 1;
                         sSlotSpectraDataPath = m_resultDataSavePath[0] + "\\Slot." + m_module.p_infoWafer.m_nSlot + 1 + "\\SpectraData" + "\\" + nDataNum.ToString() + "_" + DateTime.Now.ToString("HHmmss");
@@ -178,7 +179,7 @@ namespace Root_CAMELLIA.Module
 
                     }
                     LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(sSlotSpectraDataPath, m_module.p_infoWafer, m_DataManager.recipeDM, nDataIndex, item.m_index);
-                    
+
                     //SaveRT
                     LibSR_Met.DataManager.GetInstance().SaveRT(m_historyRTDataPath + "\\" + item.m_index + "_" + DateTime.Now.ToString("HHmmss") + "RawData.csv", item.m_index);
 
@@ -207,7 +208,7 @@ namespace Root_CAMELLIA.Module
         string m_slotSpectraDataPath = "";
         string m_historyRTDataPath = "";
         string[] m_resultDataSavePath = new string[100];
-        
+
         private bool MakeSaveDirectory(int nRepeatCount)
         {
             string rootPath = m_module.p_dataSavePath;
@@ -265,9 +266,9 @@ namespace Root_CAMELLIA.Module
             {
                 return false;
             }
-          
+
             return true;
-        } 
+        }
         public override string Run()
         {
             m_module.p_processStartDate = DateTime.Now.ToString("MM\\/dd\\/yyyy");
@@ -281,11 +282,13 @@ namespace Root_CAMELLIA.Module
 
             string deviceID = BaseDefine.LOG_DEVICE_ID;
 
+            Met.Nanoview nanoView = App.m_nanoView;
+
             StopWatch test = new StopWatch();
             test.Start();
             m_log.Warn("Measure Start >> ");
 
-            
+
             Axis axisLifter = m_module.p_axisLifter;
             if (m_module.LifterDown() != "OK")
             {
@@ -349,7 +352,7 @@ namespace Root_CAMELLIA.Module
                 int nRepeatCount = m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount;
                 LibSR_Met.DataManager.GetInstance().nRepeatCount = nRepeatCount;
                 LibSR_Met.DataManager.GetInstance().nPointCount = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count;
-                
+
                 if (!MakeSaveDirectory(nRepeatCount))
                 {
                     return "Make Directory Error";
@@ -389,12 +392,12 @@ namespace Root_CAMELLIA.Module
 
                     }
 
-                    for(int cnt = 0; cnt < m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount; cnt++)
+                    for (int cnt = 0; cnt < m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount; cnt++)
                     {
                         string sMeasureIndex = string.Empty;
                         if (m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount == 1)
                         {
-                            nTotalRawDataIndex = i+1;
+                            nTotalRawDataIndex = i + 1;
                             sMeasureIndex = nTotalRawDataIndex.ToString();
                         }
                         else
@@ -404,11 +407,11 @@ namespace Root_CAMELLIA.Module
                             sMeasureIndex += (i + 1).ToString();
                             sMeasureIndex += "-" + (cnt + 1).ToString();
                         }
-                        
+
                         dataFormatter.AddData("Measure Repeat", m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount);
                         marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Measure", SSLNet.STATUS.START);
                         Thread.Sleep(10);
-                        Met.Nanoview.ERRORCODE_NANOVIEW rst = App.m_nanoView.SampleMeasure((nTotalRawDataIndex-1), x, y,
+                        Met.Nanoview.ERRORCODE_NANOVIEW rst = nanoView.SampleMeasure((nTotalRawDataIndex - 1), x, y,
         m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
         m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength, sMeasureIndex);
                         if (rst != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
@@ -418,7 +421,7 @@ namespace Root_CAMELLIA.Module
                             {
                                 m_log.Warn("Unknown Error");
                             }
-                            else if(rst == Met. Nanoview.ERRORCODE_NANOVIEW.NANOVIEW_ERROR)
+                            else if (rst == Met.Nanoview.ERRORCODE_NANOVIEW.NANOVIEW_ERROR)
                             {
                                 m_log.Warn("NANOVIEW_ERROR_NOT_FOUND_BETA_FILE");
                                 // Init Calibration 시퀀스 추가 필요
@@ -427,26 +430,28 @@ namespace Root_CAMELLIA.Module
                             {
                                 m_log.Warn(Enum.GetName(typeof(Met.Nanoview.ERRORCODE_NANOVIEW), rst));
                             }
-                           
+
                             for (int re = 0; re < 5; re++)
                             {
-                                rst = App.m_nanoView.SampleMeasure((nTotalRawDataIndex - 1), x, y,
+                                if (EQ.IsStop())
+                                    return "Stop";
+                                rst = nanoView.SampleMeasure((nTotalRawDataIndex - 1), x, y,
        m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
        m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength, sMeasureIndex);
-                                
+
                                 if (rst != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                                 {
-                                    
+
                                     string NANOVIEWERRORCODE = rst.ToString();
-                                    m_log.Warn(sMeasureIndex + " RE-SNAP FAIL" + ":" + (re+1).ToString() + NANOVIEWERRORCODE);
+                                    m_log.Warn(sMeasureIndex + " RE-SNAP FAIL" + ":" + (re + 1).ToString() + NANOVIEWERRORCODE);
                                 }
                                 else
                                 {
-                                    m_log.Warn(sMeasureIndex + " RE-SNAP DONE" + ":" +(re+1).ToString());
+                                    m_log.Warn(sMeasureIndex + " RE-SNAP DONE" + ":" + (re + 1).ToString());
                                     break;
                                 }
                             }
-                           
+
                         }
                         marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Measure", SSLNet.STATUS.END);
                         dataFormatter.ClearData();
@@ -458,7 +463,7 @@ namespace Root_CAMELLIA.Module
 
                         thicknessQueue.Enqueue(new MeasureItem(i, cnt));
                     }
-                  
+
 
                     if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
                     {
@@ -513,7 +518,7 @@ namespace Root_CAMELLIA.Module
                     return "Make Directory Error";
                 }
 
-                if (App.m_nanoView.SampleMeasure(0, m_ptMeasure.X, m_ptMeasure.Y,
+                if (nanoView.SampleMeasure(0, m_ptMeasure.X, m_ptMeasure.Y,
                       m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
                       m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
@@ -552,38 +557,38 @@ namespace Root_CAMELLIA.Module
             {
                 SaveSlotData(1);
             }
-                //// 레드로 빼버림?  contour는 일단 보류..
-                //LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
-                ////m_mwvm.p_ContourMapGraph.InitializeContourMap();
-                //// m_mwvm.p_ContourMapGraph.DrawAllDatas();
-                ////  DCOL 세이브 필요
-                ////if(m_module.p_infoWafer != null)
-                ////{
-                //LibSR_Met.DataManager MetData = LibSR_Met.DataManager.GetInstance();
-                //foreach (LibSR_Met.ContourMapData mapdata in MetData.m_ContourMapDataR)
-                //    LibSR_Met.DataManager.GetInstance().SaveContourMapData(m_slotContourMapPath + "\\R_" + mapdata.Wavelength.ToString() + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", mapdata);
+            //// 레드로 빼버림?  contour는 일단 보류..
+            //LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
+            ////m_mwvm.p_ContourMapGraph.InitializeContourMap();
+            //// m_mwvm.p_ContourMapGraph.DrawAllDatas();
+            ////  DCOL 세이브 필요
+            ////if(m_module.p_infoWafer != null)
+            ////{
+            //LibSR_Met.DataManager MetData = LibSR_Met.DataManager.GetInstance();
+            //foreach (LibSR_Met.ContourMapData mapdata in MetData.m_ContourMapDataR)
+            //    LibSR_Met.DataManager.GetInstance().SaveContourMapData(m_slotContourMapPath + "\\R_" + mapdata.Wavelength.ToString() + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", mapdata);
 
-                //foreach (LibSR_Met.ContourMapData mapdata in MetData.m_ContourMapDataT)
-                //    LibSR_Met.DataManager.GetInstance().SaveContourMapData(m_slotContourMapPath + "\\T_" + mapdata.Wavelength.ToString() + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", mapdata);
-                //for (int n = 1; n < MetData.m_LayerData.Count - 1; n++)
-                //{
-                //    string sLayerName = "";
-                //    for (int s = 0; s < MetData.m_LayerData[n].hostname.Length; s++)
-                //    {
-                //        sLayerName += MetData.m_LayerData[n].hostname[s];
-                //    }
-                //    LibSR_Met.DataManager.GetInstance().SaveCotourMapThicknessData(m_slotContourMapPath + "\\" + n.ToString() + "Layer_" + sLayerName + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", n, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
-                //}
+            //foreach (LibSR_Met.ContourMapData mapdata in MetData.m_ContourMapDataT)
+            //    LibSR_Met.DataManager.GetInstance().SaveContourMapData(m_slotContourMapPath + "\\T_" + mapdata.Wavelength.ToString() + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", mapdata);
+            //for (int n = 1; n < MetData.m_LayerData.Count - 1; n++)
+            //{
+            //    string sLayerName = "";
+            //    for (int s = 0; s < MetData.m_LayerData[n].hostname.Length; s++)
+            //    {
+            //        sLayerName += MetData.m_LayerData[n].hostname[s];
+            //    }
+            //    LibSR_Met.DataManager.GetInstance().SaveCotourMapThicknessData(m_slotContourMapPath + "\\" + n.ToString() + "Layer_" + sLayerName + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", n, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
+            //}
 
-                //if (m_module.p_infoWafer != null)
-                //{
-                //    LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(m_summaryPath + "\\" + DateTime.Now.ToString("HHmmss") + "Summary.csv", m_module.p_infoWafer.p_sLotID, m_module.p_infoWafer.p_sSlotID, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
+            //if (m_module.p_infoWafer != null)
+            //{
+            //    LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(m_summaryPath + "\\" + DateTime.Now.ToString("HHmmss") + "Summary.csv", m_module.p_infoWafer.p_sLotID, m_module.p_infoWafer.p_sSlotID, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
 
-                //}
-                //else
-                //{
-                //    LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(m_summaryPath + "\\" + DateTime.Now.ToString("HHmmss") + "Summary.csv", "NoInfowaferLot", "NoInfowaferSlot", m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
-                //}
+            //}
+            //else
+            //{
+            //    LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(m_summaryPath + "\\" + DateTime.Now.ToString("HHmmss") + "Summary.csv", "NoInfowaferLot", "NoInfowaferSlot", m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
+            //}
 
             marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, MATERIAL_TYPE.WAFER, "Measure", (int)BaseDefine.Process.Measure);
             marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, MATERIAL_TYPE.WAFER, this.p_id, 0);
@@ -877,7 +882,7 @@ namespace Root_CAMELLIA.Module
 
         private void SendDCOLMSG(string path)
         {
-            if (!m_module.m_engineer.p_bUseXGem)
+            if (App.m_engineer.ClassGem() == null || App.m_engineer.ClassGem().p_eControl != XGem.eControl.ONLINEREMOTE)
                 return;
             DCOL_Set_Data();
             DCOL_SCVFile_Parsing(path);
@@ -1089,6 +1094,7 @@ namespace Root_CAMELLIA.Module
 
         private bool SaveSlotData(int nRepeatCount)
         {
+            LibSR_Met.DataManager m_Met = LibSR_Met.DataManager.GetInstance();
             int nTotalRawDataIndex = 0;
             int nPointIndex = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count;
             if (nRepeatCount == 1)
@@ -1101,22 +1107,25 @@ namespace Root_CAMELLIA.Module
                 nTotalRawDataIndex = Convert.ToInt32(m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count * nRepeatCount);
             }
             LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance, nTotalRawDataIndex);
-            
-            // DCOL DATA Save 추가하기
 
+            // DCOL DATA Save 추가하기
+            string sDCOLDataPath = m_resultDataSavePath[0] + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + ".csv";
+            m_Met.SaveResultFileDCOL(sDCOLDataPath, m_module.p_infoWafer, m_DataManager.recipeDM, nTotalRawDataIndex);
+
+            SendDCOLMSG(sDCOLDataPath);  //추가 DCOL
             try
             {
                 if (m_module.p_infoWafer == null)
                 {
                     return false;
                 }
-                LibSR_Met.DataManager m_Met = LibSR_Met.DataManager.GetInstance();
+                //LibSR_Met.DataManager m_Met = LibSR_Met.DataManager.GetInstance();
                 //string sDCOLDataPath = m_resultDataSavePath[0] + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + ".csv";
                 //m_Met.SaveResultFileDCOL(sDCOLDataPath, m_module.p_infoWafer, m_DataManager.recipeDM, nPointIndex);
                 if (nRepeatCount == 1)
                 {
 
-                   
+
                     string sSlotContourMapPath = m_slotContourMapPath + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + "_ContourMapData";
 
                     // ContourMap foder fail Save
@@ -1133,10 +1142,10 @@ namespace Root_CAMELLIA.Module
                         }
                         m_Met.SaveCotourMapThicknessData(sSlotContourMapPath + "_THK_" + n.ToString() + "Layer_" + sLayerName + ".csv", n, nPointIndex, nRepeatCount, 1);
                     }
-                    string sDCOLDataPath = m_resultDataSavePath[0] + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + ".csv";
-                    m_Met.SaveResultFileDCOL(sDCOLDataPath, m_module.p_infoWafer, m_DataManager.recipeDM, nPointIndex);
+                    //string sDCOLDataPath = m_resultDataSavePath[0] + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + ".csv";
+                    //m_Met.SaveResultFileDCOL(sDCOLDataPath, m_module.p_infoWafer, m_DataManager.recipeDM, nPointIndex);
 
-                    SendDCOLMSG(sDCOLDataPath);  //추가 DCOL
+                    //SendDCOLMSG(sDCOLDataPath);  //추가 DCOL
 
                     // 함수 인자 정리 하기 Slot 파일 처럼
                     string sSummartPath = m_summaryPath + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + "_Summary" + m_module.p_infoWafer.p_sSlotID + ".csv";
@@ -1150,9 +1159,9 @@ namespace Root_CAMELLIA.Module
                 {
                     // 여기서의 nPointIndex는 Repeat * WaferMeasure Point 개수라는 뜻 (다시 확인해서 수정 필요)
                     int nTotalPointIndex = Convert.ToInt32(m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count * nRepeatCount);
-                    for (int cnt = 0; cnt< nRepeatCount; cnt++)
+                    for (int cnt = 0; cnt < nRepeatCount; cnt++)
                     {
-                        
+
                         string sSlotContourMapPath = m_resultDataSavePath[cnt] + "\\Slot." + m_module.p_infoWafer.m_nSlot + 1 + "\\ContourMap" + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + "_ContourMapData";
                         // ContourMap foder fail Save
                         foreach (LibSR_Met.ContourMapData mapdata in m_Met.m_ContourMapDataR)
@@ -1170,16 +1179,16 @@ namespace Root_CAMELLIA.Module
                         }
                         string sSummartPath = m_resultDataSavePath[cnt] + "\\ResultData_Summary" + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + "_Summary" + m_module.p_infoWafer.p_sSlotID + ".csv";
                         m_Met.SaveResultFileSummary(sSummartPath, m_module.p_infoWafer.p_sLotID, m_module.p_infoWafer.p_sSlotID, nTotalPointIndex, nRepeatCount, cnt);
-                        
-                        string sDCOLDataPath = m_resultDataSavePath[cnt] + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + ".csv";
-                        m_Met.SaveResultFileDCOL(sDCOLDataPath, m_module.p_infoWafer, m_DataManager.recipeDM, nTotalPointIndex, nRepeatCount, cnt);
-                        SendDCOLMSG(sDCOLDataPath); //추가 DCOL
+
+                        //string sDCOLDataPath = m_resultDataSavePath[cnt] + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + ".csv";
+                        //m_Met.SaveResultFileDCOL(sDCOLDataPath, m_module.p_infoWafer, m_DataManager.recipeDM, nTotalPointIndex, nRepeatCount, cnt);
+                        //SendDCOLMSG(sDCOLDataPath); //추가 DCOL
 
                         if (m_module.p_infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer || m_module.p_infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer)
                         {
                             m_Met.m_LotDataPath[cnt] = m_resultDataSavePath[cnt] + "\\ResultData" + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + ".csv";
                         }
-                       
+
                         m_Met.SaveResultFileLot(m_Met.m_LotDataPath[cnt], m_module.p_infoWafer, m_DataManager.recipeDM, nTotalPointIndex, nRepeatCount, cnt);
                     }
                 }

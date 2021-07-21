@@ -323,12 +323,13 @@ namespace Root_WindII
             DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
             DatabaseManager.Instance.ValidateDatabase();
             OperationUI = new Operation_UI();
+            OperationVM.Init();
 
             //logView.Init(LogView._logView);
             //InitTimer();
-        }
+    }
 
-        private void CreateGlobalPaths()
+    private void CreateGlobalPaths()
         {
             Type t = typeof(Constants.RootPath);
             FieldInfo[] fields = t.GetFields(BindingFlags.Static | BindingFlags.Public);

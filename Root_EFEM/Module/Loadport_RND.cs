@@ -257,14 +257,18 @@ namespace Root_EFEM.Module
             if (!m_diDoorOpen.p_bIn)
                 return "Door Not Opened";
 
-            if (m_engineer.ClassGem().p_bOffline)
+            if (m_engineer.ClassGem() != null)
             {
-                MarsLogManager marsLogManager = MarsLogManager.Instance;
-                marsLogManager.ChangeMaterialSlot(EQ.p_nRunLP, wafer.m_nSlot + 1);
+
+                if (m_engineer.ClassGem().p_bOffline)
+                {
+                    MarsLogManager marsLogManager = MarsLogManager.Instance;
+                    marsLogManager.ChangeMaterialSlot(EQ.p_nRunLP, wafer.m_nSlot + 1);
+                }
+                if (wafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer || wafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer)
+                    MarsLogManager.Instance.WriteLEH(EQ.p_nRunLP, p_infoCarrier.p_sLocID, SSLNet.LEH_EVENTID.PROCESS_JOB_START, EQ.p_nRunLP == 0 ? MarsLogManager.Instance.m_flowDataA : MarsLogManager.Instance.m_flowDataB
+                        , EQ.p_nRunLP == 0 ? MarsLogManager.Instance.m_dataFormatterA : MarsLogManager.Instance.m_dataFormatterB);
             }
-            if(wafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer || wafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer)
-                MarsLogManager.Instance.WriteLEH(EQ.p_nRunLP, p_infoCarrier.p_sLocID, SSLNet.LEH_EVENTID.PROCESS_JOB_START, EQ.p_nRunLP == 0 ? MarsLogManager.Instance.m_flowDataA : MarsLogManager.Instance.m_flowDataB
-                    , EQ.p_nRunLP == 0 ? MarsLogManager.Instance.m_dataFormatterA : MarsLogManager.Instance.m_dataFormatterB);
             return IsRunOK();
         }
 
@@ -950,6 +954,8 @@ namespace Root_EFEM.Module
                     int firstIdx = -1;
                     int lastIdx = -1;
 
+                    if (rnrData == null)
+                        return "OK";
                     foreach (int sel in rnrData.SelectSlot)
                     {
                         m_infoCarrier.m_aGemSlot[sel].p_eState = GemSlotBase.eState.Select;

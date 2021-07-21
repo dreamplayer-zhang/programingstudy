@@ -119,6 +119,14 @@ namespace Root_Pine2_Vision.Module
             return protocol.WaitReply(m_secTimeout);
         }
 
+        public string SendReset()
+        {
+            if (m_bStartProcess == false) return "OK";
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.Reset);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitReply(m_secTimeout);
+        }
+
         void ThreadSend()
         {
             if (m_protocolSend != null) return;
@@ -240,8 +248,8 @@ namespace Root_Pine2_Vision.Module
 
         public void Reset()
         {
+            m_qProtocol.Clear();
             m_protocolSend = null;
-            m_qProtocol.Clear(); 
         }
 
         public void RunTree(Tree tree)
