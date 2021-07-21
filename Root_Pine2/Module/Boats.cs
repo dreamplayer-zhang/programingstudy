@@ -212,7 +212,7 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Snap
-        public string StartSnap(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan)
+        public string StartSnap(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan = true)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
             run.m_eWorks = eWorks;
@@ -408,7 +408,7 @@ namespace Root_Pine2.Module
                 eWorks eWorks = (asRead[3] == "A") ? eWorks.A : eWorks.B;
                 m_aBoat[eWorks].p_sRecipe = ""; 
                 m_aBoat[eWorks].p_sRecipe = sRecipe;
-                bool bBiDirectionalScan = asRead[4];
+                bool bBiDirectionalScan = (asRead[4] == "true") ? true : false;
                 StartSnap(eWorks, true, bBiDirectionalScan);
                 m_tcpRequest.Send(sRead);
             }
