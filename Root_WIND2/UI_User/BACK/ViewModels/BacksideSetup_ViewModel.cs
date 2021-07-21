@@ -242,6 +242,14 @@ namespace Root_WIND2.UI_User
 
             });
         }
+
+        public ICommand btnClearROICommand
+        {
+            get => new RelayCommand(() =>
+             {
+                 this.ImageViewerVM.ClearMapRectList();
+             });
+        }
         #endregion
 
 

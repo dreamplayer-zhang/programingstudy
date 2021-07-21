@@ -1,4 +1,5 @@
 ﻿using RootTools.Module;
+using System.Collections.Generic;
 
 namespace RootTools
 {
@@ -16,6 +17,8 @@ namespace RootTools
 
         dynamic GetGemSlot(string sSlot);
 
+        RnRData GetRnRData();
+        void UpdateEvent();
         ModuleList p_moduleList { get; set; }
 
         //ILoadport 

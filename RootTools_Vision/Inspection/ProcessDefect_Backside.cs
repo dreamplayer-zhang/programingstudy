@@ -82,15 +82,28 @@ namespace RootTools_Vision
 
             List<Defect> DefectList = CollectDefectData();
 
-            //DeleteOutsideDefect(DefectList, waferCenterX, waferCenterY, radius, backsideOffset);
+            Settings settings = new Settings();
+            SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
 
-            List<Defect> mergeDefectList = MergeDefect(DefectList, mergeDist);
 
-            foreach (Defect defect in mergeDefectList)
+            List<Defect> mergeDefectList;
+
+            if (param.UseMergeDefect == true)
             {
-                defect.CalcAbsToRelPos(waferCenterX, waferCenterY);
+                mergeDefectList = MergeDefect(DefectList, mergeDist);
+            }
+            else
+            {
+                mergeDefectList = DefectList;
             }
 
+            int index = 0;
+            foreach (Defect defect in mergeDefectList)
+            {
+                defect.m_nDefectIndex = index;
+                defect.CalcAbsToRelPos(waferCenterX, waferCenterY);
+                index++;
+            }
 
             //Workplace displayDefect = new Workplace();
             foreach (Defect defect in mergeDefectList)
@@ -99,9 +112,6 @@ namespace RootTools_Vision
                 this.currentWorkplace.DefectList.Add(defect);
             }
 
-
-            Settings settings = new Settings();
-            SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
             //Tools.SaveDefectImage(Path.Combine(DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferInfo.ByteCnt);
             
@@ -114,26 +124,6 @@ namespace RootTools_Vision
 
             //Tools.SaveDefectImage(Path.Combine(settings_backside.DefectImagePath, sInspectionID), mergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
             Tools.SaveDefectImageParallel(Path.Combine(settings_backside.DefectImagePath, sInspectionID), mergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
-
-            //if (settings_backside.UseKlarf)
-            //{
-            //    KlarfData_Lot klarfData = new KlarfData_Lot();
-            //    Directory.CreateDirectory(settings_backside.KlarfSavePath);
-
-            //    klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
-            //    klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-            //    klarfData.SetResultTimeStamp();
-
-            //    klarfData.SaveKlarf(settings_backside.KlarfSavePath, false);
-
-            //    Tools.SaveTiffImage(settings_backside.KlarfSavePath, klarfData.GetKlarfFileName(), MergeDefectList, this.currentWorkplace.SharedBufferInfo);
-
-            //    Tools.SaveImageJpg(this.currentWorkplace.SharedBufferInfo, 
-            //        new Rect(settings_backside.WholeWaferImageStartX, settings_backside.WholeWaferImageStartY, settings_backside.WholeWaferImageEndX, settings_backside.WholeWaferImageEndY),
-            //        settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg", 
-            //        (long)(settings_backside.WholeWaferImageCompressionRate * 100));
-            //}
-
 
 
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>()));

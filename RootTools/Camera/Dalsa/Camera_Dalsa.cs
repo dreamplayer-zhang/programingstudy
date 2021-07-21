@@ -538,16 +538,16 @@ namespace RootTools.Camera.Dalsa
                 m_BlueMemPtr = m_Memory.GetPtr(2);
             }
 
-            if (enableCameraconfig)
+            if(m_CamParam.p_eUserSetCurrent != (DalsaParameterSet.eUserSet)m_GD.nUserSet)
                 m_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)m_GD.nUserSet;
 
             if (Scandir == true) //ybkwon0113
             {
-                //p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Forward);
+                p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Forward);
             }
             else
             {
-                //p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Reverse);
+                p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Reverse);
             }
 
             m_cpScanOffset = cpScanOffset;

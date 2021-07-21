@@ -294,14 +294,22 @@ namespace Root_CAMELLIA.Module
         ALID m_alid_WaferExist;
         public void SetAlarm()
         {
+            if (m_homeExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Exist");
+            else if (p_infoWafer != null && !m_homeExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Not Exist");
+            else if (m_loadExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Load Position Wafer Exist");
+            else if (p_infoWafer != null && !m_loadExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Load Position Wafer Not Exist!");
+        }
+
+        public void SetAlarmLoad()
+        {
             if (m_loadExistWafer.p_bIn)
                 m_alid_WaferExist.Run(true, "Vision Load Position Wafer Exist");
             else if (p_infoWafer != null && !m_loadExistWafer.p_bIn)
                 m_alid_WaferExist.Run(true, "Vision Load Position Wafer Not Exist!");
-            else if (m_homeExistWafer.p_bIn)
-                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Exist");
-            else if (p_infoWafer != null && !m_homeExistWafer.p_bIn)
-                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Not Exist");
         }
 
 
@@ -743,6 +751,14 @@ namespace Root_CAMELLIA.Module
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;
+
+            if (m_loadExistWafer.p_bIn)
+            {
+                SetAlarmLoad();
+                return "Check Vision Load Position";
+            }
+
+
             return "OK";
         }
 
@@ -752,11 +768,7 @@ namespace Root_CAMELLIA.Module
         {
             // Make Directory
             //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END,);
-            if (m_engineer.p_bUseXGem)
-            {
-                p_processStartDate = DateTime.Now.ToString("MM/dd/yyyy");
-                p_processStartTime = DateTime.Now.ToString("HH:mm:ss");
-            }
+
             return "OK";
         }
 
@@ -767,6 +779,12 @@ namespace Root_CAMELLIA.Module
                 p_dataSavePathDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm");
                 p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe;
                 GeneralTools.MakeDirectory(p_dataSavePath);
+            }
+
+            if (m_engineer.p_bUseXGem)
+            {
+                p_processStartDate = DateTime.Now.ToString("MM\\/dd\\/yyyy");
+                p_processStartTime = DateTime.Now.ToString("HH:mm:ss");
             }
 
             MarsLogManager.Instance.ChangeMaterialSlot(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1);

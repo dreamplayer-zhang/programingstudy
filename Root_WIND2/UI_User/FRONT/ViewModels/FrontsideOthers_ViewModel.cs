@@ -14,6 +14,11 @@ using RootTools_Vision.WorkManager3;
 using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
 using RootTools_CLR;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Forms;
+using Emgu.CV;
+using Emgu.CV.Structure;
 
 namespace Root_WIND2.UI_User
 {
@@ -36,6 +41,10 @@ namespace Root_WIND2.UI_User
         private List<CPoint> _validChip = new List<CPoint>();
 
         private byte[] _goldenImage = null;
+
+        StopWatch m_swMouse = new StopWatch();
+        CPoint m_ptViewBuffer = new CPoint();
+        CPoint m_ptMouseBuffer = new CPoint();
         #endregion
 
         #region [ColorDefines]
@@ -114,6 +123,148 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Properites]
+        private System.Windows.Input.Cursor m_Cursor = System.Windows.Input.Cursors.Arrow;
+        public System.Windows.Input.Cursor p_Cursor
+        {
+            get
+            {
+                return m_Cursor;
+            }
+            set
+            {
+                SetProperty(ref m_Cursor, value);
+            }
+        }
+
+        protected int m_CanvasWidth = 100;
+        public int p_CanvasWidth
+        {
+            get
+            {
+                return m_CanvasWidth;
+            }
+            set
+            {
+                if (value == 0)
+                    return;
+
+                SetProperty(ref m_CanvasWidth, value);
+                //SetRoiRect();
+            }
+        }
+
+        private int m_CanvasHeight = 100;
+        public int p_CanvasHeight
+        {
+            get
+            {
+                return m_CanvasHeight;
+            }
+            set
+            {
+                if (value == 0)
+                    return;
+                SetProperty(ref m_CanvasHeight, value);
+                //SetRoiRect();
+            }
+        }
+
+        protected int m_MouseX = 0;
+        public virtual int p_MouseX
+        {
+            get
+            {
+                return m_MouseX;
+            }
+            set
+            {
+                SetProperty(ref m_MouseX, value);
+            }
+        }
+
+        private int m_MouseY = 0;
+        public int p_MouseY
+        {
+            get
+            {
+                return m_MouseY;
+            }
+            set
+            {
+
+                SetProperty(ref m_MouseY, value);
+            }
+        }
+
+        private double m_Zoom = 1;
+        public double p_Zoom
+        {
+            get
+            {
+                return m_Zoom;
+            }
+            set
+            {
+                if (value < 0.0001)
+                    value = 0.0001;
+                SetProperty(ref m_Zoom, value);
+                //SetRoiRect();
+            }
+        }
+
+        private System.Drawing.Rectangle m_View_Rect = new System.Drawing.Rectangle();
+        public System.Drawing.Rectangle p_View_Rect
+        {
+            get
+            {
+                return m_View_Rect;
+            }
+            set
+            {
+                SetProperty(ref m_View_Rect, value);
+            }
+        }
+
+        private ImageData m_ImageData;
+        public ImageData p_ImageData
+        {
+            get
+            {
+                return m_ImageData;
+            }
+            set
+            {
+                SetProperty(ref m_ImageData, value);
+            }
+        }
+
+        int m_nBrightness = 0;
+        public int p_nBrightness
+        {
+            get { return m_nBrightness; }
+            set
+            {
+                // 설정하려는 값을 -100 ~ 100의 값으로 제한
+                m_nBrightness = Clamp(value, -100, 100);
+
+                // 화면에 표시되는 이미지에 반영
+                SetImageSource();
+            }
+        }
+        int m_nContrast = 0;
+        public int p_nContrast
+        {
+            get { return m_nContrast; }
+            set
+            {
+                // 설정하려는 값을 -100 ~ 100의 값으로 제한
+                m_nContrast = Clamp(value, -100, 100);
+
+                // 화면에 표시되는 이미지에 반영
+                SetImageSource();
+            }
+        }
+
         private FrontsideOthers_ImageViewer_ViewModel _imageViewerVM;
         public FrontsideOthers_ImageViewer_ViewModel ImageViewerVM
         {
@@ -280,6 +431,183 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        #region [Viewer]
+        public virtual void SetRoiRect()
+        {
+            if (p_ImageData != null)
+            {
+                CPoint StartPt = GetStartPoint_Center(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
+                bool bRatio_WH = false;
+                //if (p_ImageData.p_nByte == 1)
+                bRatio_WH = (double)p_ImageData.p_Size.X / p_CanvasWidth < (double)p_ImageData.p_Size.Y / p_CanvasHeight;
+
+                if (bRatio_WH)
+                { //세로가 길어
+                    p_View_Rect = new System.Drawing.Rectangle(StartPt.X, StartPt.Y, Convert.ToInt32(p_ImageData.p_Size.X * p_Zoom), Convert.ToInt32(p_ImageData.p_Size.X * p_Zoom * p_CanvasHeight / p_CanvasWidth));
+                }
+                else
+                {
+                    p_View_Rect = new System.Drawing.Rectangle(StartPt.X, StartPt.Y, Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom * p_CanvasWidth / p_CanvasHeight), Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom));
+                }
+                SetImageSource();
+            }
+        }
+
+        CPoint GetStartPoint_Center(int nImgWidth, int nImgHeight)
+        {
+            bool bRatio_WH;
+
+            bRatio_WH = (double)p_ImageData.p_Size.X / p_CanvasWidth < (double)p_ImageData.p_Size.Y / p_CanvasHeight;
+            int viewrectwidth = 0;
+            int viewrectheight = 0;
+            int nX = 0;
+            int nY = 0;
+            if (bRatio_WH)
+            { //세로가 길어
+              //nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgWidth * p_Zoom) /2; 기존 중앙기준으로 확대/축소되는 코드. 
+                nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgWidth * p_Zoom) * p_MouseX / p_CanvasWidth; // 마우스 커서기준으로 확대/축소
+                nY = p_View_Rect.Y + Convert.ToInt32(p_View_Rect.Height - nImgWidth * p_Zoom * p_CanvasHeight / p_CanvasWidth) * p_MouseY / p_CanvasHeight;
+                viewrectwidth = Convert.ToInt32(nImgWidth * p_Zoom);
+                viewrectheight = Convert.ToInt32(nImgWidth * p_Zoom * p_CanvasHeight / p_CanvasWidth);
+            }
+            else
+            {
+                nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgHeight * p_Zoom * p_CanvasWidth / p_CanvasHeight) * p_MouseX / p_CanvasWidth;
+                nY = p_View_Rect.Y + Convert.ToInt32(p_View_Rect.Height - nImgHeight * p_Zoom) * p_MouseY / p_CanvasHeight;
+                viewrectwidth = Convert.ToInt32(nImgHeight * p_Zoom * p_CanvasWidth / p_CanvasHeight);
+                viewrectheight = Convert.ToInt32(nImgHeight * p_Zoom);
+            }
+
+            if (nX < 0)
+                nX = 0;
+            else if (nX > nImgWidth - viewrectwidth)
+                nX = nImgWidth - viewrectwidth;
+            if (nY < 0)
+                nY = 0;
+            else if (nY > nImgHeight - viewrectheight)
+                nY = nImgHeight - viewrectheight;
+            return new CPoint(nX, nY);
+        }
+
+        public virtual void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
+        {
+            if (p_ImageData == null) return;
+
+            CPoint MovePoint = new CPoint();
+            MovePoint.X = point.X + p_View_Rect.Width * nX / p_CanvasWidth;
+            MovePoint.Y = point.Y + p_View_Rect.Height * nY / p_CanvasHeight;
+
+            if (MovePoint.X < 0)
+                MovePoint.X = 0;
+            else if (MovePoint.X > p_ImageData.p_Size.X - p_View_Rect.Width)
+                MovePoint.X = p_ImageData.p_Size.X - p_View_Rect.Width;
+            if (MovePoint.Y < 0)
+                MovePoint.Y = 0;
+            else if (MovePoint.Y > p_ImageData.p_Size.Y - p_View_Rect.Height)
+                MovePoint.Y = p_ImageData.p_Size.Y - p_View_Rect.Height;
+
+            SetViewRect(MovePoint);
+            SetImageSource();
+        }
+
+        void SetViewRect(CPoint point)      //point image의 좌상단
+        {
+            bool bRatio_WH = false;
+
+            bRatio_WH = (double)p_ImageData.p_Size.X / p_CanvasWidth < (double)p_ImageData.p_Size.Y / p_CanvasHeight;
+
+            if (bRatio_WH)
+            { 
+                p_View_Rect = new System.Drawing.Rectangle(point.X, point.Y, Convert.ToInt32(p_ImageData.p_Size.X * p_Zoom), Convert.ToInt32(p_ImageData.p_Size.X * p_Zoom * p_CanvasHeight / p_CanvasWidth));
+            }
+            else
+            {
+                p_View_Rect = new System.Drawing.Rectangle(point.X, point.Y, Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom * p_CanvasWidth / p_CanvasHeight), Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom));
+            }
+        }
+
+        public void InitRoiRect(int nWidth, int nHeight)
+        {
+            if (p_ImageData == null)
+            {
+                p_View_Rect = new System.Drawing.Rectangle(0, 0, nWidth, nHeight);
+                p_Zoom = 1;
+            }
+            bool bRatio_WH = (double)p_View_Rect.Width / p_CanvasWidth < (double)p_View_Rect.Height / p_CanvasHeight;
+            if (bRatio_WH)//세로가 길어
+            {
+                p_View_Rect = new System.Drawing.Rectangle(p_View_Rect.X, p_View_Rect.Y, p_View_Rect.Width, p_View_Rect.Width * p_CanvasHeight / p_CanvasWidth);
+            }
+            else
+            {
+                p_View_Rect = new System.Drawing.Rectangle(p_View_Rect.X, p_View_Rect.Y, p_View_Rect.Height * p_CanvasWidth / p_CanvasHeight, p_View_Rect.Height);
+            }
+        }
+
+        public virtual unsafe void SetImageSource()
+        {
+            if (p_ImageData != null)
+            {
+                object o = new object();
+
+                Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+
+                IntPtr ptrMem = p_ImageData.GetPtr();
+                if (ptrMem == IntPtr.Zero)
+                    return;
+
+                int rectX, rectY, rectWidth, rectHeight, sizeX;
+                byte[,,] viewptr = view.Data;
+
+                rectX = p_View_Rect.X;
+                rectY = p_View_Rect.Y;
+                rectWidth = p_View_Rect.Width;
+                rectHeight = p_View_Rect.Height;
+
+                sizeX = p_ImageData.p_Size.X;
+
+                Parallel.For(0, p_CanvasHeight, (yy) =>
+                {
+                    {
+                        long pix_y = rectY + yy * rectHeight / p_CanvasHeight;
+
+                        for (int xx = 0; xx < p_CanvasWidth; xx++)
+                        {
+                            long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
+                                        /*byte pixel = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];*/
+                            byte* arrByte = (byte*)ptrMem.ToPointer();
+                            long idx = pix_x + (long)pix_y * sizeX;
+                            byte pixel = arrByte[idx];
+                            viewptr[yy, xx, 0] = ApplyContrastAndBrightness(pixel);
+                        }
+                    }
+                });
+
+                p_GoldenImgSource = ImageHelper.ToBitmapSource(view);
+            }
+        }
+
+        public byte ApplyContrastAndBrightness(byte color)
+        {
+            if (p_nBrightness == 0 && p_nContrast == 0)
+                return color;
+
+            double contrastLevel = Math.Pow((100.0 + p_nContrast) / 100.0, 2);
+
+            double newColor = (((((double)color / 255.0) - 0.5) * contrastLevel) + 0.5) * 255.0;
+            newColor += p_nBrightness;
+
+            return (byte)Clamp((int)Math.Round(newColor), 0, 255);
+        }
+
+        public int Clamp(int val, int min, int max)
+        {
+            int ret = Math.Max(val, min);
+            ret = Math.Min(ret, max);
+
+            return ret;
+        }
+        #endregion
 
         #region [Position Seq]
         private void SetPositionData()
@@ -319,7 +647,7 @@ namespace Root_WIND2.UI_User
 
             if (feature.Count < 1)
             {
-                MessageBox.Show("          Feature Num < 1 \nPlease Add Feature Images", "WARNING");
+                System.Windows.MessageBox.Show("          Feature Num < 1 \nPlease Add Feature Images", "WARNING");
                 return;
             }
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
@@ -331,7 +659,7 @@ namespace Root_WIND2.UI_User
             foreach(CPoint chipPos in _validChip)
             {
                 absChipX = originRecipe.OriginX + chipPos.X * originRecipe.DiePitchX;
-                absChipY = originRecipe.OriginY + (chipPos.Y - 1) * originRecipe.DiePitchY; // 기준 좌표가 좌하단인듯
+                absChipY = originRecipe.OriginY + chipPos.Y * originRecipe.DiePitchY - originRecipe.OriginHeight; // 기준 좌표가 좌하단인듯
                 absFeatureX = originRecipe.OriginX + feature[0].PositionX + chipPos.X * originRecipe.DiePitchX;
                 absFeatureY = originRecipe.OriginY + feature[0].PositionY + chipPos.Y * originRecipe.DiePitchY;
                 
@@ -373,6 +701,7 @@ namespace Root_WIND2.UI_User
                 LoadRecipe();
             });
         }
+
         public RelayCommand UnloadedCommand
         {
             get => new RelayCommand(() =>
@@ -390,6 +719,7 @@ namespace Root_WIND2.UI_User
                 StartPosition();
             });
         }
+
         public RelayCommand btnCreateGolden
         {
             get => new RelayCommand(() =>
@@ -421,8 +751,25 @@ namespace Root_WIND2.UI_User
                 }
 
                 IsEnabledSave = true;
+                p_ImageData = null;
+                p_ImageData = new ImageData(originRecipe.OriginWidth, originRecipe.OriginHeight, 1);
+                
+                IntPtr ptrMem = p_ImageData.GetPtr();
+
+                unsafe { 
+                    byte *p = (byte*)ptrMem.ToPointer();
+                    for (int i = 0; i < originRecipe.OriginWidth * originRecipe.OriginHeight; i++, p++)
+                    {
+                        *p = _goldenImage[i];
+                    }
+                }
+
+                SetRoiRect();
+                InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
+                SetImageSource();
             });
         }
+
         public RelayCommand btnSaveGolden
         {
             get => new RelayCommand(() =>
@@ -465,9 +812,11 @@ namespace Root_WIND2.UI_User
                     });
 
                     Tools.SaveRawdataToBitmap(path, goldenImageColor, originRecipe.OriginWidth, originRecipe.OriginHeight, 3);
+                    GlobalObjects.Instance.Get<RecipeFront>().GetItem<D2DRecipe>().SetPreGoldenImage(goldenImageColor, originRecipe.OriginWidth, originRecipe.OriginHeight);
                 }
             });
         }
+
         public RelayCommand btnClear
         {
             get => new RelayCommand(() =>
@@ -484,6 +833,64 @@ namespace Root_WIND2.UI_User
         {
             ImageViewerVM.AddDrawRect(ptOldStart, ptOldEnd, ImageViewerColorDefines.ChipPosition, "position");
             ImageViewerVM.AddDrawRect(ptNewStart, ptNewEnd, ImageViewerColorDefines.ChipPositionMove, "position");
+        }
+
+        #endregion
+
+        #region MethodAction
+
+        public virtual void PreviewMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            m_ptViewBuffer = new CPoint(p_View_Rect.X, p_View_Rect.Y);
+            m_ptMouseBuffer = new CPoint(p_MouseX, p_MouseY);
+            m_swMouse.Restart();
+        }
+
+        public virtual void MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+
+            var viewer = sender as Grid;
+            viewer.Focus();
+
+            var pt = e.GetPosition(sender as IInputElement);
+            p_MouseX = (int)pt.X;
+            p_MouseY = (int)pt.Y;
+
+            if (e.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > 0)
+            {
+                CanvasMovePoint_Ref(m_ptViewBuffer, m_ptMouseBuffer.X - p_MouseX, m_ptMouseBuffer.Y - p_MouseY);
+                return;
+            }
+        }
+
+        public virtual void MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var viewer = sender as Grid;
+            viewer.Focus();
+
+
+            int lines = e.Delta * SystemInformation.MouseWheelScrollLines / 120;
+            double zoom = p_Zoom;
+
+            if (lines < 0)
+            {
+                zoom *= 1.1F;
+            }
+            if (lines > 0)
+            {
+                zoom *= 0.9F;
+            }
+
+            if (zoom > 1)
+            {
+                zoom = 1;
+            }
+            if (zoom < 0.0001)
+            {
+                zoom = 0.0001;
+            }
+            p_Zoom = zoom;
+            SetRoiRect();
         }
 
         #endregion

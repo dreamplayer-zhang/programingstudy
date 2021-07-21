@@ -7,8 +7,10 @@
              xmlns:local="clr-namespace:Root_WIND2"
              xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="1200">
+             d:DesignHeight="450" d:DesignWidth="1200"
+             Cursor="{Binding p_Cursor, Mode=TwoWay}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
@@ -129,14 +131,24 @@
                             Width="Auto"
                             Height="Auto"
                             ClipToBounds="True">
-                            <Image Source="{Binding p_GoldenImgSource}" SnapsToDevicePixels="True"  RenderTransformOrigin="0.5 0.5">
-                                <Image.RenderTransform>
-                                    <TransformGroup>
-                                        <ScaleTransform ScaleX ="{Binding PreViewerScale}" ScaleY ="{Binding PreViewerScale}"/>
-                                        <TranslateTransform X="{Binding PreViewerTransX}" Y="{Binding PreViewerTransY}"/>
-                                    </TransformGroup>
-                                </Image.RenderTransform>
-                            </Image>
+                            <Grid Focusable="True" RenderTransformOrigin="0.5 0.5">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="PreviewMouseDown">
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="PreviewMouseDown"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseMove">
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="MouseMove"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseWheel">
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="MouseWheel"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Canvas Background="Black" obs:SizeObserver.Observe="true" Focusable="True"
+                                    obs:SizeObserver.ObservedWidth="{Binding p_CanvasWidth, Mode=TwoWay}"
+                                    obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}" Grid.ColumnSpan="2">
+                                    <Image Source="{Binding Path=p_GoldenImgSource}" Stretch="Fill"/>
+                                </Canvas>
+                            </Grid>
                         </Border>
                     </GroupBox>
                     <GroupBox Grid.Column="1" 

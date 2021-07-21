@@ -101,7 +101,7 @@ namespace Root_VEGA_D
                 }
             }
         }
-         
+
         CPoint m_firstPoint = new CPoint();
         public CPoint p_firstPoint
         {
@@ -286,7 +286,7 @@ namespace Root_VEGA_D
             {
                 SetProperty(ref m_lastDieUp, value);
                 SetManualPoint(value, ref m_lastDieUpPoint, Coordinate.LASTDIEUP);
-                
+
             }
         }
 
@@ -397,6 +397,13 @@ namespace Root_VEGA_D
             }
         }
 
+        ImageData m_imgOtherPC;
+        public ImageData p_imgOtherPC
+        {
+            get { return m_imgOtherPC; }
+            set { SetProperty(ref m_imgOtherPC, value); }
+        }
+
         Vision m_vision;
         #endregion
         public RecipeWizard_VM()
@@ -408,8 +415,17 @@ namespace Root_VEGA_D
         void Init()
         {
             //p_rootViewer = new RootViewer_ViewModel();
-            this.init(new ImageData(App.m_engineer.ClassMemoryTool().GetMemory("Vision.Memory", "Vision", "Main")));
+            //this.init(new ImageData(App.m_engineer.ClassMemoryTool().GetMemory("Vision.Memory", "Vision", "Main")));
             this.p_VisibleMenu = System.Windows.Visibility.Collapsed;
+
+            Vision vision = App.m_engineer.m_handler.m_vision;
+            if (vision != null)
+            {
+                MemoryTool memoryTool = App.m_engineer.ClassMemoryTool();
+                p_imgOtherPC = new ImageData(vision.MemoryPool.p_id, vision.MemoryGroup.p_id, vision.MemoryOtherPC.p_id, memoryTool, vision.MemoryOtherPC.p_nCount, vision.MemoryOtherPC.p_nByte);
+
+                init(p_imgOtherPC);
+            }
         }
 
         #region Function

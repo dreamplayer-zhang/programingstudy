@@ -8,7 +8,6 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -17,17 +16,8 @@ using System.Windows;
 
 namespace Root_Pine2_Vision.Module
 {
-    public class Vision2D : ModuleBase
+    public class Vision2D : ModuleBase, IVision
     {
-        #region Property
-        public enum eVision
-        {
-            Top3D,
-            Top2D,
-            Bottom
-        }
-        #endregion
-
         #region ToolBox
         Camera_Dalsa m_camera;
         public LightSet m_lightSet;
@@ -44,7 +34,7 @@ namespace Root_Pine2_Vision.Module
                 p_sInfo = m_toolBox.GetComm(ref m_tcpRequest, this, "Request");
                 if (bInit)
                 {
-                    m_tcpRequest.EventReceiveData += M_tcpRequest_EventReceiveData;
+                    m_tcpRequest.EventReciveData += M_tcpRequest_EventReceiveData;
                     m_rs232RGBW.p_bConnect = true;
                     m_camera.Connect();
                 }
@@ -164,53 +154,6 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Send Info
-        public string SendRecipe(string sRecipe)
-        {
-            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendRecipe, eRemote.Client, sRecipe);
-            else
-            {
-                m_RunningRecipe[eWorks.A].RecipeOpen(sRecipe);
-                m_RunningRecipe[eWorks.B].RecipeOpen(sRecipe);
-                string sRunA = m_aWorks[eWorks.A].SendRecipe(sRecipe);
-                string sRunB = m_aWorks[eWorks.B].SendRecipe(sRecipe);
-                if ((sRunA == "OK") && (sRunB == "OK")) return "OK";
-                return "A = " + sRunA + ", B = " + sRunB;
-            }
-        }
-
-        public class SnapInfo
-        {
-            public eWorks m_eWorks = eWorks.A;
-            public int m_nSnapMode = 0;
-            public string m_sStripID = "0000";
-            public int m_nLine = 0; 
-
-            public SnapInfo Clone()
-            {
-                return new SnapInfo(m_eWorks, m_nSnapMode, m_sStripID, m_nLine); 
-            }
-
-            public string GetString()
-            {
-                return m_nSnapMode.ToString() + "," + m_sStripID + "," + m_nLine.ToString(); 
-            }
-
-            public void RunTree(Tree tree, bool bVisible)
-            {
-                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "eWorks", bVisible);
-                m_nSnapMode = tree.Set(m_nSnapMode, m_nSnapMode, "SnapMode", "Snap Mode (0 = RGB, 1 = APS, 3 = ALL)", bVisible);
-                m_sStripID = tree.Set(m_sStripID, m_sStripID, "StripID", "Strip ID", bVisible);
-                m_nLine = tree.Set(m_nLine, m_nLine, "SnapLine", "Snap Line Number", bVisible);
-            }
-
-            public SnapInfo(eWorks eWorks, int nSnapMode, string sStripID, int nLine)
-            {
-                m_eWorks = eWorks; 
-                m_nSnapMode = nSnapMode;
-                m_sStripID = sStripID;
-                m_nLine = nLine; 
-            }
-        }
         public string SendSnapInfo(SnapInfo snapInfo)
         {
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendSnapInfo, eRemote.Client, snapInfo);
@@ -220,53 +163,15 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public class LotInfo
-        {
-            public int m_nMode = 0;
-            public string m_sRecipe = "";
-            public string m_sLotID = "";
-            public bool m_bLotMix = false;
-            public bool m_bBarcode = false;
-            public int m_nBarcode = 0;
-            public int m_lBarcode = 0;
-
-            public LotInfo Clone()
-            {
-                return new LotInfo(m_nMode, m_sRecipe, m_sLotID, m_bLotMix, m_bBarcode, m_nBarcode, m_lBarcode);
-            }
-
-            public string GetString()
-            {
-                return m_nMode.ToString() + "," + m_sRecipe + "," + m_sLotID + "," + (m_bBarcode ? "1," : "0,") + (m_bLotMix ? "1," : "0,") + m_nBarcode.ToString() + "," + m_lBarcode.ToString();
-            }
-
-            public void RunTree(Tree tree, bool bVisible)
-            {
-                m_nMode = tree.Set(m_nMode, m_nMode, "Mode", "Operation Mode (1 = Magazine, 0 = Stack)", bVisible);
-                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe Name", bVisible);
-                m_sLotID = tree.Set(m_sLotID, m_sLotID, "LotID", "Lot Name", bVisible);
-                m_bLotMix = tree.Set(m_bLotMix, m_bLotMix, "Lot Mix", "Check Lot Mix", bVisible);
-                m_bBarcode = tree.Set(m_bBarcode, m_bBarcode, "Barcode", "Read Barcode", bVisible);
-                m_nBarcode = tree.Set(m_nBarcode, m_nBarcode, "Barcode Start", "Read Barcode Start Pos (pixel)", bVisible);
-                m_lBarcode = tree.Set(m_lBarcode, m_lBarcode, "Barcode Length", "Read Barcode Length (pixel)", bVisible);
-            }
-
-            public LotInfo(int nMode, string sRecipe, string sLotID, bool bLotMix, bool bBarcode, int nBarcode, int lBarcode)
-            {
-                m_nMode = nMode;
-                m_sRecipe = sRecipe;
-                m_sLotID = sLotID;
-                m_bLotMix = bLotMix;
-                m_bBarcode = bBarcode;
-                m_nBarcode = nBarcode;
-                m_lBarcode = lBarcode;
-            }
-        }
+        public LotInfo m_lotInfo = null;
         public string SendLotInfo(LotInfo lotInfo)
         {
+            m_lotInfo = lotInfo; 
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendLotInfo, eRemote.Client, lotInfo);
             else
             {
+                m_RunningRecipe[eWorks.A].RecipeOpen(lotInfo.m_sRecipe);
+                m_RunningRecipe[eWorks.B].RecipeOpen(lotInfo.m_sRecipe);
                 string sRunA = m_aWorks[eWorks.A].SendLotInfo(lotInfo);
                 string sRunB = m_aWorks[eWorks.B].SendLotInfo(lotInfo);
                 if ((sRunA == "OK") && (sRunB == "OK")) return "OK";
@@ -274,36 +179,6 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public class SortInfo
-        {
-            public eWorks m_eWorks = eWorks.A;
-            public string m_sStripID = "";
-            public string m_sSortID = "";
-
-            public SortInfo Clone()
-            {
-                return new SortInfo(m_eWorks, m_sStripID, m_sSortID);
-            }
-
-            public string GetString()
-            {
-                return m_sStripID + "," + m_sSortID;
-            }
-
-            public void RunTree(Tree tree, bool bVisible)
-            {
-                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "eWorks", bVisible);
-                m_sStripID = tree.Set(m_sStripID, m_sStripID, "StripID", "StripID", bVisible);
-                m_sSortID = tree.Set(m_sSortID, m_sSortID, "SortID", "SortID", bVisible);
-            }
-
-            public SortInfo(eWorks eWorks, string sStripID, string sSortID)
-            {
-                m_eWorks = eWorks;
-                m_sStripID = sStripID;
-                m_sSortID = sSortID;
-            }
-        }
         public string SendSortInfo(SortInfo sortInfo)
         {
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendSortInfo, eRemote.Client, sortInfo);
@@ -335,7 +210,8 @@ namespace Root_Pine2_Vision.Module
 
         public class CalibrationData
         {
-            public DalsaParameterSet.eFlatFieldUserSet m_eCalUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
+            public DalsaParameterSet.eFlatFieldUserSet m_eForwardUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
+            public DalsaParameterSet.eFlatFieldUserSet m_eBackwardUserSet = DalsaParameterSet.eFlatFieldUserSet.Factory;
             public DalsaParameterSet.eAnalogGain m_eAnalogGain = DalsaParameterSet.eAnalogGain.One;
             public string _sAnalogGain = "1";
             public string m_sAnalogGain
@@ -396,7 +272,8 @@ namespace Root_Pine2_Vision.Module
 
             public void RunTree(Tree tree)
             {
-                m_eCalUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eCalUserSet, m_eCalUserSet, "Flat Field Correction UserSet", "Select Flat Field Correction UserSet");
+                m_eForwardUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eForwardUserSet, m_eForwardUserSet, "Forward UserSet", "Select Flat Field Correction UserSet");
+                m_eBackwardUserSet = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(m_eBackwardUserSet, m_eBackwardUserSet, "Reverse UserSet", "Select Flat Field Correction UserSet");
                 m_sAnalogGain = tree.Set(m_sAnalogGain, m_sAnalogGain, DalsaParameterSet.m_aAnalogGain, "Analog Gain", "Analog Gain");
                 m_dSystemGain = tree.Set(m_dSystemGain, m_dSystemGain, "System Gain", "System Gain");
                 m_dAllRowsGain = tree.Set(m_dAllRowsGain, m_dAllRowsGain, "AllRows Gain", "AllRows Gain");
@@ -523,13 +400,6 @@ namespace Root_Pine2_Vision.Module
                     data.m_bUseFlipVertical = true;
                     m_vision.m_aGrabData[eWorks].SetData(data);
                     return data;
-                }
-
-                public CPoint GetMemoryOffset()
-                {
-                    CPoint cp = new CPoint(m_cpMemory);
-                    //if (m_eDirection == eDirection.Backward) cp.Y += m_vision.m_nLine;
-                    return cp;
                 }
 
                 public void RunTree(Tree tree, bool bVisible, bool bReadOnly = false)
@@ -672,23 +542,12 @@ namespace Root_Pine2_Vision.Module
 
             public eWorks m_eWorks = eWorks.A;
 
-            public Recipe Clone()
-            {
-                Recipe recipe = new Recipe(m_vision, m_eWorks);
-                recipe.m_eWorks = m_eWorks;
-                recipe.m_sRecipe = m_sRecipe;
-                recipe.m_lightPowerRGB = m_lightPowerRGB.Clone();
-                recipe.m_lightPowerAPS = m_lightPowerAPS.Clone();
-                foreach (Snap snap in m_aSnap) recipe.m_aSnap.Add(snap.Clone());
-                return recipe;
-            }
-
             const string c_sExt = ".pine2";
             public void RecipeSave(string sRecipe)
             {
                 string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
                 Directory.CreateDirectory(sPath);
-                string sFile = sPath + "\\" + m_vision.m_eVision.ToString() + m_eWorks.ToString() + c_sExt;
+                string sFile = sPath + "\\" + m_vision.p_eVision.ToString() + m_eWorks.ToString() + c_sExt;
                 m_treeRecipe.m_job = new Job(sFile, true, m_vision.m_log);
                 RunTreeRecipe(Tree.eMode.JobSave);
                 m_treeRecipe.m_job.Close();
@@ -699,7 +558,7 @@ namespace Root_Pine2_Vision.Module
                 m_sRecipe = sRecipe;
                 string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
                 Directory.CreateDirectory(sPath);
-                string sFile = sPath + "\\" + m_vision.m_eVision.ToString() + m_eWorks.ToString() + c_sExt;
+                string sFile = sPath + "\\" + m_vision.p_eVision.ToString() + m_eWorks.ToString() + c_sExt;
                 m_treeRecipe.m_job = new Job(sFile, false, m_vision.m_log);
                 RunTreeRecipe(Tree.eMode.JobOpen);
                 m_treeRecipe.m_job.Close();
@@ -791,11 +650,6 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Works
-        public enum eWorks
-        {
-            A,
-            B,
-        }
         public Dictionary<eWorks, Works2D> m_aWorks = new Dictionary<eWorks, Works2D>();
         void InitVisionWorks()
         {
@@ -805,6 +659,12 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region RunSnap
+        bool m_bCanChangeUserSet = true;
+        bool m_bUserSetThreadOn = false;
+        bool m_bDoneChangeUserSet = true;
+        int nWaitTime = 3 * 1000;
+        int nWaitInterval = 10;
+        int nTimeCount = 0;
         public string StartSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
@@ -823,10 +683,150 @@ namespace Root_Pine2_Vision.Module
             int nYOffset = m_aGrabData[eWorks].m_nYOffset;
             Recipe.eSnapMode nSnapMode = m_RunningRecipe[eWorks].p_eSnapMode;
             int nTotalSnap = m_RunningRecipe[eWorks].p_lSnap;
-            int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? iSnap % (nTotalSnap / 2) : iSnap % (nTotalSnap);
+            int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? iSnap % (nTotalSnap / 2) : iSnap;
 
             // 이미지 시작점 설정
-            CPoint cpOffset;    
+            CPoint cpOffset = CalcOffset(nSnapLineIndex, nFOVpx, nReverseOffset, recipe); 
+            MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
+            GrabData grabData = recipe.GetGrabData(eWorks, cpOffset, nOverlap);
+            grabData.nScanOffsetY = (nSnapLineIndex) * nYOffset;
+            grabData.nUserSet = (int)m_eCamUserSet;
+
+            try
+            {
+                m_log.Info("Start");
+                // Set Camera Gain (When first snap line)
+                if(nSnapLineIndex == 0)
+                    SetCameraGain(iSnap, nSnapMode, recipe.m_eDirection);
+                m_log.Info("Set Gain Done");
+
+                // Set First Cal UserSet (첫 라인 이후부터는 Thread로 Userset 변경)
+                if (iSnap == 0)
+                    SetFirstCalUserSet(nSnapMode, recipe);
+                m_log.Info("Set First Cal Userset Done");
+
+                // Check Userset Change Thread
+                nTimeCount = 0;
+                while (m_bDoneChangeUserSet == false && nTimeCount < nWaitTime)
+                {
+                    nTimeCount += nWaitInterval;
+                    Thread.Sleep(nWaitInterval);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                m_log.Info("Check Userset Thread Done");
+
+                // Set Camera GrabThread On
+                m_bCanChangeUserSet = false;
+                m_bUserSetThreadOn = false;
+                m_camera.m_bGrabThreadOn = false;
+                m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
+                while (m_camera.m_bGrabThreadOn != true)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                m_log.Info("Grab Thread On Done");
+
+                // Send SnapReady to Handler (Handler move Axis After receive this msg)
+                ReqSnapReady(eWorks);
+                m_log.Info("Send Snap Ready Done");
+
+                // Wait for Grab
+                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+
+                    // Set Next Snap Userset (If Y Axis Move Done)
+                    if (m_bCanChangeUserSet == true)
+                    {
+                        m_bCanChangeUserSet = false;
+                        m_bUserSetThreadOn = true;
+                        if (iSnap < nTotalSnap - 1)
+                            RunChangeUserSetThread(iSnap, nTotalSnap, nSnapMode, eWorks);
+                    }
+                }
+                m_log.Info("Grab Done");
+
+                // Send Snap Done to VisionWorks2
+                if (m_aWorks[eWorks].IsProcessRun())
+                    m_aWorks[eWorks].SendSnapDone(iSnap);
+                m_log.Info("Send Snap Done Done");
+
+                // Set Next Snap Userset (while 문에서 실행 못했을 경우)
+                if (m_bUserSetThreadOn == false && iSnap < nTotalSnap - 1)
+                    RunChangeUserSetThread(iSnap, nTotalSnap, nSnapMode, eWorks);
+                m_log.Info("Userset Thread Done");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+                m_camera.StopGrab();
+            }
+            return "OK";
+        }
+
+        private void SetFirstCalUserSet(Recipe.eSnapMode nSnapMode, Recipe.Snap recipe)
+        {
+            if (nSnapMode == Recipe.eSnapMode.ALL || nSnapMode == Recipe.eSnapMode.RGB)
+            {
+                if (recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
+                    m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.RGB].m_eForwardUserSet;
+                else
+                    m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.RGB].m_eBackwardUserSet;
+            }
+            else if (nSnapMode == Recipe.eSnapMode.APS)
+            {
+                if (recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
+                    m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.APS].m_eForwardUserSet;
+                else
+                    m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[eCalMode.APS].m_eBackwardUserSet;
+            }
+        }
+
+        private void RunChangeUserSetThread(int iSnap, int nTotalSnap, Recipe.eSnapMode nSnapMode, eWorks eWorks)
+        {
+            Recipe.Snap nextRecipe = m_RunningRecipe[eWorks].m_aSnap[iSnap + 1];
+            System.Threading.Thread thUpdate = new Thread(new ParameterizedThreadStart(UpdateCalUserset));
+            int nNextSnap = iSnap + 1;
+            int nNextSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? nNextSnap % (nTotalSnap / 2) : nNextSnap;
+            m_bDoneChangeUserSet = false;
+
+            if (nSnapMode == Recipe.eSnapMode.ALL)
+            {
+                if (nNextSnap < (nTotalSnap / 2))       // RGB
+                {
+                    if (nNextSnapLineIndex % 2 == 0)
+                        thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+                    else
+                        thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
+                }
+                else    // APS
+                {
+                    if (nNextSnapLineIndex % 2 == 0)
+                        thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
+                    else
+                        thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
+                }
+            }
+            else if (nSnapMode == Recipe.eSnapMode.RGB)
+            {
+                if (nNextSnapLineIndex % 2 == 0)
+                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+                else
+                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
+            }
+            else if (nSnapMode == Recipe.eSnapMode.APS)
+            {
+                if (nNextSnapLineIndex % 2 == 0)
+                    thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
+                else
+                    thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
+            }
+        }
+        private CPoint CalcOffset(int nSnapLineIndex, int nFOVpx, int nReverseOffset, Recipe.Snap recipe)
+        {
+            CPoint cpOffset;
             if (m_bUseBiDirectional)
             {
                 if (recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
@@ -840,101 +840,40 @@ namespace Root_Pine2_Vision.Module
                 cpOffset = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
             }
 
-            MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
-            GrabData grabData = recipe.GetGrabData(eWorks, cpOffset, nOverlap);
-            grabData.nScanOffsetY = (nSnapLineIndex) * nYOffset;
-
-            DalsaParameterSet.eUserSet nUserset = m_eCamUserSet;
-
-            try
-            {
-                if (m_camera.p_CamParam.p_eUserSetCurrent != nUserset)
-                    m_camera.p_CamParam.p_eUserSetCurrent = nUserset;
-
-               
-
-                if (nSnapLineIndex == 0)
-                {
-                    if (nSnapMode == Recipe.eSnapMode.ALL)
-                    {
-                        if (iSnap == 0)
-                        {
-                            SetCalibration(eCalMode.RGB, recipe.m_eDirection);
-                        }
-                        else
-                        {
-                            SetCalibration(eCalMode.APS, recipe.m_eDirection);
-                        }
-                    }
-                    else
-                    {
-                        SetCalibration((eCalMode)nSnapMode, recipe.m_eDirection);
-                    }
-                }
-
-                m_camera.m_bGrabThreadOn = false;
-                m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
-                while (m_camera.m_bGrabThreadOn != true)
-                {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return "EQ Stop";
-                }
-                ReqSnapReady(eWorks);
-                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
-                {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return "EQ Stop";
-                }
-                // Root Vision -> VisionWorks2
-                if (m_aWorks[eWorks].IsProcessRun())
-                    m_aWorks[eWorks].SendSnapDone(iSnap);
-
-                if (recipe.m_eDirection != Recipe.Snap.eDirection.Forward)
-                    m_camera.p_CamParam.SetFlatFieldUserSet(DalsaParameterSet.eFlatFieldUserSet.UserSet2);
-                else
-                    m_camera.p_CamParam.SetFlatFieldUserSet(DalsaParameterSet.eFlatFieldUserSet.UserSet1);
-
-
-              //  if (nSnapMode == Recipe.eSnapMode.ALL && (nTotalSnap/2-1) == iSnap) // 미리 체인지 하기위함
-             //    {
-                     System.Threading.Thread th = new Thread(UpdateUserset);
-                     th.Start();
-                //    }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-                m_camera.StopGrab();
-            }
-            return "OK";
+            return cpOffset;
         }
 
-        private void UpdateUserset()
+        private void UpdateCalUserset(object param)
         {
-            m_camera.p_CamParam.LoadCalibration();
+            m_camera.p_CamParam.p_eFlatFieldCorrection = (DalsaParameterSet.eFlatFieldUserSet)param;
+            m_bDoneChangeUserSet = true;
         }
 
-        private void SetCalibration(eCalMode eMode, Recipe.Snap.eDirection eDir)
+        private void SetCameraGain(int iSnap, Recipe.eSnapMode nSnapMode, Recipe.Snap.eDirection eDir)
+        {
+            if (nSnapMode == Recipe.eSnapMode.ALL)
+            {
+                if (iSnap == 0)
+                    SetGain(eCalMode.RGB);
+                else
+                    SetGain(eCalMode.APS);
+            }
+            else
+                SetGain((eCalMode)nSnapMode);
+        }
+
+        private void SetGain(eCalMode eMode)
         {
             CalibrationData data = m_aCalData[eMode];
-            //if (eDir == Recipe.Snap.eDirection.Forward)
-            //    m_camera.p_CamParam.SetFlatFieldUserSet(DalsaParameterSet.eFlatFieldUserSet.UserSet2);
-            //else
-            //    m_camera.p_CamParam.SetFlatFieldUserSet(DalsaParameterSet.eFlatFieldUserSet.UserSet1);
-
-            //m_camera.p_CamParam.LoadCalibration();
             m_camera.p_CamParam.SetAnalogGain(data.m_eAnalogGain);
             m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.System);
             m_camera.p_CamParam.SetGain(data.m_dSystemGain);
-            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.All);
-            m_camera.p_CamParam.SetGain(data.m_dAllRowsGain);
             m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Blue);
             m_camera.p_CamParam.SetGain(data.m_dBlueGain);
             m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Green);
             m_camera.p_CamParam.SetGain(data.m_dGreenGain);
             m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Red);
             m_camera.p_CamParam.SetGain(data.m_dRedGain);
-            return;
         }
 
         #endregion
@@ -942,15 +881,27 @@ namespace Root_Pine2_Vision.Module
         #region Request  
         int m_nReq = 0; //forget
         string m_sReceive = "";
-        TCPAsyncClient m_tcpRequest;
+        TCPIPClient m_tcpRequest;
         private void M_tcpRequest_EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
             m_sReceive = Encoding.Default.GetString(aBuf, 0, nSize);
+            if (m_sReceive.Length <= 0) return;
+            ReadReceive(m_sReceive);
+        }
+
+        void ReadReceive(string sReceive)
+        {
+            string[] asRead = sReceive.Split(',');
+            if (asRead.Length < 2) return;
+            if (asRead[1] == eProtocol.ChangeUserset.ToString())
+            {
+                m_bCanChangeUserSet = true;
+            }
         }
 
         public string ReqSnap(string sRecipe, eWorks eWorks)
         {
-            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             while (sSend != m_sReceive)
@@ -963,7 +914,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqSnapReady(eWorks eWorks)
         {
-            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.SnapReady.ToString() + "," + eWorks.ToString();
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.SnapReady.ToString() + "," + eWorks.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             return "OK";
@@ -971,7 +922,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqInspDone(string sStripID, string sStripResult, string sX, string sY, string sMapResult, eWorks eWorks)
         {
-            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.InspDone.ToString() + ",";
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.InspDone.ToString() + ",";
             sSend += sStripID + "," + sStripResult + "," + sX + "," + sY + "," + sMapResult + "," + eWorks.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
@@ -980,7 +931,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqWorksConnect(eWorks eWorks, bool bConnect)
         {
-            string sSend = m_nReq.ToString("000") + "," + eWorks.ToString() + "," + Works2D.eProtocol.WorksConnect.ToString() + "," + (bConnect ? "1" : "0");
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.WorksConnect.ToString() + "," + eWorks.ToString() + "," + (bConnect ? "1" : "0");
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             return "OK";
@@ -1004,15 +955,23 @@ namespace Root_Pine2_Vision.Module
             while (m_bThreadCheck)
             {
                 Thread.Sleep(200); 
-                if (m_bWorksConnect[0] != m_aWorks[eWorks.A].m_tcpip.p_bConnect)
+                if (m_tcpRequest.p_bConnect == false)
                 {
-                    ReqWorksConnect(eWorks.A, m_aWorks[eWorks.A].m_tcpip.p_bConnect);
-                    m_bWorksConnect[0] = m_aWorks[eWorks.A].m_tcpip.p_bConnect; 
+                    m_bWorksConnect[0] = false;
+                    m_bWorksConnect[1] = false;
                 }
-                if (m_bWorksConnect[1] != m_aWorks[eWorks.B].m_tcpip.p_bConnect)
+                else
                 {
-                    ReqWorksConnect(eWorks.B, m_aWorks[eWorks.B].m_tcpip.p_bConnect);
-                    m_bWorksConnect[1] = m_aWorks[eWorks.B].m_tcpip.p_bConnect;
+                    if (m_bWorksConnect[0] != m_aWorks[eWorks.A].m_tcpip.p_bConnect)
+                    {
+                        ReqWorksConnect(eWorks.A, m_aWorks[eWorks.A].m_tcpip.p_bConnect);
+                        m_bWorksConnect[0] = m_aWorks[eWorks.A].m_tcpip.p_bConnect;
+                    }
+                    if (m_bWorksConnect[1] != m_aWorks[eWorks.B].m_tcpip.p_bConnect)
+                    {
+                        ReqWorksConnect(eWorks.B, m_aWorks[eWorks.B].m_tcpip.p_bConnect);
+                        m_bWorksConnect[1] = m_aWorks[eWorks.B].m_tcpip.p_bConnect;
+                    }
                 }
             }
         }
@@ -1047,7 +1006,7 @@ namespace Root_Pine2_Vision.Module
             else
             {
                 p_lLight = tree.GetTree("Light", false).Set(p_lLight, p_lLight, "Channel", "Light Channel Count");
-                m_eVision = (eVision)tree.GetTree("Vision").Set(m_eVision, m_eVision, "Type", "Vision Type");
+                p_eVision = (eVision)tree.GetTree("Vision").Set(p_eVision, p_eVision, "Type", "Vision Type");
                 RunCameraTree(tree.GetTree("Camera", true));
                 RunProcessTree(tree.GetTree("Process", false));
                 RunGrabDataTree(tree.GetTree("GrabData", false));
@@ -1094,10 +1053,15 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        public eVision m_eVision = eVision.Top2D;
+        #region IVision
+        public eVision p_eVision { get; set; }
+        public TreeRoot p_treeRootQueue { get { return m_treeRootQueue; } }
+        public Remote p_remote { get { return m_remote; } }
+        #endregion
+
         public Vision2D(eVision eVision, IEngineer engineer, eRemote eRemote)
         {
-            m_eVision = eVision;
+            p_eVision = eVision;
             InitVisionWorks();
             InitCalData();
             InitBase("Vision " + eVision.ToString(), engineer, eRemote);
@@ -1131,7 +1095,6 @@ namespace Root_Pine2_Vision.Module
             StateHome,
             RunLight,
             RunLightOff,
-            SendRecipe,
             SendSnapInfo,
             SendLotInfo,
             SendSortInfo,
@@ -1146,7 +1109,6 @@ namespace Root_Pine2_Vision.Module
             {
                 case eRemoteRun.StateHome: break;
                 case eRemoteRun.RunLight: run.m_lightPower = value; break;
-                case eRemoteRun.SendRecipe: run.m_sRecipe = value; break;
                 case eRemoteRun.SendSnapInfo: run.m_snapInfo = value; break;
                 case eRemoteRun.SendLotInfo: run.m_lotInfo = value; break;
                 case eRemoteRun.SendSortInfo: run.m_sortInfo = value; break;
@@ -1179,7 +1141,6 @@ namespace Root_Pine2_Vision.Module
 
             public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
             public LightPower m_lightPower;
-            public string m_sRecipe = "";
             public eWorks m_eWorks = eWorks.A;
             public SnapInfo m_snapInfo = new SnapInfo(eWorks.A, 0, "", 0); 
             public LotInfo m_lotInfo = new LotInfo(0, "", "", false, false, 0, 0);
@@ -1189,7 +1150,6 @@ namespace Root_Pine2_Vision.Module
                 Run_Remote run = new Run_Remote(m_module);
                 run.m_eRemoteRun = m_eRemoteRun;
                 run.m_lightPower = m_lightPower.Clone();
-                run.m_sRecipe = m_sRecipe;
                 run.m_eWorks = m_eWorks;
                 run.m_lotInfo = m_lotInfo.Clone();
                 run.m_sortInfo = m_sortInfo.Clone();
@@ -1203,7 +1163,6 @@ namespace Root_Pine2_Vision.Module
                 switch (m_eRemoteRun)
                 {
                     case eRemoteRun.RunLight: m_lightPower.RunTree(tree.GetTree("Light Power", true, bVisible), bVisible); break;
-                    case eRemoteRun.SendRecipe: m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible); break;
                     case eRemoteRun.SendSnapInfo: m_snapInfo.RunTree(tree.GetTree("SnapInfo"), bVisible); break;
                     case eRemoteRun.SendLotInfo: m_lotInfo.RunTree(tree.GetTree("LotInfo"), bVisible); break;
                     case eRemoteRun.SendSortInfo: m_sortInfo.RunTree(tree.GetTree("SortInfo"), bVisible); break;
@@ -1219,7 +1178,6 @@ namespace Root_Pine2_Vision.Module
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
                     case eRemoteRun.RunLightOff: m_module.RunLightOff(); break;
-                    case eRemoteRun.SendRecipe: return m_module.SendRecipe(m_sRecipe);
                     case eRemoteRun.SendSnapInfo: return m_module.SendSnapInfo(m_snapInfo);
                     case eRemoteRun.SendLotInfo: return m_module.SendLotInfo(m_lotInfo);
                     case eRemoteRun.SendSortInfo: return m_module.SendSortInfo(m_sortInfo);

@@ -130,7 +130,7 @@ namespace Root_WIND2
 
             m_recipe = new WIND2_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            p_process = new EFEM_Process("Process", m_engineer, iWTR, m_ILoadport);
+            p_process = new EFEM_Process("Process", m_engineer, iWTR, p_aLoadport);
         }
 
         void InitEFEMModule()
@@ -164,7 +164,7 @@ namespace Root_WIND2
 
             m_recipe = new WIND2_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            p_process = new EFEM_Process("Process", m_engineer, iWTR, m_ILoadport);
+            p_process = new EFEM_Process("Process", m_engineer, iWTR, p_aLoadport);
         }
 
         void InitModule(ModuleBase module)
@@ -694,6 +694,16 @@ namespace Root_WIND2
                 if (m_engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
                     m_vision.ThreadStop();
             }
+        }
+
+        public RnRData GetRnRData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateEvent()
+        {
+            throw new NotImplementedException();
         }
     }
 }

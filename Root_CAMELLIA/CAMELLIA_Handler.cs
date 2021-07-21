@@ -28,6 +28,13 @@ namespace Root_CAMELLIA
             if (OnRnRDone != null)
                 OnRnRDone();
         }
+
+        public event EventHandler OnListUpdate;
+        public void UpdateEvent()
+        {
+            if (OnListUpdate != null)
+                OnListUpdate();
+        }
         public ModuleList p_moduleList
         {
             get; set;
@@ -119,48 +126,35 @@ namespace Root_CAMELLIA
             if (EQ.p_eState != EQ.eState.Ready)
                 return false;
             IWTR iWTR = (IWTR)m_wtr;
-            foreach (IWTRChild child in iWTR.p_aChild)
-            {
-                if (child.p_infoWafer != null)
-                {
-                    if (!child.p_id.Contains("Loadport"))
-                    {
-                        if (child.IsWaferExist(0) == false) return false;
-                        if (child.IsWaferExist(0) == true) return true;
-                    }
-                    else
-                    {
-                        //if (!child.IsWaferExist(0))
-                        //{
-                        //    child.SetAlarm();
-                        //    return false;
-                        //}
-                    }
-                }
-                else if (child.p_infoWafer == null)
-                {
-                    if (!child.p_id.Contains("Loadport"))
-                    {
-                        if (child.IsWaferExist(0) == true)
-                        {
-                            child.SetAlarm();
-                            return false;
-                        }
-                    }
-                }
-                else if(child.p_infoWafer != null)
-                {
-                    //if (!child.p_id.Contains("Loadport"))
-                    //{
-                    //    if (!child.IsWaferExist(0))
-                    //    {
-                    //        child.SetAlarm();
-                    //        return false;
-                    //    }
-                    //}
-                }
-            }
-            return iWTR.IsEnableRecovery();
+            //foreach (IWTRChild child in iWTR.p_aChild)
+            //{
+            //    if (child.p_infoWafer != null)
+            //    {
+            //        if (!child.p_id.Contains("Loadport"))
+            //        {
+            //            if (child.IsWaferExist(0) == false) return false;
+            //            if (child.IsWaferExist(0) == true) return true;
+            //        }
+            //    }
+            //    else if (child.p_infoWafer == null)
+            //    {
+            //        if (!child.p_id.Contains("Loadport"))
+            //        {
+            //            if (child.IsWaferExist(0) == true)
+            //            {
+            //                child.SetAlarm();
+            //                return false;
+            //            }
+            //        }
+            //    }
+            //}
+            //bool isRecovery = m_bIsPossible_Recovery;
+            //if (m_IsCheckWTR)
+            //{
+            //    isRecovery = iWTR.IsEnableRecovery();
+            //}
+
+            return m_bIsPossible_Recovery;
         }
         #endregion
 
@@ -297,6 +291,7 @@ namespace Root_CAMELLIA
 
         #region StateHome
         public bool m_bIsPossible_Recovery = false;
+        public bool m_IsCheckWTR = false;
         public string StateHome()
         {
             m_HomeProgress.Reset();
@@ -315,7 +310,11 @@ namespace Root_CAMELLIA
                 m_gem.DeleteAllJobInfo();
             }
 
+            //m_bIsPossible_Recovery = false;
             IWTR iWTR = (IWTR)m_wtr;
+            //m_bIsPossible_Recovery = iWTR.IsEnableRecovery();
+
+            bool needRecovery = false;
             foreach (IWTRChild child in iWTR.p_aChild)
             {
                 if (child.p_infoWafer != null)
@@ -325,7 +324,12 @@ namespace Root_CAMELLIA
                         if (child.IsWaferExist(0) == false)
                         {
                             child.SetAlarm();
+                            m_bIsPossible_Recovery = false;
                             return "Wafer Check Error";
+                        }
+                        else
+                        {
+                            needRecovery = true;
                         }
                     }
                 }
@@ -336,12 +340,20 @@ namespace Root_CAMELLIA
                         if (child.IsWaferExist(0) == true)
                         {
                             child.SetAlarm();
+                            m_bIsPossible_Recovery = false;
                             return "Wafer Check Error";
                         }
                     }
                 }
             }
 
+
+            bool wtrRecovery = false;
+            if (!needRecovery)
+                wtrRecovery = iWTR.IsEnableRecovery();
+
+            m_bIsPossible_Recovery = needRecovery || wtrRecovery;
+            //m_bIsPossible_Recovery = ExistWaferInfoRecovery && NotExistWaferInfoRecovery;
             return sInfo;
         }
 
@@ -575,18 +587,29 @@ namespace Root_CAMELLIA
                             if ((EQ.p_nRnR > 1) && (p_process.p_qSequence.Count == 0))
                             {
                                 p_process.CopyRNRSeq();
+                                //SetGemSlotRnR();
                                 DoneEvent();
                                 EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
+                                
+                            }
+                            else if ((EQ.p_nRnR == 1) && (p_process.p_qSequence.Count == 1))
+                            {
+                                MarsLogManager.Instance.WriteLEH(EQ.p_nRunLP, m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_sLocID, SSLNet.LEH_EVENTID.PROCESS_JOB_END,
+                                    EQ.p_nRunLP == 0 ? MarsLogManager.Instance.m_flowDataA : MarsLogManager.Instance.m_flowDataB,
+                                    EQ.p_nRunLP == 0 ? MarsLogManager.Instance.m_dataFormatterA : MarsLogManager.Instance.m_dataFormatterB);
                             }
                             else if ((EQ.p_nRnR == 1) && (p_process.p_qSequence.Count == 0))
                             {
                                 DoneEvent();
                                 EQ.p_nRnR--;
+                                m_RnRData.ClearData();
                             }
                         }
                         break;
                 }
+                //CheckFinish();
+                //CheckFinish();
             }
         }
         /*
@@ -661,6 +684,12 @@ namespace Root_CAMELLIA
                     module.ThreadStop();
             }
            
+        }
+
+        RnRData m_RnRData = new RnRData();
+        public RnRData GetRnRData()
+        {
+            return m_RnRData;
         }
     }
 }

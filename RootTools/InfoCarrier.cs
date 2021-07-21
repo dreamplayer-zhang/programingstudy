@@ -267,8 +267,11 @@ namespace RootTools
                 else Thread.Sleep(10);
             }
             p_eReqTransfer = (p_ePresentSensor == ePresent.Exist) ? eTransfer.ReadyToUnload : eTransfer.ReadyToLoad;
-            if ((p_ePresentSensor == ePresent.Empty) && (m_gem != null) && m_gem.p_bOffline == false) 
+            if ((p_ePresentSensor == ePresent.Empty) && (m_gem != null) && m_gem.p_bOffline == false)
+            {
+                p_sCarrierID = "";
                 m_gem.RemoveCarrierInfo(p_sLocID);
+            }
         }
         #endregion
 
