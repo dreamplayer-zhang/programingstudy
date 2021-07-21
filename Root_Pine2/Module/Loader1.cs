@@ -171,6 +171,7 @@ namespace Root_Pine2.Module
                 Thread.Sleep(200); 
                 boat.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
+                boat.StartClean();
                 if (Run(m_axisXZ.WaitReady())) return p_sInfo;
             }
             finally

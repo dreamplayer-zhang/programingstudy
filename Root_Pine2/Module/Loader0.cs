@@ -473,6 +473,7 @@ namespace Root_Pine2.Module
                 boat.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
                 boat.p_infoStrip.m_eWorks = eWorks;
+                boat.StartClean(); 
                 if (Run(m_axis.WaitReady())) return p_sInfo;
             }
             finally

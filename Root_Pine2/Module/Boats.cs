@@ -181,6 +181,36 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region Clean Option
+        bool _bCleanRoller = false;
+        public bool p_bCleanRoller
+        {
+            get { return _bCleanRoller; }
+            set
+            {
+                _bCleanRoller = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool _bCleanBlow = false;
+        public bool p_bCleanBlow
+        {
+            get { return _bCleanBlow; }
+            set
+            {
+                _bCleanBlow = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public void RunTreeClean(Tree tree)
+        {
+            p_bCleanRoller = tree.Set(p_bCleanRoller, false, "Roller", "Clean Roller");
+            p_bCleanBlow = tree.Set(p_bCleanBlow, false, "Blow", "Clean Blow");
+        }
+        #endregion
+
         #region Snap
         public string StartSnap(eWorks eWorks, bool bReadRecipe)
         {
