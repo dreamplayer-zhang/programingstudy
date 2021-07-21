@@ -160,9 +160,9 @@ namespace Root_Pine2.Module
                 boat.RunVacuum(true);
                 Thread.Sleep((int)(1000 * m_secVacuum));
                 if (Run(RunMoveZ(c_sReady))) return p_sInfo;
+                boat.StartClean();
                 boat.p_infoStrip = p_infoStrip;
                 p_infoStrip = null;
-                boat.StartClean();
                 if (Run(RunMoveX(c_sReady))) return p_sInfo;
                 if (Run(RunTurnUp(true))) return p_sInfo;
             }
