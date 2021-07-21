@@ -205,7 +205,7 @@ namespace Root_Rinse_Unloader.Module
         public TCPIPServer m_tcpip;
         public override void GetTools(bool bInit)
         {
-            GetToolsDIO();
+            GetToolsDIO(bInit);
             p_sInfo = m_toolBox.GetComm(ref m_tcpip, this, "TCPIP");
             if (bInit) 
             {
@@ -254,7 +254,7 @@ namespace Root_Rinse_Unloader.Module
         DIO_Os m_doBuzzer;
         DIO_I m_diLightCurtain;
         DIO_O[] m_doEnable = new DIO_O[2];
-        void GetToolsDIO()
+        void GetToolsDIO(bool bInit)
         {
             p_sInfo = m_toolBox.GetDIO(ref m_diEMG, this, "Emergency");
             p_sInfo = m_toolBox.GetDIO(ref m_diAir, this, "Air Pressure");
@@ -265,6 +265,11 @@ namespace Root_Rinse_Unloader.Module
             p_sInfo = m_toolBox.GetDIO(ref m_diLightCurtain, this, "Light Curtain");
             p_sInfo = m_toolBox.GetDIO(ref m_doEnable[0], this, "EQ Enable0");
             p_sInfo = m_toolBox.GetDIO(ref m_doEnable[1], this, "EQ Enable1");
+            if (bInit)
+            {
+                m_doEnable[0].Write(true);
+                m_doEnable[1].Write(true);
+            }
         }
 
         bool _bEMG = false;
@@ -396,9 +401,8 @@ namespace Root_Rinse_Unloader.Module
                 case EQ.eState.Run: m_doLamp.Write(eLamp.Green); break;
                 case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
             }
-            bool bEnable = (EQ.p_eState == EQ.eState.Run) || (EQ.p_eState == EQ.eState.Ready); 
-            m_doEnable[0].Write(bEnable);
-            m_doEnable[1].Write(bEnable);
+            m_doEnable[0].Write(EQ.p_eState == EQ.eState.Error);
+            m_doEnable[1].Write(EQ.p_eState == EQ.eState.Error);
         }
         #endregion
 
