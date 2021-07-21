@@ -686,6 +686,7 @@ namespace Root_Pine2_Vision.Module
         public string RunSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
             EQ.p_bStop = false;
+            if (!m_bUseBiDirectional) recipe.m_eDirection = Recipe.Snap.eDirection.Forward;
             int nFOVpx = m_aGrabData[eWorks].m_nFovSize;
             int nReverseOffset = m_aGrabData[eWorks].m_nReverseOffset;
             int nOverlap = m_aGrabData[eWorks].m_nOverlap;
@@ -805,32 +806,52 @@ namespace Root_Pine2_Vision.Module
             {
                 if (nNextSnap < (nTotalSnap / 2))       // RGB
                 {
+                    if (m_bUseBiDirectional)
+                    {
+                        if (nNextSnapLineIndex % 2 == 0)
+                            thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+                        else
+                            thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
+                    }
+                    else
+                        thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+                }
+                else    // APS
+                {
+                    if (m_bUseBiDirectional)
+                    {
+                        if (nNextSnapLineIndex % 2 == 0)
+                            thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
+                        else
+                            thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
+                    }
+                    else
+                        thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
+                }
+            }
+            else if (nSnapMode == Recipe.eSnapMode.RGB)
+            {
+                if (m_bUseBiDirectional)
+                {
                     if (nNextSnapLineIndex % 2 == 0)
                         thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
                     else
                         thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
                 }
-                else    // APS
+                else
+                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+            }
+            else if (nSnapMode == Recipe.eSnapMode.APS)
+            {
+                if (m_bUseBiDirectional)
                 {
                     if (nNextSnapLineIndex % 2 == 0)
                         thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
                     else
                         thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
                 }
-            }
-            else if (nSnapMode == Recipe.eSnapMode.RGB)
-            {
-                if (nNextSnapLineIndex % 2 == 0)
-                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
                 else
-                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
-            }
-            else if (nSnapMode == Recipe.eSnapMode.APS)
-            {
-                if (nNextSnapLineIndex % 2 == 0)
                     thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
-                else
-                    thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
             }
         }
         private CPoint CalcOffset(int nSnapLineIndex, int nFOVpx, int nReverseOffset, Recipe.Snap recipe)
