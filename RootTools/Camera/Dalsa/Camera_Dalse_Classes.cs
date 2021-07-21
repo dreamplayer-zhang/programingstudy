@@ -288,7 +288,7 @@ namespace RootTools.Camera.Dalsa
             get { return m_eFlatFieldUserSet; }
             set
             {
-                if (m_eFlatFieldUserSet == value) return;
+                //if (m_eFlatFieldUserSet == value) return;
                 if (SetFlatFieldUserSet(value))
                 {
                     if (LoadCalibration())

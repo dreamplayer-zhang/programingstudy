@@ -54,6 +54,7 @@ namespace Root_Pine2.Module
         {
             m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum Sensor Wait (sec)");
             m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
+            m_secDrop = tree.Set(m_secDrop, m_secDrop, "Drop", "Strip Drop Time (sec)");
         }
         #endregion
 
@@ -79,15 +80,17 @@ namespace Root_Pine2.Module
             m_threadCheck.Start();
         }
 
+        double m_secDrop = 0.2;
         void RunThreadCheck()
         {
+            StopWatch sw = new StopWatch(); 
             m_bThread = true;
             Thread.Sleep(5000);
             while (m_bThread)
             {
                 Thread.Sleep(10);
-                m_alidDrop.p_bSet = ((p_infoStrip != null) && m_dioVacuum.p_bOut && (m_dioVacuum.p_bIn == false));
-                if (m_alidDrop.p_bSet) p_infoStrip = null; 
+                if ((p_infoStrip == null) || (m_dioVacuum.p_bOut == false) && m_dioVacuum.p_bIn) sw.Start(); 
+                m_alidDrop.p_bSet = (sw.ElapsedMilliseconds > (int)(1000 * m_secDrop));
             }
         }
         #endregion

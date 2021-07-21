@@ -53,7 +53,15 @@ namespace Root_WIND2.UI_User
             }
         }
 
-
+        private bool isEnableOthers = false;
+        public bool IsEnabledOthers
+        {
+            get => this.isEnableOthers;
+            set
+            {
+                SetProperty<bool>(ref this.isEnableOthers, value);
+            }
+        }
 
         #endregion
 
@@ -70,8 +78,8 @@ namespace Root_WIND2.UI_User
         public readonly UI_User.FrontsideAlignment frontsideAlignment = new UI_User.FrontsideAlignment();
         public readonly UI_User.FrontsideMask frontsideMask = new UI_User.FrontsideMask();
         public readonly UI_User.FrontsideSpec frontsideSpec = new UI_User.FrontsideSpec();
-        public readonly UI_User.FrontsideInspect frontsideInspect = new UI_User.FrontsideInspect();
-        
+         public readonly UI_User.FrontsideInspect frontsideInspect = new UI_User.FrontsideInspect();
+        public readonly UI_User.FrontsideOthers frontsideOthers = new UI_User.FrontsideOthers();
 
         // BACK
         //btnBackProduct
@@ -146,6 +154,12 @@ namespace Root_WIND2.UI_User
             get => frontsideInspectVM;
         }
 
+        private UI_User.FrontsideOthers_ViewModel frontsideOthersVM = new UI_User.FrontsideOthers_ViewModel();
+        public UI_User.FrontsideOthers_ViewModel FrontsideOthersVM
+        {
+            get => frontsideOthersVM;
+        }
+        
         #endregion
 
         #region [Back ViewModels]
@@ -268,6 +282,14 @@ namespace Root_WIND2.UI_User
             else
             {
                 this.IsEnabledSpec = true;
+            }
+            if (originRecipe.OriginWidth == 0 || originRecipe.OriginHeight == 0)
+            {
+                this.IsEnabledOthers = false;
+            }
+            else
+            {
+                this.IsEnabledOthers = true;
             }
         }
 
@@ -448,6 +470,18 @@ namespace Root_WIND2.UI_User
                 });
             }
         }
+
+        public ICommand btnFrontOthers
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(frontsideOthers);
+                    frontsideOthers.DataContext = frontsideOthersVM;
+                });
+            }
+        }        
 
         public ICommand btnNewRecipeFront
         {

@@ -40,6 +40,8 @@ namespace Root_Vega
             get { return Brushes.BurlyWood; }
             set { }
         }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion 
 
         #region Module

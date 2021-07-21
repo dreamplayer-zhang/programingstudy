@@ -88,10 +88,10 @@ namespace Root_CAMELLIA
             CurrentCandidatePoint = -1;
             CurrentSelectPoint = -1;
 
-          
-            
+
+
             //dialogService = new DialogService(this);
-            
+
 
             //DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.SystemIdle);    //객체생성
 
@@ -709,7 +709,7 @@ namespace Root_CAMELLIA
                 else if (int.TryParse(value, out val))
                 {
                     _VISIntegrationTime = val.ToString();
-                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = val;     
+                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = val;
                 }
                 else
                 {
@@ -734,7 +734,7 @@ namespace Root_CAMELLIA
                     _NIRIntegrationTime = "0";
                     dataManager.recipeDM.TeachingRD.NIRIntegrationTime = 0;
                 }
-                else if(int.TryParse(value, out val))
+                else if (int.TryParse(value, out val))
                 {
                     _NIRIntegrationTime = val.ToString();
                     dataManager.recipeDM.TeachingRD.NIRIntegrationTime = val;
@@ -743,8 +743,8 @@ namespace Root_CAMELLIA
                 {
                     _NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime.ToString();
                 }
-               
-              
+
+
                 RaisePropertyChanged("NIRIntegrationTime");
             }
         }
@@ -766,7 +766,7 @@ namespace Root_CAMELLIA
                 }
                 else if (int.TryParse(value, out val))
                 {
-                    if(val >= 30)
+                    if (val >= 30)
                     {
                         val = 30;
                     }
@@ -908,7 +908,7 @@ namespace Root_CAMELLIA
             set
             {
                 double val;
-                if(double.TryParse(value, out val))
+                if (double.TryParse(value, out val))
                 {
                     _WaveLengthValue = val.ToString("N3");
                 }
@@ -941,7 +941,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                SetProperty(ref _WaveLenghOffset,value);
+                SetProperty(ref _WaveLenghOffset, value);
             }
         }
 
@@ -1378,7 +1378,7 @@ namespace Root_CAMELLIA
             int idx = 0;
             if (p_isCustomize)
             {
-                foreach(ShapeEllipse se in listCandidateSelectedPoint)
+                foreach (ShapeEllipse se in listCandidateSelectedPoint)
                 {
                     se.SetBrush(GeneralTools.CustomSelectBrush);
                 }
@@ -1426,7 +1426,7 @@ namespace Root_CAMELLIA
                     se.SetBrush(GeneralTools.GbHole);
                 }
             }
-           
+
         }
         public void OnMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
@@ -1649,7 +1649,7 @@ namespace Root_CAMELLIA
                 }
             }
 
-          
+
             //else
             //{
             //    if (StageMouseHoverUpdate)
@@ -1751,7 +1751,7 @@ namespace Root_CAMELLIA
 
             System.Windows.Point pt = e.GetPosition((UIElement)sender);
 
-            
+
 
             int nOffsetDiffX = (int)(CenterX - pt.X);
             int nOffsetDiffY = (int)(-CenterY + pt.Y);
@@ -1768,7 +1768,7 @@ namespace Root_CAMELLIA
                     {
                         OffsetY -= (int)(CenterY - pt.Y);
                     }
-                    
+
                     //OffsetX += (CenterX - (int)pt.X);
                     //OffsetY += -(CenterY - (int)pt.Y);
                 }
@@ -1864,12 +1864,12 @@ namespace Root_CAMELLIA
             }
             else if (p_isCustomize)
             {
-                if(p_isPoint)
+                if (p_isPoint)
                 {
                     CustomizeStageMap(pt);
-                  
+
                 }
-                else if(p_isSelect)
+                else if (p_isSelect)
                 {
                     if (Math.Abs(SelectStartPoint.X - SelectEndPoint.X) > Limit || Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y) > Limit)
                     {
@@ -1904,7 +1904,7 @@ namespace Root_CAMELLIA
                                     if (!ContainsData(m_customizeRD.DataCandidateSelectedPoint, circle, out _index))
                                     {
                                         //dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count);
-                                         m_customizeRD.DataCandidateSelectedPoint.Add(circle);
+                                        m_customizeRD.DataCandidateSelectedPoint.Add(circle);
                                         //RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
                                     }
                                 }
@@ -2002,12 +2002,12 @@ namespace Root_CAMELLIA
                 System.Diagnostics.Debug.WriteLine(swa.ElapsedMilliseconds);
                 swa.Start();
                 UpdateView();
-               
+
                 swa.Stop();
                 System.Diagnostics.Debug.WriteLine(swa.ElapsedMilliseconds);
 
 
-                
+
             }
 
 
@@ -2046,7 +2046,7 @@ namespace Root_CAMELLIA
                 OffsetX = -(int)((nPreviewX * ZoomScale));
                 OffsetY = (int)((nPreviewY * ZoomScale));
 
-                
+
 
                 RedrawStage();
             }
@@ -2183,7 +2183,7 @@ namespace Root_CAMELLIA
         {
             int index = 0;
 
-            
+
             //stage.
             CustomEllipseGeometry stageField = Geometry[index] as CustomEllipseGeometry;
             viewStageField.Set(GeneralTools.DataStageField);
@@ -2211,7 +2211,7 @@ namespace Root_CAMELLIA
                 index++;
             }
 
-          
+
 
             // 엣지부분 흰색 영역
             for (int i = 0; i < 2 * GeneralTools.EdgeNum; i++)
@@ -2221,7 +2221,7 @@ namespace Root_CAMELLIA
                 viewStageEdgeHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
             }
 
- 
+
             for (int n = 0; n < GeneralTools.EdgeNum; n++)
             {
                 CustomPathGeometry edgeArc = Geometry[index] as CustomPathGeometry;
@@ -2573,7 +2573,7 @@ namespace Root_CAMELLIA
                     Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                     dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), 96, true);
 
-                   // else
+                    // else
                     {
                         dataSelectedPoint.SetBrush(GeneralTools.CustomSelectBrush);
                     }
@@ -2583,7 +2583,7 @@ namespace Root_CAMELLIA
 
                 }
             }
-          
+
             Rect rect = DataViewPosition;
             rect.X = rect.X / ZoomScale - OffsetX / ZoomScale * 1000 / (double)1000;
             rect.Y = rect.Y / ZoomScale - OffsetY / ZoomScale * 1000 / (double)1000;
@@ -2657,18 +2657,18 @@ namespace Root_CAMELLIA
 
         public void SetSelectRect()
         {
-                selectRectangle = new CustomRectangleGeometry(GeneralTools.SelectPointBrush);
-                CustomRectangleGeometry select = selectRectangle as CustomRectangleGeometry;
+            selectRectangle = new CustomRectangleGeometry(GeneralTools.SelectPointBrush);
+            CustomRectangleGeometry select = selectRectangle as CustomRectangleGeometry;
 
-                Rect selectRect = new Rect(Math.Min(SelectStartPoint.X, SelectEndPoint.X), Math.Min(SelectStartPoint.Y, SelectEndPoint.Y),
-                    Math.Abs(SelectStartPoint.X - SelectEndPoint.X), Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y));
+            Rect selectRect = new Rect(Math.Min(SelectStartPoint.X, SelectEndPoint.X), Math.Min(SelectStartPoint.Y, SelectEndPoint.Y),
+                Math.Abs(SelectStartPoint.X - SelectEndPoint.X), Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y));
 
-                select.SetData(selectRect, 99);
-                SelectGeometry.Add(select);
-                m_DrawSelectElement.Add(select.path);
+            select.SetData(selectRect, 99);
+            SelectGeometry.Add(select);
+            m_DrawSelectElement.Add(select.path);
         }
 
-      
+
         public ObservableCollection<ModelData.LayerData> GetLayerData()
         {
             UpdateLayerGridView(false);
@@ -2778,7 +2778,7 @@ namespace Root_CAMELLIA
                 }
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                 dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height), 95);
-                
+
                 temp.Add(dataCandidatePoint.UIElement);
                 if (!preview)
                 {
@@ -2857,7 +2857,7 @@ namespace Root_CAMELLIA
                 CurrentCandidatePoint = -1;
                 CurrentSelectPoint = -1;
                 sw.Start();
-             
+
                 p_DrawPointElement.Clear();
                 Shapes.Clear();
                 TextBlocks.Clear();
@@ -3004,10 +3004,10 @@ namespace Root_CAMELLIA
             {
                 App.m_nanoView.m_LayerList.Clear();
                 LibSR_Met.DataManager.GetInstance().m_ThicknessData.Clear();
-                dataManager.recipeDM.MeasureModelData.AddLayer(isSave : false);
-                dataManager.recipeDM.MeasureModelData.AddLayer(isSave : false);
+                dataManager.recipeDM.MeasureModelData.AddLayer(isSave: false);
+                dataManager.recipeDM.MeasureModelData.AddLayer(isSave: false);
             }
-            
+
         }
 
         private void UpdateParameter()
@@ -3281,7 +3281,7 @@ namespace Root_CAMELLIA
 
                         Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                         dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), 96, true);
-                      
+
                         if (!preview)
                         {
                             Shapes.Add(dataSelectedPoint);
@@ -3568,7 +3568,7 @@ namespace Root_CAMELLIA
                 viewStageTopHoleArc[i].Set(GeneralTools.DataStageTopHoleArc[i]);
                 viewStageTopHoleArc[i].Transform(RatioX, RatioY);
                 viewStageTopHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
-                
+
                 //Bot
                 viewStageBotHoleArc[i] = new Arc();
                 viewStageBotHoleArc[i].Set(GeneralTools.DataStageBotHoleArc[i]);
@@ -3875,7 +3875,7 @@ namespace Root_CAMELLIA
                 {
                     MessageBox.Show("Check Size");
                 }
-               
+
             }
             else
             {
@@ -3938,7 +3938,7 @@ namespace Root_CAMELLIA
                     {
                         SetStartEndPointMode = false;
                         ReorderCnt = 0;
-                       // ReorderBrush = normalBrush;
+                        // ReorderBrush = normalBrush;
                     }
                 }
             }
@@ -4187,7 +4187,7 @@ namespace Root_CAMELLIA
 
         public bool CheckSaveLayerData()
         {
-            if(p_UseThickness && dataManager.recipeDM.SaveRecipeRD.ModelRecipePath == "")
+            if (p_UseThickness && dataManager.recipeDM.SaveRecipeRD.ModelRecipePath == "")
             {
                 CustomMessageBox.Show("Caution", "Model Not Saved!", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Warning);
                 return false;
@@ -4300,7 +4300,7 @@ namespace Root_CAMELLIA
             }
             else
             {
-                foreach(string str in MaterialMeasureListItem)
+                foreach (string str in MaterialMeasureListItem)
                 {
                     exist = false;
                     Material = Path.GetFileNameWithoutExtension(str);
@@ -4324,7 +4324,7 @@ namespace Root_CAMELLIA
                     }
                 }
             }
-           
+
         }
 
         public void DeleteGridCombo(bool isSave = true)
@@ -4355,7 +4355,7 @@ namespace Root_CAMELLIA
                     }
                 }
             }
-           
+
         }
 
         public bool CheckMaterialUse()
@@ -4396,7 +4396,7 @@ namespace Root_CAMELLIA
                     cnt--;
                 }
             }
-           
+
         }
 
         private void UpdateLayerModel()
@@ -4412,7 +4412,7 @@ namespace Root_CAMELLIA
         private bool CheckLayerHost()
         {
             int cnt = LayerCount - 1;
-            for(int i = 0; i < GridLayerData.Count; i++)
+            for (int i = 0; i < GridLayerData.Count; i++)
             {
                 if (!GridLayerData[i].CheckLayerHost(cnt))
                 {
@@ -4464,18 +4464,18 @@ namespace Root_CAMELLIA
             else
             {
                 MeasureLayerCount = dataManager.recipeDM.MeasureModelData.GetLayerCount(false);
-                if(MeasureLayerCount == 0)
+                if (MeasureLayerCount == 0)
                 {
                     MeasureLayerCount = 2;
                 }
                 loop = MeasureLayerCount;
             }
-             
 
-           
+
+
             string[] strHeader = { "Sub.", "1st L.", "2nd L.", "3rd L.", "4th L.", "5th L.", "6th L.", "7th L.", "8th L.", "9th L.", "10th L." };
 
-            
+
             int rows = loop - 1;
             for (int i = 0; i < loop; i++)
             {
@@ -4488,7 +4488,7 @@ namespace Root_CAMELLIA
                 }
                 else
                 {
-                    if(isSave)
+                    if (isSave)
                         GridLayerData.Add(new ModelData.LayerData(strHeader[rows]));
                     else
                         GridMeasureLayerData.Add(new ModelData.LayerData(strHeader[rows]));
@@ -4590,7 +4590,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     double x, y;
-                    if(double.TryParse(p_SettingPointX, out x) && double.TryParse(p_SettingPointY, out y))
+                    if (double.TryParse(p_SettingPointX, out x) && double.TryParse(p_SettingPointY, out y))
                     {
                         CustomizeStageMap(x, y);
                     }
@@ -4657,7 +4657,7 @@ namespace Root_CAMELLIA
         {
             double dStartR, dEndR, dStepR, dStepAngle, dSize;
 
-            if(!double.TryParse(p_circleSize, out dSize) || !double.TryParse(p_SettingRRangeMin, out dStartR) || !double.TryParse(p_SettingRRangeMax, out dEndR) || !double.TryParse(p_SettingRStep, out dStepR)
+            if (!double.TryParse(p_circleSize, out dSize) || !double.TryParse(p_SettingRRangeMin, out dStartR) || !double.TryParse(p_SettingRRangeMax, out dEndR) || !double.TryParse(p_SettingRStep, out dStepR)
                 || !double.TryParse(p_SettingAngle, out dStepAngle))
             {
                 return;
@@ -4706,7 +4706,7 @@ namespace Root_CAMELLIA
                         }
 
                         m_customizeRD.DataCandidatePoint.Add(circle);
-                      
+
                         //m_customizeRD.DataCandidateSelectedPoint.Add(circle);
                     }
                 }
@@ -4759,14 +4759,14 @@ namespace Root_CAMELLIA
 
                             UpdateListView();
                         }
-                     
+
                         //dataManager.recipeDM.MeasurementRD.CheckCircleSize();
 
                         //dataManager.recipeDM.MeasurementRD.Clone(dataManager.recipeDM.TeachingRD);
 
                         customizePath = dialog.FileName;
 
-                      
+
                         UpdateView();
                     }
                 });
@@ -4779,9 +4779,9 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    for(int i = 0; i < m_customizeRD.DataCandidateSelectedPoint.Count; i++)
+                    for (int i = 0; i < m_customizeRD.DataCandidateSelectedPoint.Count; i++)
                     {
-                        for(int j = 0; j < m_customizeRD.DataCandidatePoint.Count; j++)
+                        for (int j = 0; j < m_customizeRD.DataCandidatePoint.Count; j++)
                         {
                             if (m_customizeRD.DataCandidateSelectedPoint[i].x == m_customizeRD.DataCandidatePoint[j].x
                             && m_customizeRD.DataCandidateSelectedPoint[i].y == m_customizeRD.DataCandidatePoint[j].y)
@@ -4842,13 +4842,13 @@ namespace Root_CAMELLIA
                         ListReorderPoint.Clear();
                         ReorderCnt = 0;
                         SetStartEndPointMode = true;
-                      //  ReorderBrush = buttonSelectBrush;
+                        //  ReorderBrush = buttonSelectBrush;
                         PointAddMode = "Reorder Mode";
                     }
                     else
                     {
                         SetStartEndPointMode = false;
-                    //    ReorderBrush = normalBrush;
+                        //    ReorderBrush = normalBrush;
                         PointAddMode = "Normal";
                     }
                     UpdateView();
@@ -4863,12 +4863,12 @@ namespace Root_CAMELLIA
                 {
                     if (IsShowIndex)
                     {
-                       // ShowIndexBrush = normalBrush;
+                        // ShowIndexBrush = normalBrush;
                         IsShowIndex = false;
                     }
                     else
                     {
-                       // ShowIndexBrush = buttonSelectBrush;
+                        // ShowIndexBrush = buttonSelectBrush;
                         IsShowIndex = true;
 
                     }
@@ -4885,13 +4885,13 @@ namespace Root_CAMELLIA
                 {
                     if (IsLockUI)
                     {
-                       // LockBrush = normalBrush;
+                        // LockBrush = normalBrush;
                         LockState = "Lock UI";
                         IsLockUI = false;
                     }
                     else
                     {
-                      //  LockBrush = buttonSelectBrush;
+                        //  LockBrush = buttonSelectBrush;
                         LockState = "UnLock UI";
                         IsLockUI = true;
 
@@ -5138,8 +5138,8 @@ namespace Root_CAMELLIA
                         m_customizeRD.DataCandidatePoint = (List<CCircle>)GeneralFunction.Read(m_customizeRD.DataCandidatePoint, BaseDefine.Dir_StageMap + "Preset 1.smp");
                         InitCandidatePoint(m_customizeRD);
                     }
-                  
-                    
+
+
                     UpdateView();
 
                 });
@@ -5295,7 +5295,7 @@ namespace Root_CAMELLIA
                     {
                         if (m_customizeRD.DataMeasurementRoute[j] > idx)
                         {
-                           m_customizeRD.DataMeasurementRoute[j] = m_customizeRD.DataMeasurementRoute[j] - 1;
+                            m_customizeRD.DataMeasurementRoute[j] = m_customizeRD.DataMeasurementRoute[j] - 1;
                         }
                     }
                     //i = 0;
@@ -5356,7 +5356,7 @@ namespace Root_CAMELLIA
                         UpdateParameter();
                         ClearViewData();
                         UpdateView();
-                        
+
                         RecipePath = dataManager.recipeDM.TeachingRecipePath;
                     }
                 });
@@ -5505,7 +5505,7 @@ namespace Root_CAMELLIA
                     double value = Convert.ToDouble(WaveLengthValue);
                     if (p_SettingViewModel.p_ExceptNIR)
                     {
-                        if(value < 350 || value > 950)
+                        if (value < 350 || value > 950)
                         {
                             MessageBox.Show("350nm ~ 950nm");
                             WaveLengthValue = "0";
@@ -5515,7 +5515,7 @@ namespace Root_CAMELLIA
                     }
                     else
                     {
-                        if(value < 350 || value > 1500)
+                        if (value < 350 || value > 1500)
                         {
                             MessageBox.Show("350nm ~ 1500nm");
                             WaveLengthValue = "0";
@@ -5534,17 +5534,11 @@ namespace Root_CAMELLIA
                     {
                         dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Add(item);
                         ReflectanceListItem.Add(item);
-                        ReflectanceListItem = new ObservableCollection<WavelengthItem>(ReflectanceListItem.OrderBy(x => x.p_waveLength));
-                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Sort((x1, x2) => x1.p_waveLength.CompareTo(x2.p_waveLength));
-                        //ReflectanceListItem.Add(value);
-                        //ReflectanceListItem = new ObservableCollection<double>(ReflectanceListItem.OrderBy(x=>x));
                     }
-                    else if(IsTransmittanceCheck)
+                    else if (IsTransmittanceCheck)
                     {
                         dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Add(item);
                         TransmittanceListItem.Add(item);
-                        TransmittanceListItem = new ObservableCollection<WavelengthItem>(TransmittanceListItem.OrderBy(x => x.p_waveLength));
-                        dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Sort((x1, x2) => x1.p_waveLength.CompareTo(x2.p_waveLength));
                     }
                     //WaveLengthValue = "0";
                     MyIsFocused = true;
@@ -5557,9 +5551,9 @@ namespace Root_CAMELLIA
             if (IsReflectanceCheck)
             {
                 int nRWLCount = 0;
-                foreach(WavelengthItem item in dataManager.recipeDM.TeachingRD.WaveLengthReflectance)
+                foreach (WavelengthItem item in dataManager.recipeDM.TeachingRD.WaveLengthReflectance)
                 {
-                    if(item.p_waveLength == wave && item.p_scale == Scale && item.p_offset == Offset)
+                    if (item.p_waveLength == wave && item.p_scale == Scale && item.p_offset == Offset)
                     {
                         return false;
                     }
@@ -5570,7 +5564,7 @@ namespace Root_CAMELLIA
                     }
                     nRWLCount++;
                 }
-            }   
+            }
             else
             {
                 int nTWLCount = 0;
@@ -5599,7 +5593,7 @@ namespace Root_CAMELLIA
                 {
                     if (IsReflectanceCheck)
                     {
-                        if(ReflectanceSelectedIndex == -1)
+                        if (ReflectanceSelectedIndex == -1)
                         {
                             return;
                         }
@@ -5626,7 +5620,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     bool res = dataManager.recipeDM.AddMaterial();
-                    if(res)
+                    if (res)
                     {
                         MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.SaveModelData.MaterialList.ToArray());
                     }
@@ -5643,7 +5637,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     //MaterialListItem.Clear();
-                    if(CheckMaterialUse() == false)
+                    if (CheckMaterialUse() == false)
                     {
                         UpdateLayerModel();
                         dataManager.recipeDM.DeleteMaterial(MaterialSelectIndex);
@@ -5663,18 +5657,18 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                  
-                    if(dataManager.recipeDM.OpenModel() == true)
+
+                    if (dataManager.recipeDM.OpenModel() == true)
                     {
                         GridLayerData.Clear();
                         MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.SaveModelData.MaterialList.ToArray());
                         ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
 
                         InitLayerGrid();
-                        
+
                         DeleteGridCombo();
                         UpdateGridCombo();
-                        
+
                         UpdateLayerGrid();
                     }
                 });
@@ -5696,9 +5690,9 @@ namespace Root_CAMELLIA
                     }
                     if (dataManager.recipeDM.SaveModel())
                     {
-                        if(dataManager.recipeDM.SaveRecipeRD.ModelRecipePath != dataManager.recipeDM.TeachingRD.ModelRecipePath)
+                        if (dataManager.recipeDM.SaveRecipeRD.ModelRecipePath != dataManager.recipeDM.TeachingRD.ModelRecipePath)
                         {
-                            if(CustomMessageBox.Show("Caution!", "Model Path has been Changed! Change the Model Path?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Warning) == MessageBoxResult.OK)
+                            if (CustomMessageBox.Show("Caution!", "Model Path has been Changed! Change the Model Path?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Warning) == MessageBoxResult.OK)
                             {
                                 ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
                                 isModelPathChange = true;
@@ -5721,7 +5715,7 @@ namespace Root_CAMELLIA
                         CustomMessageBox.Show("Error", "Select Layer row", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
                         return;
                     }
-                    if(GridLayerData.Count == 12)
+                    if (GridLayerData.Count == 12)
                     {
                         CustomMessageBox.Show("Error", "Cannot add any more.", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
                         return;

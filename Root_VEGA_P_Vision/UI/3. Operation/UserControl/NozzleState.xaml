@@ -15,8 +15,18 @@
             <Canvas.Background>
                 <ImageBrush ImageSource="{Binding ImgSrc}" Stretch="Uniform"/>
             </Canvas.Background>
-            <Rectangle Fill="{StaticResource WorkingNozzleColor}" Height="60" Width="60" Canvas.Top="363" Canvas.Left="72" RadiusX="10" RadiusY="10" x:Name="CoverNozzle1_1"/>
-            <Rectangle Fill="{StaticResource WorkingNozzleColor}" Height="60" Width="60" Canvas.Top="440" Canvas.Left="72" RadiusX="10" RadiusY="10" x:Name="CoverNozzle1_2"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}"  Height="60" Width="60" Canvas.Top="363" Canvas.Left="72" RadiusX="10" RadiusY="10" Visibility="{Binding IsCoverNozzle[0]}"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}" Height="60" Width="40" Canvas.Top="445" Canvas.Left="72" RadiusX="10" RadiusY="10" x:Name="CoverNozzle1_2"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}" Height="60" Width="40" Canvas.Top="100" Canvas.Left="72" RadiusX="10" RadiusY="10" x:Name="CoverNozzle2_1"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}"  Height="60" Width="60" Canvas.Top="120" Canvas.Left="135" RadiusX="10" RadiusY="10" x:Name="CoverNozzle2_2"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}" Height="60" Width="40" Canvas.Top="100" Canvas.Left="400" RadiusX="10" RadiusY="10" x:Name="CoverNozzle3_1"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}"  Height="60" Width="60" Canvas.Top="180" Canvas.Left="380" RadiusX="10" RadiusY="10" x:Name="CoverNozzle3_2"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}" Height="60" Width="40" Canvas.Top="445" Canvas.Left="400" RadiusX="10" RadiusY="10" x:Name="CoverNozzle4_1"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}"  Height="60" Width="60" Canvas.Top="427" Canvas.Left="316" RadiusX="10" RadiusY="10" x:Name="CoverNozzle4_2"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}"  Height="160" Width="110" Canvas.Top="190" Canvas.Left="28" RadiusX="10" RadiusY="10" x:Name="CoverNozzle5"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}"  Height="160" Width="110" Canvas.Top="270" Canvas.Left="370" RadiusX="10" RadiusY="10" x:Name="CoverNozzle6"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}"  Height="170" Width="170" Canvas.Top="120" Canvas.Left="205" RadiusX="10" RadiusY="10" x:Name="CoverNozzle7"/>
+            <Rectangle Fill="{StaticResource WorkingNozzleColor}"  Height="170" Width="170" Canvas.Top="315" Canvas.Left="137" RadiusX="10" RadiusY="10" x:Name="CoverNozzle8"/>
         </Canvas>
         <Grid Grid.Row="1">
             <ItemsControl ItemsSource="{Binding Nozzles}">

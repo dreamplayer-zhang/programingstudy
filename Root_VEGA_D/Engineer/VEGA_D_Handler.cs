@@ -369,6 +369,8 @@ namespace Root_VEGA_D.Engineer
             }
             return null;
         }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         #region Thread
@@ -379,7 +381,7 @@ namespace Root_VEGA_D.Engineer
             m_thread = new Thread(new ThreadStart(RunThread));
             m_thread.Start();
         }
-        int m_nCount = 0;
+
         void RunThread()
         {
             m_bThread = true;
@@ -402,8 +404,6 @@ namespace Root_VEGA_D.Engineer
                             m_process.p_sInfo = m_process.RunNextSequence();
                             if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
-                                m_nCount = EQ.p_nRnR < 1 ? 0 : EQ.p_nRnR;
-                                m_engineer.m_handler.m_interlock.m_log.Info("RNR Start, RNR Count : " + m_nCount);
                                 while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();

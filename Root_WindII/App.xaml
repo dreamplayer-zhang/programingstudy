@@ -563,5 +563,398 @@
             <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
             <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
         </Style>
+
+        <Style x:Key="CustomProgress"
+       TargetType="{x:Type ProgressBar}">
+            <Setter Property="Foreground"
+            Value="#01D328"/>
+            <Setter Property="Background"
+            Value="{StaticResource ProgressBarBackground}"/>
+            <Setter Property="BorderBrush"
+            Value="{StaticResource ProgressBarBorderBrush}"/>
+            <Setter Property="BorderThickness"
+            Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ProgressBar}">
+                        <Grid Name="TemplateRoot"
+                      SnapsToDevicePixels="true">
+                            <Rectangle Fill="{TemplateBinding Background}"
+                               RadiusX="2"
+                               RadiusY="2"/>
+                            <Border Background="{StaticResource ProgressBarGlassyHighlight}"
+                            Margin="1"
+                            CornerRadius="2"/>
+                            <Border BorderBrush="#80FFFFFF"
+                            Background="{StaticResource ProgressBarTopHighlight}"
+                            BorderThickness="1,0,1,1"
+                            Margin="1"/>
+                            <Rectangle Name="PART_Track"
+                               Margin="1"/>
+
+                            <Decorator x:Name="PART_Indicator"
+                               HorizontalAlignment="Left"
+                               Margin="1">
+                                <Grid Name="Foreground">
+                                    <Rectangle x:Name="Indicator"
+                                       Fill="{TemplateBinding Foreground}"/>
+                                    <Grid x:Name="Animation" ClipToBounds="true">
+                                        <Rectangle x:Name="PART_GlowRect" Width="100" 
+                                            Fill="{StaticResource ProgressBarIndicatorAnimatedFill}"
+                                            Margin="-100,0,0,0"
+                                            HorizontalAlignment="Left">
+                                        </Rectangle>
+                                    </Grid>
+                                    <Grid x:Name="Overlay">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MaxWidth="15"/>
+                                            <ColumnDefinition Width="0.1*"/>
+                                            <ColumnDefinition MaxWidth="15"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <Rectangle x:Name="LeftDark"
+                                           Grid.RowSpan="2"
+                                           Fill="{StaticResource ProgressBarIndicatorDarkEdgeLeft}"
+                                           RadiusX="1"
+                                           RadiusY="1"
+                                           Margin="1,1,0,1"/>
+                                        <Rectangle x:Name="RightDark"
+                                           Grid.RowSpan="2"
+                                           Grid.Column="2"
+                                           RadiusX="1"
+                                           RadiusY="1"
+                                           Fill="{StaticResource ProgressBarIndicatorDarkEdgeRight}"
+                                           Margin="0,1,1,1"/>
+                                        <Rectangle x:Name="LeftLight"
+                                           Grid.Column="0"
+                                           Grid.Row="2"
+                                           Fill="{StaticResource ProgressBarIndicatorLightingEffectLeft}"/>
+                                        <Rectangle x:Name="CenterLight"
+                                           Grid.Column="1"
+                                           Grid.Row="2"
+                                           Fill="{StaticResource ProgressBarIndicatorLightingEffect}"/>
+                                        <Rectangle x:Name="RightLight"
+                                           Grid.Column="2"
+                                           Grid.Row="2"
+                                           Fill="{StaticResource ProgressBarIndicatorLightingEffectRight}"/>
+                                        <Border x:Name="Highlight1"
+                                        Grid.RowSpan="2"
+                                        Grid.ColumnSpan="3"
+                                        Background="{StaticResource ProgressBarIndicatorGlassyHighlight}"/>
+                                        <Border x:Name="Highlight2"
+                                        Grid.RowSpan="2" 
+                                        Grid.ColumnSpan="3"
+                                        Background="{StaticResource ProgressBarTopHighlight}"/>
+                                    </Grid>
+                                </Grid>
+                            </Decorator>
+
+                            <Border BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            CornerRadius="2"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Orientation"
+                             Value="Vertical">
+                                <Setter TargetName="TemplateRoot"
+                                Property="LayoutTransform">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="-90"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+
+                            <Trigger Property="IsIndeterminate"
+                             Value="true">
+                                <Setter TargetName="LeftDark"
+                                Property="Visibility"
+                                Value="Collapsed"/>
+                                <Setter TargetName="RightDark"
+                                Property="Visibility"
+                                Value="Collapsed"/>
+                                <Setter TargetName="LeftLight"
+                                Property="Visibility"
+                                Value="Collapsed"/>
+                                <Setter TargetName="CenterLight"
+                                Property="Visibility"
+                                Value="Collapsed"/>
+                                <Setter TargetName="RightLight"
+                                Property="Visibility"
+                                Value="Collapsed"/>
+                                <Setter TargetName="Indicator"
+                                Property="Visibility"
+                                Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="IsIndeterminate"
+                             Value="false">
+                                <Setter TargetName="Animation"
+                                Property="Background"
+                                Value="#80B5FFA9"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <Style x:Key="customCheckButton" TargetType="CheckBox">
+            <Setter Property="FontFamily" Value="consolas"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid>
+                            <Border x:Name="checkBoxBorder" CornerRadius="4" BorderBrush="Black">
+                                <Border.Effect>
+                                    <DropShadowEffect 
+                                  ShadowDepth="2"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                </Border.Effect>
+                                <Border.Background>
+                                    <SolidColorBrush Color="GhostWhite"/>
+                                </Border.Background>
+                            </Border>
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="True"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="checkBoxBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#aa86ff75"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="True"/>
+                                    <Condition Property="IsMouseOver" Value="False"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="checkBoxBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#86ff75"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="False"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="checkBoxBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect 
+                                  ShadowDepth="0"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="checkBoxBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#efefef"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Foreground" Value="#333333"/>
+                            </MultiTrigger>
+                            <!--<Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="checkBoxBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="Red"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>-->
+                            <!--<Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="buttonBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect 
+                                  ShadowDepth="0"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="buttonBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#efefef"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Foreground" Value="#333333"/>
+                            </Trigger>-->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="checkBoxBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect 
+                                  ShadowDepth="0"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="checkBoxBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="LightGray"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Foreground" Value="#333333"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="customButton" TargetType="Button">
+            <Setter Property="FontFamily" Value="consolas"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="buttonBorder" CornerRadius="4" BorderBrush="Black">
+                                <Border.Effect>
+                                    <DropShadowEffect 
+                                  ShadowDepth="2"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                </Border.Effect>
+                                <Border.Background>
+                                    <SolidColorBrush Color="GhostWhite"/>
+                                </Border.Background>
+                            </Border>
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="buttonBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect 
+                                  ShadowDepth="1"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="buttonBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#fafafa"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Foreground" Value="#333333"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="buttonBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect 
+                                  ShadowDepth="0"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="buttonBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#efefef"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="buttonBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect 
+                                  ShadowDepth="0"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="buttonBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#cacaca"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Foreground" Value="#dddddd"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <Style x:Key="customLoadButton" TargetType="Button">
+            <Setter Property="FontFamily" Value="consolas"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="buttonBorder" CornerRadius="4" BorderBrush="Black">
+                                <Border.Effect>
+                                    <DropShadowEffect 
+                                  ShadowDepth="2"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                </Border.Effect>
+                                <Border.Background>
+                                    <SolidColorBrush Color="#86ff75"/>
+                                </Border.Background>
+                            </Border>
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="buttonBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect 
+                                  ShadowDepth="1"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="buttonBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#86ee75"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Foreground" Value="#333333"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="buttonBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect 
+                                  ShadowDepth="0"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="buttonBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#86cc75"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="buttonBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect 
+                                  ShadowDepth="0"
+                                  Color="Black"
+                                  Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="buttonBorder" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#cacaca"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Foreground" Value="#dddddd"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>

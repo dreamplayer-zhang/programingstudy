@@ -243,6 +243,28 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constants.cs" />
+    <Compile Include="Converter\AxisBoolToBrushConverter.cs" />
+    <Compile Include="Converter\AxisStateToLoadingOpacityConverter.cs" />
+    <Compile Include="Converter\AxisStateToOpacityConverter.cs" />
+    <Compile Include="Converter\AxisToMotionUIConverter.cs" />
+    <Compile Include="Converter\AxisToPositionConverter.cs" />
+    <Compile Include="Converter\BoolConverter.cs" />
+    <Compile Include="Converter\ColorToBrushConverter.cs" />
+    <Compile Include="Converter\HumidityToGradientOffsetConverter.cs" />
+    <Compile Include="Converter\ImageConverter.cs" />
+    <Compile Include="Converter\ListToValueConverter.cs" />
+    <Compile Include="Converter\ModuleStateToLoadingOpacityConverter.cs" />
+    <Compile Include="Converter\PathConverter.cs" />
+    <Compile Include="Converter\TextBoxToIntConverter.cs" />
+    <Compile Include="Converter\ValueToColorConverter.cs" />
+    <Compile Include="Converter\ValueToUIValueConverter.cs" />
+    <Compile Include="ManualJobSchedule.cs" />
+    <Compile Include="ManualJobSchedule_UI.xaml.cs">
+      <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OPERATION\Loadport_UI.xaml.cs">
+      <DependentUpon>Loadport_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tools\DataConverter.cs" />
     <Compile Include="Engineer\WIND2EventArgs.cs" />
     <Compile Include="Engineer\WIND2EventManager.cs" />
@@ -256,6 +278,8 @@
     <Compile Include="MvvmTools\RelayCommand.cs" />
     <Compile Include="MvvmTools\SizeObserver.cs" />
     <Compile Include="Recipe\RecipeFront.cs" />
+    <Compile Include="Tools\KlarfFileReader.cs" />
+    <Compile Include="Tools\XMLCreator.cs" />
     <Compile Include="UI\Dialog\Dialog_PortSelect.xaml.cs">
       <DependentUpon>Dialog_PortSelect.xaml</DependentUpon>
     </Compile>
@@ -268,9 +292,13 @@
     </Compile>
     <Compile Include="UI\Dialog\ManualAlignViewer_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\Dialog\ManualAlignViewer_ViewModel.cs" />
-	  <Compile Include="Tools\PositionConverter.cs" />
-	  <Compile Include="Tools\StepTableData.cs" />
-	  <Compile Include="UI\SelectMode.xaml.cs">
+    <Compile Include="Tools\PositionConverter.cs" />
+    <Compile Include="Tools\StepTableData.cs" />
+    <Compile Include="UI\OPERATION\Operation_UI.xaml.cs">
+      <DependentUpon>Operation_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OPERATION\OperationUI_ViewModel.cs" />
+    <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MAINTENANCE\MaintenancePanel.xaml.cs">
@@ -361,6 +389,9 @@
       <DependentUpon>MotionViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\MapFileSelectionViewer.xaml.cs">
+      <DependentUpon>MapFileSelectionViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SETUP\RAC\RACAlignKey.xaml.cs">
       <DependentUpon>RACAlignKey.xaml</DependentUpon>
     </Compile>
@@ -373,6 +404,7 @@
     <Compile Include="UI\SETUP\RAC\RACSetup.xaml.cs">
       <DependentUpon>RACSetup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SETUP\RAC\ViewModels\MapFileSelectionViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACAlignKey_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\MapFileListViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACAlignKey_ViewModel.cs" />
@@ -427,6 +459,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ManualJobSchedule_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\OPERATION\Loadport_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -459,6 +499,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Dialog\ManualAlignViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\OPERATION\Operation_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -551,6 +595,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\SETUP\CAMERA\MotionViewer\MotionViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\RAC\MapFileSelectionViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -4,6 +4,7 @@ using RootTools.Gem;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.ToolBoxs;
+using System.Collections.Generic;
 
 namespace RootTools
 {

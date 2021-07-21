@@ -581,8 +581,8 @@ namespace Root_CAMELLIA
             }
             else // 나중에 centering 값 추가 테스트 진행 예정
             {
-                centerX = StageCenterPos.X - (DataManager.Instance.m_waferCentering.m_ptCenter.X - StageCenterPos.X);
-                centerY = StageCenterPos.Y - (DataManager.Instance.m_waferCentering.m_ptCenter.Y - StageCenterPos.Y);
+                centerX = DataManager.Instance.m_waferCentering.m_ptCenter.X;
+                centerY = DataManager.Instance.m_waferCentering.m_ptCenter.Y;
             }
 
             double x = listRealPos[nMinIndex].x;

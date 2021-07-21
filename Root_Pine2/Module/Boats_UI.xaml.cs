@@ -24,7 +24,7 @@ namespace Root_Pine2.Module
             m_boats = boats;
             DataContext = boats;
             treeRootUI.Init(boats.m_treeRootQueue);
-            treeVisionUI.Init(boats.m_vision.m_treeRootQueue);
+            treeVisionUI.Init(boats.m_vision.p_treeRootQueue);
             textBlockInfo.DataContext = boats; 
             boats.RunTreeQueue(Tree.eMode.Init);
         }
@@ -39,16 +39,22 @@ namespace Root_Pine2.Module
                 case ModuleBase.eState.Run: Background = Brushes.Yellow; break;
                 case ModuleBase.eState.Error: Background = Brushes.OrangeRed; break;
             }
-            textBlockVision.Foreground = m_boats.m_vision.m_remote.p_bEnable ? Brushes.Red : Brushes.LightGray; 
-            textBlockA.Text = (m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip.p_id : "";
-            textBlockB.Text = (m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip.p_id : "";
-            gridStripA.Background = (m_boats.m_aBoat[Vision2D.eWorks.A].p_inspectStrip != null) ? Brushes.Orange : Brushes.Beige;
-            gridStripB.Background = (m_boats.m_aBoat[Vision2D.eWorks.B].p_inspectStrip != null) ? Brushes.Orange : Brushes.Beige;
-            gridA.Background = (m_boats.m_aBoat[Vision2D.eWorks.A].p_bWorksConnect ? Brushes.AliceBlue : Brushes.Purple);
-            gridB.Background = (m_boats.m_aBoat[Vision2D.eWorks.B].p_bWorksConnect ? Brushes.AliceBlue : Brushes.Purple);
-            textBlockStepA.Text = m_boats.m_aBoat[Vision2D.eWorks.A].p_eStep.ToString();
-            textBlockStepB.Text = m_boats.m_aBoat[Vision2D.eWorks.B].p_eStep.ToString();
+            textBlockVision.Foreground = m_boats.m_vision.p_remote.p_bEnable ? Brushes.Red : Brushes.LightGray; 
+            textBlockA.Text = (m_boats.m_aBoat[eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[eWorks.A].p_infoStrip.p_id : "";
+            textBlockB.Text = (m_boats.m_aBoat[eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[eWorks.B].p_infoStrip.p_id : "";
+            gridStripA.Background = (m_boats.m_aBoat[eWorks.A].p_inspectStrip != null) ? Brushes.Orange : Brushes.Beige;
+            gridStripB.Background = (m_boats.m_aBoat[eWorks.B].p_inspectStrip != null) ? Brushes.Orange : Brushes.Beige;
+            gridA.Background = (m_boats.m_aBoat[eWorks.A].p_bWorksConnect ? Brushes.AliceBlue : Brushes.Purple);
+            gridB.Background = (m_boats.m_aBoat[eWorks.B].p_bWorksConnect ? Brushes.AliceBlue : Brushes.Purple);
+            textBlockStepA.Text = m_boats.m_aBoat[eWorks.A].p_eStep.ToString();
+            textBlockStepB.Text = m_boats.m_aBoat[eWorks.B].p_eStep.ToString();
             OnRunTree();
+
+            if (m_boats.m_vision.p_remote.m_client.p_bConnect == false)
+            {
+                m_boats.m_aBoat[eWorks.A].p_bWorksConnect = false;
+                m_boats.m_aBoat[eWorks.B].p_bWorksConnect = false;
+            }
         }
 
         int[] m_nQueue = new int[2] { 0, 0 };
@@ -62,21 +68,21 @@ namespace Root_Pine2.Module
 
         private void Grid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            m_boats.m_vision.m_remote.p_bEnable = !m_boats.m_vision.m_remote.p_bEnable;
+            m_boats.m_vision.p_remote.p_bEnable = !m_boats.m_vision.p_remote.p_bEnable;
         }
 
         private void GridA_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (EQ.p_eState != EQ.eState.Ready) return;
             if (m_boats.p_eState != ModuleBase.eState.Ready) return;
-            m_boats.m_aBoat[Vision2D.eWorks.A].RunMove(Boat.ePos.Vision, false);  
+            m_boats.m_aBoat[eWorks.A].RunMove(Boat.ePos.Vision, false);  
         }
 
         private void GridB_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (EQ.p_eState != EQ.eState.Ready) return;
             if (m_boats.p_eState != ModuleBase.eState.Ready) return;
-            m_boats.m_aBoat[Vision2D.eWorks.B].RunMove(Boat.ePos.Vision, false);
+            m_boats.m_aBoat[eWorks.B].RunMove(Boat.ePos.Vision, false);
         }
 
         private void GridInfo_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

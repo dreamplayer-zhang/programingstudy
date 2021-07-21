@@ -275,6 +275,8 @@ namespace Root_CAMELLIA
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Run; //? Run으로 되어있었음.
             EQ.p_bRecovery = true;
+            m_handler.m_bIsPossible_Recovery = false;
+            m_handler.m_IsCheckWTR = false;
         }
 
         bool IsEnable_Pause()

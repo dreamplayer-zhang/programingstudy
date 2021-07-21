@@ -20,8 +20,11 @@ namespace Root_CAMELLIA.LibSR_Met
         public const double PM_CAMERA_PIXEL_RESOLUTION = 1.098;
         public const double PM_STAGE_PULSE = 10;
         //
-        public const int SPECTROMETER_MAX_PIXELSIZE = 5001;  //350nm ~ 1500nm (1nm 간격)
+        public const int SPECTROMETER_MAX_PIXELSIZE = 5001;  
+        //350nm ~ 1500nm (1nm 간격)
+        //5001 값 바꾸면   SR_Background Measure 함수에서 에러 발생
         public const int RAWDATA_POINT_MAX_SIZE = 3000;
+        public const int RE_SNAP_COUNT = 5;
 
         public const string NONE = "None";
 

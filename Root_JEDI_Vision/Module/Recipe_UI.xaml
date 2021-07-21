@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="Root_JEDI_Vision.Module.Recipe_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_JEDI_Vision.Module"
+             xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <ComboBox x:Name="comboBoxOpen" Width="200" Margin="3" SelectionChanged="comboBoxOpen_SelectionChanged"/>
+            <TextBox x:Name="textBoxRecipe" TextAlignment="Center" Width="200" Margin="3"/>
+            <Button x:Name="buttonSave" Content="Save" Width="70" Margin="3" Click="buttonSave_Click"/>
+            <Label x:Name="labelInfo" Margin="3"/>
+        </StackPanel>
+        <tree:TreeUI Grid.Row="1" x:Name="treeRootUI"/>
+    </Grid>
+</UserControl>
