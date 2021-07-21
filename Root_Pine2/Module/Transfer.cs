@@ -139,9 +139,11 @@ namespace Root_Pine2.Module
                 
             }
 
-            public double GetXOffset(InfoStrip.eMagazine eMagazine)
+            public double GetXScale(InfoStrip.eMagazine eMagazine)
             {
-                return m_axis.GetPosValue(InfoStrip.eMagazine.Magazine7) - m_axis.GetPosValue(eMagazine); 
+                double p0 = m_axis.GetPosValue(InfoStrip.eMagazine.Magazine0);
+                double p7 = m_axis.GetPosValue(InfoStrip.eMagazine.Magazine7); 
+                return (m_axis.GetPosValue(eMagazine) - p0)  / (p7 - p0); 
             }
             #endregion
 
