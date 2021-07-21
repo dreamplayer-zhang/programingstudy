@@ -95,6 +95,8 @@ namespace Root_Pine2.Module
             Handler,
             Vision,
             SnapStart,
+            CleanStart,
+            CleanEnd,
         }
         void InitPosition()
         {
@@ -256,10 +258,10 @@ namespace Root_Pine2.Module
             try
             {
                 if ((bRoller == false) && (bBlow == false)) return;
-                RunMove(ePos.Handler);
+                RunMove(ePos.CleanStart);
                 RunCleaner(bBlow, bBlow);
                 RunRoller(bRoller);
-                m_axis.StartMove(m_axis.GetPosValue(ePos.SnapStart), "Clean");
+                m_axis.StartMove(m_axis.GetPosValue(ePos.CleanEnd), "Clean");
                 m_axis.WaitReady();
             }
             finally
