@@ -320,6 +320,7 @@ namespace Root_Pine2.Module
 
         string StartUnloadTray()
         {
+            if (m_picker.p_infoStrip.p_bInspect) return "OK";
             Run_UnloadTray run = (Run_UnloadTray)m_runUnloadTray.Clone();
             return StartRun(run);
         }

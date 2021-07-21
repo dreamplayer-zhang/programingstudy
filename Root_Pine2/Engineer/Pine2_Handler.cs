@@ -310,6 +310,9 @@ namespace Root_Pine2.Engineer
                 case Pine2.eRunMode.Stack:
                     if (m_loadEV.p_bCheck) return false;
                     break;
+                case Pine2.eRunMode.Magazine:
+                    //forget
+                    break; 
             }
             return true;
         }
