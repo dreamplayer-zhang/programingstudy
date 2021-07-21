@@ -465,9 +465,9 @@ namespace Root_Rinse_Unloader.Module
             m_rinse = rinse;
             m_rail = rail;
             m_storage = storage;
-            InitALID(); 
             InitILines();
             InitBase(id, engineer);
+            InitALID();
 
             InitThreadCheck(); 
             EQ.m_EQ.OnChanged += M_EQ_OnChanged;
