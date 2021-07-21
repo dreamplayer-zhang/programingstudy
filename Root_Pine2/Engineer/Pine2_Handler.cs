@@ -311,7 +311,10 @@ namespace Root_Pine2.Engineer
                     if (m_loadEV.p_bCheck) return false;
                     break;
                 case Pine2.eRunMode.Magazine:
-                    //forget
+                    foreach (MagazineEV ev in m_magazineEVSet.m_aEV.Values)
+                    {
+                        if (ev.IsMagazineBusy()) return false; 
+                    }
                     break; 
             }
             return true;

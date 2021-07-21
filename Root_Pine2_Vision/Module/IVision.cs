@@ -139,6 +139,7 @@ namespace Root_Pine2_Vision.Module
         SortingData,
         WorksConnect,
         ChangeUserset,
+        Reset,
     }
 
     public class Protocol
@@ -207,6 +208,12 @@ namespace Root_Pine2_Vision.Module
             m_eProtocol = eProtocol;
             m_sortInfo = sortInfo;
             m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sortInfo.GetString() + ">";
+        }
+
+        public Protocol(int nID, eProtocol eProtocol)
+        {
+            m_eProtocol = eProtocol;
+            m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() +  ">";
         }
     }
     #endregion
