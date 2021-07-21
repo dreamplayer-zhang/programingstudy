@@ -168,10 +168,10 @@ namespace Root_Pine2.Module
                 boat.RunVacuum(true);
                 m_picker.RunVacuum(false);
                 if (Run(RunMoveUp(false))) return p_sInfo;
-                Thread.Sleep(200); 
+                Thread.Sleep(200);
+                boat.StartClean();
                 boat.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
-                boat.StartClean();
                 if (Run(m_axisXZ.WaitReady())) return p_sInfo;
             }
             finally
