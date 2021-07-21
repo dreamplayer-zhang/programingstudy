@@ -203,9 +203,10 @@ namespace Root_EFEM.Module.FrontsideVision
                     if (bNormal == true)
                     {
                         //WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
-
-                        nScanLine++;
-                        cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
+                        
+                            nScanLine++;
+                            cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
+                      
                     }
                     else //비정상 스캔일때.
                     {

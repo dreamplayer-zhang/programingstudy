@@ -5,6 +5,7 @@ using RootTools.OHTNew;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 
 namespace Root_EFEM
@@ -652,10 +653,10 @@ namespace Root_EFEM
         public string m_id;
         IEngineer m_engineer;
         public IHandler m_handler;
-        List<ILoadport> m_aLoadport = new List<ILoadport>();
+        ObservableCollection<ILoadport> m_aLoadport = new ObservableCollection<ILoadport>();
         IWTR m_wtr;
         Log m_log;
-        public EFEM_Process(string id, IEngineer engineer, IWTR wtr, List<ILoadport> loadports)
+        public EFEM_Process(string id, IEngineer engineer, IWTR wtr, ObservableCollection<ILoadport> loadports)
         {
             m_id = id;
             m_engineer = engineer;

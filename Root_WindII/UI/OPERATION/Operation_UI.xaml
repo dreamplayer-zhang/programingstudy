@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:local="clr-namespace:Root_WindII"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -11,6 +12,13 @@
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
+        <Grid>
+            <TextBlock DataContext="{Binding Source={x:Static tools:EQ.m_EQ}}"
+                                                   Text="{Binding p_eState}"
+                                                   Grid.Row="1"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+        </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
@@ -18,7 +26,7 @@
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="Home" Command="{Binding CommandHome}"></Button>
-            <Button Grid.Column="1" Content="Load"></Button>
+            <Button Grid.Column="1" Content="Load" Command="{Binding CommandLoadCST}"></Button>
             <Button Grid.Column="2" Content="Recovery"></Button>
         </Grid>
         

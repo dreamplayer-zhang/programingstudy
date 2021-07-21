@@ -272,15 +272,20 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             int nDCOLTransDataNum = 0;
             m_DM.m_RawData[nPointidx].DCOLTransmittance.Clear();
-            for (int n = 0; n < m_DM.m_RawData[0].nNIRDataNum; n++)
+            for (int indexT = 0; indexT < m_DM.m_ContourMapDataT.Count; indexT++)
             {
-                if (nDCOLTransDataNum < CalWL.Length && m_DM.m_RawData[nPointidx].Wavelength[n] == m_DM.m_ContourMapDataT[nDCOLTransDataNum].Wavelength)
+                for (int n = 0; n < m_DM.m_RawData[0].nNIRDataNum; n++)
                 {
-                    DCOLTransmittanceData DCOLData = new DCOLTransmittanceData();
-                    DCOLData.Wavelength = m_DM.m_ScalesListT[nDCOLTransDataNum].p_waveLength;
-                    DCOLData.RawTransmittance = m_DM.m_RawData[nPointidx].Transmittance[n];
-                    m_DM.m_RawData[nPointidx].DCOLTransmittance.Add(DCOLData);
-                    nDCOLTransDataNum++;
+                    if (nDCOLTransDataNum < CalWL.Length && m_DM.m_RawData[nPointidx].Wavelength[n] == m_DM.m_ContourMapDataT[nDCOLTransDataNum].Wavelength)
+                    {
+                        DCOLTransmittanceData DCOLData = new DCOLTransmittanceData();
+                        DCOLData.Wavelength = m_DM.m_ScalesListT[nDCOLTransDataNum].p_waveLength;
+                        DCOLData.RawTransmittance = m_DM.m_RawData[nPointidx].Transmittance[n];
+                        m_DM.m_RawData[nPointidx].DCOLTransmittance.Add(DCOLData);
+                        nDCOLTransDataNum++;
+
+                        break;
+                    }
                 }
             }
         }
@@ -718,7 +723,7 @@ namespace Root_CAMELLIA.LibSR_Met
             {
                 double dTHK = mPn[n];
                 //dTHK *= m_DM.m_LayerData[n].scales.dScale;
-               // dTHK += m_DM.m_LayerData[n].scales.dOffset;
+                // dTHK += m_DM.m_LayerData[n].scales.dOffset;
 
                 if (double.IsNaN(dTHK) || double.IsNegativeInfinity(dTHK) || double.IsPositiveInfinity(dTHK))
                 {

@@ -170,6 +170,8 @@ namespace Root_Pine2_Vision.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendLotInfo, eRemote.Client, lotInfo);
             else
             {
+                m_RunningRecipe[eWorks.A].RecipeOpen(lotInfo.m_sRecipe);
+                m_RunningRecipe[eWorks.B].RecipeOpen(lotInfo.m_sRecipe);
                 string sRunA = m_aWorks[eWorks.A].SendLotInfo(lotInfo);
                 string sRunB = m_aWorks[eWorks.B].SendLotInfo(lotInfo);
                 if ((sRunA == "OK") && (sRunB == "OK")) return "OK";
