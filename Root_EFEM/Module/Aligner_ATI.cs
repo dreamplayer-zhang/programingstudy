@@ -123,11 +123,11 @@ namespace Root_EFEM.Module
             #endregion
 
             #region AxisX
-            public double m_xOffset = 15000; // Forward + m_xOffset = 1620000
+            public double m_xOffset = 20000; // Forward + m_xOffset = 2170000
             public enum ePosX
             {
-                Backward, // 0
-                Forward // 1605000
+                Backward, // -115000
+                Forward // 2150000
             }
             void InitPosX()
             {
@@ -144,14 +144,14 @@ namespace Root_EFEM.Module
             #region AxisZ
             public enum ePosZ
             {
-                PutReady, // -180636
-                PutDown, //-126000
-                GetReady, // 0
+                PutReady, // -300000
+                PutDown, //-106400
+                GetReady, // 35000
                 GetUp, // -126992
-                InversePutReady, // -180636
-                InversePutDown, // -165636
-                InverseGetReady, //-262386
-                InverseGetDown // -155636
+                InversePutReady, // -300000
+                InversePutDown, // -155000
+                InverseGetReady, //-300000
+                InverseGetDown // -142500
             }
             void InitPosZ()
             {
@@ -168,8 +168,8 @@ namespace Root_EFEM.Module
             #region AxisRotate
             public enum ePosRotate
             {
-                UpSide, // 0 -230
-                DownSide // 100000 -230
+                UpSide, // 0
+                DownSide // 1800000
             }
             void InitPosRotate()
             {
@@ -204,11 +204,12 @@ namespace Root_EFEM.Module
         public string RunPut()
         {
             // Start Init
+            if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
             // End Init
 
@@ -229,10 +230,11 @@ namespace Root_EFEM.Module
         public string RunGet()
         {
             // Start Init
+            if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
             if (Run(m_flipper.RunGuide(false))) return p_sInfo;
             // End Init
@@ -253,11 +255,12 @@ namespace Root_EFEM.Module
         public string RunInversePut()
         {
             // Start Init
+            if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.DownSide))) return p_sInfo;
             // End Init
 
@@ -278,10 +281,11 @@ namespace Root_EFEM.Module
         public string RunInverseGet()
         {
             // Start Init
+            if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.DownSide))) return p_sInfo;
             if (Run(m_flipper.RunGuide(false))) return p_sInfo;
             // End Init
