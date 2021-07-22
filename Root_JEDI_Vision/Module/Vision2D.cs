@@ -33,11 +33,11 @@ namespace Root_JEDI_Vision.Module
                 p_sInfo = m_toolBox.GetComm(ref m_rs232RGBW, this, "RGBW");
                 m_boat.GetTools(m_toolBox, this, bInit); 
                 m_camAxis.GetTools(m_toolBox, this, bInit); 
-                m_process.GetTools(m_toolBox, bInit); 
+                m_process.GetTools(m_toolBox, bInit);
                 if (bInit)
                 {
                     m_rs232RGBW.p_bConnect = true;
-                    m_camera.Connect();
+                    m_camera?.Connect();
                     InitMemory();
                 }
             }
@@ -76,18 +76,18 @@ namespace Root_JEDI_Vision.Module
             #region Offset
             double m_pulseum = 10; 
             double m_mmSpace = 100; 
-            public Dictionary<eLine, R3Point[]> m_umOffset = new Dictionary<eLine, R3Point[]>();
+            public Dictionary<eLine, RPoint[]> m_umOffset = new Dictionary<eLine, RPoint[]>();
             void InitOffset()
             {
-                m_umOffset.Add(eLine.Single, new R3Point[1] { new R3Point() });
-                m_umOffset.Add(eLine.Double, new R3Point[2] { new R3Point(), new R3Point() });
-                m_umOffset.Add(eLine.Triple, new R3Point[3] { new R3Point(), new R3Point(), new R3Point() });
+                m_umOffset.Add(eLine.Single, new RPoint[1] { new RPoint() });
+                m_umOffset.Add(eLine.Double, new RPoint[2] { new RPoint(), new RPoint() });
+                m_umOffset.Add(eLine.Triple, new RPoint[3] { new RPoint(), new RPoint(), new RPoint() });
             }
             public void RunTree(Tree tree)
             {
                 m_pulseum = tree.Set(m_pulseum, m_pulseum, "pulse/um", "pulse per um");
                 m_mmSpace = tree.Set(m_mmSpace, m_mmSpace, "Space", "Grab Sapce (mm)");
-                R3Point[] umOffset = m_umOffset[eLine.Double];
+                RPoint[] umOffset = m_umOffset[eLine.Double];
                 for (int n = 0; n < 2; n++) umOffset[n] = tree.GetTree("Double").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
                 umOffset = m_umOffset[eLine.Triple];
                 for (int n = 0; n < 3; n++) umOffset[n] = tree.GetTree("Triple").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
@@ -103,14 +103,14 @@ namespace Root_JEDI_Vision.Module
 
             public string RunMove(eLine eLine, int iLine, bool bWait = true)
             {
-                R3Point umOffset = new R3Point(m_umOffset[eLine][iLine]); 
+                RPoint umOffset = new RPoint(m_umOffset[eLine][iLine]); 
                 switch (eLine)
                 {
                     case eLine.Single: break; 
                     case eLine.Double: umOffset.X += 1000 * m_mmSpace * (iLine - 0.5); break;
                     case eLine.Triple: umOffset.X += 1000 * m_mmSpace * (iLine - 1); break; 
                 }
-                m_axis.StartMove(ePos.Snap, new RPoint(m_pulseum * umOffset.X, m_pulseum * umOffset.Z));
+                m_axis.StartMove(ePos.Snap, new RPoint(m_pulseum * umOffset.X, m_pulseum * umOffset.Y));
                 return bWait ? m_axis.WaitReady() : "OK";
             }
             #endregion
@@ -835,15 +835,16 @@ namespace Root_JEDI_Vision.Module
         public Vision2D(eVision eVision, IEngineer engineer)
         {
             p_eVision = eVision;
-            m_boat = new Boat(eVision.ToString());
-            m_recipe = new Recipe(this); 
-            InitBase("Vision " + eVision.ToString(), engineer, eRemote.Client);
+            InitBase(eVision.ToString(), engineer, eRemote.Client);
         }
 
         VisionProcess m_process = null; 
         public Vision2D(string id, IEngineer engineer)
         {
-            m_process = new VisionProcess(this); 
+            m_process = new VisionProcess(this);
+            m_boat = new Boat(id);
+            m_recipe = new Recipe(this);
+            InitCalData(); 
             InitBase(id, engineer, eRemote.Server);
         }
 
