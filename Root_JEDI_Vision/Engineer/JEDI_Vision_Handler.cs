@@ -45,12 +45,12 @@ namespace Root_JEDI_Vision.Engineer
             {
                 case eSide.Top:
 
-                    m_vision = new Vision2D(eVision.Top2D.ToString(), m_engineer);
+                    m_vision = new Vision2D(eVision.Top2D, m_engineer, ModuleBase.eRemote.Server);
                     InitModule(m_vision);
                     break;
                 case eSide.Bottom:
 
-                    m_vision = new Vision2D(eVision.Bottom.ToString(), m_engineer);
+                    m_vision = new Vision2D(eVision.Bottom, m_engineer, ModuleBase.eRemote.Server);
                     InitModule(m_vision);
                     break; 
             }

@@ -214,6 +214,14 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Root_JEDI_Sorter\Root_JEDI_Sorter.csproj">
+      <Project>{0fe03362-0879-4ce2-b75b-c9416fa623f0}</Project>
+      <Name>Root_JEDI_Sorter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Root_JEDI_Vision\Root_JEDI_Vision.csproj">
+      <Project>{9bcefb39-b671-42ee-9f92-ef641f8930ef}</Project>
+      <Name>Root_JEDI_Vision</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
