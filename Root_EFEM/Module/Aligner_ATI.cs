@@ -18,7 +18,9 @@ namespace Root_EFEM.Module
         #region ToolBox
         Axis m_axisRotate;
         AxisXY m_axisCamAlign;
-        Axis m_axisCamOCR;
+        Axis m_axisCamOCRX;
+        Axis m_axisCamOCRTopZ;
+        Axis m_axisCamOCRBotZ;
         DIO_IO m_dioVac;
         DIO_O m_doBlow;
         DIO_O m_doLightCoaxial;
@@ -41,7 +43,9 @@ namespace Root_EFEM.Module
             m_flipper.GetTools(m_toolBox, this, bInit);
             p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "AxisRotate");
             p_sInfo = m_toolBox.GetAxis(ref m_axisCamAlign, this, "AxisCamera");
-            p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCR, this, "AxisOCR");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCRX, this, "AxisOCRX");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCRTopZ, this, "AxisOCRTopZ");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCRBotZ, this, "AxisOCRBotZ");
             p_sInfo = m_toolBox.GetDIO(ref m_dioVac, this, "Vacuum");
             p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Blow");
             p_sInfo = m_toolBox.GetDIO(ref m_doLightCoaxial, this, "LightCoaxial");
@@ -62,7 +66,9 @@ namespace Root_EFEM.Module
             InitMemory();
             InitPosAlign();
             InitPosAlignRotate();
-            InitPosOCR();
+            InitPosOCRX();
+            InitPosOCRTopZ();
+            InitPosOCRBotZ();
         }
         #endregion
 
@@ -249,6 +255,19 @@ namespace Root_EFEM.Module
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
             // End Get
+
+            // Test Code
+            /*if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo;
+            if (Run(RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(true))) return p_sInfo;
+            Thread.Sleep(10);
+            if (Run(m_flipper.RunGuide(false))) return p_sInfo; // JEONG
+            if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(true))) return p_sInfo; // JEONG
+            //if (Run(m_flipper.RunVacuum(true))) return p_sInfo; // JEONG : Vacuum ON 확인 위해서
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;*/
 
             return "OK";
         }
@@ -482,15 +501,40 @@ namespace Root_EFEM.Module
             Ready,
             OCR,
         }
-        void InitPosOCR()
+
+        void InitPosOCRX()
         {
-            m_axisCamOCR.AddPos(Enum.GetNames(typeof(ePosOCR)));
+            m_axisCamOCRX.AddPos(Enum.GetNames(typeof(ePosOCR)));
         }
 
-        public string AxisMoveOCR(ePosOCR pos, double mmOCR)
+        public string AxisMoveOCRX(ePosOCR pos, double mmOCR)
         {
             double dx = m_mmWaferSize - p_infoWafer.p_mmWaferSize + mmOCR;
-            m_axisCamOCR.StartMove(pos, dx);
+            m_axisCamOCRX.StartMove(pos, dx);
+            return "OK";
+        }
+
+        void InitPosOCRTopZ()
+        {
+            m_axisCamOCRTopZ.AddPos(Enum.GetNames(typeof(ePosOCR)));
+        }
+
+        public string AxisMoveOCRTopZ(ePosOCR pos, double mmOCR)
+        {
+            double dx = m_mmWaferSize - p_infoWafer.p_mmWaferSize + mmOCR;
+            m_axisCamOCRTopZ.StartMove(pos, dx);
+            return "OK";
+        }
+
+        void InitPosOCRBotZ()
+        {
+            m_axisCamOCRBotZ.AddPos(Enum.GetNames(typeof(ePosOCR)));
+        }
+
+        public string AxisMoveOCRBotZ(ePosOCR pos, double mmOCR)
+        {
+            double dx = m_mmWaferSize - p_infoWafer.p_mmWaferSize + mmOCR;
+            m_axisCamOCRBotZ.StartMove(pos, dx);
             return "OK";
         }
         #endregion
@@ -796,11 +840,19 @@ namespace Root_EFEM.Module
         public string RunOCR(double dTheta, double dR)
         {
             m_doLightCoaxial.Write(true);
-            AxisMoveOCR(ePosOCR.OCR, dR);
+            AxisMoveOCRX(ePosOCR.OCR, dR);
+            AxisMoveOCRTopZ(ePosOCR.OCR, dR);
+            AxisMoveOCRBotZ(ePosOCR.OCR, dR);
             if (Run(Rotate(dTheta))) return p_sInfo;
-            if (Run(m_axisCamOCR.WaitReady())) return p_sInfo;
+            if (Run(m_axisCamOCRX.WaitReady())) return p_sInfo;
+            if (Run(m_axisCamOCRTopZ.WaitReady())) return p_sInfo;
+            if (Run(m_axisCamOCRBotZ.WaitReady())) return p_sInfo;
             if (Run(m_camOCR.SendReadOCR())) return p_sInfo;
-            return AxisMoveOCR(ePosOCR.Ready, 0);
+            AxisMoveOCRX(ePosOCR.Ready, 0);
+            AxisMoveOCRTopZ(ePosOCR.Ready, 0);
+            AxisMoveOCRBotZ(ePosOCR.Ready, 0);
+
+            return "OK";
         }
         #endregion
 
