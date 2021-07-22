@@ -203,8 +203,16 @@ namespace Root_Pine2_Vision.Module
             m_threadProcess.Start();
         }
 
-        bool m_bStartProcess = false;
         int m_nProcessID = -1;
+        void InitProcessReg(string sGroup)
+        {
+            m_reg = new Registry(sGroup + ".Process");
+            m_nProcessID = m_reg.Read("ProcessID", -1); 
+
+        }
+
+        bool m_bStartProcess = false;
+        Registry m_reg; 
         void RunThreadProcess()
         {
             int nProcess = 0; 
@@ -231,6 +239,7 @@ namespace Root_Pine2_Vision.Module
 
                             //Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
                             m_nProcessID = process.Id;
+                            m_reg.Write("ProcessID", m_nProcessID);
                             Thread.Sleep(2000);
                             if (m_vision.m_lotInfo != null) SendLotInfo(m_vision.m_lotInfo); 
                         }
@@ -286,6 +295,7 @@ namespace Root_Pine2_Vision.Module
         public Vision2D m_vision;
         public Works2D(eWorks eWorks, Vision2D vision)
         {
+            InitProcessReg(vision.ToString() + eWorks.ToString()); 
             p_eWorks = eWorks;
             p_id = eWorks.ToString();
             m_vision = vision;
