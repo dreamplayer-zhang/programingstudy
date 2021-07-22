@@ -260,7 +260,14 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            m_axisXZ.ServoOn(true);
+            m_axisXZ.p_axisY.Jog(-1);
+            Thread.Sleep(300);
+            m_axisXZ.p_axisX.Jog(-1);
+            Thread.Sleep(700);
+            m_axisXZ.p_axisY.StopAxis();
             p_sInfo = base.StateHome(m_axisXZ.p_axisY);
+            m_axisXZ.p_axisX.StopAxis();
             if (p_sInfo != "OK") return p_sInfo;
             RunMoveUp(); 
             p_sInfo = base.StateHome(m_axisXZ.p_axisX);

@@ -36,7 +36,8 @@ namespace Root_Pine2.Engineer
             m_pine2.p_iBundle = 0;
             m_loadEV.p_iStrip = 0;
             m_sLotSend = "";
-            SendLotInfo(); 
+            SendLotInfo();
+            m_summary.ClearCount(); 
         }
 
         string m_sLotSend = "";
@@ -55,7 +56,12 @@ namespace Root_Pine2.Engineer
             Pine2.VisionOption option = m_pine2.m_aVisionOption[boats.m_vision.p_eVision];
             LotInfo lotInfo = new LotInfo(nMode, p_sRecipe, m_pine2.p_sLotID, option.p_bLotMix, option.p_bBarcode, option.p_nBarcode, option.p_lBarcode);
             string sRun = boats.m_vision.SendLotInfo(lotInfo);
-            if (sRun == "OK") boats.p_sInfo = lotInfo.m_sLotID; 
+            if (sRun == "OK")
+            {
+                boats.p_sInfo = lotInfo.m_sLotID;
+                boats.m_aBoat[eWorks.A].p_bWorksConnect = true;
+                boats.m_aBoat[eWorks.B].p_bWorksConnect = true;
+            }
         }
 
         BackgroundWorker m_bgwSendSort = new BackgroundWorker(); 
