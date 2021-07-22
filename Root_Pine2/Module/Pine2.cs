@@ -823,6 +823,12 @@ namespace Root_Pine2.Module
                 m_srp350.End(); 
             }
 
+            void Write(string sWrite)
+            {
+                m_srp350.WriteText(sWrite);
+                m_log.Info(sWrite); 
+            }
+
             int m_iMachine = 1;
             int m_szFont = 9;
             public void RunTree(Tree tree)
@@ -831,10 +837,12 @@ namespace Root_Pine2.Module
                 m_szFont = tree.Set(m_szFont, m_szFont, "Size", "Fonr Size");
             }
 
+            Log m_log; 
             Pine2_Handler m_handler; 
             public Printer(Pine2_Handler handler)
             {
-                m_handler = handler; 
+                m_handler = handler;
+                m_log = LogView.GetLog("Summary"); 
                 InitTimer();
             }
         }
