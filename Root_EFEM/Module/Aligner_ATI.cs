@@ -61,6 +61,7 @@ namespace Root_EFEM.Module
         {
             InitMemory();
             InitPosAlign();
+            InitPosAlignRotate();
             InitPosOCR();
         }
         #endregion
@@ -433,12 +434,22 @@ namespace Root_EFEM.Module
         #region Camera Align
         public enum ePosAlign
         {
-            Ready,
-            Align
+            Ready, // Z: -175000, Y: -250000
+            Align // Z: 0 , Y: 0
         }
         void InitPosAlign()
         {
             m_axisCamAlign.AddPos(Enum.GetNames(typeof(ePosAlign)));
+        }
+
+        public enum ePosAlignRotate
+        {
+            Ready, // 0
+            Align // 360000
+        }
+        void InitPosAlignRotate()
+        {
+            m_axisRotate.AddPos(Enum.GetNames(typeof(ePosAlignRotate)));
         }
 
         double m_mmWaferSize = 300;
@@ -1002,15 +1013,15 @@ namespace Root_EFEM.Module
                 m_module.p_bLightCoaxial = true;
 
                 if (m_module.Run(m_module.m_axisCamAlign.StartMove(ePosAlign.Align))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlign.Ready))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlignRotate.Ready))) return p_sInfo;
                 if (m_module.Run(m_module.m_axisCamAlign.WaitReady())) return p_sInfo;
                 if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
 
-                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlign.Align))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlignRotate.Align))) return p_sInfo;
                 if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
 
                 if (m_module.Run(m_module.m_axisCamAlign.StartMove(ePosAlign.Ready))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlign.Ready))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlignRotate.Ready))) return p_sInfo;
                 if (m_module.Run(m_module.m_axisCamAlign.WaitReady())) return p_sInfo;
                 if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
 
