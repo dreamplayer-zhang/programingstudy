@@ -149,11 +149,9 @@ namespace Root_Pine2_Vision.Module
         public string m_sSend = "";
         public string m_sInfo = "";
 
-        bool m_bWait = true;
         public void ReceiveData(string sSend)
         {
             m_sInfo = Receive(sSend);
-            m_bWait = false;
         }
 
         string Receive(string sSend)
@@ -162,19 +160,6 @@ namespace Root_Pine2_Vision.Module
             if (sSend.Length < l) return "Message Length Error";
             if (m_sSend.Substring(0, l - 1) != sSend.Substring(0, l - 1)) return "Message not Correct";
             return sSend.Substring(l, sSend.Length - l - 1);
-        }
-
-        public string WaitReply(int secTimeout)
-        {
-            int msTimeout = 1000 * secTimeout;
-            StopWatch sw = new StopWatch();
-            while (m_bWait)
-            {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return "EQ Stop";
-                if (sw.ElapsedMilliseconds > msTimeout) return "Protocol Recieve Timeout";
-            }
-            return m_sInfo;
         }
 
         public int m_iSnap = 0;          // Snap Done Line Index (0 Base)

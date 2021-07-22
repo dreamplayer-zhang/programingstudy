@@ -704,16 +704,17 @@ namespace Root_Pine2_Vision.Module
 
             try
             {
-                m_log.Info("Start");
+                m_logSnap.Info("Snap Start");
+
                 // Set Camera Gain (When first snap line)
                 if(nSnapLineIndex == 0)
                     SetCameraGain(iSnap, nSnapMode, recipe.m_eDirection);
-                m_log.Info("Set Gain Done");
+                m_logSnap.Info("Set Gain Done");
 
                 // Set First Cal UserSet (첫 라인 이후부터는 Thread로 Userset 변경)
                 if (iSnap == 0)
                     SetFirstCalUserSet(nSnapMode, recipe);
-                m_log.Info("Set First Cal Userset Done");
+                m_logSnap.Info("Set First Cal Userset Done");
 
                 // Check Userset Change Thread
                 nTimeCount = 0;
@@ -723,7 +724,7 @@ namespace Root_Pine2_Vision.Module
                     Thread.Sleep(nWaitInterval);
                     if (EQ.IsStop()) return "EQ Stop";
                 }
-                m_log.Info("Check Userset Thread Done");
+                m_logSnap.Info("Check Userset Thread Done");
 
                 // Set Camera GrabThread On
                 m_bCanChangeUserSet = false;
@@ -735,11 +736,11 @@ namespace Root_Pine2_Vision.Module
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
                 }
-                m_log.Info("Grab Thread On Done");
+                m_logSnap.Info("Grab Thread On Done");
 
                 // Send SnapReady to Handler (Handler move Axis After receive this msg)
                 ReqSnapReady(eWorks);
-                m_log.Info("Send Snap Ready Done");
+                m_logSnap.Info("Send Snap Ready Done to Handler");
 
                 // Wait for Grab
                 while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
@@ -756,17 +757,19 @@ namespace Root_Pine2_Vision.Module
                             RunChangeUserSetThread(iSnap, nTotalSnap, nSnapMode, eWorks);
                     }
                 }
-                m_log.Info("Grab Done");
+                m_logSnap.Info("Grab Done");
 
                 // Send Snap Done to VisionWorks2
                 if (m_aWorks[eWorks].IsProcessRun())
                     m_aWorks[eWorks].SendSnapDone(iSnap);
-                m_log.Info("Send Snap Done Done");
+                m_logSnap.Info("Send Snap Done to VisionWorks2");
 
                 // Set Next Snap Userset (while 문에서 실행 못했을 경우)
                 if (m_bUserSetThreadOn == false && iSnap < nTotalSnap - 1)
                     RunChangeUserSetThread(iSnap, nTotalSnap, nSnapMode, eWorks);
-                m_log.Info("Userset Thread Done");
+                m_logSnap.Info("Userset Thread Done");
+
+                m_logSnap.Info("Snap End");
             }
             catch (Exception ex)
             {
@@ -1097,6 +1100,8 @@ namespace Root_Pine2_Vision.Module
         public TreeRoot p_treeRootQueue { get { return m_treeRootQueue; } }
         public Remote p_remote { get { return m_remote; } }
         #endregion
+
+        Log m_logSnap = LogView.GetLog("Snap"); 
 
         public Vision2D(eVision eVision, IEngineer engineer, eRemote eRemote)
         {

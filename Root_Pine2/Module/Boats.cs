@@ -116,12 +116,14 @@ namespace Root_Pine2.Module
             return StartRun(run);
         }
 
-        public string RunMoveDone(eWorks eWorks)
+        public string RunMoveDone(eWorks eWorks, bool bNoVision)
         {
             m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
             if (Run(m_aBoat[eWorks].RunMove(p_ePosUnload))) return p_sInfo;
             m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
-            if (m_aBoat[eWorks].p_infoStrip != null) m_aBoat[eWorks].p_infoStrip.SetResult(m_vision.p_eVision, InfoStrip.eResult.POS.ToString(), "1", "1", "4"); 
+            if (bNoVision == false) return "OK";
+            if (m_aBoat[eWorks].p_infoStrip == null) return "OK";
+            m_aBoat[eWorks].p_infoStrip.SetResult(m_vision.p_eVision, InfoStrip.eResult.POS.ToString(), "1", "1", "4");
             return "OK";
         }
         #endregion
@@ -595,7 +597,7 @@ namespace Root_Pine2.Module
                 switch (m_eRun)
                 {
                     case eRun.Ready: return m_module.RunMoveReady(m_eWorks);
-                    case eRun.Done: return m_module.RunMoveDone(m_eWorks); 
+                    case eRun.Done: return m_module.RunMoveDone(m_eWorks, true); 
                 }
                 return "OK";
             }

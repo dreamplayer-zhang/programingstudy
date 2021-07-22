@@ -311,7 +311,7 @@ namespace Root_Pine2.Module
         public bool m_bUpdated = false; 
         public string SetSort(bool b3D, InfoStrip infoStrip)
         {
-            return "OK";
+            //return "OK";
             m_data = infoStrip.m_summary;
             m_data.m_sStripID = infoStrip.p_id;
             m_data.m_stripTotal.m_eResult = Data.Strip.eResult.Good; 
