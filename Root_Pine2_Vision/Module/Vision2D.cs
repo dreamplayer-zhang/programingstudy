@@ -984,7 +984,7 @@ namespace Root_Pine2_Vision.Module
         void RunThreadCheckConnect()
         {
             m_bThreadCheck = true;
-            Thread.Sleep(3000); 
+            Thread.Sleep(15000); 
             while (m_bThreadCheck)
             {
                 Thread.Sleep(200); 
