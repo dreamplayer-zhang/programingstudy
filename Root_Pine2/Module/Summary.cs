@@ -63,11 +63,8 @@ namespace Root_Pine2.Module
 
                     public string SetSort(Unit unit)
                     {
-                        if (m_szMap.X == 0)
-                        {
-                            if (unit.m_szMap.X == 0) return "OK";
-                            m_szMap = new CPoint(unit.m_szMap);
-                        }
+                        if (unit.m_szMap.X == 0) return "OK";
+                        if (m_szMap.X == 0) m_szMap = new CPoint(unit.m_szMap);
                         if (m_szMap.X != unit.m_szMap.X) return "Map Size not Same";
                         if (m_szMap.Y != unit.m_szMap.Y) return "Map Size not Same";
                         InitMap();
