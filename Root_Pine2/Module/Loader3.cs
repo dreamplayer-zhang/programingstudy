@@ -65,6 +65,7 @@ namespace Root_Pine2.Module
             m_axis.AddPos(GetPosString(eWorks.B));
             m_axis.AddPos(ePosTransfer.Transfer0.ToString());
             m_axis.AddPos(ePosTransfer.Transfer7.ToString());
+            m_axis.AddPos(ePosTray.Tray0.ToString());
             m_axis.AddPos(ePosTray.Tray7.ToString());
             m_axis.p_axisZ.AddPos(c_sPosUp);
         }
@@ -224,7 +225,7 @@ namespace Root_Pine2.Module
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(boats.RunMoveDone(eWorks))) return p_sInfo;
+                if (Run(boats.RunMoveDone(eWorks, false))) return p_sInfo;
                 if (Run(RunMoveBoat(eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);
