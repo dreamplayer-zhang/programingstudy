@@ -5,6 +5,8 @@ using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_Pine2.Module
@@ -493,13 +495,23 @@ namespace Root_Pine2.Module
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, true, true))) return p_sInfo;
             m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
             if (Run(m_pusher.RunPusher())) return p_sInfo;
-            if (m_pusher.IsExist()) return "Strip Exist in Pusher after Push"; 
-            ((Pine2_Handler)m_engineer.ClassHandler()).SendSortInfo(infoStrip); 
+            if (m_pusher.IsExist()) return "Strip Exist in Pusher after Push";
+            m_qInfoStripSend.Enqueue(infoStrip); 
             m_magazineEV.PutInfoStrip(infoStrip);
             m_pusher.p_infoStrip = null;
             if (Run(m_gripper.WaitUnlock())) return p_sInfo; 
             m_engineer.ClassHandler().CheckFinish();
             return "OK"; 
+        }
+
+        Queue<InfoStrip> m_qInfoStripSend = new Queue<InfoStrip>(); 
+        void SendSortInfo()
+        {
+            if (m_qInfoStripSend.Count == 0) return;
+            InfoStrip infoStrip = m_qInfoStripSend.Peek();
+            if (infoStrip.p_bInspect) return;
+            ((Pine2_Handler)m_engineer.ClassHandler()).SendSortInfo(infoStrip);
+            m_qInfoStripSend.Dequeue(); 
         }
         #endregion
 
@@ -513,6 +525,12 @@ namespace Root_Pine2.Module
         #endregion
 
         #region override
+        protected override void RunThread()
+        {
+            SendSortInfo(); 
+            base.RunThread();
+        }
+
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
@@ -522,6 +540,7 @@ namespace Root_Pine2.Module
                     m_loaderPusher.RunMoveReady(); 
                     break;
                 case Pine2.eRunMode.Magazine:
+                    if (m_pusher.p_bLock || m_gripper.p_bLock) return "OK";
                     if (m_pusher.p_infoStrip != null) return StartUnload();
                     if (m_gripper.p_infoStrip == null) return StartLoad();
                     return StartWaitLoader();
