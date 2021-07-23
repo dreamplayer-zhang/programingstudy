@@ -34,7 +34,15 @@ namespace Root_WIND2
             string filePath = @"C:\Log\" + "ExceptionLog_" + strTime + ".txt";
             FileInfo file = new FileInfo(filePath);
             StreamWriter sw;
-            sw = file.CreateText();
+
+            if (!file.Exists)
+            {
+                sw = file.CreateText();
+            }
+            else
+            {
+                sw = file.AppendText();
+            }
 
             sw.WriteLine(string.Format("[ {0:yyyy-MM-dd hh:mm s} ]" + System.Diagnostics.Process.GetCurrentProcess().ProcessName, DateTime.Now));
             sw.WriteLine("Module : " + e.Exception.Source);
