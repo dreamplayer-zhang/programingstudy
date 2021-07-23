@@ -261,9 +261,11 @@ namespace Root_VEGA_D.Module
         public int m_nBottomCenterY = 0;
         public string p_sTopTemplateFile = "";
         public string p_sBottomTemplateFile = "";
-        public CPoint m_ptBotAlignMarkerOffset = new CPoint();
+        public CPoint m_ptLeftTopAlignKeyOffset = new CPoint();
+        public CPoint m_ptLeftBotAlignKeyOffset = new CPoint();
         public bool m_bUseFindEdge = true;
-        public string p_sTempAlignMarkerFile = "";
+        public string p_sTempLeftTopAlignKeyFile = "";
+        public string p_sTempLeftBottomAlignKeyFile = "";
 
         void RunTreeAlign(Tree tree, bool bVisible, bool bReadOnly)
         {
@@ -273,12 +275,14 @@ namespace Root_VEGA_D.Module
             m_nCenterX = tree.Set(m_nCenterX, m_nCenterX, "Center X", "Template Matching Search Target Center X", bVisible);
             m_nTopCenterY = tree.Set(m_nTopCenterY, m_nTopCenterY, "Top Center Y", "Template Matching Search Target Top Center Y", bVisible);
             m_nBottomCenterY = tree.Set(m_nBottomCenterY, m_nBottomCenterY, "Bottom Center Y", "Template Matching Search Target Bottom Center Y", bVisible);
-            m_ptBotAlignMarkerOffset = tree.Set(m_ptBotAlignMarkerOffset, m_ptBotAlignMarkerOffset, "Offset", "Offset from left bottom position", bVisible);
+            m_ptLeftTopAlignKeyOffset = tree.Set(m_ptLeftTopAlignKeyOffset, m_ptLeftTopAlignKeyOffset, "LT Offset", "Offset from left top position", bVisible);
+            m_ptLeftBotAlignKeyOffset = tree.Set(m_ptLeftBotAlignKeyOffset, m_ptLeftBotAlignKeyOffset, "LB Offset", "Offset from left bottom position", bVisible);
             m_bUseFindEdge = tree.Set(m_bUseFindEdge, m_bUseFindEdge, "Use FindEdge", "Use FindEdge function", bVisible);
 
             p_sTopTemplateFile = tree.SetFile(p_sTopTemplateFile, p_sTopTemplateFile, "bmp", "Top File", "TopTemplate File");
             p_sBottomTemplateFile = tree.SetFile(p_sBottomTemplateFile, p_sBottomTemplateFile, "bmp", "Bottom File", "BottomTemplate File");
-            p_sTempAlignMarkerFile = tree.SetFile(p_sTempAlignMarkerFile, p_sTempAlignMarkerFile, "bmp", "AlignMarker File", "Left bottom AlignMarker image saved temporarily to display image");
+            p_sTempLeftTopAlignKeyFile = tree.SetFile(p_sTempLeftTopAlignKeyFile, p_sTempLeftTopAlignKeyFile, "bmp", "LT Align Key File", "Left top Align Key image saved temporarily to display image");
+            p_sTempLeftBottomAlignKeyFile = tree.SetFile(p_sTempLeftBottomAlignKeyFile, p_sTempLeftBottomAlignKeyFile, "bmp", "LB Align Key File", "Left bottom Align Key image saved temporarily to display image");
         }
         #endregion
 
