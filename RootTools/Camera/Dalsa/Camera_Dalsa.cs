@@ -576,7 +576,7 @@ namespace RootTools.Camera.Dalsa
                 else
                     m_GrabThread = new Thread(new ThreadStart(RunGrabLineColorScanThread));
             }
-
+            m_GrabThread.Priority = ThreadPriority.Highest;
             m_GrabThread.Start();
         }
         public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData grabData = null)
