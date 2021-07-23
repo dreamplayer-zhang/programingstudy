@@ -19,7 +19,7 @@ namespace Root_EFEM
 {
     public class Vision_Frontside : ModuleBase, IWTRChild
     {
-        ALID m_alid_WaferExist;
+        public ALID m_alid_WaferExist;
         public void SetAlarm()
         {
             m_alid_WaferExist.Run(true, "Vision Stage Wafer Exist Error");

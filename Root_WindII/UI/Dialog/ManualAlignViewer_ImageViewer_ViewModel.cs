@@ -271,7 +271,8 @@ namespace Root_WindII
         {
             get => new RelayCommand(() =>
             {
-                axisRotate.StartMove(this.MeasuredAngle * 1000);
+                axisRotate.StartShift(axisRotate.p_dRelPos + this.MeasuredAngle * 1000);
+                //axisRotate.StartMove(axisRotate.p_dRelPos + this.MeasuredAngle * 1000);
                 axisRotate.WaitReady();
             });
         }

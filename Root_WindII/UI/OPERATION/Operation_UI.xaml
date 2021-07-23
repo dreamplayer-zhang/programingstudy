@@ -27,7 +27,7 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="Home" Command="{Binding CommandHome}"></Button>
             <Button Grid.Column="1" Content="Load" Command="{Binding CommandLoadCST}"></Button>
-            <Button Grid.Column="2" Content="Recovery"></Button>
+            <Button Grid.Column="2" Content="Recovery" Command="{Binding CommandRecovery}"></Button>
         </Grid>
         
     </Grid>
