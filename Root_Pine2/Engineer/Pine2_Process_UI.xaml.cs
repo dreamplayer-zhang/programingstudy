@@ -254,5 +254,10 @@ namespace Root_Pine2.Engineer
             m_handler.NewLot();
         }
         #endregion
+
+        private void labelEQState_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (EQ.p_eState == EQ.eState.Error) EQ.p_eState = EQ.eState.Ready; 
+        }
     }
 }

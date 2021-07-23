@@ -396,33 +396,30 @@ namespace Root_Pine2.Module
 
         #region PickerSet
         double m_mmPickerSetUp = 10;
-        double m_secPickerSet = 7;
         public string RunPickerSet(eWorks eWorks)
         {
-            StopWatch sw = new StopWatch();
-            long msPickerSet = (long)(1000 * m_secPickerSet);
+            double sec = 0;
+            double pulseUp = 1000 * m_mmPickerSetUp;
             try
             {
+                if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMoveBoat(eWorks))) return p_sInfo;
+                if (Run(m_picker.RunVacuum(false))) return p_sInfo;
+                bool bUp = false;
                 while (true)
                 {
-                    if (Run(RunMoveZ(eWorks, 0))) return p_sInfo;
-                    if (Run(m_picker.RunVacuum(false))) return p_sInfo;
-                    double sec = 0;
+                    if (Run(RunMoveZ(eWorks, bUp ? pulseUp : 0))) return p_sInfo;
+                    if (Run(m_picker.RunVacuum(bUp))) return p_sInfo;
                     if (Run(m_pine2.WaitPickerSet(ref sec))) return p_sInfo;
-                    if (Run(m_picker.RunVacuum(true))) return p_sInfo;
-                    if (Run(RunMoveZ(eWorks, 1000 * m_mmPickerSetUp))) return p_sInfo;
-                    Thread.Sleep(200);
                     m_pine2.p_diPickerSet = false;
-                    if (m_picker.IsVacuum())
+                    if (sec > 1)
                     {
-                        sw.Start();
-                        while (sw.ElapsedMilliseconds < msPickerSet)
-                        {
-                            Thread.Sleep(10);
-                            if (EQ.IsStop()) return "EQ Stop";
-                            if (m_pine2.p_diPickerSet) return "OK";
-                        }
+                        RunMoveUp();
+                        m_picker.p_infoStrip = m_handler.m_aBoats[eVision.Bottom].m_aBoat[eWorks].p_infoStrip;
+                        m_handler.m_aBoats[eVision.Bottom].m_aBoat[eWorks].p_infoStrip = null;
+                        return "OK";
                     }
+                    bUp = !bUp; 
                 }
             }
             finally
@@ -434,7 +431,6 @@ namespace Root_Pine2.Module
         void RunTreePickerSet(Tree tree)
         {
             m_mmPickerSetUp = tree.Set(m_mmPickerSetUp, m_mmPickerSetUp, "Picker Up", "Picker Up (mm)");
-            m_secPickerSet = tree.Set(m_secPickerSet, m_secPickerSet, "Done", "PickerSet Done Time (sec)");
         }
         #endregion
 

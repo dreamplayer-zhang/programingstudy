@@ -31,7 +31,7 @@
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal" Margin="3">
                             <Label Content="EQ :" Margin="3"/>
-                            <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="3"/>
+                            <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="3" PreviewMouseLeftButtonDown="labelEQState_PreviewMouseLeftButtonDown"/>
                         </StackPanel>
                         <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="3"/>
                         <CheckBox x:Name="checkBoxPause" Content="EQ.Pause" IsChecked="{Binding p_bPause}" Margin="3"/>

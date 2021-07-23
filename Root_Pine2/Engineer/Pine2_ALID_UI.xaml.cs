@@ -43,6 +43,7 @@ namespace Root_Pine2.Engineer
         private void buttonClear_Click(object sender, RoutedEventArgs e)
         {
             m_listALID.ClearALID();
+            if (EQ.p_eState == EQ.eState.Error) EQ.p_eState = EQ.eState.Ready;
         }
 
     }
