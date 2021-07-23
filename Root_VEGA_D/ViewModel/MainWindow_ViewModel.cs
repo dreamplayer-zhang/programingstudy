@@ -1,4 +1,5 @@
 ﻿using Root_VEGA_D.Module;
+using Root_VEGA_D.Module.Recipe;
 using RootTools;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace Root_VEGA_D
     {
 
         MainWindow m_MainWindow;
+        ADIRecipe m_recipe;
 
         #region Dialog
         public DialogService m_dialogService;
@@ -49,11 +51,17 @@ namespace Root_VEGA_D
         }
         #endregion
 
-        BitmapSource m_bitmapAlignKeySrc;
-        public BitmapSource p_bitmapAlignKeySrc
+        BitmapSource m_bmpLeftTopAlignKeySrc;
+        public BitmapSource p_bmpLeftTopAlignKeySrc
         {
-            get => m_bitmapAlignKeySrc;
-            set => SetProperty(ref m_bitmapAlignKeySrc, value);
+            get => m_bmpLeftTopAlignKeySrc;
+            set => SetProperty(ref m_bmpLeftTopAlignKeySrc, value);
+        }
+        BitmapSource m_bmpLeftBottomAlignKeySrc;
+        public BitmapSource p_bmpLeftBottomAlignKeySrc
+        {
+            get => m_bmpLeftBottomAlignKeySrc;
+            set => SetProperty(ref m_bmpLeftBottomAlignKeySrc, value);
         }
 
         double m_SnapProgressValue = 0;
@@ -84,9 +92,10 @@ namespace Root_VEGA_D
             set => SetProperty(ref m_InspDispText, value);
         }
 
-        public MainWindow_ViewModel(MainWindow mainwindow)
+        public MainWindow_ViewModel(MainWindow mainwindow, ADIRecipe recipe)
         {
             m_MainWindow = mainwindow;
+            m_recipe = recipe;
 
             InitViewModel();
             DialogInit(m_MainWindow);
@@ -94,7 +103,7 @@ namespace Root_VEGA_D
 
         void InitViewModel()
         {
-            p_recipeManager_ViewModel = new RecipeManager_VM();
+            p_recipeManager_ViewModel = new RecipeManager_VM(m_recipe);
             //p_recipeWizard_ViewModel = new RecipeWizard_VM();
         }
         private void DialogInit(MainWindow main)
@@ -134,14 +143,18 @@ namespace Root_VEGA_D
                     break;
                 case Vision.LineScanStatus.AlignCompleted:
                     {
-                        BitmapImage img = new BitmapImage(new Uri(moduleRun.m_grabMode.p_sTempAlignMarkerFile));
                         m_MainWindow.Dispatcher.BeginInvoke(new ThreadStart(() =>
                         {
+                            BitmapImage imgLeftTop = new BitmapImage(new Uri(moduleRun.m_grabMode.p_sTempLeftTopAlignKeyFile));
+                            BitmapImage imgLeftBottom = new BitmapImage(new Uri(moduleRun.m_grabMode.p_sTempLeftBottomAlignKeyFile));
+
                             // Information의 AlignKey 표시
-                            p_bitmapAlignKeySrc = img;
+                            p_bmpLeftTopAlignKeySrc = imgLeftTop;
+                            p_bmpLeftBottomAlignKeySrc = imgLeftBottom;
 
                             // RecipeWizard의 AlignKey 표시
-                            p_recipeManager_ViewModel.p_bitmapAlignKeySrc = img;
+                            p_recipeManager_ViewModel.p_bmpLeftTopAlignKeySrc = imgLeftTop;
+                            p_recipeManager_ViewModel.p_bmpLeftBottomAlignKeySrc = imgLeftBottom;
                         }));
                     }
                     break;
@@ -156,20 +169,20 @@ namespace Root_VEGA_D
                         {
                             double val = (double)nCurScanNum / nTotalScanNum;
                             p_SnapProgressValue = val;
-                            p_SnapDispText = val.ToString(".0%");
+                            p_SnapDispText = val.ToString("P0");
                         });
                     }
                     break;
                 case Vision.LineScanStatus.LineInspCompleted:
                     {
                         int[] arrData = (int[])data;
-                        int nTotalScanNum = arrData[0];
-                        int nCurScanNum = arrData[1];
+                        int nTotalInspNum = arrData[0];
+                        int nCurInspNum = arrData[1];
                         Application.Current.Dispatcher.Invoke(delegate
                         {
-                            double val = (double)nCurScanNum / nTotalScanNum;
-                            p_SnapProgressValue = val;
-                            p_SnapDispText = val.ToString(".0%");
+                            double val = (double)nCurInspNum / nTotalInspNum;
+                            p_InspProgressValue = val;
+                            p_InspDispText = val.ToString("P0");
                         });
                     }
                     break;

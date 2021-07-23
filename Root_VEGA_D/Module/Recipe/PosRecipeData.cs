@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
 
-namespace Root_VEGA_D.Module.Reicpe
+namespace Root_VEGA_D.Module.Recipe
 {
 	/// <summary>
 	/// xml형식으로된 position recipe를 parse하는 class

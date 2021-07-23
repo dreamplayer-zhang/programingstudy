@@ -56,6 +56,7 @@ namespace Root_VEGA_D_IPU.Module
             LineStart,
             LineEnd,
             RcpName,
+            ScanInfo,
             Result,
             resume,
             InspStatus,
@@ -72,9 +73,68 @@ namespace Root_VEGA_D_IPU.Module
         public const string PARAM_NAME_TOTALSCANLINECOUNT = "TOTALSCANLINECOUNT";
         public const string PARAM_NAME_CURRENTSCANLINE = "CURRENTSCANLINE";
         public const string PARAM_NAME_STARTSCANLINE = "STARTSCANLINE";
-        public const string PARAM_NAME_BOT_ALIGN_MARKER_POS_X = "BOT_ALIGN_MARKER_POS_X";
-        public const string PARAM_NAME_BOT_ALIGN_MARKER_POS_Y = "BOT_ALIGN_MARKER_POS_Y";
+        public const string PARAM_NAME_LEFTTOP_ALIGN_MARKER_POS_X = "LEFTTOP_ALIGN_MARKER_POS_X";
+        public const string PARAM_NAME_LEFTTOP_ALIGN_MARKER_POS_Y = "LEFTTOP_ALIGN_MARKER_POS_Y";
+        public const string PARAM_NAME_LEFTBOT_ALIGN_MARKER_POS_X = "LEFTBOT_ALIGN_MARKER_POS_X";
+        public const string PARAM_NAME_LEFTBOT_ALIGN_MARKER_POS_Y = "LEFTBOT_ALIGN_MARKER_POS_Y";
         public const string PARAM_NAME_INSPENDLINE = "INSPENDLINE";
+
+        public enum eParamName
+        {
+            OffsetX,
+            OffsetY,
+            Scandir,
+            FOV,
+            Overlap,
+            RcpName,
+            Line,
+            TotalScanLineCount,
+            CurrentScanLine,
+            StartScanLine,
+            LeftTop_Align_Key_Pos_X,
+            LeftTop_Align_Key_Pos_Y,
+            LeftBot_Align_Key_Pos_X,
+            LeftBot_Align_Key_Pos_Y,
+            InspEndLine,
+
+            RCP_Left,
+            RCP_Top,
+            RCP_Right,
+            RCP_Bottom,
+            RCP_AlignPosX,
+            RCP_AlignPosY,
+            RCP_FirstDieLeft,
+            RCP_FirstDieRight,
+            RCP_SecondDieLeft,
+            RCP_LastDieRight,
+            RCP_FirstDieBottom,
+            RCP_FirstDieTop,
+            RCP_SecondDieBottom,
+            RCP_LastDieTop,
+            RCP_TriggerSizeX,
+            RCP_TriggerSizeY,
+            RCP_RectSizeX,
+            RCP_RectSizeY,
+            RCP_Padding,
+            RCP_AfterEffectMorpology,
+            RCP_AfterEffectBright,
+            RCP_AfterEffectHistogram,
+            RCP_ConsiderLinearPosY,
+            RCP_LoadScore,
+            RCP_DefectImagePath,
+            RCP_D2DThresholdGV,
+            RCP_SurfaceGV_Min,
+            RCP_SurfaceGV_Max,
+            RCP_DefectImagePadding,
+            RCP_DefectSizeX,
+            RCP_DefectSizeY,
+            RCP_MergeLength,
+            RCP_SwatheLength,
+            RCP_SwatheIgnore,
+            RCP_SwathePadding,
+            RCP_StartSwathe,
+            RCP_SwatheMaxCount,
+        }
 
         const string COMMAND_NAME = "CMD";
 

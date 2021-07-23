@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Root_VEGA_D.Module.Reicpe
+namespace Root_VEGA_D_IPU.Module.Recipe
 {
 	public class ADIRecipe
 	{

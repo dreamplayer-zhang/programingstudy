@@ -337,8 +337,8 @@
     </Compile>
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\Interlock.cs" />
-    <Compile Include="Module\Reicpe\ADIRecipe.cs" />
-    <Compile Include="Module\Reicpe\PosRecipeData.cs" />
+    <Compile Include="Module\Recipe\ADIRecipe.cs" />
+    <Compile Include="Module\Recipe\PosRecipeData.cs" />
     <Compile Include="Module\TowerLamp.cs" />
     <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
     <Compile Include="Module\Vision\Run_MakeTemplateImage.cs" />
