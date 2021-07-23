@@ -61,11 +61,13 @@ namespace Root_Pine2.Module
             m_axis.AddPos(c_sPosLoadEV);
             m_axis.AddPos(c_sPosPaper);
             m_axis.AddPos(c_sPosKeyence);
+            m_axis.AddPos(ePosTransfer.Transfer0.ToString());
             m_axis.AddPos(ePosTransfer.Transfer7.ToString());
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, eWorks.B));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, eWorks.B));
+            m_axis.AddPos(ePosTray.Tray0.ToString());
             m_axis.AddPos(ePosTray.Tray7.ToString());
             m_axis.p_axisZ.AddPos(c_sPosUp);
         }
@@ -162,11 +164,19 @@ namespace Root_Pine2.Module
         #endregion
 
         #region AxisXY
+        double GetXOffset(InfoStrip.eMagazine ePos)
+        {
+            double xScale = m_transfer.m_buffer.GetXScale(ePos);
+            double p0 = m_axis.p_axisX.GetPosValue(ePosTransfer.Transfer0.ToString()); 
+            double p7 = m_axis.p_axisX.GetPosValue(ePosTransfer.Transfer7.ToString());
+            return xScale * (p7 - p0); 
+        }
+
         public string RunMoveTransfer(ePosTransfer ePos, double xOffset, bool bWait = true)
         {
-            xOffset += m_transfer.m_buffer.GetXOffset((InfoStrip.eMagazine)ePos);
-            if (Run(StartMoveX(ePosTransfer.Transfer7.ToString(), xOffset))) return p_sInfo; 
-            m_axis.p_axisY.StartMove(ePosTransfer.Transfer7);
+            xOffset += GetXOffset((InfoStrip.eMagazine)ePos);
+            if (Run(StartMoveX(ePosTransfer.Transfer0.ToString(), xOffset))) return p_sInfo; 
+            m_axis.p_axisY.StartMove(ePosTransfer.Transfer0);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -180,9 +190,9 @@ namespace Root_Pine2.Module
 
         public string RunMoveTray(ePosTray eTray, bool bWait = true)
         {
-            double xOffset = m_transfer.m_buffer.GetXOffset((InfoStrip.eMagazine)eTray);
-            if (Run(StartMoveX(ePosTray.Tray7.ToString(), xOffset))) return p_sInfo;
-            m_axis.p_axisY.StartMove(ePosTray.Tray7);
+            double xOffset = GetXOffset((InfoStrip.eMagazine)eTray);
+            if (Run(StartMoveX(ePosTray.Tray0.ToString(), xOffset))) return p_sInfo;
+            m_axis.p_axisY.StartMove(ePosTray.Tray0);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -460,7 +470,8 @@ namespace Root_Pine2.Module
                 boat.RunVacuum(true);
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 if (Run(RunMoveUp(false))) return p_sInfo;
-                Thread.Sleep(200); 
+                Thread.Sleep(200);
+                boat.StartClean();
                 boat.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
                 boat.p_infoStrip.m_eWorks = eWorks;

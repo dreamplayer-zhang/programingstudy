@@ -36,8 +36,8 @@ namespace Root_Pine2.Module
                 case ModuleBase.eState.Error: Background = Brushes.OrangeRed; break;
             }
             textBlockStrip.Text = (m_loader.p_infoStrip != null) ? m_loader.p_infoStrip.p_id : "";
-            bool bInspect = (m_loader.p_infoStrip != null) ? m_loader.p_infoStrip.p_bInspect : false; 
-            textBlockStrip.Background = bInspect ? Brushes.Orange : Brushes.Beige;
+            bool bInspect = (m_loader.p_infoStrip != null) ? m_loader.p_infoStrip.p_bInspect : false;
+            gridID.Background = bInspect ? Brushes.Orange : Brushes.Beige;
             OnRunTree();
         }
 

@@ -345,16 +345,36 @@ namespace Root_EFEM.Module
 
 		public string AfterGet(int nID)
 		{
-			return "OK";
+			
+			doVac.Write(false);
+			Thread.Sleep(500);
+			if (!diWaferExist.p_bIn)
+			{
+				return "OK";
+			}
+			else
+			{
+				alid_WaferExist.Run(true, "Edge Side Wafer Exist Error");
+				return "OK";
+			}
 		}
 
 		public string AfterPut(int nID)
 		{
-			
+			doVac.Write(true);
+			Thread.Sleep(500);
+			if(diWaferExist.p_bIn && diWaferExistVac.p_bIn)
+            {
+				return "OK";
+            }
+            else
+            {
+				alid_WaferExist.Run(true, "Edge Side Wafer Exist Error");
+				return "OK";
+            }
 			//doVac.Write(true);
 			//if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
 			//	alid_WaferExist.Run(true, "Wafer Check Error");
-			return "OK";
 		}
 
 		enum eCheckWafer

@@ -140,8 +140,8 @@ namespace RootTools.Camera.Matrox
                 SetProperty(ref m_CamInfo, value);
             }
         }
-        const int c_nBuf = 40;
-        int _nBuf = 40;
+        const int c_nBuf = 80;
+        int _nBuf = 80;
         public int p_nBuf
         {
             get

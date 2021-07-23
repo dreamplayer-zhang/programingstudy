@@ -500,17 +500,26 @@ namespace Root_Pine2_Vision.Module
                         m_aSnap[i].m_dpAxis = new RPoint(dStageXOffset, 0);
                         m_aSnap[i].m_nOverlap = nOverlap;
 
-                        if (nSnapLineIndex % 2 == 0)  // 정방향
+                        if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen)
                         {
-                            m_aSnap[i].m_eDirection = Snap.eDirection.Forward;
-
-                            //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, 0);
+                            if (m_vision.m_bUseBiDirectional == true)
+                            {
+                                if (nSnapLineIndex % 2 == 0)  // 정방향
+                                    m_aSnap[i].m_eDirection = Snap.eDirection.Forward;
+                                else  // 역방향
+                                    m_aSnap[i].m_eDirection = Snap.eDirection.Backward;
+                            }
+                            else
+                            {
+                                m_aSnap[i].m_eDirection = Snap.eDirection.Forward;
+                            }
                         }
-                        else  // 역방향
+                        else
                         {
-                            m_aSnap[i].m_eDirection = Snap.eDirection.Backward/*Forward*/;
-                          
-                            //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
+                            if (nSnapLineIndex % 2 == 0)  // 정방향
+                                m_aSnap[i].m_eDirection = Snap.eDirection.Forward;
+                            else  // 역방향
+                                m_aSnap[i].m_eDirection = Snap.eDirection.Backward;
                         }
 
                         if (p_eSnapMode == eSnapMode.RGB)
@@ -677,6 +686,7 @@ namespace Root_Pine2_Vision.Module
         public string RunSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
             EQ.p_bStop = false;
+            if (!m_bUseBiDirectional) recipe.m_eDirection = Recipe.Snap.eDirection.Forward;
             int nFOVpx = m_aGrabData[eWorks].m_nFovSize;
             int nReverseOffset = m_aGrabData[eWorks].m_nReverseOffset;
             int nOverlap = m_aGrabData[eWorks].m_nOverlap;
@@ -694,16 +704,17 @@ namespace Root_Pine2_Vision.Module
 
             try
             {
-                m_log.Info("Start");
+                m_logSnap.Info("Snap Start");
+
                 // Set Camera Gain (When first snap line)
                 if(nSnapLineIndex == 0)
                     SetCameraGain(iSnap, nSnapMode, recipe.m_eDirection);
-                m_log.Info("Set Gain Done");
+                m_logSnap.Info("Set Gain Done");
 
                 // Set First Cal UserSet (첫 라인 이후부터는 Thread로 Userset 변경)
                 if (iSnap == 0)
                     SetFirstCalUserSet(nSnapMode, recipe);
-                m_log.Info("Set First Cal Userset Done");
+                m_logSnap.Info("Set First Cal Userset Done");
 
                 // Check Userset Change Thread
                 nTimeCount = 0;
@@ -713,7 +724,7 @@ namespace Root_Pine2_Vision.Module
                     Thread.Sleep(nWaitInterval);
                     if (EQ.IsStop()) return "EQ Stop";
                 }
-                m_log.Info("Check Userset Thread Done");
+                m_logSnap.Info("Check Userset Thread Done");
 
                 // Set Camera GrabThread On
                 m_bCanChangeUserSet = false;
@@ -725,11 +736,11 @@ namespace Root_Pine2_Vision.Module
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
                 }
-                m_log.Info("Grab Thread On Done");
+                m_logSnap.Info("Grab Thread On Done");
 
                 // Send SnapReady to Handler (Handler move Axis After receive this msg)
                 ReqSnapReady(eWorks);
-                m_log.Info("Send Snap Ready Done");
+                m_logSnap.Info("Send Snap Ready Done to Handler");
 
                 // Wait for Grab
                 while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
@@ -746,17 +757,19 @@ namespace Root_Pine2_Vision.Module
                             RunChangeUserSetThread(iSnap, nTotalSnap, nSnapMode, eWorks);
                     }
                 }
-                m_log.Info("Grab Done");
+                m_logSnap.Info("Grab Done");
 
                 // Send Snap Done to VisionWorks2
                 if (m_aWorks[eWorks].IsProcessRun())
                     m_aWorks[eWorks].SendSnapDone(iSnap);
-                m_log.Info("Send Snap Done Done");
+                m_logSnap.Info("Send Snap Done to VisionWorks2");
 
                 // Set Next Snap Userset (while 문에서 실행 못했을 경우)
                 if (m_bUserSetThreadOn == false && iSnap < nTotalSnap - 1)
                     RunChangeUserSetThread(iSnap, nTotalSnap, nSnapMode, eWorks);
-                m_log.Info("Userset Thread Done");
+                m_logSnap.Info("Userset Thread Done");
+
+                m_logSnap.Info("Snap End");
             }
             catch (Exception ex)
             {
@@ -796,32 +809,52 @@ namespace Root_Pine2_Vision.Module
             {
                 if (nNextSnap < (nTotalSnap / 2))       // RGB
                 {
+                    if (m_bUseBiDirectional)
+                    {
+                        if (nNextSnapLineIndex % 2 == 0)
+                            thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+                        else
+                            thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
+                    }
+                    else
+                        thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+                }
+                else    // APS
+                {
+                    if (m_bUseBiDirectional)
+                    {
+                        if (nNextSnapLineIndex % 2 == 0)
+                            thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
+                        else
+                            thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
+                    }
+                    else
+                        thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
+                }
+            }
+            else if (nSnapMode == Recipe.eSnapMode.RGB)
+            {
+                if (m_bUseBiDirectional)
+                {
                     if (nNextSnapLineIndex % 2 == 0)
                         thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
                     else
                         thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
                 }
-                else    // APS
+                else
+                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
+            }
+            else if (nSnapMode == Recipe.eSnapMode.APS)
+            {
+                if (m_bUseBiDirectional)
                 {
                     if (nNextSnapLineIndex % 2 == 0)
                         thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
                     else
                         thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
                 }
-            }
-            else if (nSnapMode == Recipe.eSnapMode.RGB)
-            {
-                if (nNextSnapLineIndex % 2 == 0)
-                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eForwardUserSet);
                 else
-                    thUpdate.Start(m_aCalData[eCalMode.RGB].m_eBackwardUserSet);
-            }
-            else if (nSnapMode == Recipe.eSnapMode.APS)
-            {
-                if (nNextSnapLineIndex % 2 == 0)
                     thUpdate.Start(m_aCalData[eCalMode.APS].m_eForwardUserSet);
-                else
-                    thUpdate.Start(m_aCalData[eCalMode.APS].m_eBackwardUserSet);
             }
         }
         private CPoint CalcOffset(int nSnapLineIndex, int nFOVpx, int nReverseOffset, Recipe.Snap recipe)
@@ -899,9 +932,9 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public string ReqSnap(string sRecipe, eWorks eWorks)
+        public string ReqSnap(string sRecipe, eWorks eWorks, bool bBiDirectionalScan = true)
         {
-            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString() + "," + bBiDirectionalScan.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             while (sSend != m_sReceive)
@@ -951,7 +984,7 @@ namespace Root_Pine2_Vision.Module
         void RunThreadCheckConnect()
         {
             m_bThreadCheck = true;
-            Thread.Sleep(3000); 
+            Thread.Sleep(15000); 
             while (m_bThreadCheck)
             {
                 Thread.Sleep(200); 
@@ -980,10 +1013,19 @@ namespace Root_Pine2_Vision.Module
         #region override
         public override void Reset()
         {
-            m_aWorks[eWorks.A].Reset();
-            m_aWorks[eWorks.B].Reset();
-            foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true; 
-            base.Reset();
+            if (p_eRemote == eRemote.Client)
+            {
+                foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true;
+                m_aWorks[eWorks.A].Reset();
+                m_aWorks[eWorks.B].Reset();
+                base.Reset();
+                RemoteRun(eRemoteRun.Reset, eRemote.Client, 0);
+            }
+            else
+            {
+                m_aWorks[eWorks.A].SendReset();
+                m_aWorks[eWorks.B].SendReset();
+            }
         }
         #endregion
 
@@ -1059,6 +1101,8 @@ namespace Root_Pine2_Vision.Module
         public Remote p_remote { get { return m_remote; } }
         #endregion
 
+        Log m_logSnap = LogView.GetLog("Snap"); 
+
         public Vision2D(eVision eVision, IEngineer engineer, eRemote eRemote)
         {
             p_eVision = eVision;
@@ -1093,6 +1137,7 @@ namespace Root_Pine2_Vision.Module
         public enum eRemoteRun
         {
             StateHome,
+            Reset,
             RunLight,
             RunLightOff,
             SendSnapInfo,
@@ -1108,6 +1153,7 @@ namespace Root_Pine2_Vision.Module
             switch (eRemoteRun)
             {
                 case eRemoteRun.StateHome: break;
+                case eRemoteRun.Reset: break; 
                 case eRemoteRun.RunLight: run.m_lightPower = value; break;
                 case eRemoteRun.SendSnapInfo: run.m_snapInfo = value; break;
                 case eRemoteRun.SendLotInfo: run.m_lotInfo = value; break;
@@ -1176,6 +1222,7 @@ namespace Root_Pine2_Vision.Module
                 switch (m_eRemoteRun)
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
+                    case eRemoteRun.Reset: m_module.Reset(); return "OK";
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
                     case eRemoteRun.RunLightOff: m_module.RunLightOff(); break;
                     case eRemoteRun.SendSnapInfo: return m_module.SendSnapInfo(m_snapInfo);
@@ -1299,7 +1346,7 @@ namespace Root_Pine2_Vision.Module
                     SnapInfo snapInfo = new SnapInfo(m_eWorks, nSnapMode, "0000", nSnapCount); 
                     m_module.SendSnapInfo(snapInfo); 
                 }
-                return m_module.ReqSnap(m_sRecipe, m_eWorks);
+                return m_module.ReqSnap(m_sRecipe, m_eWorks, m_module.m_bUseBiDirectional);
 
                 //m_module.m_recipe[m_eWorks].RecipeOpen(m_sRecipe);                  // 1. Root Vision Recipe Open
 

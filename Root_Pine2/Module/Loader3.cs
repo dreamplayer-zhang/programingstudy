@@ -63,7 +63,9 @@ namespace Root_Pine2.Module
         {
             m_axis.AddPos(GetPosString(eWorks.A));
             m_axis.AddPos(GetPosString(eWorks.B));
+            m_axis.AddPos(ePosTransfer.Transfer0.ToString());
             m_axis.AddPos(ePosTransfer.Transfer7.ToString());
+            m_axis.AddPos(ePosTray.Tray0.ToString());
             m_axis.AddPos(ePosTray.Tray7.ToString());
             m_axis.p_axisZ.AddPos(c_sPosUp);
         }
@@ -141,19 +143,27 @@ namespace Root_Pine2.Module
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
+        double GetXOffset(InfoStrip.eMagazine ePos)
+        {
+            double xScale = m_transfer.m_buffer.GetXScale(ePos);
+            double p0 = m_axis.p_axisX.GetPosValue(ePosTransfer.Transfer0.ToString());
+            double p7 = m_axis.p_axisX.GetPosValue(ePosTransfer.Transfer7.ToString());
+            return xScale * (p7 - p0);
+        }
+
         public string RunMoveTransfer(ePosTransfer ePos, double xOffset, bool bWait = true)
         {
-            xOffset -= m_transfer.m_buffer.GetXOffset((InfoStrip.eMagazine)ePos); 
-            if (Run(StartMoveX(ePosTransfer.Transfer7.ToString(), xOffset))) return p_sInfo;
-            m_axis.p_axisY.StartMove(ePosTransfer.Transfer7);
+            xOffset += GetXOffset((InfoStrip.eMagazine)ePos); 
+            if (Run(StartMoveX(ePosTransfer.Transfer0.ToString(), xOffset))) return p_sInfo;
+            m_axis.p_axisY.StartMove(ePosTransfer.Transfer0);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveTray(ePosTray ePos, bool bWait = true)
         {
-            double xOffset = -m_transfer.m_buffer.GetXOffset((InfoStrip.eMagazine)ePos);
-            if (Run(StartMoveX(ePosTray.Tray7.ToString(), xOffset))) return p_sInfo;
-            m_axis.p_axisY.StartMove(ePosTray.Tray7);
+            double xOffset = GetXOffset((InfoStrip.eMagazine)ePos);
+            if (Run(StartMoveX(ePosTray.Tray0.ToString(), xOffset))) return p_sInfo;
+            m_axis.p_axisY.StartMove(ePosTray.Tray0);
             return bWait ? m_axis.WaitReady() : "OK";
         }
         #endregion
@@ -215,15 +225,15 @@ namespace Root_Pine2.Module
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(boats.RunMoveDone(eWorks))) return p_sInfo;
+                if (Run(boats.RunMoveDone(eWorks, false))) return p_sInfo;
                 if (Run(RunMoveBoat(eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);
                 boat.RunBlow(true);
                 if (Run(m_picker.RunVacuum(true))) return p_sInfo;
                 Thread.Sleep(500);
-                boat.RunBlow(false);
                 if (Run(RunMoveUp())) return p_sInfo;
+                boat.RunBlow(false);
                 if (m_picker.IsVacuum() == false)
                 {
                     m_picker.RunVacuum(false); 
@@ -311,6 +321,7 @@ namespace Root_Pine2.Module
 
         string StartUnloadTray()
         {
+            if (m_picker.p_infoStrip.p_bInspect) return "OK";
             Run_UnloadTray run = (Run_UnloadTray)m_runUnloadTray.Clone();
             return StartRun(run);
         }

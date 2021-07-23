@@ -38,30 +38,37 @@ namespace Root_JEDI_Vision.Module
 
     public class SnapInfo
     {
-        public int m_nSnapMode = 0;
+        public enum eMode
+        {
+            RGB,
+            APS,
+            All
+        }
+        public eMode m_eMode = eMode.RGB; 
         public string m_sStripID = "0000";
         public int m_nLine = 0;
 
         public SnapInfo Clone()
         {
-            return new SnapInfo(m_nSnapMode, m_sStripID, m_nLine);
+            return new SnapInfo(m_eMode, m_sStripID, m_nLine);
         }
 
         public string GetString()
         {
-            return m_nSnapMode.ToString() + "," + m_sStripID + "," + m_nLine.ToString();
+            int nMode = (m_eMode == eMode.All) ? 3 : (int)m_eMode; 
+            return nMode.ToString() + "," + m_sStripID + "," + m_nLine.ToString();
         }
 
         public void RunTree(Tree tree, bool bVisible)
         {
-            m_nSnapMode = tree.Set(m_nSnapMode, m_nSnapMode, "SnapMode", "Snap Mode (0 = RGB, 1 = APS, 3 = ALL)", bVisible);
+            m_eMode = (eMode)tree.Set(m_eMode, m_eMode, "SnapMode", "Snap Mode", bVisible);
             m_sStripID = tree.Set(m_sStripID, m_sStripID, "StripID", "Strip ID", bVisible);
             m_nLine = tree.Set(m_nLine, m_nLine, "SnapLine", "Snap Line Number", bVisible);
         }
 
-        public SnapInfo(int nSnapMode, string sStripID, int nLine)
+        public SnapInfo(eMode eMode, string sStripID, int nLine)
         {
-            m_nSnapMode = nSnapMode;
+            m_eMode = eMode;
             m_sStripID = sStripID;
             m_nLine = nLine;
         }

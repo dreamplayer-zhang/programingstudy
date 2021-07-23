@@ -101,10 +101,10 @@ namespace RootTools.Printer
 
         public void WriteText(string sWrite, eAlign eAlign = eAlign.Left, eAttribute eAttribute = eAttribute.Default)
         {
-            BXLAPI.PrintText(sWrite, GetAlign(eAlign), GetAttribute(eAttribute), BXLAPI.BXL_TS_0WIDTH | BXLAPI.BXL_TS_0HEIGHT);
+            BXLAPI.PrintText(sWrite + "\n", GetAlign(eAlign), GetAttribute(eAttribute), BXLAPI.BXL_TS_0WIDTH | BXLAPI.BXL_TS_0HEIGHT);
         }
 
-        public void WriteQR(string sWrite, int nSize = 4)
+        public void WriteQR(string sWrite, int nSize = 8)
         {
             BXLAPI.PrintQRCode(sWrite, BXLAPI.BXL_QRCODE_MODEL1, nSize, BXLAPI.BXL_QRCODE_ECC_LEVEL_L, BXLAPI.BXL_ALIGNMENT_LEFT);
         }
