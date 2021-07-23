@@ -214,8 +214,8 @@ namespace Root_Pine2.Module
             string MoveElevator(Enum ePos, double fOffset = 0)
             {
                 if (IsProtrude()) return "Strip Protrude";
-                string sRun = m_handler.m_transfer.IsPusherOff(); 
-                if (sRun != "OK") return sRun;
+                //string sRun = m_handler.m_transfer.IsPusherOff(); 
+                //if (sRun != "OK") return sRun;
                 if (m_bProduct[InfoStrip.eMagazinePos.Down])
                 {
                     double fPos = m_axis.GetPosValue(ePos) + fOffset;

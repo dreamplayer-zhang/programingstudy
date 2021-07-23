@@ -186,13 +186,21 @@ namespace Root_Pine2.Module
                 mm75,
                 mm95,
             }
+            double m_dPos = 0; 
             public string RunWidth(double fWidth, bool bWait = true)
             {
                 double f75 = m_axisWidth.GetPosValue(eWidth.mm75);
                 double f95 = m_axisWidth.GetPosValue(eWidth.mm95);
                 double dPos = (f95 - f75) * (fWidth - 75) / 20 + f75;
+                m_dPos = dPos; 
                 m_axisWidth.StartMove(dPos);
                 return bWait ? m_axisWidth.WaitReady() : "OK";
+            }
+
+            public string RunAlign(bool bAlign)
+            {
+                m_axisWidth.StartMove(m_dPos + (bAlign ? 1000 : 0));
+                return "OK";
             }
             #endregion
 
@@ -235,26 +243,26 @@ namespace Root_Pine2.Module
                 Ungrip,
                 Grip
             }
-            public string RunMoveGripper(eGripper eGripper, bool bWait = true)
+            public string RunMoveGripper(eGripper eGripper, double fOffset, bool bWait = true)
             {
-                m_axis.StartMove(eGripper);
+                m_axis.StartMove(eGripper, fOffset);
                 return bWait ? m_axis.WaitReady() : "OK";
             }
 
             public string RunGripperReady(eGripper eGripper)
             {
                 m_dioGripper.Write(false);
-                return RunMoveGripper(eGripper, false);
+                return RunMoveGripper(eGripper, 0, false);
             }
 
             public string RunGripper()
             {
                 if (Run(RunGripper(false))) return m_sRun;
-                if (Run(RunMoveGripper(eGripper.Grip))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Grip, 5000))) return m_sRun;
                 if (Run(RunGripper(true))) return m_sRun;
-                if (Run(RunMoveGripper(eGripper.Ungrip))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Ungrip, 0))) return m_sRun;
                 if (Run(RunGripper(false))) return m_sRun;
-                if (Run(RunMoveGripper(eGripper.Ready))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Ready, 0))) return m_sRun;
                 return "OK";
             }
 

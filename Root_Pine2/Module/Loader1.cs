@@ -96,7 +96,7 @@ namespace Root_Pine2.Module
                 boat.p_infoStrip.m_eVisionLoad = eVision;
                 boat.p_infoStrip.m_eWorks = eWorks; 
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(boats.RunMoveDone(eWorks, false))) return p_sInfo;
+                //if (Run(boats.RunMoveDone(eWorks, false))) return p_sInfo;
                 if (Run(RunMoveX(eVision, eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eVision, eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);

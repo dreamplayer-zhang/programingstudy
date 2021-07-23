@@ -225,7 +225,7 @@ namespace Root_Pine2.Module
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(boats.RunMoveDone(eWorks, false))) return p_sInfo;
+                //if (Run(boats.RunMoveDone(eWorks, false))) return p_sInfo;
                 if (Run(RunMoveBoat(eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);
@@ -301,6 +301,7 @@ namespace Root_Pine2.Module
                 ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
                 double xOffset = m_transfer.m_buffer.m_xOffset;
                 m_transfer.m_pusher.p_bLock = true;
+                m_transfer.m_buffer.RunAlign(false); 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveTransfer(ePos, xOffset))) return p_sInfo;
                 if (Run(RunMoveZ(ePos))) return p_sInfo;

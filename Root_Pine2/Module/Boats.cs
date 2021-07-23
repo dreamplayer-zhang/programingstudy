@@ -289,13 +289,13 @@ namespace Root_Pine2.Module
 
                 }
                 vision.RunLightOff();
+                m_axisCam.StartMove((eWorks)(1 - (int)eWorks));
+                m_aBoat[eWorks].RunMove(p_ePosUnload);
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
             }
             catch (Exception e) { p_sInfo = e.Message; }
             finally
             {
-                m_axisCam.StartMove((eWorks)(1 - (int)eWorks));
-                m_aBoat[eWorks].RunMove(p_ePosUnload);
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(false);
             }
             m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
@@ -366,13 +366,13 @@ namespace Root_Pine2.Module
 
                 }
                 vision.RunLightOff();
+                m_axisCam.StartMove((eWorks)(1 - (int)eWorks));
+                m_aBoat[eWorks].RunMove(p_ePosUnload);
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
             }
             catch (Exception e) { p_sInfo = e.Message; }
             finally
             {
-                m_axisCam.StartMove((eWorks)(1 - (int)eWorks));
-                m_aBoat[eWorks].RunMove(p_ePosUnload);
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(false);
             }
             m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
