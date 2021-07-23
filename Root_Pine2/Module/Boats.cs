@@ -6,6 +6,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -289,9 +290,7 @@ namespace Root_Pine2.Module
 
                 }
                 vision.RunLightOff();
-                m_axisCam.StartMove((eWorks)(1 - (int)eWorks));
-                m_aBoat[eWorks].RunMove(p_ePosUnload);
-                m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
+                m_bgwDone.RunWorkerAsync(eWorks);
             }
             catch (Exception e) { p_sInfo = e.Message; }
             finally
@@ -366,9 +365,7 @@ namespace Root_Pine2.Module
 
                 }
                 vision.RunLightOff();
-                m_axisCam.StartMove((eWorks)(1 - (int)eWorks));
-                m_aBoat[eWorks].RunMove(p_ePosUnload);
-                m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
+                m_bgwDone.RunWorkerAsync(eWorks);
             }
             catch (Exception e) { p_sInfo = e.Message; }
             finally
@@ -378,6 +375,14 @@ namespace Root_Pine2.Module
             m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
             return "OK";
         }
+
+        BackgroundWorker m_bgwDone = new BackgroundWorker();
+        private void M_bgwDone_DoWork(object sender, DoWorkEventArgs e)
+        {
+            m_aBoat[(eWorks)e.Argument].RunMove(p_ePosUnload);
+            m_aBoat[(eWorks)e.Argument].p_eStep = Boat.eStep.Done;
+        }
+
         #endregion
 
         #region Recipe
@@ -469,11 +474,12 @@ namespace Root_Pine2.Module
         public IVision m_vision; 
         public Boats(IVision vision, IEngineer engineer, Pine2 pine2)
         {
+            m_bgwDone.DoWork += M_bgwDone_DoWork;
             m_vision = vision;
             p_id = "Boats " + vision.p_eVision.ToString();
             m_pine2 = pine2;
-            InitBoat(); 
-            InitBase(p_id, engineer); 
+            InitBoat();
+            InitBase(p_id, engineer);
         }
 
         protected override void RunThreadStop()
