@@ -1,6 +1,7 @@
 ﻿using Root_Pine2.Engineer;
 using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -20,7 +21,17 @@ namespace Root_Pine2.Module
             m_buffer.GetTools(m_toolBox, this, bInit);
             m_gripper.GetTools(m_toolBox, this, bInit);
             m_pusher.GetTools(m_toolBox, this, bInit);
+            if (bInit) InitALID(); 
         }
+
+        ALID m_alidGripper;
+        ALID m_alidPusher;
+        void InitALID()
+        {
+            m_alidGripper = m_gaf.GetALID(this, "Gripper", "Home Error : Gripper has Strip");
+            m_alidPusher = m_gaf.GetALID(this, "Pusher", "Home Error : Pusher has Strip");
+        }
+
         #endregion
 
         #region Loader Pusher
@@ -557,6 +568,8 @@ namespace Root_Pine2.Module
             }
             if (m_gripper.IsExist() || m_pusher.IsExist())
             {
+                m_alidGripper.p_bSet = m_gripper.IsExist();
+                m_alidPusher.p_bSet = m_pusher.IsExist(); 
                 p_eState = eState.Init;
                 return "Check Strip Sensor";
             }

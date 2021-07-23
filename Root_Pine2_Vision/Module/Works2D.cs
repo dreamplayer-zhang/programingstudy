@@ -218,7 +218,7 @@ namespace Root_Pine2_Vision.Module
         {
             int nProcess = 0; 
             m_bThreadProcess = true;
-            Thread.Sleep(p_eWorks == eWorks.A ? 6000 : 7000);
+            Thread.Sleep(p_eWorks == eWorks.A ? 25000 : 28000);
             while (m_bThreadProcess)
             {
                 Thread.Sleep(10);
