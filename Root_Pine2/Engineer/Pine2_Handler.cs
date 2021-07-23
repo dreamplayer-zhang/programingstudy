@@ -197,7 +197,7 @@ namespace Root_Pine2.Engineer
             m_magazineEVSet = new MagazineEVSet(m_pine2);
             foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
             {
-                MagazineEV magazineEV = new MagazineEV(eMagazine, m_engineer, m_pine2);
+                MagazineEV magazineEV = new MagazineEV(eMagazine, m_engineer, m_pine2, m_magazineEVSet);
                 m_magazineEVSet.m_aEV.Add(eMagazine, magazineEV);
                 InitModule(magazineEV); 
             }
