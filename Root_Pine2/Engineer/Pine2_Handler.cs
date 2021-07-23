@@ -64,15 +64,18 @@ namespace Root_Pine2.Engineer
             }
         }
 
-        BackgroundWorker m_bgwSendSort = new BackgroundWorker(); 
+        Queue<InfoStrip> m_qInfoStripSend = new Queue<InfoStrip>();
         public void SendSortInfo(InfoStrip infoStrip)
         {
-            m_bgwSendSort.RunWorkerAsync(infoStrip); 
+            m_qInfoStripSend.Enqueue(infoStrip); 
         }
 
-        private void M_bgwSendSort_DoWork(object sender, DoWorkEventArgs e)
+        void SendSortInfo()
         {
-            InfoStrip infoStrip = e.Argument as InfoStrip; 
+            if (m_qInfoStripSend.Count == 0) return;
+            InfoStrip infoStrip = m_qInfoStripSend.Peek();
+            if (infoStrip.p_bInspect) return;
+            m_qInfoStripSend.Dequeue();
             if (m_pine2.p_b3D) SendSortInfo(m_aBoats[eVision.Top3D], infoStrip);
             SendSortInfo(m_aBoats[eVision.Top2D], infoStrip);
             SendSortInfo(m_aBoats[eVision.Bottom], infoStrip);
@@ -371,6 +374,7 @@ namespace Root_Pine2.Engineer
             while (m_bThread)
             {
                 Thread.Sleep(10);
+                SendSortInfo(); 
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
@@ -378,7 +382,6 @@ namespace Root_Pine2.Engineer
                         if (m_eEQState == EQ.eState.Ready) m_summary.LotStart(m_pine2.p_sLotID);
                         break;
                     case EQ.eState.ModuleRunList: 
-
                         break;
                 }
                 p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
@@ -401,7 +404,6 @@ namespace Root_Pine2.Engineer
             InitModule();
             InitThread();
             m_bgwRecipe.DoWork += M_bgwRecipe_DoWork;
-            m_bgwSendSort.DoWork += M_bgwSendSort_DoWork;
             m_engineer.ClassMemoryTool().InitThreadProcess();
         }
 

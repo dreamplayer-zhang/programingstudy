@@ -518,32 +518,16 @@ namespace Root_Pine2.Module
             m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
             if (Run(m_pusher.RunPusher())) return p_sInfo;
             if (m_pusher.IsExist()) return "Strip Exist in Pusher after Push";
-            m_qInfoStripSend.Enqueue(infoStrip); 
+            ((Pine2_Handler)m_engineer.ClassHandler()).SendSortInfo(infoStrip);
             m_magazineEV.PutInfoStrip(infoStrip);
             m_pusher.p_infoStrip = null;
             if (Run(m_gripper.WaitUnlock())) return p_sInfo; 
             m_engineer.ClassHandler().CheckFinish();
             return "OK"; 
         }
-
-        Queue<InfoStrip> m_qInfoStripSend = new Queue<InfoStrip>(); 
-        void SendSortInfo()
-        {
-            if (m_qInfoStripSend.Count == 0) return;
-            InfoStrip infoStrip = m_qInfoStripSend.Peek();
-            if (infoStrip.p_bInspect) return;
-            ((Pine2_Handler)m_engineer.ClassHandler()).SendSortInfo(infoStrip);
-            m_qInfoStripSend.Dequeue(); 
-        }
         #endregion
 
         #region override
-        protected override void RunThread()
-        {
-            SendSortInfo(); 
-            base.RunThread();
-        }
-
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
