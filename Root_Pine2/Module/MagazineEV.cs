@@ -211,11 +211,15 @@ namespace Root_Pine2.Module
                 return true; 
             }
 
+            public bool m_bPusherSafe = true; 
             string MoveElevator(Enum ePos, double fOffset = 0)
             {
                 if (IsProtrude()) return "Strip Protrude";
-                //string sRun = m_handler.m_transfer.IsPusherOff(); 
-                //if (sRun != "OK") return sRun;
+                while (m_bPusherSafe == false)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
                 if (m_bProduct[InfoStrip.eMagazinePos.Down])
                 {
                     double fPos = m_axis.GetPosValue(ePos) + fOffset;

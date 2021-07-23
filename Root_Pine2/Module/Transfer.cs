@@ -6,7 +6,6 @@ using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -104,6 +103,7 @@ namespace Root_Pine2.Module
                 DIO_I diOverload = m_diOverload[GetAxisID(eMagazine)];
                 try
                 {
+                    m_magazineSet.m_aEV[eMagazine].m_elevator.m_bPusherSafe = false;
                     dioPusher.Write(true);
                     StopWatch sw = new StopWatch();
                     int msTimeout = (int)(1000 * dioPusher.m_secTimeout);
@@ -118,18 +118,21 @@ namespace Root_Pine2.Module
                     dioPusher.Write(false);
                     return dioPusher.WaitDone(); 
                 }
-                finally { dioPusher.Write(false); }
-            }
-
-            public bool IsPusherOff()
-            {
-                if (m_dioPusher[0].m_aBitDI[0].p_bOn == false) return false;
-                if (m_dioPusher[1].m_aBitDI[0].p_bOn == false) return false;
-                return true; 
+                finally 
+                { 
+                    dioPusher.Write(false);
+                    m_magazineSet.m_aEV[eMagazine].m_elevator.m_bPusherSafe = true; 
+                }
             }
             #endregion
+
+            MagazineEVSet m_magazineSet; 
+            public LoaderPusher(MagazineEVSet magazineSet)
+            {
+                m_magazineSet = m_magazineSet; 
+            }
         }
-        LoaderPusher m_loaderPusher = new LoaderPusher();
+        LoaderPusher m_loaderPusher;
         #endregion
 
         #region Buffer
@@ -534,15 +537,6 @@ namespace Root_Pine2.Module
         }
         #endregion
 
-        #region Pusher Safe
-        public string IsPusherOff()
-        {
-            if (m_loaderPusher.IsPusherOff() == false) return "Check Loader Pusher";
-            if (m_pusher.m_dioPusher.m_aBitDI[0].p_bOn == false) return "Check Transfer Pusher";
-            return "OK"; 
-        }
-        #endregion
-
         #region override
         protected override void RunThread()
         {
@@ -612,7 +606,8 @@ namespace Root_Pine2.Module
         {
             m_pine2 = pine2;
             m_magazineEV = magazineEV;
-            m_buffer = new Buffer(this); 
+            m_buffer = new Buffer(this);
+            m_loaderPusher = new LoaderPusher(magazineEV);
             InitBase(id, engineer); 
         }
 
