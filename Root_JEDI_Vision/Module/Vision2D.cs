@@ -27,17 +27,17 @@ namespace Root_JEDI_Vision.Module
         {
             if (p_eRemote == eRemote.Server)
             {
-                p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera");
+                //p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera");
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
                 p_sInfo = m_toolBox.GetComm(ref m_rs232RGBW, this, "RGBW");
                 m_boat.GetTools(m_toolBox, this, bInit); 
                 m_camAxis.GetTools(m_toolBox, this, bInit); 
-                m_process.GetTools(m_toolBox, bInit); 
+                m_process.GetTools(m_toolBox, bInit);
                 if (bInit)
                 {
                     m_rs232RGBW.p_bConnect = true;
-                    m_camera.Connect();
+                    m_camera?.Connect();
                     InitMemory();
                 }
             }
@@ -76,20 +76,38 @@ namespace Root_JEDI_Vision.Module
             #region Offset
             double m_pulseum = 10; 
             double m_mmSpace = 100; 
-            public Dictionary<eLine, R3Point[]> m_umOffset = new Dictionary<eLine, R3Point[]>();
+            public Dictionary<eLine, RPoint[]> m_umCamOffset = new Dictionary<eLine, RPoint[]>();
+            public Dictionary<eLine, double[]> m_umScanOffset = new Dictionary<eLine, double[]>();
             void InitOffset()
             {
-                m_umOffset.Add(eLine.Single, new R3Point[1] { new R3Point() });
-                m_umOffset.Add(eLine.Double, new R3Point[2] { new R3Point(), new R3Point() });
-                m_umOffset.Add(eLine.Triple, new R3Point[3] { new R3Point(), new R3Point(), new R3Point() });
+                m_umCamOffset.Add(eLine.Single, new RPoint[1] { new RPoint() });
+                m_umCamOffset.Add(eLine.Double, new RPoint[2] { new RPoint(), new RPoint() });
+                m_umCamOffset.Add(eLine.Triple, new RPoint[3] { new RPoint(), new RPoint(), new RPoint() });
+                m_umScanOffset.Add(eLine.Single, new double[1] { 0 });
+                m_umScanOffset.Add(eLine.Double, new double[2] { 0, 0 });
+                m_umScanOffset.Add(eLine.Triple, new double[3] { 0, 0, 0 });
             }
             public void RunTree(Tree tree)
             {
                 m_pulseum = tree.Set(m_pulseum, m_pulseum, "pulse/um", "pulse per um");
                 m_mmSpace = tree.Set(m_mmSpace, m_mmSpace, "Space", "Grab Sapce (mm)");
-                R3Point[] umOffset = m_umOffset[eLine.Double];
+                RunTreeCamOffset(tree.GetTree("Camera Offset"));
+                RunTreeScanOffset(tree.GetTree("Scan Offset"));
+            }
+
+            void RunTreeCamOffset(Tree tree)
+            {
+                RPoint[] umOffset = m_umCamOffset[eLine.Double];
                 for (int n = 0; n < 2; n++) umOffset[n] = tree.GetTree("Double").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
-                umOffset = m_umOffset[eLine.Triple];
+                umOffset = m_umCamOffset[eLine.Triple];
+                for (int n = 0; n < 3; n++) umOffset[n] = tree.GetTree("Triple").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
+            }
+
+            void RunTreeScanOffset(Tree tree)
+            {
+                double[] umOffset = m_umScanOffset[eLine.Double];
+                for (int n = 0; n < 2; n++) umOffset[n] = tree.GetTree("Double").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
+                umOffset = m_umScanOffset[eLine.Triple];
                 for (int n = 0; n < 3; n++) umOffset[n] = tree.GetTree("Triple").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
             }
             #endregion
@@ -103,14 +121,14 @@ namespace Root_JEDI_Vision.Module
 
             public string RunMove(eLine eLine, int iLine, bool bWait = true)
             {
-                R3Point umOffset = new R3Point(m_umOffset[eLine][iLine]); 
+                RPoint umOffset = new RPoint(m_umCamOffset[eLine][iLine]); 
                 switch (eLine)
                 {
                     case eLine.Single: break; 
                     case eLine.Double: umOffset.X += 1000 * m_mmSpace * (iLine - 0.5); break;
                     case eLine.Triple: umOffset.X += 1000 * m_mmSpace * (iLine - 1); break; 
                 }
-                m_axis.StartMove(ePos.Snap, new RPoint(m_pulseum * umOffset.X, m_pulseum * umOffset.Z));
+                m_axis.StartMove(ePos.Snap, new RPoint(m_pulseum * umOffset.X, m_pulseum * umOffset.Y));
                 return bWait ? m_axis.WaitReady() : "OK";
             }
             #endregion
@@ -516,13 +534,7 @@ namespace Root_JEDI_Vision.Module
                 }
             }
 
-            public enum eSnapMode
-            {
-                RGB,
-                APS,
-                ALL
-            }
-            public eSnapMode m_eSnapMode = eSnapMode.RGB;
+            public SnapInfo.eMode m_eSnapMode = SnapInfo.eMode.RGB;
 
             public double _dProductWidth = 0;
             public double p_dProductWidth
@@ -541,24 +553,24 @@ namespace Root_JEDI_Vision.Module
                     m_aSnap.Clear();
                     switch (m_eSnapMode)
                     {
-                        case eSnapMode.RGB: AddSnap(eSnapMode.RGB, eLine, Snap.eEXT.EXT1, m_lightPowerRGB); break;
-                        case eSnapMode.APS: AddSnap(eSnapMode.APS, eLine, Snap.eEXT.EXT2, m_lightPowerAPS); break;
-                        case eSnapMode.ALL:
-                            AddSnap(eSnapMode.RGB, eLine, Snap.eEXT.EXT1, m_lightPowerRGB);
-                            AddSnap(eSnapMode.APS, eLine, Snap.eEXT.EXT2, m_lightPowerAPS);
+                        case SnapInfo.eMode.RGB: AddSnap(SnapInfo.eMode.RGB, eLine, Snap.eEXT.EXT1, m_lightPowerRGB); break;
+                        case SnapInfo.eMode.APS: AddSnap(SnapInfo.eMode.APS, eLine, Snap.eEXT.EXT2, m_lightPowerAPS); break;
+                        case SnapInfo.eMode.All:
+                            AddSnap(SnapInfo.eMode.RGB, eLine, Snap.eEXT.EXT1, m_lightPowerRGB);
+                            AddSnap(SnapInfo.eMode.APS, eLine, Snap.eEXT.EXT2, m_lightPowerAPS);
                             break; 
                     }
                 }
             }
 
-            void AddSnap(eSnapMode eSnapMode, eLine eLine, Snap.eEXT eEXT, LightPower lightPower)
+            void AddSnap(SnapInfo.eMode eSnapMode, eLine eLine, Snap.eEXT eEXT, LightPower lightPower)
             {
                 for (int i = 0; i <= (int)eLine; i++)
                 {
                     Snap snap = new Snap(m_vision);
                     snap.m_eLine = eLine;
                     snap.m_iLine = i;
-                    snap.m_eCalMode = (eSnapMode == eSnapMode.RGB) ? eCalMode.RGB : eCalMode.APS; 
+                    snap.m_eCalMode = (eSnapMode == SnapInfo.eMode.RGB) ? eCalMode.RGB : eCalMode.APS; 
                     snap.m_nOverlap = m_vision.m_grabData.m_nOverlap;
                     if (m_vision.m_bUseBiDirectional == false) snap.m_eDirection = Boat.eDirection.Forward;
                     else snap.m_eDirection = (i % 2 == 0) ? Boat.eDirection.Forward : Boat.eDirection.Backward;
@@ -591,15 +603,15 @@ namespace Root_JEDI_Vision.Module
             public LightPower m_lightPowerRGB, m_lightPowerAPS;
             public void RunTreeRecipe(Tree tree, bool bVisible, bool bReadOnly = false)
             {
-                m_eSnapMode = (eSnapMode)tree.Set(m_eSnapMode, m_eSnapMode, "Snap Mode", "Select Snap Mode", bVisible);
+                m_eSnapMode = (SnapInfo.eMode)tree.Set(m_eSnapMode, m_eSnapMode, "Snap Mode", "Select Snap Mode", bVisible);
                 p_dProductWidth = tree.Set(p_dProductWidth, p_dProductWidth, "Product Width", "Product Width(mm)", bVisible);
                 p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "Snap Count", bVisible, true);
 
                 if (!(m_treeRecipe.p_eMode == Tree.eMode.JobOpen && m_vision.p_eRemote == eRemote.Client))
                 {
-                    if (m_eSnapMode == eSnapMode.RGB || m_eSnapMode == eSnapMode.ALL)
+                    if (m_eSnapMode == SnapInfo.eMode.RGB || m_eSnapMode == SnapInfo.eMode.All)
                         m_lightPowerRGB.RunTree(tree.GetTree("Light").GetTree("RGB Light", true, bVisible), bVisible);
-                    if (m_eSnapMode == eSnapMode.APS || m_eSnapMode == eSnapMode.ALL)
+                    if (m_eSnapMode == SnapInfo.eMode.APS || m_eSnapMode == SnapInfo.eMode.All)
                         m_lightPowerAPS.RunTree(tree.GetTree("Light").GetTree("APS Light", true, bVisible), bVisible);
                 }
 
@@ -666,6 +678,36 @@ namespace Root_JEDI_Vision.Module
             }
             set { }
         }
+
+        public Recipe m_recipeEdit;
+        Recipe_UI m_recipeEditUI; 
+        void InitRecipeEditUI()
+        {
+            m_recipeEdit = new Recipe(this);
+            m_recipeEditUI = new Recipe_UI();
+            m_recipeEditUI.Init(this);
+            m_aTool.Add(m_recipeEditUI); 
+        }
+        #endregion
+
+        #region Send Info
+        public LotInfo m_lotInfo = null;
+        public string SendLotInfo(LotInfo lotInfo)
+        {
+            m_lotInfo = lotInfo;
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendLotInfo, eRemote.Client, lotInfo);
+            else
+            {
+                p_sRecipe = lotInfo.m_sRecipe;
+                return m_process.SendLotInfo(lotInfo); 
+            }
+        }
+
+        public string SendSortInfo(SortInfo sortInfo)
+        {
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendSortInfo, eRemote.Client, sortInfo);
+            else { return m_process.SendSortInfo(sortInfo); }
+        }
         #endregion
 
         #region Snap
@@ -680,7 +722,7 @@ namespace Root_JEDI_Vision.Module
                 {
                     RunLight(snap.m_lightPower);
                     if (Run(m_camAxis.RunMove(snap.m_eLine, snap.m_iLine, false))) return p_sInfo;
-                    double mmOffsetY = m_camAxis.m_umOffset[snap.m_eLine][snap.m_iLine].Y / 1000.0;
+                    double mmOffsetY = m_camAxis.m_umScanOffset[snap.m_eLine][snap.m_iLine] / 1000.0;
                     if (Run(m_boat.RunMove(snap.m_eDirection, mmOffsetY, false))) return p_sInfo; 
                     if (bSendSnapInfo == false)
                     {
@@ -779,21 +821,28 @@ namespace Root_JEDI_Vision.Module
         #region override
         public override void Reset()
         {
-            m_process?.Reset(); 
-            foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true;
-            base.Reset();
+            if (p_eRemote == eRemote.Client)
+            {
+                base.Reset();
+                foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true;
+                RemoteRun(eRemoteRun.SendLotInfo, eRemote.Client, 0);
+            }
+            else
+            {
+                m_process?.Reset();
+            }
         }
 
         public override string StateHome()
         {
-            if (EQ.p_bSimulate)
+            if (EQ.p_bSimulate) return "OK";
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, 0);
+            else
             {
-                p_eState = eState.Ready;
-                return "OK";
+                string sRun = base.StateHome();
+                p_eState = (sRun == "OK") ? eState.Ready : eState.Error;
+                return sRun;
             }
-            string sRun = base.StateHome();
-            p_eState = (sRun == "OK") ? eState.Ready : eState.Error;
-            return sRun; 
         }
         #endregion
 
@@ -831,20 +880,20 @@ namespace Root_JEDI_Vision.Module
         #endregion
 
         public eVision p_eVision { get; set; }
-        public Boat m_boat; 
-        public Vision2D(eVision eVision, IEngineer engineer)
+        public Boat m_boat;
+        VisionProcess m_process = null;
+        public Vision2D(eVision eVision, IEngineer engineer, eRemote eRemote)
         {
             p_eVision = eVision;
-            m_boat = new Boat(eVision.ToString());
-            m_recipe = new Recipe(this); 
-            InitBase("Vision " + eVision.ToString(), engineer, eRemote.Client);
-        }
-
-        VisionProcess m_process = null; 
-        public Vision2D(string id, IEngineer engineer)
-        {
-            m_process = new VisionProcess(this); 
-            InitBase(id, engineer, eRemote.Server);
+            if (eRemote == eRemote.Server)
+            {
+                m_process = new VisionProcess(this);
+                m_boat = new Boat(eVision.ToString());
+                m_recipe = new Recipe(this);
+                InitRecipeEditUI();
+                InitCalData();
+            }
+            InitBase(eVision.ToString(), engineer, eRemote);
         }
 
         public override void ThreadStop()
@@ -852,5 +901,92 @@ namespace Root_JEDI_Vision.Module
             m_process?.ThreadStop(); 
             base.ThreadStop();
         }
+
+        #region RemoteRun
+        public enum eRemoteRun
+        {
+            StateHome,
+            Reset,
+            SendLotInfo,
+            SendSortInfo,
+        }
+
+        Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
+        {
+            Run_Remote run = new Run_Remote(this);
+            run.m_eRemoteRun = eRemoteRun;
+            run.m_eRemote = eRemote;
+            switch (eRemoteRun)
+            {
+                case eRemoteRun.StateHome: break;
+                case eRemoteRun.Reset: break;
+                case eRemoteRun.SendLotInfo: run.m_lotInfo = value; break;
+                case eRemoteRun.SendSortInfo: run.m_sortInfo = value; break;
+            }
+            return run;
+        }
+
+        string RemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
+        {
+            if (m_remote.p_bEnable == false) return "OK";
+            Run_Remote run = GetRemoteRun(eRemoteRun, eRemote, value);
+            StartRun(run);
+            while (run.p_eRunState != ModuleRunBase.eRunState.Done)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+            }
+            return p_sInfo;
+        }
+
+        public class Run_Remote : ModuleRunBase
+        {
+            Vision2D m_module;
+            public Run_Remote(Vision2D module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
+            public LotInfo m_lotInfo = new LotInfo("", "", 0);
+            public SortInfo m_sortInfo = new SortInfo("", "");
+            public override ModuleRunBase Clone()
+            {
+                Run_Remote run = new Run_Remote(m_module);
+                run.m_eRemoteRun = m_eRemoteRun;
+                run.m_lotInfo = m_lotInfo.Clone();
+                run.m_sortInfo = m_sortInfo.Clone();
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eRemoteRun = (eRemoteRun)tree.Set(m_eRemoteRun, m_eRemoteRun, "RemoteRun", "Select Remote Run", bVisible);
+                m_eRemote = (eRemote)tree.Set(m_eRemote, m_eRemote, "Remote", "Remote", false);
+                switch (m_eRemoteRun)
+                {
+                    case eRemoteRun.SendLotInfo: m_lotInfo.RunTree(tree.GetTree("LotInfo"), bVisible); break;
+                    case eRemoteRun.SendSortInfo: m_sortInfo.RunTree(tree.GetTree("SortInfo"), bVisible); break;
+                    default: break;
+                }
+            }
+
+            public override string Run()
+            {
+                EQ.p_bStop = false;
+                switch (m_eRemoteRun)
+                {
+                    case eRemoteRun.StateHome: return m_module.StateHome();
+                    case eRemoteRun.Reset: m_module.Reset(); return "OK";
+                    case eRemoteRun.SendLotInfo: return m_module.SendLotInfo(m_lotInfo);
+                    case eRemoteRun.SendSortInfo: return m_module.SendSortInfo(m_sortInfo);
+                }
+                return "OK";
+            }
+        }
+        #endregion
+
+
     }
 }

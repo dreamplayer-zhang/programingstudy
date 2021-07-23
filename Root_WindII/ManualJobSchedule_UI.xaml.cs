@@ -159,7 +159,7 @@ namespace Root_WindII
         void InitSlotRecipeList()
         {
             DirectoryInfo info = new DirectoryInfo("C:\\Recipe");
-            FileInfo[] files = info.GetFiles("*.WIND2");
+            FileInfo[] files = info.GetFiles("*.WIND2F");
             List<string> asRecipeFile = new List<string>();
             foreach (FileInfo fileInfo in files)
             {
@@ -194,7 +194,7 @@ namespace Root_WindII
         void InitRecipeList()
         {
             DirectoryInfo info = new DirectoryInfo("C:\\Recipe");
-            FileInfo[] files = info.GetFiles("*.WIND2");
+            FileInfo[] files = info.GetFiles("*.WIND2F");
             List<string> asRecipeFile = new List<string>();
             foreach (FileInfo fileInfo in files)
             {

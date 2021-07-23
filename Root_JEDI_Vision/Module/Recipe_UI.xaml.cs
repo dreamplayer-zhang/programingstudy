@@ -22,7 +22,7 @@ namespace Root_JEDI_Vision.Module
             DataContext = vision;
             comboBoxOpen.ItemsSource = vision.p_asRecipe;
             treeRootUI.Init(vision.m_recipeEdit.m_treeRecipe);
-            vision.m_recipeEdir.RunTreeRecipe(Tree.eMode.Init); 
+            vision.m_recipeEdit.RunTreeRecipe(Tree.eMode.Init); 
         }
 
         private void comboBoxOpen_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -109,6 +109,13 @@ namespace Root_EFEM.Module.BacksideVision
             GrabData grabData = m_MaingrabMode.m_GD;
             grabData.ReverseOffsetY = m_MaingrabMode.m_nReverseOffsetY;
             #endregion
+            m_module.doVac.Write(true);
+
+            if (!m_module.diWaferExist.p_bIn)
+            {
+                m_module.alid_WaferExist.Run(true, "Wafer Exist Fail");
+                return "Wafer Not Exist";
+            }
 
             if (m_MaingrabMode.m_bUseLADS && m_module.LadsInfos.Count == 0)
             {
@@ -177,7 +184,7 @@ namespace Root_EFEM.Module.BacksideVision
                 }
 
                 m_MaingrabMode.m_camera.StopGrab();
-
+                m_module.doVac.Write(false);
                 return "OK";
             }
             finally

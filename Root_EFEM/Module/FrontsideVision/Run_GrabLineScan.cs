@@ -77,7 +77,7 @@ namespace Root_EFEM.Module.FrontsideVision
                 m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dTargetResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                 int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dTargetResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
-                int nScanOffset_pulse = 40000;
+                int nScanOffset_pulse = 400000;
 
                 int startOffsetX = cpMemoryOffset.X;
                 //int startOffsetY = 0;
@@ -86,6 +86,8 @@ namespace Root_EFEM.Module.FrontsideVision
                 const int nTimeOutInterval = 10; // ms
                 int nRescanCount = 0;
                 const int nRescanTotal = 3;
+    
+                    
                 while (m_grabMode.m_ScanLineNum > nScanLine)
                 {
                     if (EQ.IsStop())
@@ -96,7 +98,7 @@ namespace Root_EFEM.Module.FrontsideVision
                     // Grab하기 위해 이동할 Y축의 시작 끝 점
                     //ybkwon0113
                     int nScanSpeed = Convert.ToInt32((double)m_grabMode.m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_grabMode.m_nScanRate / 100);
-                    nScanOffset_pulse = (int)((double)nScanSpeed * axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move).m_acc * 0.5)*2;
+                    //nScanOffset_pulse = (int)((double)nScanSpeed * axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move).m_acc * 0.5)*2;
                     double dStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
                     double dEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 

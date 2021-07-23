@@ -526,6 +526,13 @@ namespace Root_Pine2.Module
             if ((m_aMagazine[InfoStrip.eMagazinePos.Down] != null) && m_aMagazine[InfoStrip.eMagazinePos.Down].IsDone()) StartUnload();
             if ((m_aMagazine[InfoStrip.eMagazinePos.Up] != null) && m_aMagazine[InfoStrip.eMagazinePos.Up].IsDone()) StartUnload();
         }
+
+        public bool IsMagazineBusy()
+        {
+            if ((m_aMagazine[InfoStrip.eMagazinePos.Down] != null) && (m_aMagazine[InfoStrip.eMagazinePos.Down].IsDone() == false)) return true;
+            if ((m_aMagazine[InfoStrip.eMagazinePos.Up] != null) && (m_aMagazine[InfoStrip.eMagazinePos.Up].IsDone() == false)) return true;
+            return false; 
+        }
         #endregion
 
         #region override

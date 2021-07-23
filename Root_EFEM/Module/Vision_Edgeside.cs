@@ -31,8 +31,8 @@ namespace Root_EFEM.Module
 		Axis axisEbrZ;
 		DIO_O doVac;
 		DIO_O doBlow;
-		DIO_I diWaferExist;
-		DIO_I diWaferExistVac;
+		public DIO_I diWaferExist;
+		public DIO_I diWaferExistVac;
 
 		MemoryPool memoryPool;
 		MemoryGroup memoryGroup;
@@ -47,7 +47,7 @@ namespace Root_EFEM.Module
 		Camera_Dalsa camEdgeBtm;
 		Camera_Matrox camEBR;
 
-		ALID alid_WaferExist;
+		public ALID alid_WaferExist;
 
 		#region Getter/Setter
 		public Axis AxisRotate { get => axisRotate; private set => axisRotate = value; }
@@ -346,32 +346,35 @@ namespace Root_EFEM.Module
 		public string AfterGet(int nID)
 		{
 			
-			doVac.Write(false);
-			Thread.Sleep(500);
-			if (!diWaferExist.p_bIn)
-			{
-				return "OK";
-			}
-			else
-			{
-				alid_WaferExist.Run(true, "Edge Side Wafer Exist Error");
-				return "OK";
-			}
+				doVac.Write(false);
+				Thread.Sleep(500);
+				if (!diWaferExist.p_bIn)
+				{
+					return "OK";
+				}
+				else
+				{
+					alid_WaferExist.Run(true, "Edge Side Wafer Exist Error");
+					return "OK";
+				}
+			
 		}
 
 		public string AfterPut(int nID)
 		{
-			doVac.Write(true);
-			Thread.Sleep(500);
-			if(diWaferExist.p_bIn && diWaferExistVac.p_bIn)
-            {
-				return "OK";
-            }
-            else
-            {
-				alid_WaferExist.Run(true, "Edge Side Wafer Exist Error");
-				return "OK";
-            }
+			
+				doVac.Write(true);
+				Thread.Sleep(500);
+				if (diWaferExist.p_bIn)
+				{
+					return "OK";
+				}
+				else
+				{
+					alid_WaferExist.Run(true, "Edge Side Wafer Exist Error");
+					return "Edge Side Wafer Exist Error";
+				}
+			
 			//doVac.Write(true);
 			//if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
 			//	alid_WaferExist.Run(true, "Wafer Check Error");

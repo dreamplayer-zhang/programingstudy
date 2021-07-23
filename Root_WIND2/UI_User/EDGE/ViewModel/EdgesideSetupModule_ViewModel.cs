@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace Root_WIND2.UI_User
 {
@@ -53,6 +54,20 @@ namespace Root_WIND2.UI_User
 			}
 		}
 
+		private ObservableCollection<OptionDefect> optionDefectList;
+		public ObservableCollection<OptionDefect> OptionDefectList
+		{
+			get
+			{
+				return optionDefectList;
+			}
+			set
+			{
+				SetParameter();
+				SetProperty(ref optionDefectList, value);
+			}
+		}
+				
 		#region [Grab Mode]
 		public List<string> GrabModeList
 		{
@@ -169,9 +184,9 @@ namespace Root_WIND2.UI_User
 			Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop;
 			Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 			ProcessDefectParameter = recipe.GetItem<ProcessDefectEdgeParameter>();
+			OptionDefectList = new ObservableCollection<OptionDefect>();
 
 			this.camInfoDataListVM = new DataListView_ViewModel();
-
 			SetOriginInfo();
 		}
 
@@ -219,6 +234,77 @@ namespace Root_WIND2.UI_User
 			this.OriginY = OriginRecipe.OriginY;
 			this.OriginWidth = OriginRecipe.OriginWidth;
 			this.OriginHeight = OriginRecipe.OriginHeight;
+		}
+
+		public void SetOptionDefect()
+		{
+			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+			int count = recipe.GetItem<ProcessDefectEdgeParameter>().Angles.Count;
+
+			if (OptionDefectList == null)
+				OptionDefectList = new ObservableCollection<OptionDefect>();
+
+			OptionDefectList.Clear();
+			for (int i = 0; i < count; i++)
+			{
+				OptionDefectList.Add(new OptionDefect(recipe.GetItem<ProcessDefectEdgeParameter>().Angles[i], recipe.GetItem<ProcessDefectEdgeParameter>().DefectCodes[i]));
+			}
+		}
+
+		public void SetParameter()
+		{
+			if (OptionDefectList == null)
+				return;
+
+			List<double> angleList = new List<double>();
+			List<int> defectCodeList = new List<int>();
+
+			foreach (OptionDefect item in OptionDefectList)
+			{
+				angleList.Add(item.Angle);
+				defectCodeList.Add(item.Code);
+			}
+
+			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+			recipe.GetItem<ProcessDefectEdgeParameter>().Angles = angleList;
+			recipe.GetItem<ProcessDefectEdgeParameter>().DefectCodes = defectCodeList;
+			SetOptionDefect();
+		}
+
+		public ICommand btnAddOptionDefect
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					OptionDefect item = new OptionDefect(0,0);
+					OptionDefectList.Add(item);
+					//SetParameter();
+				});
+			}
+		}
+
+		public ICommand btnSaveOptionDefect
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					SetParameter();
+				});
+			}
+		}
+	}
+	
+	public class OptionDefect
+	{
+		public double Angle { get; set; }
+		public int Code { get; set; }
+
+		public OptionDefect(double angle, int code)
+		{
+			this.Angle = angle;
+			this.Code = code;
 		}
 	}
 }

@@ -27,9 +27,9 @@ namespace Root_EFEM.Module
         #region ToolBox
         Axis axisZ;
         AxisXY axisXY;
-        DIO_O doVac;
+        public DIO_O doVac;
         DIO_O doBlow;
-        DIO_I diWaferExist;
+        public DIO_I diWaferExist;
         DIO_I diWaferExistVac;
         DIO_I di_test1;
         DIO_I di_test2;
@@ -45,7 +45,7 @@ namespace Root_EFEM.Module
         Camera_Silicon camLADS;
         List<List<double>> ladsinfos;
 
-        ALID alid_WaferExist;
+        public ALID alid_WaferExist;
 
         #region Getter/Setter
         public Axis AxisZ { get => axisZ; private set => axisZ = value; }
@@ -286,18 +286,19 @@ namespace Root_EFEM.Module
 
         public string AfterGet(int nID)
         {
-            doVac.Write(false);
-            Thread.Sleep(500);
-            if (!diWaferExist.p_bIn )
-            {
+            
+                doVac.Write(false);
+                Thread.Sleep(500);
+                if (!diWaferExist.p_bIn)
+                {
+                    return "OK";
+                }
+                else
+                {
+                    alid_WaferExist.Run(true, "Back Side Wafer Exist Error");
+                    return "OK";
+                }
                 return "OK";
-            }
-            else
-            {
-                alid_WaferExist.Run(true, "Back Side Wafer Exist Error");
-                return "OK";
-            }
-            return "OK";
         }
 
         public string AfterPut(int nID)

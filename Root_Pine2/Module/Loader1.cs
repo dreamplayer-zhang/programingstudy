@@ -96,7 +96,7 @@ namespace Root_Pine2.Module
                 boat.p_infoStrip.m_eVisionLoad = eVision;
                 boat.p_infoStrip.m_eWorks = eWorks; 
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(boats.RunMoveDone(eWorks))) return p_sInfo;
+                if (Run(boats.RunMoveDone(eWorks, false))) return p_sInfo;
                 if (Run(RunMoveX(eVision, eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eVision, eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);
@@ -168,7 +168,8 @@ namespace Root_Pine2.Module
                 boat.RunVacuum(true);
                 m_picker.RunVacuum(false);
                 if (Run(RunMoveUp(false))) return p_sInfo;
-                Thread.Sleep(200); 
+                Thread.Sleep(200);
+                boat.StartClean();
                 boat.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
                 if (Run(m_axisXZ.WaitReady())) return p_sInfo;
@@ -259,7 +260,14 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            m_axisXZ.ServoOn(true);
+            m_axisXZ.p_axisY.Jog(-1);
+            Thread.Sleep(300);
+            m_axisXZ.p_axisX.Jog(-1);
+            Thread.Sleep(700);
+            m_axisXZ.p_axisY.StopAxis();
             p_sInfo = base.StateHome(m_axisXZ.p_axisY);
+            m_axisXZ.p_axisX.StopAxis();
             if (p_sInfo != "OK") return p_sInfo;
             RunMoveUp(); 
             p_sInfo = base.StateHome(m_axisXZ.p_axisX);

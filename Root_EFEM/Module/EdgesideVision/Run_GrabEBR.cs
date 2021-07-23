@@ -69,6 +69,12 @@ namespace Root_EFEM.Module.EdgesideVision
 			{
 				gmEBR.SetLight(true);
 
+				if (!module.diWaferExist.p_bIn)
+                {
+					module.alid_WaferExist.Run(true, "Wafer Exist Fail");
+					return "Wafer Not Exist";
+                }
+
 				Axis axisR = module.AxisRotate;
 				Axis axisX = module.AxisEbrX;
 				Axis axisZ = module.AxisEbrZ;

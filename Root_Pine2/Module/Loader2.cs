@@ -160,6 +160,7 @@ namespace Root_Pine2.Module
                 boat.RunVacuum(true);
                 Thread.Sleep((int)(1000 * m_secVacuum));
                 if (Run(RunMoveZ(c_sReady))) return p_sInfo;
+                boat.StartClean();
                 boat.p_infoStrip = p_infoStrip;
                 p_infoStrip = null;
                 if (Run(RunMoveX(c_sReady))) return p_sInfo;
@@ -201,6 +202,7 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            Thread.Sleep(1000); 
             p_sInfo = base.StateHome(m_axisXZ.p_axisY);
             if (p_sInfo != "OK") return p_sInfo;
             p_sInfo = base.StateHome(m_axisXZ.p_axisX);
