@@ -212,12 +212,13 @@ namespace Root_Pine2_Vision.Module
         }
 
         bool m_bStartProcess = false;
-        Registry m_reg; 
+        Registry m_reg;
+        static readonly object g_csLock = new object();
         void RunThreadProcess()
         {
             int nProcess = 0; 
             m_bThreadProcess = true;
-            Thread.Sleep(7000);
+            Thread.Sleep(p_eWorks == eWorks.A ? 6000 : 7000);
             while (m_bThreadProcess)
             {
                 Thread.Sleep(10);
@@ -229,19 +230,22 @@ namespace Root_Pine2_Vision.Module
                     {
                         if (IsMemoryPool() && (IsProcessRun() == false))
                         {
-                            m_sRecipe = "";
-                            m_tcpip.ThreadStop();
-                            m_tcpip.InitClient();
-                            ProcessStartInfo startInfo = new ProcessStartInfo(m_sFileVisionWorks);
-                            startInfo.Arguments = p_id + "." + m_tcpip.p_nPort.ToString();
-                            startInfo.WorkingDirectory = "C://WisVision//";
-                            Process process = Process.Start(startInfo);
+                            lock (g_csLock)
+                            {
+                                m_sRecipe = "";
+                                m_tcpip.ThreadStop();
+                                m_tcpip.InitClient();
+                                ProcessStartInfo startInfo = new ProcessStartInfo(m_sFileVisionWorks);
+                                startInfo.Arguments = p_id + "." + m_tcpip.p_nPort.ToString();
+                                startInfo.WorkingDirectory = "C://WisVision//";
+                                Process process = Process.Start(startInfo);
 
-                            //Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
-                            m_nProcessID = process.Id;
-                            m_reg.Write("ProcessID", m_nProcessID);
-                            Thread.Sleep(2000);
-                            if (m_vision.m_lotInfo != null) SendLotInfo(m_vision.m_lotInfo); 
+                                //Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
+                                m_nProcessID = process.Id;
+                                m_reg.Write("ProcessID", m_nProcessID);
+                                Thread.Sleep(2000);
+                                if (m_vision.m_lotInfo != null) SendLotInfo(m_vision.m_lotInfo);
+                            }
                         }
                         else if (m_tcpip.p_bConnect == false)
                         {
