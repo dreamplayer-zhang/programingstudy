@@ -801,7 +801,7 @@ namespace Root_Pine2.Module
             {
                 string sRecipe = m_handler.p_sRecipe;
                 string sLot = m_handler.m_pine2.p_sLotID; 
-                string sVS = "_S00_C" + doc.m_sBundle; 
+                string sVS = "-S00-C" + doc.m_sBundle; 
                 m_srp350.Start();
                 Write("Machine ID : Pine2 #" + m_iMachine.ToString());
                 Write("--------------------------------");
@@ -817,9 +817,9 @@ namespace Root_Pine2.Module
                 Write("Strip Count : " + doc.m_nStrip.ToString());
                 Write("");
                 Write(doc.m_dtNow.ToString("yyyy-MM-dd HH:mm:ss"));
-                string sRecipeLot = "/" + sRecipe + "_" + sLot; 
+                string sRecipeLot = "/" + sRecipe + "-" + sLot; 
                 string sQR = "/M" + m_iMachine.ToString() + "V2/" + sRecipe + sRecipeLot + sRecipeLot + sVS; 
-                m_srp350.WriteQR(sQR); 
+                m_srp350.WriteQR(sQR, 7); 
                 m_srp350.End(); 
             }
 

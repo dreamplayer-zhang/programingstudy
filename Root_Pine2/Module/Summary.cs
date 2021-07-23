@@ -263,6 +263,7 @@ namespace Root_Pine2.Module
                 m_countStrip[eVision].Clear();
                 m_countUnit[eVision].Clear();
             }
+            m_bUpdated = true;
         }
         #endregion
 
