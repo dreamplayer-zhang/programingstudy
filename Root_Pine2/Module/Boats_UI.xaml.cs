@@ -19,9 +19,11 @@ namespace Root_Pine2.Module
         }
 
         Boats m_boats;
-        public void Init(Boats boats)
+        Pine2 m_pine2; 
+        public void Init(Boats boats, Pine2 pine2)
         {
             m_boats = boats;
+            m_pine2 = pine2; 
             DataContext = boats;
             treeRootUI.Init(boats.m_treeRootQueue);
             treeVisionUI.Init(boats.m_vision.p_treeRootQueue);
@@ -39,7 +41,9 @@ namespace Root_Pine2.Module
                 case ModuleBase.eState.Run: Background = Brushes.Yellow; break;
                 case ModuleBase.eState.Error: Background = Brushes.OrangeRed; break;
             }
-            textBlockVision.Foreground = m_boats.m_vision.p_remote.p_bEnable ? Brushes.Red : Brushes.LightGray; 
+            textBlockVision.Foreground = m_boats.m_vision.p_remote.p_bEnable ? Brushes.Red : Brushes.LightGray;
+            checkBoxRoller.IsEnabled = (m_pine2.p_b3D || (m_boats.m_vision.p_eVision == eVision.Bottom)); 
+            if ((m_pine2.p_b3D == false) && (m_boats.m_vision.p_eVision != eVision.Bottom)) checkBoxRoller.IsChecked = false;
             textBlockA.Text = (m_boats.m_aBoat[eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[eWorks.A].p_infoStrip.p_id : "";
             textBlockB.Text = (m_boats.m_aBoat[eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[eWorks.B].p_infoStrip.p_id : "";
             gridStripA.Background = (m_boats.m_aBoat[eWorks.A].p_inspectStrip != null) ? Brushes.Orange : Brushes.Beige;

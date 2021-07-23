@@ -39,7 +39,7 @@ namespace Root_Pine2.Module
             OnRunTree();
             textBlockUp.Text = (m_magazineEV.m_stack != null) ? "Stack" : ((m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Up] != null) ? "Magazine" : "");
             textBlockDown.Text = (m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] != null) ? "Magazine" : "";
-            if (m_magazineEV.m_elevator.m_bProtrude)
+            if (m_magazineEV.m_elevator.m_diProtrude.p_bIn)
             {
                 gridUp.Background = Brushes.Pink; 
                 gridDown.Background = Brushes.Pink;

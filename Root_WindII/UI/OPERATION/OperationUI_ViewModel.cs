@@ -92,6 +92,17 @@ namespace Root_WindII
             bgwLoad.RunWorkerAsync();
         }
 
+        public void RecoveryCommand()
+        {
+            WindII_Handler handler = ((WindII_Handler)GlobalObjects.Instance.Get<WindII_Engineer>().ClassHandler());
+            //if (IsEnable_Recovery(handler) == false)
+            //    return;
+            handler.CalcRecover();
+            EQ.p_bStop = false;
+            EQ.p_eState = EQ.eState.Run;
+            EQ.p_bRecovery = true;
+        }
+
 
         public RelayCommand CommandHome
         {
@@ -105,6 +116,11 @@ namespace Root_WindII
             get { return new RelayCommand(LoadLoadport1CST); }
         }
 
-        
+        public RelayCommand CommandRecovery
+        {
+            get { return new RelayCommand(RecoveryCommand); }
+        }
+
+
     }
 }

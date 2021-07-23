@@ -411,15 +411,41 @@ namespace Root_WindII.Engineer
 
         public void CalcSequence()
         {
-            m_process.ReCalcSequence(); 
-            CalcDockingUndocking();
+            m_process.ReCalcSequence();
+            CalcUndocking();
         }
 
         public void CalcRecover()
         {
             m_process.CalcRecover(); 
             CalcDockingUndocking();
+        }   
+
+        void CalcUndocking()
+        {
+            List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
+            while (m_process.p_qSequence.Count > 0) aSequence.Add(m_process.p_qSequence.Dequeue());
+            List<ILoadport> aDock = new List<ILoadport>();
+            aDock.Add(m_aLoadport[0]);   //kkkkk
+            while (aSequence.Count > 0)
+            {
+                EFEM_Process.Sequence sequence = aSequence[0];
+                m_process.p_qSequence.Enqueue(sequence);
+                aSequence.RemoveAt(0);
+                for (int n = aDock.Count - 1; n >= 0; n--)
+                {
+                    if (CalcUnload(aDock[n], aSequence))
+                    {
+                        ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
+                        EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
+                        m_process.p_qSequence.Enqueue(sequenceUndock);
+                        aDock.RemoveAt(n);
+                    } 
+                }
+            }
+            m_process.RunTree(Tree.eMode.Init);
         }
+
         void CalcDockingUndocking()
         {
             List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
@@ -452,7 +478,13 @@ namespace Root_WindII.Engineer
         {
             foreach (EFEM_Process.Sequence sequence in aSequence)
             {
-                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true;
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule)
+                {
+                    ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
+                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    m_process.p_qSequence.Enqueue(sequenceDock);
+                    return true;
+                }
             }
             return false;
         }

@@ -94,6 +94,7 @@
                         <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         <CheckBox Content="Box" IsChecked="{Binding IsBoxChecked, Mode=TwoWay}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                         <CheckBox Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" IsEnabled="False" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                        <Button Content="Save" Command="{Binding btnToolSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                         <Button Content="Clear" Command="{Binding btnToolClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
 
 
