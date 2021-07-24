@@ -1,5 +1,4 @@
-﻿using QRCoder;
-using Root_Pine2.Engineer;
+﻿using Root_Pine2.Engineer;
 using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.Comm;
@@ -749,7 +748,6 @@ namespace Root_Pine2.Module
         public class Printer
         {
             public SRP350 m_srp350;
-            QRCodeGenerator m_qrGenerator = new QRCodeGenerator(); 
 
             public class Doc
             {
@@ -758,7 +756,20 @@ namespace Root_Pine2.Module
                 public InfoStrip m_InfoStrip = null;
                 public int m_nStrip = 0;
                 public InfoStrip.eResult m_eResult = InfoStrip.eResult.Init; 
-                public DateTime m_dtNow = DateTime.Now; 
+                public DateTime m_dtNow = DateTime.Now;
+
+                public List<string> m_aRework = new List<string>(); 
+                public void AddStripInfo(MagazineEV.Magazine magazine)
+                {
+                    foreach (InfoStrip infoStrip in magazine.m_aStripDone)
+                    {
+                        switch (infoStrip.GetResult())
+                        {
+                            case InfoStrip.eResult.BCD: m_aRework.Add(infoStrip.p_id + " : Barcode"); break;
+                            case InfoStrip.eResult.POS: m_aRework.Add(infoStrip.p_id + " : Position"); break;
+                        }
+                    }
+                }
 
                 public Doc(int iSorter, int iBundle, int nStrip, InfoStrip.eResult eResult)
                 {
@@ -770,10 +781,11 @@ namespace Root_Pine2.Module
             }
             Queue<Doc> m_qDoc = new Queue<Doc>();
 
-            public void AddPrint(int iSorter, int iBundle, int nStrip)
+            public void AddPrint(int iSorter, MagazineEV.Magazine magazine)
             {
-                Doc doc = new Doc(iSorter, iBundle, nStrip, InfoStrip.eResult.Init);
-                m_qDoc.Enqueue(doc); 
+                Doc doc = new Doc(iSorter, magazine.p_iBundle, magazine.m_nStripCount, InfoStrip.eResult.Init);
+                doc.AddStripInfo(magazine); 
+                m_qDoc.Enqueue(doc);
             }
 
             public void AddPrint(int iSorter, int iBundle, int nStrip, InfoStrip.eResult eResult)
@@ -799,6 +811,7 @@ namespace Root_Pine2.Module
 
             void PrintDoc(Doc doc)
             {
+                if (doc.m_nStrip == 0) return; 
                 string sRecipe = m_handler.p_sRecipe;
                 string sLot = m_handler.m_pine2.p_sLotID; 
                 string sVS = "-S00-C" + doc.m_sBundle; 
@@ -820,6 +833,7 @@ namespace Root_Pine2.Module
                 string sRecipeLot = "/" + sRecipe + "_" + sLot; 
                 string sQR = "/M" + m_iMachine.ToString() + "V2/" + sRecipe + sRecipeLot + sRecipeLot + sVS; 
                 m_srp350.WriteQR(sQR, 7); 
+                foreach (string sWrite in doc.m_aRework) Write(sWrite);
                 m_srp350.End(); 
             }
 

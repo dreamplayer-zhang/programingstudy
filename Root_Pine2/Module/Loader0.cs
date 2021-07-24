@@ -159,7 +159,8 @@ namespace Root_Pine2.Module
         public string RunAvoidX(double fPos)
         {
             m_axis.p_axisX.StartMove(fPos);
-            return m_axis.p_axisX.WaitReady();
+            m_axis.p_axisY.StartMove((p_infoStrip == null) ? ePosTransfer.Transfer7.ToString() : GetPosString(eUnloadVision.Top2D, eWorks.A)); 
+            return m_axis.WaitReady();
         }
         #endregion
 
@@ -348,13 +349,13 @@ namespace Root_Pine2.Module
         {
             Transfer.Gripper gripper = m_transfer.m_gripper;
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
-            if (bCheckEnable && (gripper.p_bEnable == false)) return "OK";
             try
             {
-                ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
-                double xOffset = m_transfer.m_buffer.m_xOffset; 
                 gripper.p_bLock = true;
-                m_transfer.m_buffer.RunAlign(true); 
+                if (bCheckEnable && (gripper.p_bEnable == false)) return "OK";
+                ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
+                double xOffset = m_transfer.m_buffer.m_xOffset;
+                m_transfer.m_buffer.RunAlign(true);
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveTransfer(ePos, -xOffset))) return p_sInfo;
                 if (Run(RunMoveZ(ePos))) return p_sInfo;
@@ -369,7 +370,7 @@ namespace Root_Pine2.Module
                 RunMoveUp();
                 gripper.p_bLock = false;
             }
-            return "OK"; 
+            return "OK";
         }
         #endregion
 
