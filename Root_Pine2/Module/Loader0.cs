@@ -230,21 +230,26 @@ namespace Root_Pine2.Module
         #endregion
 
         #region AxisZ
+        double p_dZ
+        {
+            get { return m_pine2.m_thicknessDefault - m_pine2.p_thickness; }
+        }
+
         public string RunMoveZ(string sPos, double dPos, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(sPos, -dPos);
+            m_axis.p_axisZ.StartMove(sPos, dPos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveZ(ePosTransfer ePos, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(ePosTransfer.Transfer7);
+            m_axis.p_axisZ.StartMove(ePosTransfer.Transfer7, p_dZ);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveZ(eUnloadVision eVision, eWorks eWorks, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(GetPosString(eVision, eWorks));
+            m_axis.p_axisZ.StartMove(GetPosString(eVision, eWorks), p_dZ);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -279,7 +284,7 @@ namespace Root_Pine2.Module
 
         string RunShakeUp(double dzPulse)
         {
-            m_axis.p_axisZ.StartShift(dzPulse);
+            m_axis.p_axisZ.StartShift(dzPulse, p_dZ);
             return m_axis.WaitReady(); 
         }
         #endregion

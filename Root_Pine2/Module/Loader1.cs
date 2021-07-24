@@ -49,15 +49,20 @@ namespace Root_Pine2.Module
             return bWait ? m_axisXZ.p_axisX.WaitReady() : "OK";
         }
 
+        double p_dZ
+        {
+            get { return m_pine2.m_thicknessDefault - m_pine2.p_thickness; }
+        }
+
         public string RunMoveZ(string sPos, bool bWait = true)
         {
-            m_axisXZ.p_axisY.StartMove(sPos);
+            m_axisXZ.p_axisY.StartMove(sPos, p_dZ);
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 
         public string RunMoveZ(eVision eVision, eWorks ePos, double dPos, bool bWait = true)
         {
-            m_axisXZ.p_axisY.StartMove(GetPosString(eVision, ePos), -dPos);
+            m_axisXZ.p_axisY.StartMove(GetPosString(eVision, ePos), p_dZ - dPos);
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 

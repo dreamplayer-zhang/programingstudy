@@ -169,15 +169,20 @@ namespace Root_Pine2.Module
         #endregion
 
         #region AxisZ
+        double p_dZ
+        {
+            get { return m_pine2.m_thicknessDefault - m_pine2.p_thickness; }
+        }
+
         public string RunMoveZ(eWorks eWorks, double dPos, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(GetPosString(eWorks), -dPos);
+            m_axis.p_axisZ.StartMove(GetPosString(eWorks), p_dZ - dPos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveZ(ePosTransfer ePos, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(ePosTransfer.Transfer7);
+            m_axis.p_axisZ.StartMove(ePosTransfer.Transfer7, p_dZ);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 

@@ -72,9 +72,14 @@ namespace Root_Pine2.Module
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 
+        double p_dZ
+        {
+            get { return m_pine2.m_thicknessDefault - m_pine2.p_thickness; }
+        }
+
         public string RunMoveZ(eWorks ePos, bool bWait = true)
         {
-            m_axisXZ.p_axisY.StartMove(GetPosString(ePos));
+            m_axisXZ.p_axisY.StartMove(GetPosString(ePos), p_dZ);
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 
