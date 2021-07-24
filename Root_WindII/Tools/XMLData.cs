@@ -38,6 +38,8 @@ namespace Root_WindII
         // Xml data
         public string RecipeName { get; set; }
         public string Description { get; set; }
+        public int UnitX { get; set; }
+        public int UnitY { get; set; }
         public string Device { get; set; }
         public double DiePitchX { get; set; }
         public double DiePitchY { get; set; }
@@ -126,6 +128,9 @@ namespace Root_WindII
                 if (minY > valY) minY = valY;
                 if (maxY < valY) maxY = valY;
             }
+
+            UnitX = maxX - minX + 1;
+            UnitY = maxY - minY + 1;
 
             return new Size(maxX - minX + 1, maxY - minY + 1);
         }

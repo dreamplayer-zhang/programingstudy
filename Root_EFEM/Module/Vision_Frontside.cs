@@ -38,20 +38,7 @@ namespace Root_EFEM
 
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
-        Camera_Basler m_CamAutoFocus;
         Camera_Basler m_CamVRS;
-
-        public Camera_Basler p_CamAutoFocus
-        {
-            get
-            {
-                return m_CamAutoFocus;
-            }
-            set
-            {
-                m_CamAutoFocus = value;
-            }
-        }
 
         public Camera_Basler p_CamVRS
         {
@@ -93,8 +80,6 @@ namespace Root_EFEM
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         public Camera_Basler CamVRS { get => m_CamVRS; private set => m_CamVRS = value; }
-        public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
-
         public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
         #endregion
 
@@ -111,7 +96,6 @@ namespace Root_EFEM
                 p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRSCam");
-                p_sInfo = m_toolBox.GetCamera(ref m_CamAutoFocus, this, "AutoFocusCam");
                 p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
             }
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
@@ -576,6 +560,7 @@ namespace Root_EFEM
             AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
             AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
             AddModuleRunList(new Run_VRSAlign(this), true, "Run VRSAlign");
+            AddModuleRunList(new Run_Centering(this), true, "Run Centering");
             //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
         }
         #endregion
