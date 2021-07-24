@@ -300,7 +300,7 @@ namespace Root_Pine2.Module
         public string RunUnloadTransfer() 
         {
             if (m_picker.p_infoStrip == null) return "InfoStrip == null";
-            if (m_transfer.m_pusher.p_bEnable == false) return "Buffer Pusher not Enable";
+            if (m_transfer.m_pusher.p_bEnable == false) return "OK";
             try
             {
                 ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;

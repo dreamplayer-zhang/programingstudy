@@ -348,7 +348,7 @@ namespace Root_Pine2.Module
         {
             Transfer.Gripper gripper = m_transfer.m_gripper;
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
-            if (bCheckEnable && (gripper.p_bEnable == false)) return "Load from Transfer not Enable";
+            if (bCheckEnable && (gripper.p_bEnable == false)) return "OK";
             try
             {
                 ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;

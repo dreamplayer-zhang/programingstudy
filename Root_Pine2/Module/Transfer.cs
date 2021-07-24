@@ -103,7 +103,7 @@ namespace Root_Pine2.Module
                 DIO_I diOverload = m_diOverload[GetAxisID(eMagazine)];
                 try
                 {
-                    m_magazineSet.m_aEV[eMagazine].m_elevator.m_bPusherSafe = false;
+                    //m_magazineSet.m_aEV[eMagazine].m_elevator.m_bPusherSafe = false;
                     dioPusher.Write(true);
                     StopWatch sw = new StopWatch();
                     int msTimeout = (int)(1000 * dioPusher.m_secTimeout);
@@ -121,7 +121,7 @@ namespace Root_Pine2.Module
                 finally 
                 { 
                     dioPusher.Write(false);
-                    m_magazineSet.m_aEV[eMagazine].m_elevator.m_bPusherSafe = true; 
+                    //m_magazineSet.m_aEV[eMagazine].m_elevator.m_bPusherSafe = true; 
                 }
             }
             #endregion

@@ -25,7 +25,7 @@ namespace Root_Pine2.Module
                 if ((magazineEV != null) && (magazineEV.p_eState == ModuleBase.eState.Ready) && (magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] == null))
                 {
                     MagazineEV.Magazine magazine = magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Up];
-                    if ((magazine != null) && (magazine.m_qStripReady.Count > 0)) magazine.GetInfoStrip(bPeek);
+                    if ((magazine != null) && (magazine.m_qStripReady.Count > 0)) return magazine.GetInfoStrip(bPeek);
                 }
             }
             return null; 

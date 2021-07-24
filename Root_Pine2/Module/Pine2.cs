@@ -817,7 +817,7 @@ namespace Root_Pine2.Module
                 Write("Strip Count : " + doc.m_nStrip.ToString());
                 Write("");
                 Write(doc.m_dtNow.ToString("yyyy-MM-dd HH:mm:ss"));
-                string sRecipeLot = "/" + sRecipe + "-" + sLot; 
+                string sRecipeLot = "/" + sRecipe + "_" + sLot; 
                 string sQR = "/M" + m_iMachine.ToString() + "V2/" + sRecipe + sRecipeLot + sRecipeLot + sVS; 
                 m_srp350.WriteQR(sQR, 7); 
                 m_srp350.End(); 
