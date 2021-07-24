@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_Pine2.Engineer"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="800" d:DesignWidth="800">
     <Grid x:Name="grid">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
@@ -31,7 +31,7 @@
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal" Margin="3">
                             <Label Content="EQ :" Margin="3"/>
-                            <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="3"/>
+                            <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="3" PreviewMouseLeftButtonDown="labelEQState_PreviewMouseLeftButtonDown"/>
                         </StackPanel>
                         <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="3"/>
                         <CheckBox x:Name="checkBoxPause" Content="EQ.Pause" IsChecked="{Binding p_bPause}" Margin="3"/>

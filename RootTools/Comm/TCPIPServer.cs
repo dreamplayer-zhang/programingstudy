@@ -123,10 +123,14 @@ namespace RootTools.Comm
                     int nReadLength = socket.EndReceive(ar);
                     if (nReadLength > 0)
                     {
+                        byte[] buf = new byte[m_aReadBuff.Length];
+                        Array.Copy(m_aReadBuff, buf, nReadLength);
+
                         m_commLog.Add(CommLog.eType.Receive, (nReadLength < 1024) ? Encoding.ASCII.GetString(m_aReadBuff, 0, nReadLength) : "...");
 
+                        if (EventReciveData != null) EventReciveData(buf, nReadLength, socket);
+
                         socket.BeginReceive(m_aReadBuff, 0, m_aReadBuff.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
-                        if (EventReciveData != null) EventReciveData(m_aReadBuff, nReadLength, socket);
                     }
                     else m_commLog.Add(CommLog.eType.Info, "CallBack_Receive Close");
                 }

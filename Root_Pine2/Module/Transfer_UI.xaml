@@ -22,7 +22,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0" Margin="3" Background="Beige">
+                <Grid Grid.Column="0" x:Name="gridPusher" Margin="3" Background="Beige">
                     <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
                 </Grid>
                 <Grid Grid.Column="1" Margin="3" Background="Beige">

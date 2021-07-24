@@ -10,6 +10,45 @@
         Closing="Window_Closing"
         Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
     <Grid>
-        <engineer:VEGA_D_IPU_Engineer_UI x:Name="engineerUI"/>
+        <TabControl TabStripPlacement="Left">
+            <TabItem Header="Engineer" Style="{StaticResource ResourceKey=WizardTabItem}">
+                <engineer:VEGA_D_IPU_Engineer_UI x:Name="engineerUI"/>
+            </TabItem>
+            <TabItem Header="Setting" Style="{StaticResource ResourceKey=WizardTabItem}">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <GroupBox Header="Recipe File" Height="63" VerticalAlignment="Top" Margin="10,10,10,0" >
+                            <Grid>
+                                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="ReceivedFile" VerticalAlignment="Top"/>
+                                <TextBox Height="23" Margin="90,10,50,0" TextWrapping="NoWrap" VerticalAlignment="Top" Text="{Binding p_sRecipeFile}" AcceptsReturn="False"/>
+                                <Button Content="..." HorizontalAlignment="Right" Height="23" Margin="10,10,10,0" VerticalAlignment="Top" Width="30" Command="{Binding BrowseRecipeFileBtnCommand}"/>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Header="Inspection Option" Height="200" VerticalAlignment="Top" Margin="10,78,10,0" >
+                            <Grid>
+                                <CheckBox Content="Perform Inspection" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="{Binding p_bPerformInspection}"/>
+                                <CheckBox Content="D2D Inspection" Height="20" Margin="20,35,0,0" VerticalAlignment="Top" IsChecked="{Binding p_bD2DInspection}"/>
+                                <CheckBox Content="Surface Inspection" Height="20" Margin="20,60,0,0" VerticalAlignment="Top" IsChecked="{Binding p_bSurfaceInspection}"/>
+                                <CheckBox Content="Custom Option 1" Height="20" Margin="10,85,0,0" VerticalAlignment="Top" IsChecked="{Binding p_bCustomOption1}"/>
+                                <CheckBox Content="Custom Option 2" Height="20" Margin="10,110,0,0" VerticalAlignment="Top" IsChecked="{Binding p_bCustomOption2}"/>
+
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <GroupBox Header="Recipe Data" Height="267" VerticalAlignment="Top" Margin="10,10,10,0" >
+                            <Grid>
+                                <Button Content="Save" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" VerticalAlignment="Top" Width="81" Command="{Binding SaveRecipeFileBtnCommand}"/>
+                                <Button Content="Load" HorizontalAlignment="Left" Height="23" Margin="96,10,0,0" VerticalAlignment="Top" Width="81" Command="{Binding LoadRecipeFileBtnCommand}"/>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

@@ -4,6 +4,62 @@
              xmlns:local="clr-namespace:Root_VEGA_D_IPU"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <SolidColorBrush x:Key="ControlBackGround" 
+                         Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
+        
+        <Style TargetType="{x:Type TabItem}"
+               x:Key="WizardTabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Panel"
+                                Width="100"
+                                Height="30"
+                                HorizontalAlignment="Right"
+                                SnapsToDevicePixels="True"
+                                BorderBrush="#FFACACAC"
+                                BorderThickness="1,1,0,1">
+                            <TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontFamily="Arial"
+                                       FontSize="12">
+                                <ContentPresenter VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header" />
+                            </TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected"
+                                     Value="False">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=ControlBackGround}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Margin"
+                                        Value="0,0,-1,0" />
+                                <Setter TargetName="Panel"
+                                        Property="Width"
+                                        Value="105" />
+                                <Setter TargetName="Panel"
+                                        Property="Height"
+                                        Value="35" />
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="#EAF3FC" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>

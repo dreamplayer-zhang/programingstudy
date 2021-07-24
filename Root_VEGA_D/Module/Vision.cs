@@ -777,6 +777,9 @@ namespace Root_VEGA_D.Module
             camMain.p_CamParam.SetRotaryEncoderMultiplier(nEncoderMul);
             camMain.p_CamParam.SetRotaryEncoderDivider(nEncoderDiv);
 
+            // GrabMode의 StartGrab() 초기에 Userset 변경으로 인한 불필요한 이미지 그랩 방지위해서
+            grabmode.m_GD.nUserSet = (int)camMain.p_CamParam.p_eUserSetCurrent;
+
             // 트리거 설정
             AxisXY.p_axisY.SetTrigger(startTriggerY, endTriggerY, grabmode.m_dTrigger, 0.001, true);
 

@@ -6,6 +6,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -116,12 +117,14 @@ namespace Root_Pine2.Module
             return StartRun(run);
         }
 
-        public string RunMoveDone(eWorks eWorks)
+        public string RunMoveDone(eWorks eWorks, bool bNoVision)
         {
             m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
             if (Run(m_aBoat[eWorks].RunMove(p_ePosUnload))) return p_sInfo;
             m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
-            if (m_aBoat[eWorks].p_infoStrip != null) m_aBoat[eWorks].p_infoStrip.SetResult(m_vision.p_eVision, InfoStrip.eResult.POS.ToString(), "1", "1", "4"); 
+            if (bNoVision == false) return "OK";
+            if (m_aBoat[eWorks].p_infoStrip == null) return "OK";
+            m_aBoat[eWorks].p_infoStrip.SetResult(m_vision.p_eVision, InfoStrip.eResult.POS.ToString(), "1", "1", "4");
             return "OK";
         }
         #endregion
@@ -181,25 +184,56 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region Clean Option
+        bool _bCleanRoller = false;
+        public bool p_bCleanRoller
+        {
+            get { return _bCleanRoller; }
+            set
+            {
+                _bCleanRoller = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool _bCleanBlow = false;
+        public bool p_bCleanBlow
+        {
+            get { return _bCleanBlow; }
+            set
+            {
+                _bCleanBlow = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public void RunTreeClean(Tree tree)
+        {
+            p_bCleanRoller = tree.Set(p_bCleanRoller, false, "Roller", "Clean Roller");
+            p_bCleanBlow = tree.Set(p_bCleanBlow, false, "Blow", "Clean Blow");
+        }
+        #endregion
+
         #region Snap
-        public string StartSnap(eWorks eWorks, bool bReadRecipe)
+        public string StartSnap(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan = true)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
             run.m_eWorks = eWorks;
             run.m_bReadRecipe = bReadRecipe; 
+            run.m_bBiDirectionalScan = bBiDirectionalScan;
             return StartRun(run);
         }
 
-        public string RunSnap(eWorks eWorks, bool bReadRecipe)
+        public string RunSnap(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan)
         {
             switch (m_vision.p_eVision)
             {
-                case eVision.Top3D: return RunSnap2D(eWorks, bReadRecipe);
-                default: return RunSnap2D(eWorks, bReadRecipe);
+                case eVision.Top3D: return RunSnap3D(eWorks, bReadRecipe, bBiDirectionalScan);
+                default: return RunSnap2D(eWorks, bReadRecipe, bBiDirectionalScan);
             }
         }
 
-        public string RunSnap3D(eWorks eWorks, bool bReadRecipe)
+        public string RunSnap3D(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan)
         {
             Vision3D vision = (Vision3D)m_vision;
             StopWatch sw = new StopWatch();
@@ -234,6 +268,7 @@ namespace Root_Pine2.Module
                 for (int i = 0; i < m_aBoat[eWorks].m_recipe.m_aSnap.Count; i++)
                 {
                     Vision3D.Recipe.Snap snap = m_aBoat[eWorks].m_recipe.m_aSnap[i];
+                    if (bBiDirectionalScan == true) snap.m_eDirection = Vision3D.Recipe.Snap.eDirection.Forward;
                     vision.RunLight(snap.m_lightPower);
                     m_bSnapReady = false;
                     vision.StartSnap(snap, eWorks, iSnap);
@@ -255,13 +290,11 @@ namespace Root_Pine2.Module
 
                 }
                 vision.RunLightOff();
-                m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
+                m_bgwDone.RunWorkerAsync(eWorks);
             }
             catch (Exception e) { p_sInfo = e.Message; }
             finally
             {
-                m_axisCam.StartMove((eWorks)(1 - (int)eWorks));
-                m_aBoat[eWorks].RunMove(p_ePosUnload);
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(false);
             }
             m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
@@ -270,7 +303,7 @@ namespace Root_Pine2.Module
 
         RPoint[] m_aCamOffset = null; 
         bool m_bSnapReady = false; 
-        public string RunSnap2D(eWorks eWorks, bool bReadRecipe)
+        public string RunSnap2D(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan)
         {
             Vision2D vision = (Vision2D)m_vision; 
             StopWatch sw = new StopWatch();
@@ -302,6 +335,12 @@ namespace Root_Pine2.Module
                     default: m_aCamOffset = null; break; 
                 }
                 int iSnap = 0;
+                if (bBiDirectionalScan == false)
+                {
+                    for (int i = 0; i < m_aBoat[eWorks].m_recipe.m_aSnap.Count; i++)
+                        m_aBoat[eWorks].m_recipe.m_aSnap[i].m_eDirection = Vision2D.Recipe.Snap.eDirection.Forward;
+                }
+
                 for (int i = 0; i < m_aBoat[eWorks].m_recipe.m_aSnap.Count; i++)
                 {
                     Vision2D.Recipe.Snap snap = m_aBoat[eWorks].m_recipe.m_aSnap[i];
@@ -326,18 +365,24 @@ namespace Root_Pine2.Module
 
                 }
                 vision.RunLightOff();
-                m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
+                m_bgwDone.RunWorkerAsync(eWorks);
             }
             catch (Exception e) { p_sInfo = e.Message; }
             finally
             {
-                m_axisCam.StartMove((eWorks)(1 - (int)eWorks));
-                m_aBoat[eWorks].RunMove(p_ePosUnload);
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(false);
             }
             m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
             return "OK";
         }
+
+        BackgroundWorker m_bgwDone = new BackgroundWorker();
+        private void M_bgwDone_DoWork(object sender, DoWorkEventArgs e)
+        {
+            m_aBoat[(eWorks)e.Argument].RunMove(p_ePosUnload);
+            m_aBoat[(eWorks)e.Argument].p_eStep = Boat.eStep.Done;
+        }
+
         #endregion
 
         #region Recipe
@@ -374,8 +419,9 @@ namespace Root_Pine2.Module
                 string sRecipe = asRead[2];
                 eWorks eWorks = (asRead[3] == "A") ? eWorks.A : eWorks.B;
                 m_aBoat[eWorks].p_sRecipe = ""; 
-                m_aBoat[eWorks].p_sRecipe = sRecipe; 
-                StartSnap(eWorks, true);
+                m_aBoat[eWorks].p_sRecipe = sRecipe;
+                bool bBiDirectionalScan = (asRead[4] == "True") ? true : false;
+                StartSnap(eWorks, true, bBiDirectionalScan);
                 m_tcpRequest.Send(sRead);
             }
             if (asRead[1] == eProtocol.SnapReady.ToString())
@@ -428,11 +474,12 @@ namespace Root_Pine2.Module
         public IVision m_vision; 
         public Boats(IVision vision, IEngineer engineer, Pine2 pine2)
         {
+            m_bgwDone.DoWork += M_bgwDone_DoWork;
             m_vision = vision;
             p_id = "Boats " + vision.p_eVision.ToString();
             m_pine2 = pine2;
-            InitBoat(); 
-            InitBase(p_id, engineer); 
+            InitBoat();
+            InitBase(p_id, engineer);
         }
 
         protected override void RunThreadStop()
@@ -467,13 +514,15 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public bool m_bReadRecipe = true; 
+            public bool m_bBiDirectionalScan = true; 
+            public bool m_bReadRecipe = true;
             public eWorks m_eWorks; 
             public override ModuleRunBase Clone()
             {
                 Run_Snap run = new Run_Snap(m_module);
                 run.m_eWorks = m_eWorks;
                 run.m_bReadRecipe = m_bReadRecipe; 
+                run.m_bBiDirectionalScan = m_bBiDirectionalScan;
                 return run;
             }
 
@@ -484,7 +533,7 @@ namespace Root_Pine2.Module
 
             public override string Run()
             {
-                return m_module.RunSnap(m_eWorks, m_bReadRecipe); 
+                return m_module.RunSnap(m_eWorks, m_bReadRecipe, m_bBiDirectionalScan); 
             }
         }
 
@@ -554,7 +603,7 @@ namespace Root_Pine2.Module
                 switch (m_eRun)
                 {
                     case eRun.Ready: return m_module.RunMoveReady(m_eWorks);
-                    case eRun.Done: return m_module.RunMoveDone(m_eWorks); 
+                    case eRun.Done: return m_module.RunMoveDone(m_eWorks, true); 
                 }
                 return "OK";
             }

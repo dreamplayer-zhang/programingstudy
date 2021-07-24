@@ -1,4 +1,6 @@
-﻿using RootTools;
+﻿using Root_JEDI_Sorter.Module;
+using Root_JEDI_Vision.Module;
+using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
@@ -27,13 +29,15 @@ namespace Root_JEDI.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        //public Vision2D m_vision;
+        public Dictionary<eVision, Vision2D> m_vision2D = new Dictionary<eVision, Vision2D>(); 
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            //m_vision = new Vision2D("Vision", m_engineer, ModuleBase.eRemote.Server);
-            //InitModule(m_vision);
+            m_vision2D.Add(eVision.Top2D, new Vision2D(eVision.Top2D, m_engineer, ModuleBase.eRemote.Client));
+            InitModule(m_vision2D[eVision.Top2D]);
+            m_vision2D.Add(eVision.Bottom, new Vision2D(eVision.Bottom, m_engineer, ModuleBase.eRemote.Client));
+            InitModule(m_vision2D[eVision.Bottom]);
         }
 
         void InitModule(ModuleBase module)

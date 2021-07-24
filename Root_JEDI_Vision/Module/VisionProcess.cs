@@ -17,7 +17,7 @@ namespace Root_JEDI_Vision.Module
         public TCPAsyncClient m_tcpip;
         public void GetTools(ToolBox toolBox, bool bInit)
         {
-            toolBox.GetComm(ref m_tcpip, (ModuleBase)m_vision, "TCPIP");
+            toolBox.GetComm(ref m_tcpip, (ModuleBase)m_vision, "Works");
             if (bInit)
             {
                 m_tcpip.EventReceiveData += M_tcpip_EventReceiveData;

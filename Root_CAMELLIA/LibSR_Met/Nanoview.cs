@@ -189,7 +189,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     // 레시피 파일 로드 시, DM 에 Nano-View dll 데이터 저장
                     rst = (ERRORCODE_NANOVIEW)m_Model.FillFromFile(sRecipeFilePath);
                     m_DM.m_LayerData = m_LayerList.ToLayerData();
-                    
+
                 }
 
                 if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
@@ -262,34 +262,34 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             m_DM.m_ThicknessData.Add(new ThicknessScaleOffset());
                         }
-                    
+
                     }
                 }
-                
-
-                    //string[] line = new string[20];
-
-                    //int linecnt = 0;
-
-                    //while ((line[linecnt] = SR.ReadLine()) != null)
-                    //{
-                    //    linecnt++;
-                    //}
-
-                    ////m_thk_scl_linecnt = linecnt;
-
-                    //for (int j = 0; j < linecnt; j++)
-                    //{
-                    //    string[] result = line[j].Split(new char[] { ',' });
 
 
-                    //    m_thk_scale[j] = Convert.ToDouble(result[0]);
-                    //    m_thk_offset[j] = Convert.ToDouble(result[1]);
+                //string[] line = new string[20];
+
+                //int linecnt = 0;
+
+                //while ((line[linecnt] = SR.ReadLine()) != null)
+                //{
+                //    linecnt++;
+                //}
+
+                ////m_thk_scl_linecnt = linecnt;
+
+                //for (int j = 0; j < linecnt; j++)
+                //{
+                //    string[] result = line[j].Split(new char[] { ',' });
 
 
-                    //}
+                //    m_thk_scale[j] = Convert.ToDouble(result[0]);
+                //    m_thk_offset[j] = Convert.ToDouble(result[1]);
 
-                    
+
+                //}
+
+
 
                 return rst;
             }
@@ -852,7 +852,7 @@ namespace Root_CAMELLIA.LibSR_Met
         }
 
 
-        public ERRORCODE_NANOVIEW GetThickness(int nPointIndex, int nIteration, double dDampingFactor,string sMeasurePoint,bool isCalDCOLTransmittance, bool isAlphafit = true)
+        public ERRORCODE_NANOVIEW GetThickness(int nPointIndex, int nIteration, double dDampingFactor, string sMeasurePoint, bool isCalDCOLTransmittance, bool isAlphafit = true)
         {
             try
             {
@@ -884,19 +884,19 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             if (UpdateModel(false) == false)
                             {
-                            //MessageBox.Show("Modeling Fail! Please check the log.");
-                            m_DM.m_Log.WriteLog(LogType.Warning, "Modeling Recipe Ready Fail");
-                            return ERRORCODE_NANOVIEW.SR_LAYER_MODEL_NOT_READY;
+                                //MessageBox.Show("Modeling Fail! Please check the log.");
+                                m_DM.m_Log.WriteLog(LogType.Warning, "Modeling Recipe Ready Fail");
+                                return ERRORCODE_NANOVIEW.SR_LAYER_MODEL_NOT_READY;
                             }
                         }
                         RawData data = m_DM.m_RawData[nPointIndex];
                         int m_NKFitLayer = 0;
                         m_SR.NKFitLayer = m_NKFitLayer;
-                        //Stopwatch sw = new Stopwatch();
-                        //sw.Start();
+                        Stopwatch sw = new Stopwatch();
+                        sw.Start();
                         ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.Fit(data.VIS_Reflectance, data.VIS_Reflectance, data.eV, m_DM.nThicknessDataNum);
-                        //sw.Stop();
-                        //Debug.WriteLine("Fit >> " + sw.ElapsedMilliseconds.ToString());
+                        sw.Stop();
+                        Debug.WriteLine("Fit >> " + sw.ElapsedMilliseconds.ToString());
                         if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
                         {
                             Array.Copy(m_SR.FitY, data.CalcReflectance, m_DM.nThicknessDataNum);
@@ -949,11 +949,11 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             if (GetTransmittance(nPointIndex))
                             {
-                                m_DM.m_Log.WriteLog(LogType.Operating, sMeasurePoint+ "Transmittance Cal Done");
+                                m_DM.m_Log.WriteLog(LogType.Operating, sMeasurePoint + "Transmittance Cal Done");
                             }
                             else
                             {
-                                m_DM.m_Log.WriteLog(LogType.Error, sMeasurePoint+ "Cal Transmittance Fail!");
+                                m_DM.m_Log.WriteLog(LogType.Error, sMeasurePoint + "Cal Transmittance Fail!");
                                 //MessageBox.Show("Cal Transmittance Fail!");
                                 return ERRORCODE_NANOVIEW.ATI_CAL_TRANSMITTANCE_FAIL;
                             }
@@ -1177,7 +1177,7 @@ namespace Root_CAMELLIA.LibSR_Met
             {
                 // 선택 파장 투과율 배열 생성하기
                 double[] CalTWavelenghList = new double[m_DM.m_ContourMapDataT.Count];
-                for (int i=0; i < m_DM.m_ContourMapDataT.Count; i++ )
+                for (int i = 0; i < m_DM.m_ContourMapDataT.Count; i++)
                 {
                     CalTWavelenghList[i] = m_DM.m_ContourMapDataT[i].Wavelength;
                 }
@@ -1215,7 +1215,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 else
                 {
-                    
+
                     sw2.Start();
                     m_Calculation.PointCalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
                     sw2.Stop();
@@ -1258,7 +1258,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 else
                 {
-                    nWLStop = nWLStart + m_DM.m_RawData[0].nNIRDataNum-1;
+                    nWLStop = nWLStart + m_DM.m_RawData[0].nNIRDataNum - 1;
                     nNKDataNum = 2 * ConstValue.NUM_OF_MATERIAL_DATANUM;
                     m_Model.m_eVMax = 4.0;
                     m_Model.m_eVMin = 0.8;
@@ -1374,7 +1374,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 return false;
             }
         }
-       
+
         public bool SaveRawData(int NumofData, double[] expx, double[] expy)
         {
             try
@@ -1536,7 +1536,7 @@ namespace Root_CAMELLIA.LibSR_Met
             catch (Exception ex)
             {
                 m_DM.m_Log.WriteLog(LogType.Error, ex.Message);
-               // MessageBox.Show(ex.Message);
+                // MessageBox.Show(ex.Message);
                 return ERRORCODE_NANOVIEW.NANOVIEW_ERROR;
             }
         }
@@ -1896,11 +1896,11 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 sp.Write("c");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                
+
             }
-          
+
         }
 
         public double UpdateLampData(string CheckWord)
@@ -1929,7 +1929,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
                         m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
                         m_Hr = m_Min = m_Sec = 0;
-                        
+
                         if (!fi.Exists)
                         {
                             fi.Create();
@@ -1982,7 +1982,7 @@ namespace Root_CAMELLIA.LibSR_Met
                             m_DM.m_Log.WriteLog(LogType.Datas, "Lamp Use Time" + strtime);
                         }
                         sp.Write("c");
-                        
+
                     }
                     else
                     {
@@ -1996,7 +1996,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
 
             }
-            
+
             return value;
         }
         private void UpdateLampTime(bool Initialize)

@@ -9,6 +9,7 @@ using RootTools.Trees;
 using RootTools_Vision;
 using RootTools_CLR;
 using System;
+using System.Threading;
 
 namespace Root_EFEM.Module.FrontsideVision
 {
@@ -34,14 +35,14 @@ namespace Root_EFEM.Module.FrontsideVision
         public int m_searchInterval = 0;
         public double m_VRSCamResolution = 0.75;
 
-        double m_diePitchX = 5718;
-        double m_diePitchY = 4358;
-        double m_shotOffsetX = -151.1;
-        double m_shotOffsetY = -6536.9;
-        double m_shotSizeX = 3;
-        double m_shotSizeY = 3;
-        double m_scribeLineX = 80;
-        double m_scribeLineY = 80;
+        double m_diePitchX = 0;
+        double m_diePitchY = 0;
+        double m_shotOffsetX = 0;
+        double m_shotOffsetY = 0;
+        double m_shotSizeX = 0;
+        double m_shotSizeY = 0;
+        double m_scribeLineX = 0;
+        double m_scribeLineY = 0;
 
         // New
         #region [Properties]
@@ -193,12 +194,12 @@ namespace Root_EFEM.Module.FrontsideVision
             }
 
             RPoint centerPoint = axisXY.p_posActual;
-            RPoint shotCenterPoint = new RPoint(centerPoint.X + m_shotOffsetX * PULSE_TO_UM, centerPoint.Y + m_shotOffsetY * PULSE_TO_UM);
-            RPoint initShotLBPoint = new RPoint(centerPoint.X - (m_diePitchX + m_scribeLineX) * m_shotSizeX / 2 * PULSE_TO_UM, centerPoint.Y - (m_diePitchY + m_scribeLineY) * m_shotSizeY / 2 * PULSE_TO_UM);
+            //RPoint shotCenterPoint = new RPoint(centerPoint.X + m_shotOffsetX * PULSE_TO_UM, centerPoint.Y + m_shotOffsetY * PULSE_TO_UM);
+            //RPoint initShotLBPoint = new RPoint(centerPoint.X - (m_diePitchX + m_scribeLineX) * m_shotSizeX / 2 * PULSE_TO_UM, centerPoint.Y - (m_diePitchY + m_scribeLineY) * m_shotSizeY / 2 * PULSE_TO_UM);
             RPoint foundShotLBPoint = new RPoint(0, 0);
 
             // Shot Center Point
-            if (m_module.Run(axisXY.StartMove(shotCenterPoint)))
+            /*if (m_module.Run(axisXY.StartMove(shotCenterPoint)))
             {
                 return p_sInfo;
             }
@@ -215,7 +216,7 @@ namespace Root_EFEM.Module.FrontsideVision
             if (m_module.Run(axisXY.WaitReady()))
             {
                 return p_sInfo;
-            }
+            }*/
 
             long outX, outY;
             long maxOutX = 0;
@@ -226,34 +227,65 @@ namespace Root_EFEM.Module.FrontsideVision
             int featureIndex;
             double score = 0;
             double scoreMax = 0;
+            int lineCount = 0;
 
             for (int y = (int)centerPoint.Y - m_searchOffset; y < (int)centerPoint.Y + m_searchOffset; y+=m_searchInterval)
             {
-                for (int x = (int)centerPoint.X - m_searchOffset; x < (int)centerPoint.X + m_searchOffset; x += m_searchInterval)
+                if (lineCount % 2 == 0)
                 {
-                    if (m_module.Run(axisXY.StartMove(new RPoint(x, y))))
+                    for (int x = (int)centerPoint.X - m_searchOffset; x < (int)centerPoint.X + m_searchOffset; x += m_searchInterval)
                     {
-                        return p_sInfo;
-                    }
-                    if (m_module.Run(axisXY.WaitReady()))
-                    {
-                        return p_sInfo;
-                    }
+                        if (m_module.Run(axisXY.StartMove(new RPoint(x, y))))
+                        {
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(axisXY.WaitReady()))
+                        {
+                            return p_sInfo;
+                        }
+                        Thread.Sleep(1000); // need to reduce
 
-                    score = TemplateMatching(alignRecipe, out outX, out outY, out featureIndex, out outOffsetX, out outOffsetY);
-                    if (score > scoreMax)
-                    {
-                        scoreMax = score;
-                        maxOutX = outX;
-                        maxOutY = outY;
-                        centerOutOffsetX = outOffsetX;
-                        centerOutOffsetY = outOffsetY;
-                        foundShotLBPoint.X = x;
-                        foundShotLBPoint.Y = y;
+                        score = TemplateMatching(alignRecipe, out outX, out outY, out featureIndex, out outOffsetX, out outOffsetY);
+                        if (score > scoreMax)
+                        {
+                            scoreMax = score;
+                            maxOutX = outX;
+                            maxOutY = outY;
+                            centerOutOffsetX = outOffsetX;
+                            centerOutOffsetY = outOffsetY;
+                            foundShotLBPoint.X = x;
+                            foundShotLBPoint.Y = y;
+                        }
                     }
-                    //break; // for debugging
                 }
-                //break; // for debugging
+                else
+                {
+                    for (int x = (int)centerPoint.X + m_searchOffset; x > (int)centerPoint.X - m_searchOffset; x -= m_searchInterval)
+                    {
+                        if (m_module.Run(axisXY.StartMove(new RPoint(x, y))))
+                        {
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(axisXY.WaitReady()))
+                        {
+                            return p_sInfo;
+                        }
+                        Thread.Sleep(1000); // need to reduce
+
+                        score = TemplateMatching(alignRecipe, out outX, out outY, out featureIndex, out outOffsetX, out outOffsetY);
+                        if (score > scoreMax)
+                        {
+                            scoreMax = score;
+                            maxOutX = outX;
+                            maxOutY = outY;
+                            centerOutOffsetX = outOffsetX;
+                            centerOutOffsetY = outOffsetY;
+                            foundShotLBPoint.X = x;
+                            foundShotLBPoint.Y = y;
+                        }
+                    }
+                }
+                lineCount = lineCount + 1;
             }
 
             if (scoreMax < m_score)
@@ -262,7 +294,7 @@ namespace Root_EFEM.Module.FrontsideVision
             }
 
             // Found Shot Point
-            foundShotLBPoint.X = foundShotLBPoint.X + centerOutOffsetX;
+            foundShotLBPoint.X = foundShotLBPoint.X - centerOutOffsetX;
             foundShotLBPoint.Y = foundShotLBPoint.Y + centerOutOffsetY;
 
             if (m_module.Run(axisXY.StartMove(foundShotLBPoint)))

@@ -24,7 +24,7 @@ namespace Root_CAMELLIA
     {
 
         #region global
-     
+
         CAMELLIA_Handler m_handler;
         RFID_Brooks m_rfid;
         BackgroundWorker m_bgwLoad;
@@ -115,11 +115,11 @@ namespace Root_CAMELLIA
 
         public bool p_isUnload
         {
-            get 
-            { 
+            get
+            {
                 return m_isUnload;
             }
-            set 
+            set
             {
                 SetProperty(ref m_isUnload, value);
             }
@@ -278,7 +278,7 @@ namespace Root_CAMELLIA
             m_handler = App.m_engineer.m_handler;
             p_loadport = (Loadport_RND)m_handler.m_aLoadport[nIdx];
             m_rfid = (RFID_Brooks)m_handler.m_aRFID[nIdx];
-            
+
             //p_loadport.m_OHTNew.p_eAccessLP
             InitTimer();
 
@@ -286,7 +286,7 @@ namespace Root_CAMELLIA
             m_bgwLoad.DoWork += M_bgwLoad_DoWork;
             m_bgwLoad.RunWorkerCompleted += M_bgwLoad_RunWorkerCompleted;
 
-            for(int i = 0; i < p_loadport.p_infoCarrier.m_aGemSlot.Count; i++)
+            for (int i = 0; i < p_loadport.p_infoCarrier.m_aGemSlot.Count; i++)
             {
                 p_loadport.p_infoCarrier.m_aGemSlot[i].StateChanged += StateChange;
             }
@@ -302,7 +302,7 @@ namespace Root_CAMELLIA
 
         private void M_handler_OnListUpdate()
         {
-            Application.Current.Dispatcher.Invoke(delegate(){
+            Application.Current.Dispatcher.Invoke(delegate () {
                 p_waferList.Clear();
                 p_isRNR = false;
                 p_CurrentRecipeID = "";
@@ -317,7 +317,7 @@ namespace Root_CAMELLIA
 
         private void M_handler_OnRnRDone()
         {
-            if(this.p_loadport.p_id == App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_id)
+            if (this.p_loadport.p_id == App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_id)
                 p_currentRNR++;
         }
 
@@ -336,7 +336,7 @@ namespace Root_CAMELLIA
                     if (p_totalDone >= p_totalSelect)
                     {
                         p_totalDone = 0;
-                        
+
                     }
 
                     p_waferList[24 - ((InfoWafer)sender).m_nSlot].p_state = ((InfoWafer)sender).p_eState;
@@ -360,7 +360,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    Load();  
+                    Load();
                 });
             }
         }
@@ -424,7 +424,7 @@ namespace Root_CAMELLIA
                     {
                         p_loadport.p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                     }
-                    else if(EQ.p_eState == EQ.eState.Ready && !p_loadport.p_diPlaced.p_bIn)
+                    else if (EQ.p_eState == EQ.eState.Ready && !p_loadport.p_diPlaced.p_bIn)
                     {
                         p_loadport.p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                     }
@@ -439,7 +439,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if(App.m_engineer.p_bUseXGem)
+                    if (App.m_engineer.p_bUseXGem)
                         p_loadport.p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.OutOfService;
                 });
             }
@@ -507,7 +507,7 @@ namespace Root_CAMELLIA
                             }
                         }
                     }
-                   
+
 
                     //if (EQ.p_bRecovery == false)
                     //{
@@ -523,7 +523,7 @@ namespace Root_CAMELLIA
                     //    //p_waferList = new ObservableCollection<InfoWafer>(infoCarrier.m_aInfoWafer.ToList());
                     //    StopWatch sw = new StopWatch();
                     //    sw.Start();
-                       
+
                     //    sw.Stop();
                     //    System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
                     //}
@@ -590,9 +590,9 @@ namespace Root_CAMELLIA
             }
             bool bReadyLoadport = p_loadport.p_eState == ModuleBase.eState.Ready;
             bool bReadyToLoad = true;
-            //if (App.m_engineer.ClassGem() != null && App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
-            //    bReadyToLoad = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad;
-            
+            if (App.m_engineer.ClassGem() != null && App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
+                bReadyToLoad = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad;
+
             bool bReadyState = p_loadport.m_qModuleRun.Count == 0;
             bool bEQReadyState = EQ.p_eState == EQ.eState.Ready;
             //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
@@ -627,7 +627,7 @@ namespace Root_CAMELLIA
             p_isEnableUnload = IsEnableUnloadReq();
         }
 
-#endregion
+        #endregion
 
         public class DataGridWaferInfo : ObservableObject
         {

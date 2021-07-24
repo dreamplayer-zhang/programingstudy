@@ -386,7 +386,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Module\Backside.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

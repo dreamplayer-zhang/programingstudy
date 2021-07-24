@@ -177,6 +177,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Module\Recipe\ADIRecipe.cs" />
+    <Compile Include="ViewModel\MainWindow_ViewModel.cs" />
     <Page Include="Engineer\VEGA_D_IPU_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -120,7 +120,7 @@ namespace Root_Pine2.Engineer
             foreach (eVision eVision in Enum.GetValues(typeof(eVision)))
             {
                 Boats_UI ui = new Boats_UI();
-                ui.Init(m_handler.m_aBoats[eVision]);
+                ui.Init(m_handler.m_aBoats[eVision], m_handler.m_pine2);
                 Grid.SetColumn(ui, 4 - (int)eVision);
                 gridBoat.Children.Add(ui);
                 m_aBoatsUI.Add(ui); 
@@ -254,5 +254,10 @@ namespace Root_Pine2.Engineer
             m_handler.NewLot();
         }
         #endregion
+
+        private void labelEQState_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (EQ.p_eState == EQ.eState.Error) EQ.p_eState = EQ.eState.Ready; 
+        }
     }
 }

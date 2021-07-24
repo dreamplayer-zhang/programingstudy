@@ -603,7 +603,11 @@ namespace Root_Pine2.Module
             p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
             RunTreeVisionOption(tree.GetTree("VisionOption"));
             m_printer.RunTree(tree.GetTree("Printer"));
-            RunTreePickerSet(tree.GetTree("PickerSet")); 
+            RunTreePickerSet(tree.GetTree("PickerSet"));
+            if (m_handler.m_aBoats.Count == 0) return; 
+            m_handler.m_aBoats[eVision.Top3D]?.RunTreeClean(tree.GetTree("Top3D Clean"));
+            m_handler.m_aBoats[eVision.Top2D]?.RunTreeClean(tree.GetTree("Top2D Clean"));
+            m_handler.m_aBoats[eVision.Bottom]?.RunTreeClean(tree.GetTree("Bottom Clean"));
         }
         #endregion
 
@@ -797,26 +801,32 @@ namespace Root_Pine2.Module
             {
                 string sRecipe = m_handler.p_sRecipe;
                 string sLot = m_handler.m_pine2.p_sLotID; 
-                string sVS = "_S00_C" + doc.m_sBundle; 
+                string sVS = "-S00-C" + doc.m_sBundle; 
                 m_srp350.Start();
-                m_srp350.WriteText("Machine ID : Pine2 #" + m_iMachine.ToString());
-                m_srp350.WriteText("--------------------------------");
-                m_srp350.WriteText("Operator : " + m_handler.m_pine2.p_sOperator);
-                m_srp350.WriteText("Recipe : " + sRecipe);
-                m_srp350.WriteText("Lot ID : " + sLot);
-                m_srp350.WriteText("3D Inspect : " + m_handler.m_pine2.p_b3D.ToString());
-                m_srp350.WriteText("VS File : " + sLot + sVS);
-                m_srp350.WriteText("--------------------------------");
-                if (doc.m_eResult != InfoStrip.eResult.Init) m_srp350.WriteText("Result : " + doc.m_eResult.ToString());
-                m_srp350.WriteText("Bundle : " + doc.m_sBundle);
-                m_srp350.WriteText("Sorter : " + doc.m_sSorter);
-                m_srp350.WriteText("Strip Count : " + doc.m_nStrip.ToString());
-                m_srp350.WriteText("");
-                m_srp350.WriteText(doc.m_dtNow.ToString("yyyy-MM-dd HH:mm:ss"));
+                Write("Machine ID : Pine2 #" + m_iMachine.ToString());
+                Write("--------------------------------");
+                Write("Operator : " + m_handler.m_pine2.p_sOperator);
+                Write("Recipe : " + sRecipe);
+                Write("Lot ID : " + sLot);
+                Write("3D Inspect : " + m_handler.m_pine2.p_b3D.ToString());
+                Write("VS File : " + sLot + sVS);
+                Write("--------------------------------");
+                if (doc.m_eResult != InfoStrip.eResult.Init) Write("Result : " + doc.m_eResult.ToString());
+                Write("Bundle : " + doc.m_sBundle);
+                Write("Sorter : " + doc.m_sSorter);
+                Write("Strip Count : " + doc.m_nStrip.ToString());
+                Write("");
+                Write(doc.m_dtNow.ToString("yyyy-MM-dd HH:mm:ss"));
                 string sRecipeLot = "/" + sRecipe + "_" + sLot; 
                 string sQR = "/M" + m_iMachine.ToString() + "V2/" + sRecipe + sRecipeLot + sRecipeLot + sVS; 
-                m_srp350.WriteQR(sQR); 
+                m_srp350.WriteQR(sQR, 7); 
                 m_srp350.End(); 
+            }
+
+            void Write(string sWrite)
+            {
+                m_srp350.WriteText(sWrite);
+                m_log.Info(sWrite); 
             }
 
             int m_iMachine = 1;
@@ -827,10 +837,12 @@ namespace Root_Pine2.Module
                 m_szFont = tree.Set(m_szFont, m_szFont, "Size", "Fonr Size");
             }
 
+            Log m_log; 
             Pine2_Handler m_handler; 
             public Printer(Pine2_Handler handler)
             {
-                m_handler = handler; 
+                m_handler = handler;
+                m_log = LogView.GetLog("Summary"); 
                 InitTimer();
             }
         }

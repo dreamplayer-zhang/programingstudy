@@ -1,12 +1,18 @@
-﻿using RootTools;
+﻿using Root_JEDI_Sorter.Module;
+using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.Dalsa;
 using RootTools.Comm;
+using RootTools.Control;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 
 namespace Root_JEDI_Vision.Module
 {
@@ -21,20 +27,118 @@ namespace Root_JEDI_Vision.Module
         {
             if (p_eRemote == eRemote.Server)
             {
-                p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera");
+                //p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera");
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
                 p_sInfo = m_toolBox.GetComm(ref m_rs232RGBW, this, "RGBW");
-                m_process.GetTools(m_toolBox, bInit); 
+                m_boat.GetTools(m_toolBox, this, bInit); 
+                m_camAxis.GetTools(m_toolBox, this, bInit); 
+                m_process.GetTools(m_toolBox, bInit);
                 if (bInit)
                 {
                     m_rs232RGBW.p_bConnect = true;
-                    m_camera.Connect();
+                    m_camera?.Connect();
                     InitMemory();
                 }
             }
             m_remote.GetTools(bInit);
         }
+        #endregion
+
+        #region Camera Axis
+        public enum eLine
+        {
+            Single, 
+            Double,
+            Triple,
+        }
+        public class CameraAxis
+        {
+            public AxisXY m_axis;
+            public void GetTools(ToolBox toolBox, ModuleBase module, bool bInit)
+            {
+                toolBox.GetAxis(ref m_axis, module, "Camera");
+                if (bInit) InitPosition(); 
+            }
+
+            #region InitPosition
+            public enum ePos
+            {
+                Ready,
+                Snap
+            }
+            void InitPosition()
+            {
+                m_axis.AddPos(Enum.GetNames(typeof(ePos)));
+            }
+            #endregion
+
+            #region Offset
+            double m_pulseum = 10; 
+            double m_mmSpace = 100; 
+            public Dictionary<eLine, RPoint[]> m_umCamOffset = new Dictionary<eLine, RPoint[]>();
+            public Dictionary<eLine, double[]> m_umScanOffset = new Dictionary<eLine, double[]>();
+            void InitOffset()
+            {
+                m_umCamOffset.Add(eLine.Single, new RPoint[1] { new RPoint() });
+                m_umCamOffset.Add(eLine.Double, new RPoint[2] { new RPoint(), new RPoint() });
+                m_umCamOffset.Add(eLine.Triple, new RPoint[3] { new RPoint(), new RPoint(), new RPoint() });
+                m_umScanOffset.Add(eLine.Single, new double[1] { 0 });
+                m_umScanOffset.Add(eLine.Double, new double[2] { 0, 0 });
+                m_umScanOffset.Add(eLine.Triple, new double[3] { 0, 0, 0 });
+            }
+            public void RunTree(Tree tree)
+            {
+                m_pulseum = tree.Set(m_pulseum, m_pulseum, "pulse/um", "pulse per um");
+                m_mmSpace = tree.Set(m_mmSpace, m_mmSpace, "Space", "Grab Sapce (mm)");
+                RunTreeCamOffset(tree.GetTree("Camera Offset"));
+                RunTreeScanOffset(tree.GetTree("Scan Offset"));
+            }
+
+            void RunTreeCamOffset(Tree tree)
+            {
+                RPoint[] umOffset = m_umCamOffset[eLine.Double];
+                for (int n = 0; n < 2; n++) umOffset[n] = tree.GetTree("Double").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
+                umOffset = m_umCamOffset[eLine.Triple];
+                for (int n = 0; n < 3; n++) umOffset[n] = tree.GetTree("Triple").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
+            }
+
+            void RunTreeScanOffset(Tree tree)
+            {
+                double[] umOffset = m_umScanOffset[eLine.Double];
+                for (int n = 0; n < 2; n++) umOffset[n] = tree.GetTree("Double").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
+                umOffset = m_umScanOffset[eLine.Triple];
+                for (int n = 0; n < 3; n++) umOffset[n] = tree.GetTree("Triple").Set(umOffset[n], umOffset[n], n.ToString(), "Camera Axis Offset (um)");
+            }
+            #endregion
+
+            #region RunMove
+            public string RunMove(ePos ePos, bool bWait = true)
+            {
+                m_axis.StartMove(ePos);
+                return bWait ? m_axis.WaitReady() : "OK";
+            }
+
+            public string RunMove(eLine eLine, int iLine, bool bWait = true)
+            {
+                RPoint umOffset = new RPoint(m_umCamOffset[eLine][iLine]); 
+                switch (eLine)
+                {
+                    case eLine.Single: break; 
+                    case eLine.Double: umOffset.X += 1000 * m_mmSpace * (iLine - 0.5); break;
+                    case eLine.Triple: umOffset.X += 1000 * m_mmSpace * (iLine - 1); break; 
+                }
+                m_axis.StartMove(ePos.Snap, new RPoint(m_pulseum * umOffset.X, m_pulseum * umOffset.Y));
+                return bWait ? m_axis.WaitReady() : "OK";
+            }
+            #endregion
+
+            public CameraAxis()
+            {
+                InitOffset(); 
+            }
+        }
+        public CameraAxis m_camAxis = new CameraAxis(); 
         #endregion
 
         #region Memory
@@ -336,12 +440,409 @@ namespace Root_JEDI_Vision.Module
         public Grab m_grabData = new Grab();
         #endregion
 
+        #region Recipe
+        public class Recipe
+        {
+            #region Snap
+            public class Snap
+            {
+                public eLine m_eLine = eLine.Single;
+                public int m_iLine = 0;
+                public eCalMode m_eCalMode = eCalMode.RGB; 
+                public Boat.eDirection m_eDirection = Boat.eDirection.Forward;
+                public enum eEXT
+                {
+                    EXT1,
+                    EXT2,
+                }
+                public eEXT m_eEXT = eEXT.EXT1;
+                public CPoint m_cpMemory = new CPoint();
+                public int m_nOverlap = 0;
+                public LightPower m_lightPower;
+
+                public Snap Clone()
+                {
+                    Snap snap = new Snap(m_vision);
+                    snap.m_eLine = m_eLine;
+                    snap.m_iLine = m_iLine;
+                    snap.m_eCalMode = m_eCalMode; 
+                    snap.m_eDirection = m_eDirection;
+                    snap.m_eEXT = m_eEXT;
+                    snap.m_cpMemory = new CPoint(m_cpMemory);
+                    snap.m_nOverlap = m_nOverlap;
+                    snap.m_lightPower = m_lightPower.Clone();
+                    return snap;
+                }
+
+                public GrabData GetGrabData(CPoint cpOffset, int nOverlap)
+                {
+                    GrabData data = new GrabData();
+                    data.bInvY = (m_eDirection == Boat.eDirection.Forward);
+                    data.m_nOverlap = nOverlap;
+                    data.nScanOffsetY = 0;   /*m_cpMemory.Y;*/
+                    data.ReverseOffsetY = cpOffset.Y; /*m_cpMemory.Y;*/ /* + m_vision.m_nLine */
+                    data.m_bUseFlipVertical = true;
+                    m_vision.m_grabData.SetData(data);
+                    return data;
+                }
+
+                public void RunTree(Tree tree, bool bVisible, bool bReadOnly = false)
+                {
+                    RunTreeStage(tree.GetTree("Stage", true, bVisible), bVisible, bReadOnly);
+                    RunTreeMemory(tree.GetTree("Memory", true, bVisible), bVisible, bReadOnly);
+                    m_lightPower.RunTree(tree.GetTree("Light", true, bVisible), bVisible, bReadOnly);
+                }
+
+                void RunTreeStage(Tree tree, bool bVisible, bool bReadOnly = false)
+                {
+                    m_eLine = (eLine)tree.Set(m_eLine, m_eLine, "Line", "Line", bVisible, bReadOnly);
+                    m_iLine = tree.Set(m_iLine, m_iLine, "Line Index", "Line Index", bVisible, bReadOnly);
+                    m_eCalMode = (eCalMode)tree.Set(m_eCalMode, m_eCalMode, "Cal Mode", "Calibration Mode", bVisible, bReadOnly); 
+                    m_eDirection = (Boat.eDirection)tree.Set(m_eDirection, m_eDirection, "Direction", "Scan Direction", bVisible, false);
+                }
+
+                void RunTreeMemory(Tree tree, bool bVisible, bool bReadOnly = false)
+                {
+                    m_eEXT = (eEXT)tree.Set(m_eEXT, m_eEXT, "EXT", "Select EXT", bVisible, bReadOnly);
+                    m_cpMemory = tree.Set(m_cpMemory, m_cpMemory, "Offset", "Memory Offset Address (pixel)", bVisible, bReadOnly);
+                    m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Overlap", "Memory Overlap Size (pixel)", bVisible, bReadOnly);
+                }
+
+                Vision2D m_vision;
+                public Snap(Vision2D vision)
+                {
+                    m_vision = vision;
+                    m_lightPower = new LightPower(vision);
+                }
+            }
+            public List<Snap> m_aSnap = new List<Snap>();
+            #endregion
+
+            #region Property
+            public int _lSnap = 0;
+            public int p_lSnap
+            {
+                get { return _lSnap; }
+                set
+                {
+                    _lSnap = value;
+                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen && m_vision.p_eRemote == eRemote.Client)
+                    {
+                        while (m_aSnap.Count > value) m_aSnap.RemoveAt(m_aSnap.Count - 1);
+                        while (m_aSnap.Count < value) m_aSnap.Add(new Snap(m_vision));
+                    }
+                }
+            }
+
+            public SnapInfo.eMode m_eSnapMode = SnapInfo.eMode.RGB;
+
+            public double _dProductWidth = 0;
+            public double p_dProductWidth
+            {
+                get { return _dProductWidth; }
+                set
+                {
+                    _dProductWidth = value;
+                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen && m_vision.p_eRemote == eRemote.Client) return;
+                    m_aSnap.Clear();
+
+                    double dResolution = m_vision.m_dResolution;
+                    double dFOVmm = m_vision.m_grabData.m_nFovSize * dResolution / 1000;
+                    eLine eLine = (eLine)((int)Math.Ceiling(_dProductWidth / dFOVmm) - 1);  // 제품 전체를 찍기위한 스냅 횟수
+
+                    m_aSnap.Clear();
+                    switch (m_eSnapMode)
+                    {
+                        case SnapInfo.eMode.RGB: AddSnap(SnapInfo.eMode.RGB, eLine, Snap.eEXT.EXT1, m_lightPowerRGB); break;
+                        case SnapInfo.eMode.APS: AddSnap(SnapInfo.eMode.APS, eLine, Snap.eEXT.EXT2, m_lightPowerAPS); break;
+                        case SnapInfo.eMode.All:
+                            AddSnap(SnapInfo.eMode.RGB, eLine, Snap.eEXT.EXT1, m_lightPowerRGB);
+                            AddSnap(SnapInfo.eMode.APS, eLine, Snap.eEXT.EXT2, m_lightPowerAPS);
+                            break; 
+                    }
+                }
+            }
+
+            void AddSnap(SnapInfo.eMode eSnapMode, eLine eLine, Snap.eEXT eEXT, LightPower lightPower)
+            {
+                for (int i = 0; i <= (int)eLine; i++)
+                {
+                    Snap snap = new Snap(m_vision);
+                    snap.m_eLine = eLine;
+                    snap.m_iLine = i;
+                    snap.m_eCalMode = (eSnapMode == SnapInfo.eMode.RGB) ? eCalMode.RGB : eCalMode.APS; 
+                    snap.m_nOverlap = m_vision.m_grabData.m_nOverlap;
+                    if (m_vision.m_bUseBiDirectional == false) snap.m_eDirection = Boat.eDirection.Forward;
+                    else snap.m_eDirection = (i % 2 == 0) ? Boat.eDirection.Forward : Boat.eDirection.Backward;
+                    snap.m_eEXT = eEXT;
+                    snap.m_lightPower = lightPower.Clone(); 
+                }
+            }
+            #endregion
+
+            #region Tree
+            public TreeRoot m_treeRecipe;
+            void InitTreeRecipe()
+            {
+                m_treeRecipe = new TreeRoot(m_vision.p_id, m_vision.m_log);
+                m_treeRecipe.UpdateTree += M_treeRecipe_UpdateTree;
+            }
+
+            private void M_treeRecipe_UpdateTree()
+            {
+                RunTreeRecipe(Tree.eMode.Update);
+                if (m_treeRecipe.IsUpdated()) RunTreeRecipe(Tree.eMode.Init);
+            }
+
+            public void RunTreeRecipe(Tree.eMode eMode)
+            {
+                m_treeRecipe.p_eMode = eMode;
+                RunTreeRecipe(m_treeRecipe, true, true);
+            }
+
+            public LightPower m_lightPowerRGB, m_lightPowerAPS;
+            public void RunTreeRecipe(Tree tree, bool bVisible, bool bReadOnly = false)
+            {
+                m_eSnapMode = (SnapInfo.eMode)tree.Set(m_eSnapMode, m_eSnapMode, "Snap Mode", "Select Snap Mode", bVisible);
+                p_dProductWidth = tree.Set(p_dProductWidth, p_dProductWidth, "Product Width", "Product Width(mm)", bVisible);
+                p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "Snap Count", bVisible, true);
+
+                if (!(m_treeRecipe.p_eMode == Tree.eMode.JobOpen && m_vision.p_eRemote == eRemote.Client))
+                {
+                    if (m_eSnapMode == SnapInfo.eMode.RGB || m_eSnapMode == SnapInfo.eMode.All)
+                        m_lightPowerRGB.RunTree(tree.GetTree("Light").GetTree("RGB Light", true, bVisible), bVisible);
+                    if (m_eSnapMode == SnapInfo.eMode.APS || m_eSnapMode == SnapInfo.eMode.All)
+                        m_lightPowerAPS.RunTree(tree.GetTree("Light").GetTree("APS Light", true, bVisible), bVisible);
+                }
+
+                for (int n = 0; n < m_aSnap.Count; n++)
+                    m_aSnap[n].RunTree(tree.GetTree("Snap").GetTree("Snap" + n.ToString("00"), false, bVisible), bVisible, true);
+
+            }
+            #endregion
+
+            #region File
+            public string m_sRecipe = "";
+            const string c_sExt = ".JEDI";
+            public void RecipeSave(string sRecipe)
+            {
+                string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
+                Directory.CreateDirectory(sPath);
+                string sFile = sPath + "\\" + m_vision.p_eVision.ToString() + c_sExt;
+                m_treeRecipe.m_job = new Job(sFile, true, m_vision.m_log);
+                RunTreeRecipe(Tree.eMode.JobSave);
+                m_treeRecipe.m_job.Close();
+            }
+
+            public void RecipeOpen(string sRecipe)
+            {
+                string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
+                Directory.CreateDirectory(sPath);
+                string sFile = sPath + "\\" + m_vision.p_eVision.ToString() + c_sExt;
+                m_treeRecipe.m_job = new Job(sFile, false, m_vision.m_log);
+                RunTreeRecipe(Tree.eMode.JobOpen);
+                m_treeRecipe.m_job.Close();
+            }
+            #endregion
+
+            Vision2D m_vision; 
+            public Recipe(Vision2D vision)
+            {
+                m_vision = vision;
+                m_lightPowerRGB = new LightPower(vision);
+                m_lightPowerAPS = new LightPower(vision);
+                InitTreeRecipe();
+            }
+        }
+        Recipe m_recipe;
+
+        public string p_sRecipe
+        {
+            get { return m_recipe.m_sRecipe; }
+            set
+            {
+                if (m_recipe.m_sRecipe == value) return;
+                m_recipe.RecipeOpen(value);
+                OnPropertyChanged(); 
+            }
+        }
+
+        public List<string> p_asRecipe
+        {
+            get
+            {
+                List<string> asRecipe = new List<string>();
+                DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
+                foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
+                return asRecipe;
+            }
+            set { }
+        }
+
+        public Recipe m_recipeEdit;
+        Recipe_UI m_recipeEditUI; 
+        void InitRecipeEditUI()
+        {
+            m_recipeEdit = new Recipe(this);
+            m_recipeEditUI = new Recipe_UI();
+            m_recipeEditUI.Init(this);
+            m_aTool.Add(m_recipeEditUI); 
+        }
+        #endregion
+
+        #region Send Info
+        public LotInfo m_lotInfo = null;
+        public string SendLotInfo(LotInfo lotInfo)
+        {
+            m_lotInfo = lotInfo;
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendLotInfo, eRemote.Client, lotInfo);
+            else
+            {
+                p_sRecipe = lotInfo.m_sRecipe;
+                return m_process.SendLotInfo(lotInfo); 
+            }
+        }
+
+        public string SendSortInfo(SortInfo sortInfo)
+        {
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendSortInfo, eRemote.Client, sortInfo);
+            else { return m_process.SendSortInfo(sortInfo); }
+        }
+        #endregion
+
+        #region Snap
+        public string RunSnap(SnapInfo snapInfo, bool bReadRecipe)
+        {
+            StopWatch sw = new StopWatch();
+            try
+            {
+                if (bReadRecipe) m_recipe.RecipeOpen(p_sRecipe);
+                bool bSendSnapInfo = false;
+                foreach (Recipe.Snap snap in m_recipe.m_aSnap)
+                {
+                    RunLight(snap.m_lightPower);
+                    if (Run(m_camAxis.RunMove(snap.m_eLine, snap.m_iLine, false))) return p_sInfo;
+                    double mmOffsetY = m_camAxis.m_umScanOffset[snap.m_eLine][snap.m_iLine] / 1000.0;
+                    if (Run(m_boat.RunMove(snap.m_eDirection, mmOffsetY, false))) return p_sInfo; 
+                    if (bSendSnapInfo == false)
+                    {
+                        if (Run(m_process.SendSnapInfo(snapInfo))) return p_sInfo;
+                        bSendSnapInfo = true; 
+                    }
+                    if (Run(m_boat.m_axis.WaitReady())) return p_sInfo;
+                    if (Run(m_camAxis.m_axis.WaitReady())) return p_sInfo;
+                    if (Run(StartSnap(snap))) return p_sInfo;
+                    if (Run(m_boat.StartSnap())) return p_sInfo; 
+                    if (Run(WaitSnap())) return p_sInfo;
+                    if (Run(m_boat.WaitSnap())) return p_sInfo;
+                }
+                RunLightOff();
+                m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
+                if (Run(m_boat.RunMove(Boat.ePos.Done))) return p_sInfo;
+                return "OK";
+            }
+            finally
+            {
+                m_boat.m_axis.RunTrigger(false);
+                m_boat.RunMove(Boat.ePos.Done);
+            }
+        }
+
+        string StartSnap(Recipe.Snap snap)
+        {
+            try
+            {
+                m_log.Info("Snap Start");
+                if (snap.m_iLine == 0)
+                {
+                    SetGain(snap.m_eCalMode);
+                    m_log.Info("Set Gain Done");
+                }
+                SetCalUserSet(snap);
+                m_log.Info("Set Cal Userset Done");
+
+                MemoryData memory = p_memSnap[(int)snap.m_eEXT];
+                CPoint cpOffset = CalcOffset(snap);
+                GrabData grabData = snap.GetGrabData(cpOffset, m_grabData.m_nOverlap);
+                m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
+                return "OK";
+            }
+            catch (Exception e)
+            {
+                m_camera.StopGrab();
+                return e.Message; 
+            }
+        }
+
+        string WaitSnap()
+        {
+            while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+            }
+            return "OK";
+        }
+
+        void SetGain(eCalMode eMode)
+        {
+            CalibrationData data = m_aCalData[eMode];
+            m_camera.p_CamParam.SetAnalogGain(data.m_eAnalogGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.System);
+            m_camera.p_CamParam.SetGain(data.m_dSystemGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Blue);
+            m_camera.p_CamParam.SetGain(data.m_dBlueGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Green);
+            m_camera.p_CamParam.SetGain(data.m_dGreenGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Red);
+            m_camera.p_CamParam.SetGain(data.m_dRedGain);
+        }
+
+        void SetCalUserSet(Recipe.Snap snap)
+        {
+            switch (snap.m_eDirection)
+            {
+                case Boat.eDirection.Forward: m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[snap.m_eCalMode].m_eForwardUserSet; break;
+                case Boat.eDirection.Backward: m_camera.p_CamParam.p_eFlatFieldCorrection = m_aCalData[snap.m_eCalMode].m_eBackwardUserSet; break;
+            }
+        }
+
+        CPoint CalcOffset(Recipe.Snap snap)
+        {
+            switch (snap.m_eDirection)
+            {
+                case Boat.eDirection.Forward: return new CPoint(snap.m_iLine * m_grabData.m_nFovSize, m_grabData.m_nReverseOffset);
+                case Boat.eDirection.Backward: return new CPoint(snap.m_iLine * m_grabData.m_nFovSize, 0);
+            }
+            return new CPoint(snap.m_iLine * m_grabData.m_nFovSize, m_grabData.m_nReverseOffset);
+        }
+        #endregion
+
         #region override
         public override void Reset()
         {
-            m_process?.Reset(); 
-            foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true;
-            base.Reset();
+            if (p_eRemote == eRemote.Client)
+            {
+                base.Reset();
+                foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true;
+                RemoteRun(eRemoteRun.SendLotInfo, eRemote.Client, 0);
+            }
+            else
+            {
+                m_process?.Reset();
+            }
+        }
+
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate) return "OK";
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, 0);
+            else
+            {
+                string sRun = base.StateHome();
+                p_eState = (sRun == "OK") ? eState.Ready : eState.Error;
+                return sRun;
+            }
         }
         #endregion
 
@@ -352,6 +853,7 @@ namespace Root_JEDI_Vision.Module
             if (p_eRemote == eRemote.Client) return;
             p_lLight = tree.GetTree("Light", false).Set(p_lLight, p_lLight, "Channel", "Light Channel Count");
             RunCameraTree(tree.GetTree("Camera", true));
+            m_camAxis.RunTree(tree.GetTree("Camera Axis")); 
             m_process?.RunTree(tree.GetTree("Process"));
             RunGrabDataTree(tree.GetTree("GrabData", false));
         }
@@ -377,31 +879,114 @@ namespace Root_JEDI_Vision.Module
         }
         #endregion
 
-
-
         public eVision p_eVision { get; set; }
-        public Vision2D(eVision eVision, IEngineer engineer)
+        public Boat m_boat;
+        VisionProcess m_process = null;
+        public Vision2D(eVision eVision, IEngineer engineer, eRemote eRemote)
         {
             p_eVision = eVision;
-            InitBase("Vision " + eVision.ToString(), engineer, eRemote.Client);
-        }
-
-        VisionProcess m_process = null; 
-        public Vision2D(string id, IEngineer engineer)
-        {
-            m_process = new VisionProcess(this); 
-            InitBase(id, engineer, eRemote.Server);
+            if (eRemote == eRemote.Server)
+            {
+                m_process = new VisionProcess(this);
+                m_boat = new Boat(eVision.ToString());
+                m_recipe = new Recipe(this);
+                InitRecipeEditUI();
+                InitCalData();
+            }
+            InitBase(eVision.ToString(), engineer, eRemote);
         }
 
         public override void ThreadStop()
         {
-            //if (m_bThreadCheck)
-            //{
-                //m_bThreadCheck = false;
-                //m_threadCheck.Join();
-            //}
             m_process?.ThreadStop(); 
             base.ThreadStop();
         }
+
+        #region RemoteRun
+        public enum eRemoteRun
+        {
+            StateHome,
+            Reset,
+            SendLotInfo,
+            SendSortInfo,
+        }
+
+        Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
+        {
+            Run_Remote run = new Run_Remote(this);
+            run.m_eRemoteRun = eRemoteRun;
+            run.m_eRemote = eRemote;
+            switch (eRemoteRun)
+            {
+                case eRemoteRun.StateHome: break;
+                case eRemoteRun.Reset: break;
+                case eRemoteRun.SendLotInfo: run.m_lotInfo = value; break;
+                case eRemoteRun.SendSortInfo: run.m_sortInfo = value; break;
+            }
+            return run;
+        }
+
+        string RemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
+        {
+            if (m_remote.p_bEnable == false) return "OK";
+            Run_Remote run = GetRemoteRun(eRemoteRun, eRemote, value);
+            StartRun(run);
+            while (run.p_eRunState != ModuleRunBase.eRunState.Done)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+            }
+            return p_sInfo;
+        }
+
+        public class Run_Remote : ModuleRunBase
+        {
+            Vision2D m_module;
+            public Run_Remote(Vision2D module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
+            public LotInfo m_lotInfo = new LotInfo("", "", 0);
+            public SortInfo m_sortInfo = new SortInfo("", "");
+            public override ModuleRunBase Clone()
+            {
+                Run_Remote run = new Run_Remote(m_module);
+                run.m_eRemoteRun = m_eRemoteRun;
+                run.m_lotInfo = m_lotInfo.Clone();
+                run.m_sortInfo = m_sortInfo.Clone();
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eRemoteRun = (eRemoteRun)tree.Set(m_eRemoteRun, m_eRemoteRun, "RemoteRun", "Select Remote Run", bVisible);
+                m_eRemote = (eRemote)tree.Set(m_eRemote, m_eRemote, "Remote", "Remote", false);
+                switch (m_eRemoteRun)
+                {
+                    case eRemoteRun.SendLotInfo: m_lotInfo.RunTree(tree.GetTree("LotInfo"), bVisible); break;
+                    case eRemoteRun.SendSortInfo: m_sortInfo.RunTree(tree.GetTree("SortInfo"), bVisible); break;
+                    default: break;
+                }
+            }
+
+            public override string Run()
+            {
+                EQ.p_bStop = false;
+                switch (m_eRemoteRun)
+                {
+                    case eRemoteRun.StateHome: return m_module.StateHome();
+                    case eRemoteRun.Reset: m_module.Reset(); return "OK";
+                    case eRemoteRun.SendLotInfo: return m_module.SendLotInfo(m_lotInfo);
+                    case eRemoteRun.SendSortInfo: return m_module.SendSortInfo(m_sortInfo);
+                }
+                return "OK";
+            }
+        }
+        #endregion
+
+
     }
 }
