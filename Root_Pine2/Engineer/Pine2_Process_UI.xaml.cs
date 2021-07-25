@@ -44,7 +44,6 @@ namespace Root_Pine2.Engineer
             textBoxLotID.DataContext = m_pine2;
             textBoxBundle.DataContext = m_pine2;
 
-            checkBoxKeyence.DataContext = m_pine2;
             checkBoxPaper.DataContext = m_pine2;
             textBoxlStack.DataContext = m_pine2;
             textBoxlStackPaper.DataContext = m_pine2;
@@ -185,6 +184,7 @@ namespace Root_Pine2.Engineer
             groupBoxRecipe.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
             groupBoxLot.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
             groupBoxStack.IsEnabled = m_pine2.p_eMode == Pine2.eRunMode.Stack && (EQ.p_eState == EQ.eState.Ready);
+            groupBoxLoadEV.IsEnabled = m_pine2.p_eMode == Pine2.eRunMode.Stack && (EQ.p_eState == EQ.eState.Ready);
             groupBoxVisionTop.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
             groupBoxVisionBottom.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
             groupBoxMode.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init);

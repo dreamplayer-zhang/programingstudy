@@ -2,6 +2,7 @@
 using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
+using System.Windows; 
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -42,8 +43,13 @@ namespace Root_Pine2.Module
                 case ModuleBase.eState.Error: Background = Brushes.OrangeRed; break;
             }
             textBlockVision.Foreground = m_boats.m_vision.p_remote.p_bEnable ? Brushes.Red : Brushes.LightGray;
-            checkBoxRoller.IsEnabled = (m_pine2.p_b3D || (m_boats.m_vision.p_eVision == eVision.Bottom)); 
-            if ((m_pine2.p_b3D == false) && (m_boats.m_vision.p_eVision != eVision.Bottom)) checkBoxRoller.IsChecked = false;
+            switch (m_boats.m_vision.p_eVision)
+            {
+                case eVision.Top3D: checkBoxRoller.Visibility = Visibility.Hidden; break;
+                case eVision.Top2D: checkBoxRoller.Visibility = m_pine2.p_b3D ? Visibility.Visible : Visibility.Hidden; break;
+                case eVision.Bottom: checkBoxRoller.Visibility = Visibility.Visible; break;
+            }
+            if (checkBoxRoller.Visibility == Visibility.Hidden) checkBoxRoller.IsChecked = false; 
             textBlockA.Text = (m_boats.m_aBoat[eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[eWorks.A].p_infoStrip.p_id : "";
             textBlockB.Text = (m_boats.m_aBoat[eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[eWorks.B].p_infoStrip.p_id : "";
             gridStripA.Background = GetBrush(m_boats.m_aBoat[eWorks.A].p_infoStrip);
