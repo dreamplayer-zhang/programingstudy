@@ -46,10 +46,10 @@ namespace Root_Pine2.Module
             if ((m_pine2.p_b3D == false) && (m_boats.m_vision.p_eVision != eVision.Bottom)) checkBoxRoller.IsChecked = false;
             textBlockA.Text = (m_boats.m_aBoat[eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[eWorks.A].p_infoStrip.p_id : "";
             textBlockB.Text = (m_boats.m_aBoat[eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[eWorks.B].p_infoStrip.p_id : "";
-            gridStripA.Background = (m_boats.m_aBoat[eWorks.A].p_inspectStrip != null) ? Brushes.Orange : Brushes.Beige;
-            gridStripB.Background = (m_boats.m_aBoat[eWorks.B].p_inspectStrip != null) ? Brushes.Orange : Brushes.Beige;
-            gridA.Background = (m_boats.m_aBoat[eWorks.A].p_bWorksConnect ? Brushes.AliceBlue : Brushes.Purple);
-            gridB.Background = (m_boats.m_aBoat[eWorks.B].p_bWorksConnect ? Brushes.AliceBlue : Brushes.Purple);
+            gridStripA.Background = GetBrush(m_boats.m_aBoat[eWorks.A].p_infoStrip);
+            gridStripB.Background = GetBrush(m_boats.m_aBoat[eWorks.B].p_infoStrip);
+            gridA.Background = GetBrush(m_boats.m_aBoat[eWorks.A]);
+            gridB.Background = GetBrush(m_boats.m_aBoat[eWorks.B]);
             textBlockStepA.Text = m_boats.m_aBoat[eWorks.A].p_eStep.ToString();
             textBlockStepB.Text = m_boats.m_aBoat[eWorks.B].p_eStep.ToString();
             OnRunTree();
@@ -59,6 +59,26 @@ namespace Root_Pine2.Module
                 m_boats.m_aBoat[eWorks.A].p_bWorksConnect = false;
                 m_boats.m_aBoat[eWorks.B].p_bWorksConnect = false;
             }
+        }
+
+        Brush GetBrush(InfoStrip infoStrip)
+        {
+            if (infoStrip == null) return Brushes.Beige; 
+            return infoStrip.p_bInspect ? Brushes.Orange : Brushes.Beige;
+        }
+
+        Brush GetBrush(Boat boat)
+        {
+            if (boat.p_bWorksConnect == false) return Brushes.OrangeRed; 
+            switch (boat.p_eStep)
+            {
+                case Boat.eStep.Init: return Brushes.White;
+                case Boat.eStep.Ready: return Brushes.LightGreen;
+                case Boat.eStep.Run: return Brushes.Yellow;
+                case Boat.eStep.Done: return Brushes.LightBlue;
+                case Boat.eStep.RunReady: return Brushes.DarkGreen;
+            }
+            return Brushes.White; 
         }
 
         int[] m_nQueue = new int[2] { 0, 0 };

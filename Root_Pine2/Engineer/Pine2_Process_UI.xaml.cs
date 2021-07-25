@@ -52,10 +52,6 @@ namespace Root_Pine2.Engineer
             checkBoxIonBlow.DataContext = m_pine2;
             checkBoxAlignBlow.DataContext = m_pine2;
 
-            checkBoxLotMix3D.DataContext = m_pine2.m_aVisionOption[eVision.Top3D];
-            checkBoxBarcode3D.DataContext = m_pine2.m_aVisionOption[eVision.Top3D];
-            textBoxBarcode3D.DataContext = m_pine2.m_aVisionOption[eVision.Top3D];
-            textBoxBarcodeLength3D.DataContext = m_pine2.m_aVisionOption[eVision.Top3D];
             checkBoxLotMix2D.DataContext = m_pine2.m_aVisionOption[eVision.Top2D];
             checkBoxBarcode2D.DataContext = m_pine2.m_aVisionOption[eVision.Top2D];
             textBoxBarcode2D.DataContext = m_pine2.m_aVisionOption[eVision.Top2D];
@@ -167,8 +163,6 @@ namespace Root_Pine2.Engineer
             m_loadEVUI.OnTimer();
             OnTimerRun();
 
-            textBoxBarcode3D.IsEnabled = m_pine2.m_aVisionOption[eVision.Top3D].p_bBarcode;
-            textBoxBarcodeLength3D.IsEnabled = m_pine2.m_aVisionOption[eVision.Top3D].p_bBarcode;
             textBoxBarcode2D.IsEnabled = m_pine2.m_aVisionOption[eVision.Top2D].p_bBarcode;
             textBoxBarcodeLength2D.IsEnabled = m_pine2.m_aVisionOption[eVision.Top2D].p_bBarcode;
             textBoxBarcodeBottom.IsEnabled = m_pine2.m_aVisionOption[eVision.Bottom].p_bBarcode;
@@ -191,7 +185,8 @@ namespace Root_Pine2.Engineer
             groupBoxRecipe.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
             groupBoxLot.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
             groupBoxStack.IsEnabled = m_pine2.p_eMode == Pine2.eRunMode.Stack && (EQ.p_eState == EQ.eState.Ready);
-            groupBoxVision.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
+            groupBoxVisionTop.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
+            groupBoxVisionBottom.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
             groupBoxMode.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init);
         }
 

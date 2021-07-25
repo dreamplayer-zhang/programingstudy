@@ -129,43 +129,46 @@
                     <CheckBox x:Name="checkBoxAlignBlow" Content="Use Align Blow" IsChecked="{Binding p_bUseAlignBlow}" Margin="3"/>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Grid.Column="5" x:Name="groupBoxVision" BorderBrush="Black" BorderThickness="1" Margin="3">
-                <GroupBox.Header>
-                    <TextBlock Text="Vision" Foreground="Black" FontWeight="Bold" />
-                </GroupBox.Header>
-                <StackPanel Orientation="Vertical">
-                    <CheckBox x:Name="checkBoxLotMix3D" Content="LotMix Top3D" IsChecked="{Binding p_bLotMix}" Margin="2"/>
-                    <CheckBox x:Name="checkBoxBarcode3D" Content="Barcode" IsChecked="{Binding p_bBarcode}" Margin="2"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" x:Name="textBoxBarcode3D" Text="{Binding p_nBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
-                        <TextBox Grid.Column="1" x:Name="textBoxBarcodeLength3D" Text="{Binding p_lBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
-                    </Grid>
-                    <CheckBox x:Name="checkBoxLotMix2D" Content="LotMix Top2D" IsChecked="{Binding p_bLotMix}" Margin="2,4,2,2"/>
-                    <CheckBox x:Name="checkBoxBarcode2D" Content="Barcode" IsChecked="{Binding p_bBarcode}" Margin="2"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" x:Name="textBoxBarcode2D" Text="{Binding p_nBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
-                        <TextBox Grid.Column="1" x:Name="textBoxBarcodeLength2D" Text="{Binding p_lBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
-                    </Grid>
-                    <CheckBox x:Name="checkBoxLotMixBottom" Content="LotMix Bottom" IsChecked="{Binding p_bLotMix}" Margin="2,4,2,2"/>
-                    <CheckBox x:Name="checkBoxBarcodeBottom" Content="Barcode" IsChecked="{Binding p_bBarcode}" Margin="2"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" x:Name="textBoxBarcodeBottom" Text="{Binding p_nBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
-                        <TextBox Grid.Column="1" x:Name="textBoxBarcodeLengthBottom" Text="{Binding p_lBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
-                    </Grid>
-                </StackPanel>
-            </GroupBox>
+            <Grid Grid.Column="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0" x:Name="groupBoxVisionTop" BorderBrush="Black" BorderThickness="1" Margin="3">
+                    <GroupBox.Header>
+                        <TextBlock Text="Vision Top" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <StackPanel Orientation="Vertical">
+                        <CheckBox x:Name="checkBoxLotMix2D" Content="LotMix" IsChecked="{Binding p_bLotMix}" Margin="3"/>
+                        <CheckBox x:Name="checkBoxBarcode2D" Content="Barcode" IsChecked="{Binding p_bBarcode}" Margin="3"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" x:Name="textBoxBarcode2D" Text="{Binding p_nBarcode}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                            <TextBox Grid.Column="1" x:Name="textBoxBarcodeLength2D" Text="{Binding p_lBarcode}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Grid.Row="1" x:Name="groupBoxVisionBottom" BorderBrush="Black" BorderThickness="1" Margin="3">
+                    <GroupBox.Header>
+                        <TextBlock Text="Vision Bottom" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <StackPanel Orientation="Vertical">
+                        <CheckBox x:Name="checkBoxLotMixBottom" Content="LotMix" IsChecked="{Binding p_bLotMix}" Margin="3"/>
+                        <CheckBox x:Name="checkBoxBarcodeBottom" Content="Barcode" IsChecked="{Binding p_bBarcode}" Margin="3"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" x:Name="textBoxBarcodeBottom" Text="{Binding p_nBarcode}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                            <TextBox Grid.Column="1" x:Name="textBoxBarcodeLengthBottom" Text="{Binding p_lBarcode}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
             <GroupBox Grid.Column="6" x:Name="groupBoxMode" BorderBrush="Black" BorderThickness="1" Margin="3">
                 <GroupBox.Header>
                     <TextBlock Text="Mode" Foreground="Black" FontWeight="Bold" />

@@ -774,7 +774,7 @@ namespace Root_Pine2.Module
                 public Doc(int iSorter, int iBundle, int nStrip, InfoStrip.eResult eResult)
                 {
                     m_eResult = eResult;
-                    for (int n = 0; n < 8; n++) m_sSorter += ((n == iSorter) ? n.ToString() : "_");
+                    for (int n = 0; n < 8; n++) m_sSorter += ((n == iSorter) ? n.ToString() : "*");
                     m_sBundle = iBundle.ToString("00");
                     m_nStrip = nStrip; 
                 }
