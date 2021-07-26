@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Root_WindII"
              xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="1600" d:DesignWidth="800"
              Background="{StaticResource main_view_background}">
     <UserControl.Resources>
         <Style x:Key="selectmode_button" TargetType="Button">

@@ -179,7 +179,7 @@ namespace RootTools.Gem
                 if (_eReqTransfer == value) return;
                 if ((m_gem == null) || m_gem.p_bOffline) return;
                 m_log.Info("p_eTransfer " + _eReqTransfer.ToString() + " -> " + value.ToString());
-                _eReqTransfer = value;
+                p_eReqTransfer = value;
                 if (EQ.p_bSimulate) p_eTransfer = value; 
                 switch (_eReqTransfer)
                 {
@@ -263,7 +263,7 @@ namespace RootTools.Gem
                 {
 
                     case eAccess.CarrierCompleted: 
-                        m_bReqUnload = true; 
+                        //m_bReqUnload = true; 
                         break; 
                 }
             }

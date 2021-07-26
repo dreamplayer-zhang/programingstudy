@@ -10,35 +10,47 @@ namespace Root_Pine2.Module
 
         public InfoStrip GetInfoStrip(bool bPeek)
         {
-            MagazineEV.Magazine magazineGet = null;
-            int nStripMin = 100; 
-            foreach (MagazineEV magazineEV in m_aEV.Values)
+            foreach (InfoStrip.eMagazine eMagazine in m_aMagazineDown)
             {
-                MagazineEV.Magazine magazine = magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down]; 
-                if ((magazine != null) && (magazine.m_qStripReady.Count > 0) && (magazineEV.p_eState == ModuleBase.eState.Ready))
+                MagazineEV magazineEV = m_aEV[eMagazine];
+                if ((magazineEV != null) && (magazineEV.p_eState == ModuleBase.eState.Ready))
                 {
-                    if (nStripMin > magazine.m_qStripReady.Count)
-                    {
-                        magazineGet = magazine;
-                        nStripMin = magazine.m_qStripReady.Count;
-                    }
+                    MagazineEV.Magazine magazine = magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down];
+                    if ((magazine != null) && (magazine.m_qStripReady.Count > 0)) return magazine.GetInfoStrip(bPeek);
                 }
             }
-            if (magazineGet != null) return magazineGet.GetInfoStrip(bPeek);
-            foreach (MagazineEV magazineEV in m_aEV.Values)
+            foreach (InfoStrip.eMagazine eMagazine in m_aMagazineUp)
             {
-                MagazineEV.Magazine magazine = magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Up];
-                if ((magazine != null) && (magazine.m_qStripReady.Count > 0) && (magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] == null) && (magazineEV.p_eState == ModuleBase.eState.Ready))
+                MagazineEV magazineEV = m_aEV[eMagazine];
+                if ((magazineEV != null) && (magazineEV.p_eState == ModuleBase.eState.Ready) && (magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] == null))
                 {
-                    if (nStripMin > magazine.m_qStripReady.Count)
-                    {
-                        magazineGet = magazine;
-                        nStripMin = magazine.m_qStripReady.Count;
-                    }
+                    MagazineEV.Magazine magazine = magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Up];
+                    if ((magazine != null) && (magazine.m_qStripReady.Count > 0)) return magazine.GetInfoStrip(bPeek);
                 }
             }
-            if (magazineGet != null) return magazineGet.GetInfoStrip(bPeek);
             return null; 
+        }
+
+        List<InfoStrip.eMagazine> m_aMagazineDown = new List<InfoStrip.eMagazine>();
+        List<InfoStrip.eMagazine> m_aMagazineUp = new List<InfoStrip.eMagazine>();
+        public void MagazineLoaded(InfoStrip.eMagazine eMagazine, InfoStrip.eMagazinePos eMagazinePos)
+        {
+            if (m_pine2.p_eMode != Pine2.eRunMode.Magazine) return; 
+            switch (eMagazinePos)
+            { 
+                case InfoStrip.eMagazinePos.Up: m_aMagazineUp.Add(eMagazine); break;
+                case InfoStrip.eMagazinePos.Down: m_aMagazineDown.Add(eMagazine); break;
+            }
+        }
+
+        public void MagazineUnloaded(InfoStrip.eMagazine eMagazine, InfoStrip.eMagazinePos eMagazinePos)
+        {
+            if (m_pine2.p_eMode != Pine2.eRunMode.Magazine) return;
+            switch (eMagazinePos)
+            {
+                case InfoStrip.eMagazinePos.Up: m_aMagazineUp.Remove(eMagazine); break;
+                case InfoStrip.eMagazinePos.Down: m_aMagazineDown.Remove(eMagazine); break;
+            }
         }
 
         public double CalcXOffset(InfoStrip infoStrip)

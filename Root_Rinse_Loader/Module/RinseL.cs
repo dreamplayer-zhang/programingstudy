@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Rinse_Loader.Engineer;
+using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
@@ -184,8 +185,7 @@ namespace Root_Rinse_Loader.Module
 
         #region Rinse
         DIO_I m_diRinseRun;
-        public DIO_O m_doRinseEmg; 
-
+        DIO_I m_diRinseUnloader; 
         public enum eRinseRun
         {
             Ready,
@@ -204,18 +204,6 @@ namespace Root_Rinse_Loader.Module
                 {
                     if (EQ.p_eState == EQ.eState.Run) EQ.p_eState = EQ.eState.Ready; 
                 }
-            }
-        }
-
-        bool _bRinseEmg = false; 
-        public bool p_bRinseEmg
-        {
-            get { return _bRinseEmg; }
-            set
-            {
-                if (_bRinseEmg == value) return;
-                _bRinseEmg = value;
-                m_doRinseEmg.Write(!value); 
             }
         }
         #endregion
@@ -261,11 +249,10 @@ namespace Root_Rinse_Loader.Module
             GetToolsDIO(); 
             p_sInfo = m_toolBox.GetComm(ref m_tcpip, this, "TCPIP");
             p_sInfo = m_toolBox.GetDIO(ref m_diRinseRun, this, "Rinse Run");
-            p_sInfo = m_toolBox.GetDIO(ref m_doRinseEmg, this, "Rinse Emg Stop");
+            p_sInfo = m_toolBox.GetDIO(ref m_diRinseUnloader, this, "Rinse Unloader Error");
             if (bInit)
             {
                 InitALID();
-                m_doRinseEmg.Write(true); 
                 EQ.m_EQ.OnChanged += M_EQ_OnChanged;
                 m_tcpip.EventReciveData += M_tcpip_EventReciveData;
             }
@@ -503,8 +490,7 @@ namespace Root_Rinse_Loader.Module
             {
                 Thread.Sleep(10);
                 p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
-                //p_bRinseEmg = (p_eStateRinse == eRinseRun.Run) && (p_eStateUnloader != EQ.eState.Run); 
-                p_bRinseEmg = p_eStateUnloader == EQ.eState.Error;
+                if (m_diRinseUnloader.p_bIn == false) p_eStateUnloader = EQ.eState.Error;
                 RunThreadDIO();
                 if (m_qProtocolReply.Count > 0)
                 {
@@ -555,6 +541,7 @@ namespace Root_Rinse_Loader.Module
                             {
                                 m_alidUnloadError.p_bSet = true;
                                 EQ.p_eState = EQ.eState.Error;
+                                m_handler.Reset(); 
                             }
                             break;
                         case eCmd.StripReceive:
@@ -677,9 +664,11 @@ namespace Root_Rinse_Loader.Module
             base.Reset();
         }
 
+        RinseL_Handler m_handler; 
         public RinseL(string id, IEngineer engineer)
         {
             p_id = id;
+            m_handler = (RinseL_Handler)engineer.ClassHandler(); 
             InitBase(id, engineer);
 
             InitThread();

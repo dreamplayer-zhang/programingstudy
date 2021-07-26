@@ -35,7 +35,7 @@ namespace Root_Pine2.Module
 
         public bool IsEnableRun()
         {
-            return (p_eStep == eStep.Ready) && (p_infoStrip != null);
+            return (p_eStep == eStep.Ready) && (p_infoStrip != null) && m_bCleamDone;
         }
 
         public bool IsDone()
@@ -95,11 +95,14 @@ namespace Root_Pine2.Module
             Handler,
             Vision,
             SnapStart,
+            CleanStart,
+            CleanEnd,
         }
         void InitPosition()
         {
             m_axis.AddPos(Enum.GetNames(typeof(ePos)));
             m_axis.AddSpeed("Snap");
+            m_axis.AddSpeed("Clean");
         }
 
         public string RunMove(ePos ePos, bool bWait = true)
@@ -224,20 +227,49 @@ namespace Root_Pine2.Module
         }
         #endregion
 
-        #region Clean Roller
-        public string RunRoller(bool bDown)
+        #region Cleaner 
+        string RunRoller(bool bDown, bool bWait = true)
         {
             m_doRollerPusher.Write(bDown);
             m_dioRollerDown.Write(bDown);
-            return m_dioRollerDown.WaitDone();
+            return bWait ? m_dioRollerDown.WaitDone() : "OK";
         }
-        #endregion
 
-        #region Cleaner
-        public void RunCleaner(bool bBlow, bool bSuction)
+        void RunCleaner(bool bBlow, bool bSuction)
         {
             m_doCleanerBlow.Write(bBlow);
             m_doCleanerSuction.Write(bSuction);
+        }
+
+        BackgroundWorker m_bgwClean = new BackgroundWorker(); 
+        public string StartClean()
+        {
+            if ((m_boats.p_bCleanRoller == false) && (m_boats.p_bCleanBlow == false)) return "OK";
+            m_bgwClean.RunWorkerAsync(); 
+            return "OK"; 
+        }
+
+        public bool m_bCleamDone = true;
+        private void M_bgwClean_DoWork(object sender, DoWorkEventArgs e)
+        {
+            m_bCleamDone = false; 
+            bool bRoller = m_boats.p_bCleanRoller;
+            bool bBlow = m_boats.p_bCleanBlow; 
+            try
+            {
+                if ((bRoller == false) && (bBlow == false)) return;
+                RunMove(ePos.CleanStart);
+                RunCleaner(bBlow, bBlow);
+                RunRoller(bRoller);
+                m_axis.StartMove(m_axis.GetPosValue(ePos.CleanEnd), "Clean");
+                m_axis.WaitReady();
+            }
+            finally
+            {
+                RunCleaner(false, false);
+                RunRoller(false, false);
+                m_bCleamDone = true;
+            }
         }
         #endregion
 
@@ -261,9 +293,9 @@ namespace Root_Pine2.Module
         public SnapInfo GetSnapInfo()
         {
             if (p_infoStrip == null)
-                return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, "", m_recipe.p_lSnap);
+                return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, "", m_recipe.p_lSnap, true);
 
-            return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, p_infoStrip.p_id, m_recipe.p_lSnap);
+            return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, p_infoStrip.p_id, m_recipe.p_lSnap, true);
         }
         #endregion
 
@@ -316,6 +348,7 @@ namespace Root_Pine2.Module
         public Boat(string id, Boats boats, eWorks eWorks, bool b3D)
         {
             m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
+            m_bgwClean.DoWork += M_bgwClean_DoWork;
             p_id = id;
             m_boats = boats;
             if (b3D) m_recipe = new Vision3D.Recipe((Vision3D)boats.m_vision, eWorks);

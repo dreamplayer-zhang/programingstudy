@@ -37,12 +37,13 @@ namespace Root_Pine2.Engineer
         DispatcherTimer m_timer = new DispatcherTimer();
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            grid.Background = (m_gaf.m_listALID.p_aSetALID.Count > 0) ? Brushes.Crimson : Brushes.LightGreen;
+            grid.Background = (m_gaf.m_listALID.p_aSetALID.Count > 0) ? Brushes.OrangeRed : Brushes.LightGreen;
         }
 
         private void buttonClear_Click(object sender, RoutedEventArgs e)
         {
             m_listALID.ClearALID();
+            if (EQ.p_eState == EQ.eState.Error) EQ.p_eState = EQ.eState.Ready;
         }
 
     }

@@ -166,6 +166,32 @@ namespace Root_WindII
             }
         }
 
+        public RelayCommand btnToolSaveCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.boxList == null || this.boxList.Count == 0) return;
+
+                    TRect lastBox = this.boxList[this.boxList.Count - 1];
+
+
+                    this.p_ImageData.SaveRectImage(lastBox.MemoryRect, 3, true, true, true);
+                    //System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+                    //sfd.Filter = "Bitmap Files(*.bmp;)|*.bmp;";
+                    //if(sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    //{
+                        
+                    //    using (System.Drawing.Bitmap bitmap = this.p_ImageData.GetRectImage(lastBox.MemoryRect))
+                    //    {
+                    //        bitmap.Save(sfd.FileName);
+                    //    }
+                    //}
+                });
+            }
+        }
+
         public RelayCommand btnToolClearCommand
         {
             get

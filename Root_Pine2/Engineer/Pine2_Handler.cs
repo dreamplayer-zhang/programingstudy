@@ -36,7 +36,8 @@ namespace Root_Pine2.Engineer
             m_pine2.p_iBundle = 0;
             m_loadEV.p_iStrip = 0;
             m_sLotSend = "";
-            SendLotInfo(); 
+            SendLotInfo();
+            m_summary.ClearCount(); 
         }
 
         string m_sLotSend = "";
@@ -55,18 +56,26 @@ namespace Root_Pine2.Engineer
             Pine2.VisionOption option = m_pine2.m_aVisionOption[boats.m_vision.p_eVision];
             LotInfo lotInfo = new LotInfo(nMode, p_sRecipe, m_pine2.p_sLotID, option.p_bLotMix, option.p_bBarcode, option.p_nBarcode, option.p_lBarcode);
             string sRun = boats.m_vision.SendLotInfo(lotInfo);
-            if (sRun == "OK") boats.p_sInfo = lotInfo.m_sLotID; 
+            if (sRun == "OK")
+            {
+                boats.p_sInfo = lotInfo.m_sLotID;
+                boats.m_aBoat[eWorks.A].p_bWorksConnect = true;
+                boats.m_aBoat[eWorks.B].p_bWorksConnect = true;
+            }
         }
 
-        BackgroundWorker m_bgwSendSort = new BackgroundWorker(); 
+        Queue<InfoStrip> m_qInfoStripSend = new Queue<InfoStrip>();
         public void SendSortInfo(InfoStrip infoStrip)
         {
-            m_bgwSendSort.RunWorkerAsync(infoStrip); 
+            m_qInfoStripSend.Enqueue(infoStrip); 
         }
 
-        private void M_bgwSendSort_DoWork(object sender, DoWorkEventArgs e)
+        void SendSortInfo()
         {
-            InfoStrip infoStrip = e.Argument as InfoStrip; 
+            if (m_qInfoStripSend.Count == 0) return;
+            InfoStrip infoStrip = m_qInfoStripSend.Peek();
+            if (infoStrip.p_bInspect) return;
+            m_qInfoStripSend.Dequeue();
             if (m_pine2.p_b3D) SendSortInfo(m_aBoats[eVision.Top3D], infoStrip);
             SendSortInfo(m_aBoats[eVision.Top2D], infoStrip);
             SendSortInfo(m_aBoats[eVision.Bottom], infoStrip);
@@ -191,7 +200,7 @@ namespace Root_Pine2.Engineer
             m_magazineEVSet = new MagazineEVSet(m_pine2);
             foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
             {
-                MagazineEV magazineEV = new MagazineEV(eMagazine, m_engineer, m_pine2);
+                MagazineEV magazineEV = new MagazineEV(eMagazine, m_engineer, m_pine2, m_magazineEVSet);
                 m_magazineEVSet.m_aEV.Add(eMagazine, magazineEV);
                 InitModule(magazineEV); 
             }
@@ -310,6 +319,12 @@ namespace Root_Pine2.Engineer
                 case Pine2.eRunMode.Stack:
                     if (m_loadEV.p_bCheck) return false;
                     break;
+                case Pine2.eRunMode.Magazine:
+                    foreach (MagazineEV ev in m_magazineEVSet.m_aEV.Values)
+                    {
+                        if (ev.IsMagazineBusy()) return false; 
+                    }
+                    break; 
             }
             return true;
         }
@@ -359,6 +374,7 @@ namespace Root_Pine2.Engineer
             while (m_bThread)
             {
                 Thread.Sleep(10);
+                SendSortInfo(); 
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
@@ -366,7 +382,6 @@ namespace Root_Pine2.Engineer
                         if (m_eEQState == EQ.eState.Ready) m_summary.LotStart(m_pine2.p_sLotID);
                         break;
                     case EQ.eState.ModuleRunList: 
-
                         break;
                 }
                 p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
@@ -389,7 +404,6 @@ namespace Root_Pine2.Engineer
             InitModule();
             InitThread();
             m_bgwRecipe.DoWork += M_bgwRecipe_DoWork;
-            m_bgwSendSort.DoWork += M_bgwSendSort_DoWork;
             m_engineer.ClassMemoryTool().InitThreadProcess();
         }
 

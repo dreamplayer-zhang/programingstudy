@@ -1,10 +1,12 @@
 ﻿using Root_Pine2.Engineer;
 using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_Pine2.Module
@@ -18,7 +20,17 @@ namespace Root_Pine2.Module
             m_buffer.GetTools(m_toolBox, this, bInit);
             m_gripper.GetTools(m_toolBox, this, bInit);
             m_pusher.GetTools(m_toolBox, this, bInit);
+            if (bInit) InitALID(); 
         }
+
+        ALID m_alidGripper;
+        ALID m_alidPusher;
+        void InitALID()
+        {
+            m_alidGripper = m_gaf.GetALID(this, "Gripper", "Home Error : Gripper has Strip");
+            m_alidPusher = m_gaf.GetALID(this, "Pusher", "Home Error : Pusher has Strip");
+        }
+
         #endregion
 
         #region Loader Pusher
@@ -91,6 +103,7 @@ namespace Root_Pine2.Module
                 DIO_I diOverload = m_diOverload[GetAxisID(eMagazine)];
                 try
                 {
+                    m_magazineSet.m_aEV[eMagazine].m_elevator.m_bPusherSafe = false;
                     dioPusher.Write(true);
                     StopWatch sw = new StopWatch();
                     int msTimeout = (int)(1000 * dioPusher.m_secTimeout);
@@ -105,18 +118,21 @@ namespace Root_Pine2.Module
                     dioPusher.Write(false);
                     return dioPusher.WaitDone(); 
                 }
-                finally { dioPusher.Write(false); }
-            }
-
-            public bool IsPusherOff()
-            {
-                if (m_dioPusher[0].m_aBitDI[0].p_bOn == false) return false;
-                if (m_dioPusher[1].m_aBitDI[0].p_bOn == false) return false;
-                return true; 
+                finally 
+                { 
+                    dioPusher.Write(false);
+                    m_magazineSet.m_aEV[eMagazine].m_elevator.m_bPusherSafe = true; 
+                }
             }
             #endregion
+
+            MagazineEVSet m_magazineSet; 
+            public LoaderPusher(MagazineEVSet magazineSet)
+            {
+                m_magazineSet = magazineSet; 
+            }
         }
-        LoaderPusher m_loaderPusher = new LoaderPusher();
+        LoaderPusher m_loaderPusher;
         #endregion
 
         #region Buffer
@@ -137,6 +153,13 @@ namespace Root_Pine2.Module
                 m_axis.AddPos(Enum.GetNames(typeof(InfoStrip.eMagazine)));
                 m_axisWidth.AddPos(Enum.GetNames(typeof(eWidth)));
                 
+            }
+
+            public double GetXScale(InfoStrip.eMagazine eMagazine)
+            {
+                double p0 = m_axis.GetPosValue(InfoStrip.eMagazine.Magazine0);
+                double p7 = m_axis.GetPosValue(InfoStrip.eMagazine.Magazine7); 
+                return (m_axis.GetPosValue(eMagazine) - p0)  / (p7 - p0); 
             }
             #endregion
 
@@ -166,13 +189,21 @@ namespace Root_Pine2.Module
                 mm75,
                 mm95,
             }
+            double m_dPos = 0; 
             public string RunWidth(double fWidth, bool bWait = true)
             {
                 double f75 = m_axisWidth.GetPosValue(eWidth.mm75);
                 double f95 = m_axisWidth.GetPosValue(eWidth.mm95);
                 double dPos = (f95 - f75) * (fWidth - 75) / 20 + f75;
+                m_dPos = dPos; 
                 m_axisWidth.StartMove(dPos);
                 return bWait ? m_axisWidth.WaitReady() : "OK";
+            }
+
+            public string RunAlign(bool bAlign)
+            {
+                m_axisWidth.StartMove(m_dPos + (bAlign ? 1000 : 0));
+                return "OK";
             }
             #endregion
 
@@ -215,26 +246,26 @@ namespace Root_Pine2.Module
                 Ungrip,
                 Grip
             }
-            public string RunMoveGripper(eGripper eGripper, bool bWait = true)
+            public string RunMoveGripper(eGripper eGripper, double fOffset, bool bWait = true)
             {
-                m_axis.StartMove(eGripper);
+                m_axis.StartMove(eGripper, fOffset);
                 return bWait ? m_axis.WaitReady() : "OK";
             }
 
             public string RunGripperReady(eGripper eGripper)
             {
                 m_dioGripper.Write(false);
-                return RunMoveGripper(eGripper, false);
+                return RunMoveGripper(eGripper, 0, false);
             }
 
             public string RunGripper()
             {
                 if (Run(RunGripper(false))) return m_sRun;
-                if (Run(RunMoveGripper(eGripper.Grip))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Grip, 5000))) return m_sRun;
                 if (Run(RunGripper(true))) return m_sRun;
-                if (Run(RunMoveGripper(eGripper.Ungrip))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Ungrip, 0))) return m_sRun;
                 if (Run(RunGripper(false))) return m_sRun;
-                if (Run(RunMoveGripper(eGripper.Ready))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Ready, 0))) return m_sRun;
                 return "OK";
             }
 
@@ -429,29 +460,26 @@ namespace Root_Pine2.Module
                 return m_pusher.WaitUnlock();
             }
             double xOffset = m_magazineEV.CalcXOffset(infoStrip);
-            if (Run(m_loaderPusher.RunMove(infoStrip.p_eMagazine, false))) return p_sInfo; 
+            if (Run(m_loaderPusher.RunMove(infoStrip.p_eMagazine, false))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, false))) return p_sInfo;
             if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, true))) return p_sInfo;
             m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
-            try
+            if (Run(m_gripper.RunGripperReady(Gripper.eGripper.Grip))) return p_sInfo;
+            if (Run(m_loaderPusher.RunPusher(infoStrip.p_eMagazine))) return p_sInfo;
+            if (m_gripper.IsPushed())
             {
-                if (Run(m_gripper.RunGripperReady(Gripper.eGripper.Grip))) return p_sInfo;
-                if (Run(m_loaderPusher.RunPusher(infoStrip.p_eMagazine))) return p_sInfo;
-                if (m_gripper.IsPushed())
-                {
-                    if (Run(m_gripper.RunGripper())) return p_sInfo;
-                    infoStrip = m_magazineEV.GetInfoStrip(false);
-                    if (m_gripper.IsGripped()) m_gripper.p_infoStrip = infoStrip;
-                    else return "Check Strip in Gripper";
-                }
-                else infoStrip.Dispose();
-                return m_pusher.WaitUnlock();
+                if (Run(m_gripper.RunGripper())) return p_sInfo;
+                infoStrip = m_magazineEV.GetInfoStrip(false);
+                if (m_gripper.IsGripped()) m_gripper.p_infoStrip = infoStrip;
+                else return "Check Strip in Gripper";
             }
-            finally
+            else
             {
-                m_gripper.RunGripperReady(Gripper.eGripper.Ready); 
+                m_magazineEV.GetInfoStrip(false);
+                infoStrip.Dispose();
             }
+            return m_pusher.WaitUnlock();
         }
         #endregion
 
@@ -489,21 +517,12 @@ namespace Root_Pine2.Module
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, true, true))) return p_sInfo;
             m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
             if (Run(m_pusher.RunPusher())) return p_sInfo;
-            if (m_pusher.IsExist()) return "Strip Exist in Pusher after Push"; 
-            ((Pine2_Handler)m_engineer.ClassHandler()).SendSortInfo(infoStrip); 
+            if (m_pusher.IsExist()) return "Strip Exist in Pusher after Push";
+            ((Pine2_Handler)m_engineer.ClassHandler()).SendSortInfo(infoStrip);
             m_magazineEV.PutInfoStrip(infoStrip);
             m_pusher.p_infoStrip = null;
             if (Run(m_gripper.WaitUnlock())) return p_sInfo; 
             m_engineer.ClassHandler().CheckFinish();
-            return "OK"; 
-        }
-        #endregion
-
-        #region Pusher Safe
-        public string IsPusherOff()
-        {
-            if (m_loaderPusher.IsPusherOff() == false) return "Check Loader Pusher";
-            if (m_pusher.m_dioPusher.m_aBitDI[0].p_bOn == false) return "Check Transfer Pusher";
             return "OK"; 
         }
         #endregion
@@ -518,6 +537,7 @@ namespace Root_Pine2.Module
                     m_loaderPusher.RunMoveReady(); 
                     break;
                 case Pine2.eRunMode.Magazine:
+                    if (m_pusher.p_bLock || m_gripper.p_bLock) return "OK";
                     if (m_pusher.p_infoStrip != null) return StartUnload();
                     if (m_gripper.p_infoStrip == null) return StartLoad();
                     return StartWaitLoader();
@@ -534,6 +554,8 @@ namespace Root_Pine2.Module
             }
             if (m_gripper.IsExist() || m_pusher.IsExist())
             {
+                m_alidGripper.p_bSet = m_gripper.IsExist();
+                m_alidPusher.p_bSet = m_pusher.IsExist(); 
                 p_eState = eState.Init;
                 return "Check Strip Sensor";
             }
@@ -568,7 +590,8 @@ namespace Root_Pine2.Module
         {
             m_pine2 = pine2;
             m_magazineEV = magazineEV;
-            m_buffer = new Buffer(this); 
+            m_buffer = new Buffer(this);
+            m_loaderPusher = new LoaderPusher(magazineEV);
             InitBase(id, engineer); 
         }
 

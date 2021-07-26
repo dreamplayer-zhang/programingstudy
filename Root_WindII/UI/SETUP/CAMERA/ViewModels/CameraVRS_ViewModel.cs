@@ -61,7 +61,7 @@ namespace Root_WindII
             this.visionModule = GlobalObjects.Instance.Get<WindII_Engineer>().m_handler.p_VisionFront;
             motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
 
-            if (visionModule.p_CamVRS.IsConnected() == true)
+            if (visionModule.p_CamVRS != null &&visionModule.p_CamVRS.IsConnected() == true)
             {
                 this.ImageViewerVM.SetImageData(VisionModule.p_CamVRS.p_ImageViewer.p_ImageData);
                 this.visionModule.p_CamVRS.Grabed += this.ImageViewerVM.OnUpdateImage;

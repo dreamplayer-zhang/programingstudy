@@ -46,7 +46,7 @@
                     <RadioButton Style="{StaticResource CustomRadio}" Grid.Column="1" Content="Manual" Margin="3" IsChecked="{Binding p_isManual}"></RadioButton>
                 </Grid>
             </GroupBox>
-            <GroupBox Header="Manaul Align"
+            <GroupBox Header="Manual Align"
                       Grid.Row="2">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -244,7 +244,7 @@
                                    Grid.Column="1"
                                    Grid.Row="5"
                                    HorizontalAlignment="Center" />
-                        <TextBlock Text="FirstDieUp"
+                        <TextBlock Text="FirstDieTop"
                                    Grid.Column="1"
                                    Grid.Row="6"
                                    HorizontalAlignment="Center" />
@@ -252,7 +252,7 @@
                                    Grid.Column="1"
                                    Grid.Row="7"
                                    HorizontalAlignment="Center" />
-                        <TextBlock Text="LastDieUp"
+                        <TextBlock Text="LastDieTop"
                                    Grid.Column="1"
                                    Grid.Row="8"
                                    HorizontalAlignment="Center" />
@@ -346,7 +346,7 @@
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="4"
-                                 x:Name="tb_f" Text="{Binding p_firstDieUp}"
+                                 x:Name="tb_f" Text="{Binding p_firstDieTop}"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="6"
                                  Margin="3,0"
@@ -358,7 +358,7 @@
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="4"
-                                 x:Name="tb_h" Text="{Binding p_lastDieUp}"
+                                 x:Name="tb_h" Text="{Binding p_lastDieTop}"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="8"
                                  Margin="3,0"

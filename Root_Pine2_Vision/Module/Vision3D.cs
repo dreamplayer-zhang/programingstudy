@@ -965,10 +965,19 @@ namespace Root_Pine2_Vision.Module
         #region override
         public override void Reset()
         {
-            m_aWorks[eWorks.A].Reset();
-            m_aWorks[eWorks.B].Reset();
-            foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true;
-            base.Reset();
+            if (p_eRemote == eRemote.Client)
+            {
+                foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true;
+                m_aWorks[eWorks.A].Reset();
+                m_aWorks[eWorks.B].Reset();
+                base.Reset();
+                RemoteRun(eRemoteRun.Reset, eRemote.Client, 0);
+            }
+            else
+            {
+                m_aWorks[eWorks.A].SendReset();
+                m_aWorks[eWorks.B].SendReset();
+            }
         }
         #endregion
 
@@ -1078,6 +1087,7 @@ namespace Root_Pine2_Vision.Module
         public enum eRemoteRun
         {
             StateHome,
+            Reset,
             RunLight,
             RunLightOff,
             SendSnapInfo,
@@ -1093,6 +1103,7 @@ namespace Root_Pine2_Vision.Module
             switch (eRemoteRun)
             {
                 case eRemoteRun.StateHome: break;
+                case eRemoteRun.Reset: break;
                 case eRemoteRun.RunLight: run.m_lightPower = value; break;
                 case eRemoteRun.SendSnapInfo: run.m_snapInfo = value; break;
                 case eRemoteRun.SendLotInfo: run.m_lotInfo = value; break;
@@ -1127,7 +1138,7 @@ namespace Root_Pine2_Vision.Module
             public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
             public LightPower m_lightPower;
             public eWorks m_eWorks = eWorks.A;
-            public SnapInfo m_snapInfo = new SnapInfo(eWorks.A, 0, "", 0);
+            public SnapInfo m_snapInfo = new SnapInfo(eWorks.A, 0, "", 0, true);
             public LotInfo m_lotInfo = new LotInfo(0, "", "", false, false, 0, 0);
             public SortInfo m_sortInfo = new SortInfo(eWorks.A, "", "");
             public override ModuleRunBase Clone()
@@ -1161,6 +1172,7 @@ namespace Root_Pine2_Vision.Module
                 switch (m_eRemoteRun)
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
+                    case eRemoteRun.Reset: m_module.Reset(); return "OK";
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
                     case eRemoteRun.RunLightOff: m_module.RunLightOff(); break;
                     case eRemoteRun.SendSnapInfo: return m_module.SendSnapInfo(m_snapInfo);
@@ -1281,7 +1293,7 @@ namespace Root_Pine2_Vision.Module
                     m_module.m_aWorks[m_eWorks].SendRecipe(m_sRecipe);                  // 2. VisionWorks2 Recipe Open 
                     int nSnapCount = m_module.m_RunningRecipe[m_eWorks].p_lSnap;               // 총 Snap 횟수
                     int nSnapMode = (int)m_module.m_RunningRecipe[m_eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
-                    SnapInfo snapInfo = new SnapInfo(m_eWorks, nSnapMode, "0000", nSnapCount);
+                    SnapInfo snapInfo = new SnapInfo(m_eWorks, nSnapMode, "0000", nSnapCount, false);
                     m_module.SendSnapInfo(snapInfo);
                 }
                 return m_module.ReqSnap(m_sRecipe, m_eWorks);

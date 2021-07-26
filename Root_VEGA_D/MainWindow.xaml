@@ -831,11 +831,10 @@
                                                             <RowDefinition/>
                                                         </Grid.RowDefinitions>
                                                         <Border Background="Black" Margin="3">
-                                                            <!--<TextBlock Foreground="White">Key 1</TextBlock>-->
-                                                            <Image x:Name="imageAlignKey" Source="{Binding p_bitmapAlignKeySrc}"/>
+                                                            <Image x:Name="imageLeftTopAlignKey" Source="{Binding p_bmpLeftTopAlignKeySrc}"/>
                                                         </Border>
                                                         <Border Background="Black" Grid.Row="1" Margin="3">
-                                                            <TextBlock Foreground="White">Key 1</TextBlock>
+                                                            <Image x:Name="imageLeftBottomAlignKey" Source="{Binding p_bmpLeftBottomAlignKeySrc}"/>
                                                         </Border>
                                                         <Border Background="Black" Grid.Row="2" Margin="3">
                                                             <TextBlock Foreground="White">Key 1</TextBlock>

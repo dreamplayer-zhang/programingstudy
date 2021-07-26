@@ -1,4 +1,5 @@
 ﻿using Root_VEGA_D_IPU.Engineer;
+using RootTools_Vision;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -10,6 +11,8 @@ namespace Root_VEGA_D_IPU
     /// </summary>
     public partial class MainWindow : Window
     {
+        MainWindow_ViewModel m_mainWindow_ViewModel;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -30,8 +33,24 @@ namespace Root_VEGA_D_IPU
         VEGA_D_IPU_Engineer m_engineer = new VEGA_D_IPU_Engineer();
         void Init()
         {
+            RegisterGlobalObjects();
+
+            m_mainWindow_ViewModel = new MainWindow_ViewModel(this);
+            this.DataContext = m_mainWindow_ViewModel;
+
             m_engineer.Init("VEGA_D_IPU");
             engineerUI.Init(m_engineer);
+        }
+
+        void RegisterGlobalObjects()
+        {
+            GlobalObjects.Instance.RegisterNamed<string>("RecipeFile", "");
+
+            GlobalObjects.Instance.RegisterNamed<bool>("PerformInspection", true);
+            GlobalObjects.Instance.RegisterNamed<bool>("D2DInspection", true);
+            GlobalObjects.Instance.RegisterNamed<bool>("SurfaceInspection", true);
+            GlobalObjects.Instance.RegisterNamed<bool>("CustomOption1", true);
+            GlobalObjects.Instance.RegisterNamed<bool>("CustomOption2", true);
         }
 
         void ThreadStop()
@@ -39,6 +58,5 @@ namespace Root_VEGA_D_IPU
             m_engineer.ThreadStop();
         }
         #endregion
-
     }
 }

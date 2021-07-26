@@ -18,7 +18,9 @@ namespace Root_EFEM.Module
         #region ToolBox
         Axis m_axisRotate;
         AxisXY m_axisCamAlign;
-        Axis m_axisCamOCR;
+        Axis m_axisCamOCRX;
+        Axis m_axisCamOCRTopZ;
+        Axis m_axisCamOCRBotZ;
         DIO_IO m_dioVac;
         DIO_O m_doBlow;
         DIO_O m_doLightCoaxial;
@@ -41,7 +43,9 @@ namespace Root_EFEM.Module
             m_flipper.GetTools(m_toolBox, this, bInit);
             p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "AxisRotate");
             p_sInfo = m_toolBox.GetAxis(ref m_axisCamAlign, this, "AxisCamera");
-            p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCR, this, "AxisOCR");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCRX, this, "AxisOCRX");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCRTopZ, this, "AxisOCRTopZ");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCRBotZ, this, "AxisOCRBotZ");
             p_sInfo = m_toolBox.GetDIO(ref m_dioVac, this, "Vacuum");
             p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Blow");
             p_sInfo = m_toolBox.GetDIO(ref m_doLightCoaxial, this, "LightCoaxial");
@@ -61,7 +65,10 @@ namespace Root_EFEM.Module
         {
             InitMemory();
             InitPosAlign();
-            InitPosOCR();
+            InitPosAlignRotate();
+            InitPosOCRX();
+            InitPosOCRTopZ();
+            InitPosOCRBotZ();
         }
         #endregion
 
@@ -123,11 +130,11 @@ namespace Root_EFEM.Module
             #endregion
 
             #region AxisX
-            public double m_xOffset = 15000; // Forward + m_xOffset = 1620000
+            public double m_xOffset = 20000; // Forward + m_xOffset = 2170000
             public enum ePosX
             {
-                Backward, // 0
-                Forward // 1605000
+                Backward, // -115000
+                Forward // 2150000
             }
             void InitPosX()
             {
@@ -144,14 +151,14 @@ namespace Root_EFEM.Module
             #region AxisZ
             public enum ePosZ
             {
-                PutReady, // -180636
-                PutDown, //-126000
-                GetReady, // 0
+                PutReady, // -300000
+                PutDown, //-106400
+                GetReady, // 35000
                 GetUp, // -126992
-                InversePutReady, // -180636
-                InversePutDown, // -165636
-                InverseGetReady, //-262386
-                InverseGetDown // -155636
+                InversePutReady, // -300000
+                InversePutDown, // -155000
+                InverseGetReady, //-300000
+                InverseGetDown // -142500
             }
             void InitPosZ()
             {
@@ -168,8 +175,8 @@ namespace Root_EFEM.Module
             #region AxisRotate
             public enum ePosRotate
             {
-                UpSide, // 0 -230
-                DownSide // 100000 -230
+                UpSide, // 0
+                DownSide // 1800000
             }
             void InitPosRotate()
             {
@@ -204,11 +211,12 @@ namespace Root_EFEM.Module
         public string RunPut()
         {
             // Start Init
+            if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
             // End Init
 
@@ -229,10 +237,11 @@ namespace Root_EFEM.Module
         public string RunGet()
         {
             // Start Init
+            if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
             if (Run(m_flipper.RunGuide(false))) return p_sInfo;
             // End Init
@@ -247,17 +256,31 @@ namespace Root_EFEM.Module
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
             // End Get
 
+            // Test Code
+            /*if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo;
+            if (Run(RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(true))) return p_sInfo;
+            Thread.Sleep(10);
+            if (Run(m_flipper.RunGuide(false))) return p_sInfo; // JEONG
+            if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(true))) return p_sInfo; // JEONG
+            //if (Run(m_flipper.RunVacuum(true))) return p_sInfo; // JEONG : Vacuum ON 확인 위해서
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;*/
+
             return "OK";
         }
 
         public string RunInversePut()
         {
             // Start Init
+            if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.DownSide))) return p_sInfo;
             // End Init
 
@@ -278,10 +301,11 @@ namespace Root_EFEM.Module
         public string RunInverseGet()
         {
             // Start Init
+            if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.DownSide))) return p_sInfo;
             if (Run(m_flipper.RunGuide(false))) return p_sInfo;
             // End Init
@@ -429,12 +453,22 @@ namespace Root_EFEM.Module
         #region Camera Align
         public enum ePosAlign
         {
-            Ready,
-            Align
+            Ready, // Z: -175000, Y: -250000
+            Align // Z: 0 , Y: 0
         }
         void InitPosAlign()
         {
             m_axisCamAlign.AddPos(Enum.GetNames(typeof(ePosAlign)));
+        }
+
+        public enum ePosAlignRotate
+        {
+            Ready, // 0
+            Align // 360000
+        }
+        void InitPosAlignRotate()
+        {
+            m_axisRotate.AddPos(Enum.GetNames(typeof(ePosAlignRotate)));
         }
 
         double m_mmWaferSize = 300;
@@ -467,15 +501,40 @@ namespace Root_EFEM.Module
             Ready,
             OCR,
         }
-        void InitPosOCR()
+
+        void InitPosOCRX()
         {
-            m_axisCamOCR.AddPos(Enum.GetNames(typeof(ePosOCR)));
+            m_axisCamOCRX.AddPos(Enum.GetNames(typeof(ePosOCR)));
         }
 
-        public string AxisMoveOCR(ePosOCR pos, double mmOCR)
+        public string AxisMoveOCRX(ePosOCR pos, double mmOCR)
         {
             double dx = m_mmWaferSize - p_infoWafer.p_mmWaferSize + mmOCR;
-            m_axisCamOCR.StartMove(pos, dx);
+            m_axisCamOCRX.StartMove(pos, dx);
+            return "OK";
+        }
+
+        void InitPosOCRTopZ()
+        {
+            m_axisCamOCRTopZ.AddPos(Enum.GetNames(typeof(ePosOCR)));
+        }
+
+        public string AxisMoveOCRTopZ(ePosOCR pos, double mmOCR)
+        {
+            double dx = m_mmWaferSize - p_infoWafer.p_mmWaferSize + mmOCR;
+            m_axisCamOCRTopZ.StartMove(pos, dx);
+            return "OK";
+        }
+
+        void InitPosOCRBotZ()
+        {
+            m_axisCamOCRBotZ.AddPos(Enum.GetNames(typeof(ePosOCR)));
+        }
+
+        public string AxisMoveOCRBotZ(ePosOCR pos, double mmOCR)
+        {
+            double dx = m_mmWaferSize - p_infoWafer.p_mmWaferSize + mmOCR;
+            m_axisCamOCRBotZ.StartMove(pos, dx);
             return "OK";
         }
         #endregion
@@ -696,20 +755,24 @@ namespace Root_EFEM.Module
         double m_secGrab = 5;
         public string AlignGrab(Aligner_ATI_AOI.Data data)
         {
+            StopWatch stopWatch = new StopWatch();
             m_aoi.m_data = data;
             m_aoiMax = null;
-            StopWatch stopWatch = new StopWatch();
+
+            RunVacuum(true);
+            p_bLightCoaxial = true;
+            p_bLightSide = false;
+
             double vGrabPulse = m_lRotate / m_secGrab;
             double pulseAcc = vGrabPulse * (m_secGrabAcc + 0.1) / 2;
             SetRotatePosition(-pulseAcc);
-            m_doLightSide.Write(true);
-            m_doLightCoaxial.Write(false);
             if (Run(AxisMoveAlign(ePosAlign.Align, true))) return p_sInfo;
             m_camAlign.SetMemoryData(m_memoryGrab);
-            m_axisRotate.StartMove(m_lRotate + pulseAcc, vGrabPulse, m_secGrabAcc, m_secGrabAcc);
+
             double posTrigger = 0;
             double dpTrigger = m_lRotate / c_lGrab;
             double dpMax = dpTrigger / 4;
+            m_axisRotate.StartMove(m_lRotate + pulseAcc, vGrabPulse, m_secGrabAcc, m_secGrabAcc);
             for (int n = 0; n < c_lGrab;)
             {
                 double dp = m_axisRotate.p_posCommand - posTrigger;
@@ -725,7 +788,9 @@ namespace Root_EFEM.Module
                 else Thread.Sleep(1);
             }
             m_log.Info("Align Grab Done " + (stopWatch.ElapsedMilliseconds / 1000.0).ToString(".0") + " sec");
-            return m_axisRotate.WaitReady();
+            if (Run(m_axisRotate.WaitReady())) return p_sInfo;
+            p_bLightCoaxial = false;
+            return "OK";
         }
 
         Aligner_ATI_AOI.AOI m_aoiMax = null;
@@ -752,6 +817,7 @@ namespace Root_EFEM.Module
             return "OK";
         }
 
+        public double m_posAlign = 0; 
         public string RunAlignExact(double degAccuracy)
         {
             if (m_aoiMax == null) return "Need Find Notch";
@@ -765,6 +831,11 @@ namespace Root_EFEM.Module
                 m_camAlign.GrabOne(n);
                 m_aoi.Inspect(m_aExactAOI[n]);
                 m_aoiMax = m_aExactAOI[n];
+                if ((m_aoiMax.m_maxNotch != null) && (Math.Abs(m_aoiMax.m_maxNotch.m_degNotch) < degAccuracy))
+                {
+                    m_posAlign = m_aoiMax.m_posGrab; 
+                    return "OK";
+                }
             }
             return "Can't Find Notch"; //forget
         }
@@ -781,11 +852,19 @@ namespace Root_EFEM.Module
         public string RunOCR(double dTheta, double dR)
         {
             m_doLightCoaxial.Write(true);
-            AxisMoveOCR(ePosOCR.OCR, dR);
+            AxisMoveOCRX(ePosOCR.OCR, dR);
+            AxisMoveOCRTopZ(ePosOCR.OCR, dR);
+            AxisMoveOCRBotZ(ePosOCR.OCR, dR);
             if (Run(Rotate(dTheta))) return p_sInfo;
-            if (Run(m_axisCamOCR.WaitReady())) return p_sInfo;
+            if (Run(m_axisCamOCRX.WaitReady())) return p_sInfo;
+            if (Run(m_axisCamOCRTopZ.WaitReady())) return p_sInfo;
+            if (Run(m_axisCamOCRBotZ.WaitReady())) return p_sInfo;
             if (Run(m_camOCR.SendReadOCR())) return p_sInfo;
-            return AxisMoveOCR(ePosOCR.Ready, 0);
+            AxisMoveOCRX(ePosOCR.Ready, 0);
+            AxisMoveOCRTopZ(ePosOCR.Ready, 0);
+            AxisMoveOCRBotZ(ePosOCR.Ready, 0);
+
+            return "OK";
         }
         #endregion
 
@@ -991,30 +1070,13 @@ namespace Root_EFEM.Module
                 m_degAccuracy = tree.Set(m_degAccuracy, m_degAccuracy, "Accuacy", "Degree of Align Accuracy", bVisible);
                 m_inspect.m_aoiData.RunTree(tree.GetTree("Inspect", true, bVisible), bVisible, bRecipe);
             }
-            public override string Run() //forget
+
+            public override string Run()
             {
                 if (EQ.p_bSimulate) return "OK";
-                m_module.RunVacuum(true);
-                m_module.p_bLightCoaxial = true;
-
-                if (m_module.Run(m_module.m_axisCamAlign.StartMove(ePosAlign.Align))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlign.Ready))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisCamAlign.WaitReady())) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
-
-                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlign.Align))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
-
-                if (m_module.Run(m_module.m_axisCamAlign.StartMove(ePosAlign.Ready))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlign.Ready))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisCamAlign.WaitReady())) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
-
-                m_module.RunVacuum(false);
-                m_module.p_bLightCoaxial = false;
-                //if (m_module.Run(m_module.AlignGrab(m_inspect.m_aoiParam))) return p_sInfo;
-                //if (m_module.Run(m_module.FindMaxNotch())) return p_sInfo;
-                //if (m_module.Run(m_module.RunAlignExact(m_degAccuracy))) return p_sInfo; 
+                if (m_module.Run(m_module.AlignGrab(m_inspect.m_aoiData))) return p_sInfo;
+                if (m_module.Run(m_module.FindMaxNotch())) return p_sInfo;
+                if (m_module.Run(m_module.RunAlignExact(m_degAccuracy))) return p_sInfo; 
                 return "OK";
             }
         }

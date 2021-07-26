@@ -92,7 +92,7 @@ namespace Root_Pine2_Vision.Module
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapDone, m_sRecipe, iSnap);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply(m_secTimeout);
+            return WaitReply(m_secTimeout);
         }
 
         public string SendSnapInfo(SnapInfo snapInfo)
@@ -100,7 +100,7 @@ namespace Root_Pine2_Vision.Module
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapInfo, snapInfo);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply(m_secTimeout);
+            return WaitReply(m_secTimeout);
         }
 
         public string SendLotInfo(LotInfo lotInfo)
@@ -108,7 +108,7 @@ namespace Root_Pine2_Vision.Module
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.LotInfo, lotInfo);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply(m_secTimeout);
+            return WaitReply(m_secTimeout);
         }
 
         public string SendSortInfo(SortInfo sortInfo)
@@ -116,9 +116,35 @@ namespace Root_Pine2_Vision.Module
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.SortingData, sortInfo);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply(m_secTimeout);
+            return WaitReply(m_secTimeout);
         }
 
+        public string SendReset()
+        {
+            if (m_bStartProcess == false) return "OK";
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.Reset);
+            m_qProtocol.Enqueue(protocol);
+            return WaitReply(m_secTimeout);
+        }
+
+        bool m_bWait = true;
+        string WaitReply(int secTimeout)
+        {
+            int msTimeout = 1000 * secTimeout;
+            StopWatch sw = new StopWatch();
+            try
+            {
+                while (m_bWait)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                    if (sw.ElapsedMilliseconds > msTimeout) return "Protocol Recieve Timeout";
+                }
+            }
+            finally { m_protocolSend = null; }
+            return "OK";
+        }
+        
         void ThreadSend()
         {
             if (m_protocolSend != null) return;
@@ -138,6 +164,7 @@ namespace Root_Pine2_Vision.Module
             if (m_protocolSend == null) return;
             m_protocolSend.ReceiveData(sSend);
             m_protocolSend = null;
+            m_bWait = false;
         }
 
         void Reply(string sSend)
@@ -238,8 +265,6 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-
-
         public void Reset()
         {
             m_protocolSend = null;
@@ -252,7 +277,7 @@ namespace Root_Pine2_Vision.Module
             {
                 m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "VisionWorks Process ID");
                 m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, "exe", "File", "VisionWorks File Name");
-                m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process");
+                m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start VisionWorks Process");
             }
         }
 

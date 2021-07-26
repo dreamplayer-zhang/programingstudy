@@ -304,7 +304,7 @@ namespace Root_WindII
 
         private void UpdateProductInfo(string path)
         {
-            XMLData data = new XMLData();
+            XMLData data = GlobalObjects.Instance.Get<XMLData>();
 
             if (path.ToLower().Contains(".xml"))
             {

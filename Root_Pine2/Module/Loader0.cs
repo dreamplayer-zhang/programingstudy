@@ -61,12 +61,14 @@ namespace Root_Pine2.Module
             m_axis.AddPos(c_sPosLoadEV);
             m_axis.AddPos(c_sPosPaper);
             m_axis.AddPos(c_sPosKeyence);
-            m_axis.AddPos(Enum.GetNames(typeof(ePosTransfer)));
+            m_axis.AddPos(ePosTransfer.Transfer0.ToString());
+            m_axis.AddPos(ePosTransfer.Transfer7.ToString());
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, eWorks.B));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, eWorks.B));
-            m_axis.AddPos(Enum.GetNames(typeof(ePosTray)));
+            m_axis.AddPos(ePosTray.Tray0.ToString());
+            m_axis.AddPos(ePosTray.Tray7.ToString());
             m_axis.p_axisZ.AddPos(c_sPosUp);
         }
         string GetPosString(eUnloadVision eVision, eWorks eWorks)
@@ -157,15 +159,25 @@ namespace Root_Pine2.Module
         public string RunAvoidX(double fPos)
         {
             m_axis.p_axisX.StartMove(fPos);
-            return m_axis.p_axisX.WaitReady();
+            m_axis.p_axisY.StartMove((p_infoStrip == null) ? ePosTransfer.Transfer7.ToString() : GetPosString(eUnloadVision.Top2D, eWorks.A)); 
+            return m_axis.WaitReady();
         }
         #endregion
 
         #region AxisXY
+        double GetXOffset(InfoStrip.eMagazine ePos)
+        {
+            double xScale = m_transfer.m_buffer.GetXScale(ePos);
+            double p0 = m_axis.p_axisX.GetPosValue(ePosTransfer.Transfer0.ToString()); 
+            double p7 = m_axis.p_axisX.GetPosValue(ePosTransfer.Transfer7.ToString());
+            return xScale * (p7 - p0); 
+        }
+
         public string RunMoveTransfer(ePosTransfer ePos, double xOffset, bool bWait = true)
         {
-            if (Run(StartMoveX(ePos.ToString(), xOffset))) return p_sInfo; 
-            m_axis.p_axisY.StartMove(ePos);
+            xOffset += GetXOffset((InfoStrip.eMagazine)ePos);
+            if (Run(StartMoveX(ePosTransfer.Transfer0.ToString(), xOffset))) return p_sInfo; 
+            m_axis.p_axisY.StartMove(ePosTransfer.Transfer0);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -179,8 +191,9 @@ namespace Root_Pine2.Module
 
         public string RunMoveTray(ePosTray eTray, bool bWait = true)
         {
-            if (Run(StartMoveX(eTray.ToString(), 0))) return p_sInfo;
-            m_axis.p_axisY.StartMove(eTray.ToString());
+            double xOffset = GetXOffset((InfoStrip.eMagazine)eTray);
+            if (Run(StartMoveX(ePosTray.Tray0.ToString(), xOffset))) return p_sInfo;
+            m_axis.p_axisY.StartMove(ePosTray.Tray0);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -189,6 +202,9 @@ namespace Root_Pine2.Module
         {
             double dPos = m_pulsemm * (m_pine2.m_widthDefaultStrip - m_pine2.p_widthStrip);
             if (Run(StartMoveX(c_sPosLoadEV, dPos))) return p_sInfo;
+            double xDst = m_axis.p_axisX.m_posDst;
+            double yDst = m_axis.p_axisY.GetPosValue(ePosTransfer.Transfer7);
+            while (Math.Abs(m_axis.p_axisX.p_posCommand - xDst) > Math.Abs(m_axis.p_axisY.p_posCommand - yDst)) Thread.Sleep(10); 
             m_axis.p_axisY.StartMove(c_sPosLoadEV);
             return bWait ? m_axis.WaitReady() : "OK"; 
         }
@@ -215,27 +231,32 @@ namespace Root_Pine2.Module
         #endregion
 
         #region AxisZ
+        double p_dZ
+        {
+            get { return m_pine2.m_thicknessDefault - m_pine2.p_thickness; }
+        }
+
         public string RunMoveZ(string sPos, double dPos, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(sPos, -dPos);
+            m_axis.p_axisZ.StartMove(sPos, dPos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveZ(ePosTransfer ePos, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(ePos);
+            m_axis.p_axisZ.StartMove(ePosTransfer.Transfer7, p_dZ);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveZ(eUnloadVision eVision, eWorks eWorks, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(GetPosString(eVision, eWorks));
+            m_axis.p_axisZ.StartMove(GetPosString(eVision, eWorks), p_dZ);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveZPaper(ePosTray eTray, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(eTray);
+            m_axis.p_axisZ.StartMove(ePosTray.Tray7);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -264,7 +285,7 @@ namespace Root_Pine2.Module
 
         string RunShakeUp(double dzPulse)
         {
-            m_axis.p_axisZ.StartShift(dzPulse);
+            m_axis.p_axisZ.StartShift(dzPulse, p_dZ);
             return m_axis.WaitReady(); 
         }
         #endregion
@@ -328,12 +349,13 @@ namespace Root_Pine2.Module
         {
             Transfer.Gripper gripper = m_transfer.m_gripper;
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
-            if (bCheckEnable && (gripper.p_bEnable == false)) return "Load from Transfer not Enable";
             try
             {
-                ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
-                double xOffset = m_transfer.m_buffer.m_xOffset; 
                 gripper.p_bLock = true;
+                if (bCheckEnable && (gripper.p_bEnable == false)) return "OK";
+                ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
+                double xOffset = m_transfer.m_buffer.m_xOffset;
+                m_transfer.m_buffer.RunAlign(true);
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveTransfer(ePos, -xOffset))) return p_sInfo;
                 if (Run(RunMoveZ(ePos))) return p_sInfo;
@@ -348,7 +370,7 @@ namespace Root_Pine2.Module
                 RunMoveUp();
                 gripper.p_bLock = false;
             }
-            return "OK"; 
+            return "OK";
         }
         #endregion
 
@@ -455,7 +477,8 @@ namespace Root_Pine2.Module
                 boat.RunVacuum(true);
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 if (Run(RunMoveUp(false))) return p_sInfo;
-                Thread.Sleep(200); 
+                Thread.Sleep(200);
+                boat.StartClean();
                 boat.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
                 boat.p_infoStrip.m_eWorks = eWorks;
@@ -481,11 +504,10 @@ namespace Root_Pine2.Module
 
         #region PickerSet
         double m_mmPickerSetUp = 10;
-        double m_secPickerSet = 7; 
         public string RunPickerSet()
         {
-            StopWatch sw = new StopWatch();
-            long msPickerSet = (long)(1000 * m_secPickerSet); 
+            double sec = 0;
+            double pulseUp = m_pulsemm * m_mmPickerSetUp; 
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo; 
@@ -495,26 +517,28 @@ namespace Root_Pine2.Module
                     case Pine2.eRunMode.Stack: if (Run(RunMoveLoadEV())) return p_sInfo; break;
                     case Pine2.eRunMode.Magazine: if (Run(RunMoveTransfer(ePosTransfer.Transfer7, 0))) return p_sInfo; break; 
                 }
+                if (Run(m_picker.RunVacuum(false))) return p_sInfo;
+                bool bUp = false; 
                 while (true)
                 {
-                    if (Run(RunMoveZ(sPick, 0))) return p_sInfo;
-                    if (Run(m_picker.RunVacuum(false))) return p_sInfo;
-                    double sec = 0;
+                    if (Run(RunMoveZ(sPick, bUp ? pulseUp : 0))) return p_sInfo;
+                    if (Run(m_picker.RunVacuum(bUp))) return p_sInfo;
                     if (Run(m_pine2.WaitPickerSet(ref sec))) return p_sInfo;
-                    if (Run(m_picker.RunVacuum(true))) return p_sInfo;
-                    if (Run(RunMoveZ(sPick, m_pulsemm * m_mmPickerSetUp))) return p_sInfo;
-                    Thread.Sleep(200);
-                    m_pine2.p_diPickerSet = false; 
-                    if (m_picker.IsVacuum())
+                    m_pine2.p_diPickerSet = false;
+                    if (sec > 1)
                     {
-                        sw.Start();
-                        while (sw.ElapsedMilliseconds < msPickerSet)
+                        RunMoveUp();
+                        switch (m_pine2.p_eMode)
                         {
-                            Thread.Sleep(10);
-                            if (EQ.IsStop()) return "EQ Stop";
-                            if (m_pine2.p_diPickerSet) return "OK";
+                            case Pine2.eRunMode.Stack: m_picker.p_infoStrip = m_loadEV.GetNewInfoStrip(); break;
+                            case Pine2.eRunMode.Magazine: 
+                                m_picker.p_infoStrip = m_transfer.m_gripper.p_infoStrip;
+                                m_transfer.m_gripper.p_infoStrip = null;
+                                break; 
                         }
+                        return "OK";
                     }
+                    bUp = !bUp; 
                 }
             }
             finally
@@ -526,7 +550,6 @@ namespace Root_Pine2.Module
         void RunTreePickerSet(Tree tree)
         {
             m_mmPickerSetUp = tree.Set(m_mmPickerSetUp, m_mmPickerSetUp, "Picker Up", "Picker Up (mm)");
-            m_secPickerSet = tree.Set(m_secPickerSet, m_secPickerSet, "Done", "PickerSet Done Time (sec)");
         }
         #endregion
 
@@ -551,7 +574,7 @@ namespace Root_Pine2.Module
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (m_pine2.p_eMode == Pine2.eRunMode.Magazine)
             {
-                double fPos = m_axis.p_axisY.GetPosValue(ePosTransfer.Transfer0) + 5000;
+                double fPos = m_axis.p_axisY.GetPosValue(ePosTransfer.Transfer7) + 5000;
                 if (m_axis.p_axisY.p_posCommand > fPos)
                 {
                     m_axis.p_axisY.StartMove(fPos);
@@ -578,6 +601,7 @@ namespace Root_Pine2.Module
         {
             m_picker.m_dioVacuum.Write(false);
             m_picker.p_infoStrip = null;
+            RunMoveUp(false); 
             base.Reset();
         }
 

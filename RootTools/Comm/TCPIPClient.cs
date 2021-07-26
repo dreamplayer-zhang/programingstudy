@@ -165,10 +165,14 @@ namespace RootTools.Comm
                 int nReadLength = socket.EndReceive(ar);
                 if (nReadLength > 0)
                 {
-                    m_commLog.Add(CommLog.eType.Receive, (nReadLength < 1024) ? Encoding.ASCII.GetString(m_aBufRead, 0, nReadLength) : "...");
+                    byte[] buf = new byte[m_aBufRead.Length];
+                    Array.Copy(m_aBufRead, buf, nReadLength);
+
+                    m_commLog.Add(CommLog.eType.Receive, (nReadLength < 1024) ? Encoding.ASCII.GetString(buf, 0, nReadLength) : "...");
+
+                    if (EventReciveData != null) EventReciveData(buf, nReadLength, socket);
 
                     socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
-                    if (EventReciveData != null) EventReciveData(m_aBufRead, nReadLength, socket);
                 }
                 else m_commLog.Add(CommLog.eType.Info, "CallBack_Receive Close");
             }

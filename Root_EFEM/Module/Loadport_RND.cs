@@ -9,6 +9,7 @@ using RootTools.OHTNew;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using static RootTools.Gem.XGem.XGem;
 
@@ -256,10 +257,18 @@ namespace Root_EFEM.Module
             if (!m_diDoorOpen.p_bIn)
                 return "Door Not Opened";
 
-            MarsLogManager marsLogManager = MarsLogManager.Instance;
-            marsLogManager.ChangeMaterial(EQ.p_nRunLP, wafer.m_nSlot + 1, wafer.p_sLotID, wafer.p_sCarrierID, wafer.p_sRecipe);
-            if(wafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer || wafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer)
-                MarsLogManager.Instance.WriteLEH(EQ.p_nRunLP, this.p_id, SSLNet.LEH_EVENTID.PROCESS_JOB_START, MarsLogManager.Instance.m_flowData, MarsLogManager.Instance.m_dataFormatter);
+            if (m_engineer.ClassGem() != null)
+            {
+
+                if (m_engineer.ClassGem().p_bOffline)
+                {
+                    MarsLogManager marsLogManager = MarsLogManager.Instance;
+                    marsLogManager.ChangeMaterialSlot(EQ.p_nRunLP, wafer.m_nSlot + 1);
+                }
+                if (wafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer || wafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer)
+                    MarsLogManager.Instance.WriteLEH(EQ.p_nRunLP, p_infoCarrier.p_sLocID, SSLNet.LEH_EVENTID.PROCESS_JOB_START, EQ.p_nRunLP == 0 ? MarsLogManager.Instance.m_flowDataA : MarsLogManager.Instance.m_flowDataB
+                        , EQ.p_nRunLP == 0 ? MarsLogManager.Instance.m_dataFormatterA : MarsLogManager.Instance.m_dataFormatterB);
+            }
             return IsRunOK();
         }
 
@@ -651,11 +660,11 @@ namespace Root_EFEM.Module
                 p_infoCarrier.m_bReqGem = false;
                 StartRun(m_runGem);
             }    
-            if (p_infoCarrier.m_bReqUnload && p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
-            {
-                p_infoCarrier.m_bReqUnload = false;
-                StartRun(m_runUndocking);
-            }
+            //if (p_infoCarrier.m_bReqUnload && p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+            //{
+            //    p_infoCarrier.m_bReqUnload = false;
+            //    StartRun(m_runUndocking);
+            //}
             return "OK";
         }
         #endregion
@@ -879,9 +888,9 @@ namespace Root_EFEM.Module
                     return p_sInfo + " SendCarrierID : " + m_infoCarrier.p_sCarrierID;
 
 
-                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "CarrierLoad", SSLNet.STATUS.START, type:SSLNet.MATERIAL_TYPE.FOUP);
 
-                while (m_infoCarrier.p_eStateCarrierID != GemCarrierBase.eGemState.VerificationOK)
+
+                while (!EQ.p_bRecovery && m_infoCarrier.p_eStateCarrierID != GemCarrierBase.eGemState.VerificationOK)
                 {
                     Thread.Sleep(10);
                     if (EQ.p_bStop) return p_sInfo + "EQ Stop";
@@ -891,6 +900,8 @@ namespace Root_EFEM.Module
                 if (m_infoCarrier.p_eTransfer != GemCarrierBase.eTransfer.TransferBlocked)
                     return p_sInfo + " infoCarrier.p_eTransfer = " + m_infoCarrier.p_eTransfer.ToString();
 
+
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_infoCarrier.p_sLocID, "CarrierLoad", SSLNet.STATUS.START, type: SSLNet.MATERIAL_TYPE.FOUP);
                 if (EQ.p_bSimulate)
                 {
                     InfoCarrier infoCarrier = m_infoCarrier;
@@ -929,7 +940,7 @@ namespace Root_EFEM.Module
                     m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
                 }
                 m_infoCarrier.SendSlotMap();
-                while (m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
+                while (!EQ.p_bRecovery && m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
                 {
                     Thread.Sleep(10);
                     if (EQ.p_bStop) return p_sInfo + "EQ Stop";
@@ -943,6 +954,8 @@ namespace Root_EFEM.Module
                     int firstIdx = -1;
                     int lastIdx = -1;
 
+                    if (rnrData == null)
+                        return "OK";
                     foreach (int sel in rnrData.SelectSlot)
                     {
                         m_infoCarrier.m_aGemSlot[sel].p_eState = GemSlotBase.eState.Select;
@@ -971,7 +984,7 @@ namespace Root_EFEM.Module
 
                     SSLNet.DataFormatter dataformatter = new SSLNet.DataFormatter();
                     dataformatter.AddData("MapID", m_infoCarrier.GetMapData());
-                    marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "CarrierLoad", SSLNet.STATUS.END, SSLNet.MATERIAL_TYPE.FOUP, dataformatter);
+                    marsLogManager.WriteFNC(EQ.p_nRunLP, m_infoCarrier.p_sLocID, "CarrierLoad", SSLNet.STATUS.END, SSLNet.MATERIAL_TYPE.FOUP, dataformatter);
                     dataformatter.ClearData();
                 }
                 return "OK";
@@ -1014,7 +1027,7 @@ namespace Root_EFEM.Module
                         return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 }
 
-                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "CarrierUnload", SSLNet.STATUS.START, type: SSLNet.MATERIAL_TYPE.FOUP);
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_infoCarrier.p_sLocID, "CarrierUnload", SSLNet.STATUS.START, type: SSLNet.MATERIAL_TYPE.FOUP);
 
                 if (bUseXGem && !m_gem.p_bOffline)
                 {
@@ -1040,10 +1053,15 @@ namespace Root_EFEM.Module
                     if (m_module.Run(m_module.CmdUnload()))
                         return p_sInfo;
                 }
+
+                SSLNet.FlowData flowData = MarsLogManager.Instance.m_flowDataA;
+                if(EQ.p_nRunLP == 1)
+                    flowData = MarsLogManager.Instance.m_flowDataB;
+
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                 m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
-                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "CarrierUnload", SSLNet.STATUS.END, SSLNet.MATERIAL_TYPE.FOUP);
-                marsLogManager.WriteLEH(EQ.p_nRunLP, m_module.p_id, SSLNet.LEH_EVENTID.CARRIER_UNLOAD, MarsLogManager.Instance.m_flowData);
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_infoCarrier.p_sLocID, "CarrierUnload", SSLNet.STATUS.END, SSLNet.MATERIAL_TYPE.FOUP);
+                marsLogManager.WriteLEH(EQ.p_nRunLP, m_infoCarrier.p_sLocID, SSLNet.LEH_EVENTID.CARRIER_UNLOAD, flowData);
                 //m_module.m_ceidUnDocking.Send();
                 return sResult;
             }
@@ -1102,16 +1120,33 @@ namespace Root_EFEM.Module
                     if (EQ.p_bStop) return p_sInfo + "EQ Stop";
                 }
 
+                if (this.m_moduleBase.p_id == "LoadportA") EQ.p_nRunLP = 0;
+                else if (this.m_moduleBase.p_id == "LoadportB") EQ.p_nRunLP = 1;
+
                 int firstIdx = -1;
                 int lastIdx = -1;
+
+                SSLNet.DataFormatter dataFormatter = MarsLogManager.Instance.m_dataFormatterA;
+                SSLNet.FlowData flowData = MarsLogManager.Instance.m_flowDataA;
+                if(EQ.p_nRunLP == 1)
+                {
+                    dataFormatter = MarsLogManager.Instance.m_dataFormatterB;
+                    flowData = MarsLogManager.Instance.m_flowDataB;
+                }
+
                 for (int i=0; i<m_infoCarrier.m_aGemSlot.Count; i++)
                 {
                     if (m_infoCarrier.m_aGemSlot[i].p_eState == GemSlotBase.eState.Select)
                     {
-                        if (firstIdx == -1)
-                            firstIdx = i;
-
+                        if (m_infoCarrier.m_aInfoWafer[i] == null)
+                            continue;
                         m_module.CopySlotInfo(m_infoCarrier.m_aInfoWafer[i], m_infoCarrier.m_aGemSlot[i]);
+                        if (firstIdx == -1)
+                        {
+                            firstIdx = i;
+                        }
+
+                        
                         m_infoCarrier.StartProcess(m_infoCarrier.m_aGemSlot[i].p_id);
                         lastIdx = i;
                     }
@@ -1124,10 +1159,13 @@ namespace Root_EFEM.Module
                     m_infoCarrier.m_aInfoWafer[lastIdx].p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
                 }
 
+                dataFormatter.ClearData();
+                dataFormatter.AddData("RecipeID", Path.GetFileNameWithoutExtension(m_infoCarrier.m_aInfoWafer[firstIdx].p_sRecipe));
+                if(m_module.m_engineer.ClassGem() == null || m_module.m_engineer.ClassGem().p_bOffline)
+                    MarsLogManager.Instance.WriteLEH(EQ.p_nRunLP, m_infoCarrier.p_sLocID, SSLNet.LEH_EVENTID.CARRIER_LOAD, flowData, dataFormatter);
                 EQ.p_nRnR = 1;
-                if (this.m_moduleBase.p_id == "LoadportA") EQ.p_nRunLP = 0;
-                else if (this.m_moduleBase.p_id == "LoadportB") EQ.p_nRunLP = 1;
                 m_module.m_engineer.ClassHandler().UpdateEvent();
+                EQ.p_eState = EQ.eState.Run;
                 return sResult;
             }
         }
