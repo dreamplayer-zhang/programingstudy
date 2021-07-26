@@ -36,7 +36,8 @@ namespace Root_Pine2_Vision.Module
                 {
                     m_tcpRequest.EventReciveData += M_tcpRequest_EventReceiveData;
                     m_rs232RGBW.p_bConnect = true;
-                    m_camera.Connect();
+                    if (m_camera != null)
+                        m_camera.Connect();
                 }
             }
             m_remote.GetTools(bInit);
@@ -1023,6 +1024,7 @@ namespace Root_Pine2_Vision.Module
             }
             else
             {
+                base.Reset();
                 m_aWorks[eWorks.A].SendReset();
                 m_aWorks[eWorks.B].SendReset();
             }

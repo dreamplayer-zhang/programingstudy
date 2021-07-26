@@ -77,7 +77,7 @@ namespace Root_Pine2_Vision.Module
 
         public string GetString()
         {
-            return m_nSnapMode.ToString() + "," + m_sStripID + "," + m_nLine.ToString() + m_bInsp.ToString();
+            return m_nSnapMode.ToString() + "," + m_sStripID + "," + m_nLine.ToString() + "," + m_bInsp.ToString();
         }
 
         public void RunTree(Tree tree, bool bVisible)
