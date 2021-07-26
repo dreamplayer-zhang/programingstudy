@@ -158,19 +158,19 @@
                                             <UniformGrid Columns="2"
                                                  Margin="0,5"
                                                  Grid.Row="1">
-                                                <TextBlock Text="Die Size"
+                                                <TextBlock Text="Die Size(um)"
                                                    HorizontalAlignment="Left" />
                                                 <TextBlock Text="17972, 50504"
                                                    HorizontalAlignment="Left" />
-                                                <TextBlock Text="Scribe Lane Size"
+                                                <TextBlock Text="Scribe Lane Size(um)"
                                                    HorizontalAlignment="Left" />
                                                 <TextBlock Text="280, 280"
                                                    HorizontalAlignment="Left" />
-                                                <TextBlock Text="Shot Size"
+                                                <TextBlock Text="Shot Size(um)"
                                                    HorizontalAlignment="Left" />
                                                 <TextBlock Text="127484, 101288"
                                                    HorizontalAlignment="Left" />
-                                                <TextBlock Text="Shot"
+                                                <TextBlock Text="Shot(um)"
                                                    HorizontalAlignment="Left" />
                                                 <TextBlock Text="64.18, 180.37"
                                                    HorizontalAlignment="Left" />
@@ -260,7 +260,7 @@
                                                    Grid.Column="1"
                                                    Grid.Row="5"
                                                    HorizontalAlignment="Left" />
-                                                <TextBlock Text="FirstDieUp"
+                                                <TextBlock Text="FirstDieTop"
                                                    Grid.Column="1"
                                                    Grid.Row="6"
                                                    HorizontalAlignment="Left" />
@@ -268,7 +268,7 @@
                                                    Grid.Column="1"
                                                    Grid.Row="7"
                                                    HorizontalAlignment="Left" />
-                                                <TextBlock Text="LastDieUp"
+                                                <TextBlock Text="LastDieTop"
                                                    Grid.Column="1"
                                                    Grid.Row="8"
                                                    HorizontalAlignment="Left" />
@@ -291,35 +291,43 @@
                                                 <TextBox Grid.Column="2"
                                                  Grid.Row="5"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
                                                 <TextBox Grid.Column="2"
                                                  Grid.Row="6"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
                                                 <TextBox Grid.Column="2"
                                                  Grid.Row="7"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
                                                 <TextBox Grid.Column="2"
                                                  Grid.Row="8"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
                                                 <TextBox Grid.Column="3"
                                                  Grid.Row="1"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
                                                 <TextBox Grid.Column="3"
                                                  Grid.Row="2"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
                                                 <TextBox Grid.Column="3"
                                                  Grid.Row="3"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
                                                 <TextBox Grid.Column="3"
                                                  Grid.Row="4"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
                                                 <TextBox Grid.Column="3"
                                                  Grid.Row="5"
                                                  Margin="3,0"
@@ -477,12 +485,12 @@
                                             </Grid.RowDefinitions>
                                             <Border Background="Black" Margin="3">
                                                 <TextBlock Foreground="White">
-                                                    <Image x:Name="imageAlignKey" Source="{Binding p_bitmapAlignKeySrc}" />
+                                                    <Image x:Name="imageLeftTopAlignKey" Source="{Binding p_bmpLeftTopAlignKeySrc}" />
                                                 </TextBlock>
                                             </Border>
                                             <Border Background="Black" Margin="3" Grid.Row="1">
                                                 <TextBlock Foreground="White">
-                                                    Align Key
+                                                    <Image x:Name="imageLeftBottomAlignKey" Source="{Binding p_bmpLeftBottomAlignKeySrc}" />
                                                 </TextBlock>
                                             </Border>
                                             <Border Background="Black" Margin="3" Grid.Row="2">
@@ -934,8 +942,9 @@
             <TabItem Header="Point">
                 <local:RecipeWizard_UI DataContext="{Binding p_recipeWizard_ViewModel}"/>
             </TabItem>
-            <TabItem Header="Align Key">
-                
+            <TabItem Header="Align Key">                
+            </TabItem>
+            <TabItem Header="Filtering">
             </TabItem>
         </TabControl>
     </Grid>

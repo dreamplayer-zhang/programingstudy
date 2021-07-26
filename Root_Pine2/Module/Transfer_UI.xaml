@@ -22,7 +22,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0" Margin="3" Background="Beige">
+                <Grid Grid.Column="0" x:Name="gridPusher" Margin="3" Background="Beige">
                     <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
                 </Grid>
                 <Grid Grid.Column="1" Margin="3" Background="Beige">
@@ -32,7 +32,7 @@
             <Grid Grid.Row="1" x:Name="gridInfo" Margin="3" Background="White" PreviewMouseLeftButtonDown="gridInfo_PreviewMouseLeftButtonDown">
                 <TextBlock x:Name="textBlockInfo" Text="{Binding p_sInfo}"/>
             </Grid>
-            <tree:TreeUI Grid.Row="2" x:Name="treeRootUI" IsEnabled="False"/>
+            <tree:TreeUI Grid.Row="2" x:Name="treeRootUI" IsEnabled="False" Margin="3,0,3,0"/>
         </Grid>
     </GroupBox>
 </UserControl>

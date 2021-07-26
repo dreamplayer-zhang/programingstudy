@@ -211,11 +211,15 @@ namespace Root_Pine2.Module
                 return true; 
             }
 
-            string MoveElevator(Enum ePos, double fOffset = 0)
+            public bool m_bPusherSafe = true; 
+            public string MoveElevator(Enum ePos, double fOffset = 0)
             {
                 if (IsProtrude()) return "Strip Protrude";
-                string sRun = m_handler.m_transfer.IsPusherOff(); 
-                if (sRun != "OK") return sRun;
+                while (m_bPusherSafe == false)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
                 if (m_bProduct[InfoStrip.eMagazinePos.Down])
                 {
                     double fPos = m_axis.GetPosValue(ePos) + fOffset;
@@ -444,10 +448,15 @@ namespace Root_Pine2.Module
                 return infoStrip; 
             }
 
+            public List<InfoStrip> m_aStripDone = new List<InfoStrip>();
             public int m_nStripCount = 0; 
             public void PutInfoStrip(InfoStrip infoStrip)
             {
-                if (infoStrip != null) m_nStripCount++; 
+                if (infoStrip != null)
+                {
+                    m_nStripCount++;
+                    m_aStripDone.Add(infoStrip); 
+                }
                 m_aStripRun.Remove(infoStrip);
                 m_magazineEV.CheckMagazineDone(); 
             }
@@ -649,6 +658,8 @@ namespace Root_Pine2.Module
                 m_conveyor.RunMoveStop();
                 if (Run(m_elevator.MoveToConveyor(eMagazinePos, (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 7 : 0))) return p_sInfo;
                 if (Run(m_elevator.RunAlign(true))) return p_sInfo;
+                if (Run(m_elevator.MoveElevator(eMagazinePos))) return p_sInfo; 
+                m_magazineSet.MagazineLoaded(p_eMagazine, eMagazinePos); 
             }
             finally
             {
@@ -682,11 +693,7 @@ namespace Root_Pine2.Module
                     if ((m_aMagazine[ePos] != null) || m_elevator.m_bProduct[ePos])
                     {
                         sRun = RunUnload(ePos);
-                        if (m_aMagazine[ePos] != null)
-                        {
-                            int nStrip = m_aMagazine[ePos].m_nStripCount; 
-                            m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos].p_iBundle, nStrip);
-                        }
+                        if (m_aMagazine[ePos] != null) m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos]);
                         m_aMagazine[ePos] = null;
                         if (Run(m_elevator.RunAlign(true))) return p_sInfo;
                         return sRun;
@@ -695,11 +702,7 @@ namespace Root_Pine2.Module
                     if ((m_aMagazine[ePos] != null) || m_elevator.m_bProduct[ePos])
                     {
                         sRun = RunUnload(ePos); 
-                        if (m_aMagazine[ePos] != null)
-                        {
-                            int nStrip = m_aMagazine[ePos].m_nStripCount; 
-                            m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos].p_iBundle, nStrip);
-                        }
+                        if (m_aMagazine[ePos] != null) m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos]);
                         m_aMagazine[ePos] = null;
                         return sRun;
                     }
@@ -741,6 +744,7 @@ namespace Root_Pine2.Module
                         if (Run(m_conveyor.WaitUnload(Conveyor.eCheck.Mid))) return p_sInfo;
                         Thread.Sleep(250);
                         m_conveyor.RunMoveStop();
+                        m_magazineSet.MagazineUnloaded(p_eMagazine, eMagazinePos);
                         break;
                     case Pine2.eRunMode.Stack:
                         if (Run(m_conveyor.WaitUnload(Conveyor.eCheck.Inside))) return p_sInfo;
@@ -809,7 +813,8 @@ namespace Root_Pine2.Module
 
         InfoStrip.eMagazine p_eMagazine { get; set; }
         Pine2 m_pine2;
-        public MagazineEV(InfoStrip.eMagazine eMagazine, IEngineer engineer, Pine2 pine2)
+        MagazineEVSet m_magazineSet; 
+        public MagazineEV(InfoStrip.eMagazine eMagazine, IEngineer engineer, Pine2 pine2, MagazineEVSet magazineSet)
         {
             m_conveyor = new Conveyor(this);
             m_elevator = new Elevator(m_conveyor, (Pine2_Handler)engineer.ClassHandler());
@@ -818,7 +823,8 @@ namespace Root_Pine2.Module
             string sID = eMagazine.ToString();
             p_id = sID.Substring(0, sID.Length - 1) + (char)(eMagazine + '0'); 
             m_nUnitLED = (int)eMagazine + 1; 
-            m_pine2 = pine2; 
+            m_pine2 = pine2;
+            m_magazineSet = magazineSet; 
             base.InitBase(p_id, engineer);
             InitThread(); 
         }

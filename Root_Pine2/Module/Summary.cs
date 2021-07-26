@@ -263,6 +263,7 @@ namespace Root_Pine2.Module
                 m_countStrip[eVision].Clear();
                 m_countUnit[eVision].Clear();
             }
+            m_bUpdated = true;
         }
         #endregion
 
@@ -289,29 +290,27 @@ namespace Root_Pine2.Module
             AddDateTime(dt);
             if (m_aTime.Count < 2) return;
             int nTime = m_aTime.Count - 1;
-            m_sTactTime = GetTactString((m_aTime[nTime] - m_aTime[nTime - 1]).Milliseconds); 
-            m_sTactAve = GetTactString((m_aTime[nTime] - m_aTime[0]).Milliseconds / nTime);
+            m_sTactTime = GetTactString((m_aTime[nTime] - m_aTime[nTime - 1]).TotalMilliseconds); 
+            m_sTactAve = GetTactString((m_aTime[nTime] - m_aTime[0]).TotalMilliseconds / nTime);
         }
 
         List<DateTime> m_aTime = new List<DateTime>();
         void AddDateTime(DateTime dt)
         {
             m_aTime.Add(dt);
-            while (m_aTime.Count > 6) m_aTime.RemoveAt(0); 
+            while (m_aTime.Count > 16) m_aTime.RemoveAt(0); 
         }
 
-        string GetTactString(int ms)
+        string GetTactString(double tms)
         {
-            int sec = ms / 1000;
-            ms %= 1000;
-            return sec.ToString() + "." + (ms / 10).ToString("00"); 
+            int ms = (int)Math.Round(tms); 
+            return (ms / 1000).ToString() + "." + ((ms % 1000) / 10).ToString("00"); 
         }
         #endregion
 
         public bool m_bUpdated = false; 
         public string SetSort(bool b3D, InfoStrip infoStrip)
         {
-            //return "OK";
             m_data = infoStrip.m_summary;
             m_data.m_sStripID = infoStrip.p_id;
             m_data.m_stripTotal.m_eResult = Data.Strip.eResult.Good; 
@@ -323,11 +322,13 @@ namespace Root_Pine2.Module
             {
                 m_countStrip[eVision].AddResult(m_data.m_aStrip[eVision].m_eResult);
             }
+            m_data.m_stripTotal.m_unit.CalcCount(); 
             foreach (eVision eVision in Enum.GetValues(typeof(eVision))) m_data.m_aStrip[eVision].m_unit.CalcCount();
             switch (m_data.m_stripTotal.m_eResult)
             {
                 case Data.Strip.eResult.Good:
                 case Data.Strip.eResult.Defect:
+                    m_countUnitTotal.AddResult(m_data.m_stripTotal.m_unit); 
                     foreach (eVision eVision in Enum.GetValues(typeof(eVision)))
                     {
                         m_countUnit[eVision].AddResult(m_data.m_aStrip[eVision].m_unit);

@@ -492,6 +492,9 @@ namespace Root_WindII
                 }
                 */
 
+                //RAC XMLData
+                XMLData xmlData = GlobalObjects.Instance.Register<XMLData>();
+
                 // DialogService
                 dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
                 dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();

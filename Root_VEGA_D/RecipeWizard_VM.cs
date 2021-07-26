@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Root_VEGA_D.Engineer;
 using Root_VEGA_D.Module;
+using Root_VEGA_D.Module.Recipe;
 using RootTools;
 using RootTools.Control;
 using RootTools.Memory;
@@ -167,141 +168,165 @@ namespace Root_VEGA_D
             }
         }
 
+        bool m_isManualChange = false;
         CPoint m_firstDieLeftPoint;
-        int m_firstDieLeft = 0;
+//         int m_firstDieLeft = 0;
         public int p_firstDieLeft
         {
             get
             {
-                return m_firstDieLeft;
+                return p_recipe.nFirstDieLeft;
             }
             set
             {
-                SetProperty(ref m_firstDieLeft, value);
+                int nCurVal = p_recipe.nFirstDieLeft;
+                SetProperty(ref nCurVal, value);
+                p_recipe.nFirstDieLeft = nCurVal;
+
                 SetManualPoint(value, ref m_firstDieLeftPoint, Coordinate.FIRSTDIELEFT);
             }
         }
 
-        bool m_isManualChange = false;
 
-        CPoint m_firstDieRightPoint;
-        int m_firstDieRight = 0;
+         CPoint m_firstDieRightPoint;
+//         int m_firstDieRight = 0;
         public int p_firstDieRight
         {
             get
             {
-                return m_firstDieRight;
+                return p_recipe.nFirstDieRight;
             }
             set
             {
-                SetProperty(ref m_firstDieRight, value);
+                int nCurVal = p_recipe.nFirstDieRight;
+                SetProperty(ref nCurVal, value);
+                p_recipe.nFirstDieRight = nCurVal;
+
                 SetManualPoint(value, ref m_firstDieRightPoint, Coordinate.FIRSTDIERIGHT);
             }
         }
 
-        CPoint m_secondDieLeftPoint;
-        int m_secondDieLeft = 0;
+         CPoint m_secondDieLeftPoint;
+//         int m_secondDieLeft = 0;
         public int p_secondDieLeft
         {
             get
             {
-                return m_secondDieLeft;
+                return p_recipe.nSecondDieLeft;
             }
             set
             {
-                SetProperty(ref m_secondDieLeft, value);
+                int nCurVal = p_recipe.nSecondDieLeft;
+                SetProperty(ref nCurVal, value);
+                p_recipe.nSecondDieLeft = nCurVal;
+
                 SetManualPoint(value, ref m_secondDieLeftPoint, Coordinate.SECONDDIELEFT);
             }
         }
 
-        CPoint m_lastDieRightPoint;
-        int m_lastDieRight = 0;
+         CPoint m_lastDieRightPoint;
+//         int m_lastDieRight = 0;
         public int p_lastDieRight
         {
             get
             {
-                return m_lastDieRight;
+                return p_recipe.nLastDieRight;
             }
             set
             {
-                SetProperty(ref m_lastDieRight, value);
+                int nCurVal = p_recipe.nLastDieRight;
+                SetProperty(ref nCurVal, value);
+                 p_recipe.nLastDieRight = nCurVal;
+
                 SetManualPoint(value, ref m_lastDieRightPoint, Coordinate.LASTDIERIGHT);
             }
         }
 
-        CPoint m_firstDieBottomPoint;
-        int m_firstDieBottom = 0;
+         CPoint m_firstDieBottomPoint;
+//         int m_firstDieBottom = 0;
         public int p_firstDieBottom
         {
             get
             {
-                return m_firstDieBottom;
+                return p_recipe.nFirstDieBottom;
             }
             set
             {
-                SetProperty(ref m_firstDieBottom, value);
+                int nCurVal = p_recipe.nFirstDieBottom;
+                SetProperty(ref nCurVal, value);
+                p_recipe.nFirstDieBottom = nCurVal;
+
                 SetManualPoint(value, ref m_firstDieBottomPoint, Coordinate.FIRSTDIEBOTTOM);
             }
         }
 
-        CPoint m_firstDieUpPoint;
-        int m_firstDieUp = 0;
-        public int p_firstDieUp
+         CPoint m_firstDieTopPoint;
+//         int m_firstDieUp = 0;
+        public int p_firstDieTop
         {
             get
             {
-                return m_firstDieUp;
+                return p_recipe.nFirstDieTop;
             }
             set
             {
-                SetProperty(ref m_firstDieUp, value);
-                SetManualPoint(value, ref m_firstDieUpPoint, Coordinate.FIRSTDIEUP);
+                int nCurVal = p_recipe.nFirstDieTop;
+                SetProperty(ref nCurVal, value);
+                p_recipe.nFirstDieTop = nCurVal;
+
+                SetManualPoint(value, ref m_firstDieTopPoint, Coordinate.FIRSTDIEUP);
             }
         }
 
-        CPoint m_secondDieBottomPoint;
-        int m_secondDieBottom = 0;
+         CPoint m_secondDieBottomPoint;
+//         int m_secondDieBottom = 0;
         public int p_secondDieBottom
         {
             get
             {
-                return m_secondDieBottom;
+                return p_recipe.nSecondDieBottom;
             }
             set
             {
-                SetProperty(ref m_secondDieBottom, value);
+                int nCurVal = p_recipe.nSecondDieBottom;
+                SetProperty(ref nCurVal, value);
+                p_recipe.nSecondDieBottom = nCurVal;
+
                 SetManualPoint(value, ref m_secondDieBottomPoint, Coordinate.SECONDDIEBOTTOM);
             }
         }
 
-        CPoint m_lastDieUpPoint;
-        int m_lastDieUp = 0;
-        public int p_lastDieUp
+         CPoint m_lastDieTopPoint;
+//        int m_lastDieUp = 0;
+        public int p_lastDieTop
         {
             get
             {
-                return m_lastDieUp;
+                return p_recipe.nLastDieTop;
             }
             set
             {
-                SetProperty(ref m_lastDieUp, value);
-                SetManualPoint(value, ref m_lastDieUpPoint, Coordinate.LASTDIEUP);
+                int nCurVal = p_recipe.nLastDieTop;
+                SetProperty(ref nCurVal, value);
+                p_recipe.nLastDieTop = nCurVal;
+
+                SetManualPoint(value, ref m_lastDieTopPoint, Coordinate.LASTDIEUP);
 
             }
         }
 
         void CalcSize()
         {
-            p_dieSize = new CPoint(p_firstDieRight - p_firstDieLeft, p_firstDieBottom - p_firstDieUp);
+            p_dieSize = new CPoint(p_firstDieRight - p_firstDieLeft, p_firstDieBottom - p_firstDieTop);
             p_strDieSize = p_dieSize.X + ", " + p_dieSize.Y;
 
-            p_scribeLaneSize = new CPoint(p_secondDieLeft - p_firstDieRight, p_firstDieUp - p_lastDieUp);
+            p_scribeLaneSize = new CPoint(p_secondDieLeft - p_firstDieRight, p_firstDieTop - p_lastDieTop);
             p_strScribeLaneSize = p_scribeLaneSize.X + ", " + p_scribeLaneSize.Y;
 
             p_shotSize = new CPoint(p_secondDieLeft - p_firstDieLeft, p_firstDieBottom - p_secondDieBottom);
             p_strShotSize = p_shotSize.X + ", " + p_shotSize.Y;
 
-            p_shot = new CPoint(p_lastDieRight - p_firstDieLeft, p_lastDieRight - p_lastDieUp);
+            p_shot = new CPoint(p_lastDieRight - p_firstDieLeft, p_lastDieRight - p_lastDieTop);
             p_strShot = p_shot.X + ", " + p_shot.Y;
         }
 
@@ -396,7 +421,7 @@ namespace Root_VEGA_D
                 SetProperty(ref m_strShot, value);
             }
         }
-
+        
         ImageData m_imgOtherPC;
         public ImageData p_imgOtherPC
         {
@@ -405,10 +430,21 @@ namespace Root_VEGA_D
         }
 
         Vision m_vision;
+        ADIRecipe m_recipe;
+        public ADIRecipe p_recipe
+        {
+            get => m_recipe;
+            set
+            {
+                SetProperty(ref m_recipe, value);
+            }
+        }
         #endregion
-        public RecipeWizard_VM()
+        public RecipeWizard_VM(ADIRecipe recipe)
         {
             m_vision = ((VEGA_D_Handler)App.m_engineer.ClassHandler()).m_vision;
+            m_recipe = recipe;
+
             Init();
         }
 
@@ -427,7 +463,7 @@ namespace Root_VEGA_D
                 init(p_imgOtherPC);
             }
         }
-
+        
         #region Function
         void CalcAngle()
         {
@@ -490,16 +526,16 @@ namespace Root_VEGA_D
                     p_firstDieBottom = p_coordinatePoint.Y;
                     break;
                 case Coordinate.FIRSTDIEUP:
-                    m_firstDieUpPoint = p_coordinatePoint;
-                    p_firstDieUp = p_coordinatePoint.Y;
+                    m_firstDieTopPoint = p_coordinatePoint;
+                    p_firstDieTop = p_coordinatePoint.Y;
                     break;
                 case Coordinate.SECONDDIEBOTTOM:
                     m_secondDieBottomPoint = p_coordinatePoint;
                     p_secondDieBottom = p_coordinatePoint.Y;
                     break;
                 case Coordinate.LASTDIEUP:
-                    m_lastDieUpPoint = p_coordinatePoint;
-                    p_lastDieUp = p_coordinatePoint.Y;
+                    m_lastDieTopPoint = p_coordinatePoint;
+                    p_lastDieTop = p_coordinatePoint.Y;
                     break;
             }
         }

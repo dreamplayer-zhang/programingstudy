@@ -68,15 +68,16 @@ namespace Root_Pine2_Vision.Module
         public int m_nSnapMode = 0;
         public string m_sStripID = "0000";
         public int m_nLine = 0;
+        public bool m_bInsp = true;
 
         public SnapInfo Clone()
         {
-            return new SnapInfo(m_eWorks, m_nSnapMode, m_sStripID, m_nLine);
+            return new SnapInfo(m_eWorks, m_nSnapMode, m_sStripID, m_nLine, m_bInsp);
         }
 
         public string GetString()
         {
-            return m_nSnapMode.ToString() + "," + m_sStripID + "," + m_nLine.ToString();
+            return m_nSnapMode.ToString() + "," + m_sStripID + "," + m_nLine.ToString() + "," + m_bInsp.ToString();
         }
 
         public void RunTree(Tree tree, bool bVisible)
@@ -85,14 +86,16 @@ namespace Root_Pine2_Vision.Module
             m_nSnapMode = tree.Set(m_nSnapMode, m_nSnapMode, "SnapMode", "Snap Mode (0 = RGB, 1 = APS, 3 = ALL)", bVisible);
             m_sStripID = tree.Set(m_sStripID, m_sStripID, "StripID", "Strip ID", bVisible);
             m_nLine = tree.Set(m_nLine, m_nLine, "SnapLine", "Snap Line Number", bVisible);
+            m_bInsp = tree.Set(m_bInsp, m_bInsp, "bInsp", "True : Do Inspection (VisionWorks2)", bVisible);
         }
 
-        public SnapInfo(eWorks eWorks, int nSnapMode, string sStripID, int nLine)
+        public SnapInfo(eWorks eWorks, int nSnapMode, string sStripID, int nLine, bool bInsp)
         {
             m_eWorks = eWorks;
             m_nSnapMode = nSnapMode;
             m_sStripID = sStripID;
             m_nLine = nLine;
+            m_bInsp = bInsp;
         }
     }
     

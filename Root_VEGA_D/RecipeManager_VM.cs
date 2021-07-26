@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_VEGA_D.Module.Recipe;
+using RootTools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,19 @@ namespace Root_VEGA_D
 {
     public class RecipeManager_VM : ObservableObject
     {
-        public RecipeManager_VM()
+        ADIRecipe m_recipe;
+        public ADIRecipe p_recipe
         {
+            get => m_recipe;
+            set
+            {
+                SetProperty(ref m_recipe, value);
+            }
+        }
+        public RecipeManager_VM(ADIRecipe recipe)
+        {
+            m_recipe = recipe;
+
             InitViewModel();
         }
 
@@ -83,19 +95,24 @@ namespace Root_VEGA_D
                 SetProperty(ref m_isCheckRecipeName, value);
             }
         }
-
-        BitmapSource m_bitmapAlignKeySrc;
-        public BitmapSource p_bitmapAlignKeySrc
+        BitmapSource m_bmpLeftTopAlignKeySrc;
+        public BitmapSource p_bmpLeftTopAlignKeySrc
         {
-            get => m_bitmapAlignKeySrc;
-            set => SetProperty(ref m_bitmapAlignKeySrc, value);
+            get => m_bmpLeftTopAlignKeySrc;
+            set => SetProperty(ref m_bmpLeftTopAlignKeySrc, value);
+        }
+        BitmapSource m_bmpLeftBottomAlignKeySrc;
+        public BitmapSource p_bmpLeftBottomAlignKeySrc
+        {
+            get => m_bmpLeftBottomAlignKeySrc;
+            set => SetProperty(ref m_bmpLeftBottomAlignKeySrc, value);
         }
         #endregion
 
         #region Function
         void InitViewModel()
         {
-            p_recipeWizard_ViewModel = new RecipeWizard_VM();
+            p_recipeWizard_ViewModel = new RecipeWizard_VM(m_recipe);
         }
 
         void SearchRecipe()
@@ -105,7 +122,7 @@ namespace Root_VEGA_D
 
         void NewRecipe()
         {
-
+            
         }
 
         void SaveRecipe()

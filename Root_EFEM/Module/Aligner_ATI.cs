@@ -755,20 +755,24 @@ namespace Root_EFEM.Module
         double m_secGrab = 5;
         public string AlignGrab(Aligner_ATI_AOI.Data data)
         {
+            StopWatch stopWatch = new StopWatch();
             m_aoi.m_data = data;
             m_aoiMax = null;
-            StopWatch stopWatch = new StopWatch();
+
+            RunVacuum(true);
+            p_bLightCoaxial = true;
+            p_bLightSide = false;
+
             double vGrabPulse = m_lRotate / m_secGrab;
             double pulseAcc = vGrabPulse * (m_secGrabAcc + 0.1) / 2;
             SetRotatePosition(-pulseAcc);
-            m_doLightSide.Write(true);
-            m_doLightCoaxial.Write(false);
             if (Run(AxisMoveAlign(ePosAlign.Align, true))) return p_sInfo;
             m_camAlign.SetMemoryData(m_memoryGrab);
-            m_axisRotate.StartMove(m_lRotate + pulseAcc, vGrabPulse, m_secGrabAcc, m_secGrabAcc);
+
             double posTrigger = 0;
             double dpTrigger = m_lRotate / c_lGrab;
             double dpMax = dpTrigger / 4;
+            m_axisRotate.StartMove(m_lRotate + pulseAcc, vGrabPulse, m_secGrabAcc, m_secGrabAcc);
             for (int n = 0; n < c_lGrab;)
             {
                 double dp = m_axisRotate.p_posCommand - posTrigger;
@@ -784,7 +788,9 @@ namespace Root_EFEM.Module
                 else Thread.Sleep(1);
             }
             m_log.Info("Align Grab Done " + (stopWatch.ElapsedMilliseconds / 1000.0).ToString(".0") + " sec");
-            return m_axisRotate.WaitReady();
+            if (Run(m_axisRotate.WaitReady())) return p_sInfo;
+            p_bLightCoaxial = false;
+            return "OK";
         }
 
         Aligner_ATI_AOI.AOI m_aoiMax = null;
@@ -811,6 +817,7 @@ namespace Root_EFEM.Module
             return "OK";
         }
 
+        public double m_posAlign = 0; 
         public string RunAlignExact(double degAccuracy)
         {
             if (m_aoiMax == null) return "Need Find Notch";
@@ -824,6 +831,11 @@ namespace Root_EFEM.Module
                 m_camAlign.GrabOne(n);
                 m_aoi.Inspect(m_aExactAOI[n]);
                 m_aoiMax = m_aExactAOI[n];
+                if ((m_aoiMax.m_maxNotch != null) && (Math.Abs(m_aoiMax.m_maxNotch.m_degNotch) < degAccuracy))
+                {
+                    m_posAlign = m_aoiMax.m_posGrab; 
+                    return "OK";
+                }
             }
             return "Can't Find Notch"; //forget
         }
@@ -1058,30 +1070,13 @@ namespace Root_EFEM.Module
                 m_degAccuracy = tree.Set(m_degAccuracy, m_degAccuracy, "Accuacy", "Degree of Align Accuracy", bVisible);
                 m_inspect.m_aoiData.RunTree(tree.GetTree("Inspect", true, bVisible), bVisible, bRecipe);
             }
-            public override string Run() //forget
+
+            public override string Run()
             {
                 if (EQ.p_bSimulate) return "OK";
-                m_module.RunVacuum(true);
-                m_module.p_bLightCoaxial = true;
-
-                if (m_module.Run(m_module.m_axisCamAlign.StartMove(ePosAlign.Align))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlignRotate.Ready))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisCamAlign.WaitReady())) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
-
-                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlignRotate.Align))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
-
-                if (m_module.Run(m_module.m_axisCamAlign.StartMove(ePosAlign.Ready))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlignRotate.Ready))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisCamAlign.WaitReady())) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
-
-                m_module.RunVacuum(false);
-                m_module.p_bLightCoaxial = false;
-                //if (m_module.Run(m_module.AlignGrab(m_inspect.m_aoiParam))) return p_sInfo;
-                //if (m_module.Run(m_module.FindMaxNotch())) return p_sInfo;
-                //if (m_module.Run(m_module.RunAlignExact(m_degAccuracy))) return p_sInfo; 
+                if (m_module.Run(m_module.AlignGrab(m_inspect.m_aoiData))) return p_sInfo;
+                if (m_module.Run(m_module.FindMaxNotch())) return p_sInfo;
+                if (m_module.Run(m_module.RunAlignExact(m_degAccuracy))) return p_sInfo; 
                 return "OK";
             }
         }
