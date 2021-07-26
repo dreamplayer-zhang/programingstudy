@@ -51,8 +51,10 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
-        public InfoTray()
+        public string p_id { get; set; }
+        public InfoTray(string id)
         {
+            p_id = id; 
             InitInspect(); 
         }
     }
