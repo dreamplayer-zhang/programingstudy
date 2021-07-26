@@ -10,13 +10,6 @@ namespace Root_Pine2.Module
         #region Data
         public class Data
         {
-            public enum eVision
-            {
-                Total,
-                Top3D,
-                Top2D,
-                Bottom,
-            }
             public class Strip
             {
                 public class Unit
@@ -70,11 +63,8 @@ namespace Root_Pine2.Module
 
                     public string SetSort(Unit unit)
                     {
-                        if (m_szMap.X == 0)
-                        {
-                            if (unit.m_szMap.X == 0) return "OK";
-                            m_szMap = new CPoint(unit.m_szMap);
-                        }
+                        if (unit.m_szMap.X == 0) return "OK";
+                        if (m_szMap.X == 0) m_szMap = new CPoint(unit.m_szMap);
                         if (m_szMap.X != unit.m_szMap.X) return "Map Size not Same";
                         if (m_szMap.Y != unit.m_szMap.Y) return "Map Size not Same";
                         InitMap();
@@ -152,18 +142,22 @@ namespace Root_Pine2.Module
                 {
                     m_eVision = eVision; 
                 }
+
+                public Strip()
+                {
+                }
             }
 
-            public void SetResult(Vision2D.eVision vision, InfoStrip.eResult result, CPoint szMap, string sMapResult)
+            public void SetResult(eVision vision, InfoStrip.eResult result, CPoint szMap, string sMapResult)
             {
                 eVision eVision = eVision.Top3D; 
                 switch (vision)
                 {
-                    case Vision2D.eVision.Top3D: eVision = eVision.Top3D; break;
-                    case Vision2D.eVision.Top2D: eVision = eVision.Top2D; break;
-                    case Vision2D.eVision.Bottom: eVision = eVision.Bottom; break;
+                    case eVision.Top3D: eVision = eVision.Top3D; break;
+                    case eVision.Top2D: eVision = eVision.Top2D; break;
+                    case eVision.Bottom: eVision = eVision.Bottom; break;
                 }
-                m_aStrip[eVision].SetResult(result, szMap, vision != Vision2D.eVision.Bottom, sMapResult); 
+                m_aStrip[eVision].SetResult(result, szMap, vision != eVision.Bottom, sMapResult); 
             }
 
             public Strip.eResult GetResult()
@@ -184,14 +178,14 @@ namespace Root_Pine2.Module
                 string sRun = "";
                 if (b3D)
                 {
-                    sRun = m_aStrip[eVision.Total].SetSort(m_aStrip[eVision.Top3D]);
+                    sRun = m_stripTotal.SetSort(m_aStrip[eVision.Top3D]);
                     CalcMapSize(m_aStrip[eVision.Top3D].m_unit.m_szMap); 
                     if (sRun != "OK") return sRun;
                 }
-                sRun = m_aStrip[eVision.Total].SetSort(m_aStrip[eVision.Top2D]);
+                sRun = m_stripTotal.SetSort(m_aStrip[eVision.Top2D]);
                 CalcMapSize(m_aStrip[eVision.Top2D].m_unit.m_szMap);
                 if (sRun != "OK") return sRun;
-                sRun = m_aStrip[eVision.Total].SetSort(m_aStrip[eVision.Bottom]);
+                sRun = m_stripTotal.SetSort(m_aStrip[eVision.Bottom]);
                 CalcMapSize(m_aStrip[eVision.Bottom].m_unit.m_szMap);
                 if (sRun != "OK") return sRun;
                 return "OK";
@@ -206,6 +200,7 @@ namespace Root_Pine2.Module
 
             public string m_sStripID; 
             public Dictionary<eVision, Strip> m_aStrip = new Dictionary<eVision, Strip>();
+            public Strip m_stripTotal = new Strip(); 
             public Data()
             {
                 foreach (eVision eVision in Enum.GetValues(typeof(eVision))) m_aStrip.Add(eVision, new Strip(eVision)); 
@@ -233,7 +228,8 @@ namespace Root_Pine2.Module
                 foreach (Data.Strip.eResult eResult in Enum.GetValues(typeof(Data.Strip.eResult))) m_aCount.Add(eResult, 0); 
             }
         }
-        public Dictionary<Data.eVision, CountStrip> m_countStrip = new Dictionary<Data.eVision, CountStrip>();
+        public Dictionary<eVision, CountStrip> m_countStrip = new Dictionary<eVision, CountStrip>();
+        public CountStrip m_countStripTotal = new CountStrip(); 
 
         public class CountUnit
         {
@@ -256,15 +252,18 @@ namespace Root_Pine2.Module
                 foreach (Data.Strip.Unit.eResult eResult in Enum.GetValues(typeof(Data.Strip.Unit.eResult))) m_aCount.Add(eResult, 0);
             }
         }
-        public Dictionary<Data.eVision, CountUnit> m_countUnit = new Dictionary<Data.eVision, CountUnit>();
+        public Dictionary<eVision, CountUnit> m_countUnit = new Dictionary<eVision, CountUnit>();
+        public CountUnit m_countUnitTotal = new CountUnit(); 
 
         public void ClearCount()
         {
-            foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision)))
+            m_countStripTotal.Clear(); 
+            foreach (eVision eVision in Enum.GetValues(typeof(eVision)))
             {
                 m_countStrip[eVision].Clear();
                 m_countUnit[eVision].Clear();
             }
+            m_bUpdated = true;
         }
         #endregion
 
@@ -291,22 +290,21 @@ namespace Root_Pine2.Module
             AddDateTime(dt);
             if (m_aTime.Count < 2) return;
             int nTime = m_aTime.Count - 1;
-            m_sTactTime = GetTactString((m_aTime[nTime] - m_aTime[nTime - 1]).Milliseconds); 
-            m_sTactAve = GetTactString((m_aTime[nTime] - m_aTime[0]).Milliseconds / nTime);
+            m_sTactTime = GetTactString((m_aTime[nTime] - m_aTime[nTime - 1]).TotalMilliseconds); 
+            m_sTactAve = GetTactString((m_aTime[nTime] - m_aTime[0]).TotalMilliseconds / nTime);
         }
 
         List<DateTime> m_aTime = new List<DateTime>();
         void AddDateTime(DateTime dt)
         {
             m_aTime.Add(dt);
-            while (m_aTime.Count > 6) m_aTime.RemoveAt(0); 
+            while (m_aTime.Count > 16) m_aTime.RemoveAt(0); 
         }
 
-        string GetTactString(int ms)
+        string GetTactString(double tms)
         {
-            int sec = ms / 1000;
-            ms %= 1000;
-            return sec.ToString() + "." + (ms / 10).ToString("00"); 
+            int ms = (int)Math.Round(tms); 
+            return (ms / 1000).ToString() + "." + ((ms % 1000) / 10).ToString("00"); 
         }
         #endregion
 
@@ -315,20 +313,23 @@ namespace Root_Pine2.Module
         {
             m_data = infoStrip.m_summary;
             m_data.m_sStripID = infoStrip.p_id;
-            m_data.m_aStrip[Data.eVision.Total].m_eResult = Data.Strip.eResult.Good; 
-            m_data.m_aStrip[Data.eVision.Total].m_unit.ClearSort(); 
+            m_data.m_stripTotal.m_eResult = Data.Strip.eResult.Good; 
+            m_data.m_stripTotal.m_unit.ClearSort(); 
             string sRun = m_data.SetSort(b3D);
             if (sRun != "OK") return sRun;
-            foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision)))
+            m_countStripTotal.AddResult(m_data.m_stripTotal.m_eResult); 
+            foreach (eVision eVision in Enum.GetValues(typeof(eVision)))
             {
                 m_countStrip[eVision].AddResult(m_data.m_aStrip[eVision].m_eResult);
             }
-            foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision))) m_data.m_aStrip[eVision].m_unit.CalcCount();
-            switch (m_data.m_aStrip[Data.eVision.Total].m_eResult)
+            m_data.m_stripTotal.m_unit.CalcCount(); 
+            foreach (eVision eVision in Enum.GetValues(typeof(eVision))) m_data.m_aStrip[eVision].m_unit.CalcCount();
+            switch (m_data.m_stripTotal.m_eResult)
             {
                 case Data.Strip.eResult.Good:
                 case Data.Strip.eResult.Defect:
-                    foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision)))
+                    m_countUnitTotal.AddResult(m_data.m_stripTotal.m_unit); 
+                    foreach (eVision eVision in Enum.GetValues(typeof(eVision)))
                     {
                         m_countUnit[eVision].AddResult(m_data.m_aStrip[eVision].m_unit);
                     }
@@ -341,7 +342,7 @@ namespace Root_Pine2.Module
 
         public Summary()
         {
-            foreach (Data.eVision eVision in Enum.GetValues(typeof(Data.eVision)))
+            foreach (eVision eVision in Enum.GetValues(typeof(eVision)))
             {
                 m_countStrip.Add(eVision, new CountStrip());
                 m_countUnit.Add(eVision, new CountUnit());

@@ -1,6 +1,7 @@
 ﻿using Root_EFEM.Module;
 using Root_VEGA_D.Engineer;
 using Root_VEGA_D.Module;
+using Root_VEGA_D.Module.Recipe;
 using RootTools;
 using RootTools.Module;
 using System;
@@ -91,8 +92,9 @@ namespace Root_VEGA_D
         Login_UI m_login;
         OHTs_UI m_ohts= new OHTs_UI();
         Login.eLevel m_level;
+        ADIRecipe m_recipe = new ADIRecipe();
 
-        MainWindow_ViewModel m_mainWindowViewModel; 
+        MainWindow_ViewModel m_mainWindowViewModel;
 
         public MainWindow()
         {
@@ -103,9 +105,6 @@ namespace Root_VEGA_D
 
         void Init()
         {
-            m_mainWindowViewModel = new MainWindow_ViewModel(this);
-            this.DataContext = m_mainWindowViewModel;
-
             m_engineer = App.m_engineer;
 
             m_engineer.Init("VEGA_D");
@@ -131,6 +130,9 @@ namespace Root_VEGA_D
             RecipeManagerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed; ;
             //RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
+
+            m_mainWindowViewModel = new MainWindow_ViewModel(this, m_recipe);
+            this.DataContext = m_mainWindowViewModel;
 
             m_handler.m_vision.LineScanStatusChanged += m_mainWindowViewModel.M_vision_LineScanStatusChanged;
         }

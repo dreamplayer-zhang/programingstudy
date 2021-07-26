@@ -27,9 +27,14 @@
                     <Button IsEnabled="False" Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>
 
                     <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <CheckBox Content="Orgin" IsChecked="{Binding IsOriginChecked, Mode=TwoWay}" Command="{Binding btnOriginCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Center" Width="auto" IsChecked="{Binding IsCenterChecked, Mode=TwoWay}" Command="{Binding btnCenterCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Orgin" IsChecked="{Binding IsOriginChecked, Mode=TwoWay}" IsEnabled="{Binding IsOriginEnable}" Command="{Binding btnOriginCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                     <CheckBox Content="Pitch" IsChecked="{Binding IsPitchChecked, Mode=TwoWay}" IsEnabled="{Binding IsPitchEnable}" Command="{Binding btnPitchCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
-                    <CheckBox IsEnabled="False" Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" Command="{Binding btnRularCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox  IsChecked="{Binding IsShotKeyChecked, Mode=TwoWay}" IsEnabled="{Binding IsShotKeyEnable}" Command="{Binding btnShotKeyCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}">
+                        <TextBlock Text="Shot Key" TextWrapping="WrapWithOverflow" TextAlignment="Center" FontWeight="Bold" FontSize="9"/>
+                    </CheckBox>
+                    <Button Content="Clear" Command="{Binding btnObjectClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <!--<CheckBox IsEnabled="False" Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" Command="{Binding btnRularCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>-->
 
                     <TextBlock Text="View" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <Button Content="FULL" Command="{Binding btnViewFullCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
@@ -39,13 +44,13 @@
                     <tools:RootViewer/>
                 </Grid>
             </Grid>
-        </GroupBox>
+        </GroupBox> 
         <StackPanel Grid.Column="1">
             <GroupBox Header="XML Data Viewer"
                       Margin="4"
                       Style="{StaticResource main_view_groupbox}">
-                <StackPanel Orientation="Vertical" Margin="12, 12, 12, 12">
-                    <Grid  Margin="12, 12, 12, 12" DataContext="{Binding XMLData}">
+                <StackPanel Orientation="Vertical" Margin="12, 12, 12, 12" >
+                    <Grid  Margin="12, 12, 12, 12" DataContext="{Binding RACSetupImageViewer_VM}">
                         <!-- StackPanel로 수정하자 카메라 레졸루션도 넣어야함 -->
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
@@ -55,7 +60,6 @@
                             <RowDefinition Height="30"/>
                             <RowDefinition Height="30"/>
                             <!-- 4 -->
-                            <RowDefinition Height="30"/>
                             <RowDefinition Height="30"/>
                             <RowDefinition Height="30"/>
                             <RowDefinition Height="30"/>
@@ -71,57 +75,60 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Row="0"  Grid.Column="0"  Text="Device ID" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
-                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding p_DeviceID}"  Grid.ColumnSpan="4" Height="20"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding DeviceID, UpdateSourceTrigger=PropertyChanged}"  Grid.ColumnSpan="4" Height="20"/>
 
-                        <TextBlock Grid.Row="1"  Grid.Column="0"  Text="Wafer ID" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding p_WaferID}"  Grid.ColumnSpan="4" Height="20"/>
 
-                        <TextBlock Grid.Row="2"  Grid.Column="0"  Text="Wafer Size[mm]" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
-                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding p_WaferSize}"  Grid.ColumnSpan="4" Height="20"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Unit Size" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" Height="20" Text="{Binding UnitX, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="4" Height="20" Text="{Binding UnitY, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Map Size" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Die Pitch" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" Height="20" Text="{Binding DiePitchX, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Row="2" Grid.Column="4" Height="20" Text="{Binding DiePitchY, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Scribe Lane" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="3" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="3" Grid.Column="2" Height="20" Text="{Binding p_MapSize.X}"/>
+                        <TextBox Grid.Row="3" Grid.Column="2" Height="20" Text="{Binding ScribeLaneX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="3" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="3" Grid.Column="4" Height="20" Text="{Binding p_MapSize.Y}"/>
+                        <TextBox Grid.Row="3" Grid.Column="4" Height="20" Text="{Binding ScribeLaneY, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Origin Die" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Shot Offset" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="4" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="4" Grid.Column="2" Height="20"/>
+                        <TextBox Grid.Row="4" Grid.Column="2" Height="20" Text="{Binding ShotOffsetX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="4" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="4" Grid.Column="4" Height="20"/>
+                        <TextBox Grid.Row="4" Grid.Column="4" Height="20" Text="{Binding ShotOffsetY, UpdateSourceTrigger=PropertyChanged}"/>
 
 
-                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Chip Size[um]" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Map Offset" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="5" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="5" Grid.Column="2" Height="20"/>
+                        <TextBox Grid.Row="5" Grid.Column="2" Height="20" Text="{Binding MapOffsetX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="5" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="5" Grid.Column="4" Height="20"/>
+                        <TextBox Grid.Row="5" Grid.Column="4" Height="20" Text="{Binding MapOffsetY, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <!-- Shot -->
-                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Shot Origin[um]" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="SMI Offset" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="6" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="6" Grid.Column="2" Height="20"/>
+                        <TextBox Grid.Row="6" Grid.Column="2" Height="20" Text="{Binding SmiOffsetX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="6" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="6" Grid.Column="4" Height="20"/>
+                        <TextBox Grid.Row="6" Grid.Column="4" Height="20" Text="{Binding SmiOffsetY, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Grid.Row="7" Grid.Column="0" Text="Shot Matrix" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="Origin Die" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="7" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="7" Grid.Column="2" Height="20"/>
+                        <TextBox Grid.Row="7" Grid.Column="2" Height="20" Text="{Binding OriginDieX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="7" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="7" Grid.Column="4" Height="20"/>
+                        <TextBox Grid.Row="7" Grid.Column="4" Height="20" Text="{Binding OriginDieY, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Grid.Row="8" Grid.Column="0" Text="Shot Size[um]" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="8" Grid.Column="0" Text="Shot Size" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="8" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="8" Grid.Column="2" Height="20"/>
+                        <TextBox Grid.Row="8" Grid.Column="2" Height="20" Text="{Binding ShotSizeX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="8" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="8" Grid.Column="4" Height="20"/>
-
-                        <TextBlock Grid.Row="9" Grid.Column="0" Text="Sample Center" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
-                        <TextBlock Grid.Row="9" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="9" Grid.Column="2" Height="20"/>
-                        <TextBlock Grid.Row="9" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="9" Grid.Column="4" Height="20"/>
+                        <TextBox Grid.Row="8" Grid.Column="4" Height="20" Text="{Binding ShotSizeY, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                     <Button Style="{StaticResource groupbox_button}" Content="Create" Command="{Binding CmdCreate}"></Button>
                 </StackPanel>

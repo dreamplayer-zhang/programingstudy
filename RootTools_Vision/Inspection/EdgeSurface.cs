@@ -88,7 +88,7 @@ namespace RootTools_Vision
 			Side = 20100,
 			Btm = 20200,
 		}
-
+				
 		private void DoColorInspection(EdgeSurfaceParameterBase param, EdgeDefectCode defectCode, int channelIndex)
 		{
 			//if (this.GetWorkplaceBufferByIndex(channelIndex) == null)
@@ -105,8 +105,8 @@ namespace RootTools_Vision
 				endPtY = originRecipe.OriginHeight;
 
 			int count = (int)((endPtY - startPtY) / param.ROIHeight);
-            //for (int i = 1; i < 3; i++)
-            Parallel.For(1, count, i =>
+			//for (int i = 1; i < 3; i++)
+			Parallel.For(1, count, i =>
 			{
 				int ptLeft = 0;
 				int ptTop = startPtY + (i * height);

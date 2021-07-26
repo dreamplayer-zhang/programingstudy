@@ -20,8 +20,17 @@
                 <RowDefinition Height="2*"/>
                 <RowDefinition Height="3*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Margin="3" Background="AntiqueWhite" PreviewMouseLeftButtonDown="Grid_PreviewMouseLeftButtonDown">
-                <TextBlock x:Name="textBlockVision" Text="Vision" HorizontalAlignment="Center"/>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" Margin="3" Background="AntiqueWhite" PreviewMouseLeftButtonDown="Grid_PreviewMouseLeftButtonDown">
+                    <TextBlock x:Name="textBlockVision" Text="Vision" HorizontalAlignment="Center"/>
+                </Grid>
+                <CheckBox Grid.Column="1" x:Name="checkBoxRoller" Margin="3" Content="Roller" IsChecked="{Binding p_bCleanRoller}"/>
+                <CheckBox Grid.Column="2" x:Name="checkBoxBlow" Margin="3" Content="Blow" IsChecked="{Binding p_bCleanBlow}"/>
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
@@ -50,8 +59,8 @@
             <Grid Grid.Row="3" x:Name="gridInfo" Margin="3" Background="White" PreviewMouseLeftButtonDown="GridInfo_PreviewMouseLeftButtonDown">
                 <TextBlock x:Name="textBlockInfo" Text="{Binding p_sInfo}"/>
             </Grid>
-            <tree:TreeUI Grid.Row="4" x:Name="treeRootUI" IsEnabled="False"/>
-            <tree:TreeUI Grid.Row="5" x:Name="treeVisionUI" IsEnabled="False"/>
+            <tree:TreeUI Grid.Row="4" x:Name="treeRootUI" IsEnabled="False" Margin="3,0,3,0"/>
+            <tree:TreeUI Grid.Row="5" x:Name="treeVisionUI" IsEnabled="False" Margin="3,0,3,0"/>
         </Grid>
     </GroupBox>
 </UserControl>

@@ -19,10 +19,10 @@ namespace Root_EFEM
 {
     public class Vision_Frontside : ModuleBase, IWTRChild
     {
-        ALID m_alid_WaferExist;
+        public ALID m_alid_WaferExist;
         public void SetAlarm()
         {
-            m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
+            m_alid_WaferExist.Run(true, "Vision Stage Wafer Exist Error");
         }
         #region ToolBox
         Axis m_axisRotate;
@@ -30,6 +30,10 @@ namespace Root_EFEM
         AxisXY m_axisXY;
         DIO_O m_doVac;
         DIO_O m_doBlow;
+        DIO_I m_diReadyX;
+        DIO_I m_diReadyY;
+        DIO_I m_diWaferExistLoad;
+        DIO_I m_diWaferExistHome;
         MemoryPool m_memoryPool;
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryMain;
@@ -38,20 +42,7 @@ namespace Root_EFEM
 
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
-        Camera_Basler m_CamAutoFocus;
         Camera_Basler m_CamVRS;
-
-        public Camera_Basler p_CamAutoFocus
-        {
-            get
-            {
-                return m_CamAutoFocus;
-            }
-            set
-            {
-                m_CamAutoFocus = value;
-            }
-        }
 
         public Camera_Basler p_CamVRS
         {
@@ -93,8 +84,6 @@ namespace Root_EFEM
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         public Camera_Basler CamVRS { get => m_CamVRS; private set => m_CamVRS = value; }
-        public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
-
         public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
         #endregion
 
@@ -107,11 +96,14 @@ namespace Root_EFEM
                 p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis XY");
                 p_sInfo = m_toolBox.GetDIO(ref m_doVac, this, "Stage Vacuum");
                 p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Stage Blow");
+                p_sInfo = m_toolBox.GetDIO(ref m_diReadyX, this, "Stage Ready X");
+                p_sInfo = m_toolBox.GetDIO(ref m_diReadyY, this, "Stage Ready Y");
+                p_sInfo = m_toolBox.GetDIO(ref m_diWaferExistHome, this, "Wafer Exist On Home Position");
+                p_sInfo = m_toolBox.GetDIO(ref m_diWaferExistLoad, this, "Wafer Exist On Load Position");
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRSCam");
-                p_sInfo = m_toolBox.GetCamera(ref m_CamAutoFocus, this, "AutoFocusCam");
                 p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
             }
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
@@ -324,7 +316,7 @@ namespace Root_EFEM
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
             else
             {
-                DoVac.Write(false);
+                Thread.Sleep(1000);
                 m_axisXY.StartMove("Position_2");
                 m_axisRotate.StartMove("Position_2");
                 m_axisZ.StartMove("Position_2");
@@ -333,7 +325,9 @@ namespace Root_EFEM
                 m_axisXY.WaitReady();
                 m_axisRotate.WaitReady();
                 m_axisZ.WaitReady();
-
+                DoVac.Write(false);
+                if (!m_diReadyX.p_bIn || !m_diReadyY.p_bIn)
+                    return "Ready Fail";
                 ClearData();
                 return "OK";
             }
@@ -344,7 +338,7 @@ namespace Root_EFEM
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, nID);
             else
             {
-                DoVac.Write(true);
+                Thread.Sleep(1000);
                 m_axisXY.StartMove("Position_2");
                 m_axisRotate.StartMove("Position_2");
                 m_axisZ.StartMove("Position_2");
@@ -353,18 +347,42 @@ namespace Root_EFEM
                 m_axisXY.WaitReady();
                 m_axisRotate.WaitReady();
                 m_axisZ.WaitReady();
+                DoVac.Write(false);
+                if (!m_diReadyX.p_bIn || !m_diReadyY.p_bIn)
+                    return "Ready Fail";
                 return "OK";
             }
         }
 
         public string AfterGet(int nID)
         {
-            return "OK";
+        
+                DoVac.Write(false);
+                if (m_diWaferExistLoad.p_bIn)
+                {
+                    m_alid_WaferExist.Run(true, "WTR Get WaferExist Error In Stage");
+                    return "WTR Get WaferExist Error In Stage";
+                }
+                else
+                {
+                    return "OK";
+                }
+          
         }
 
         public string AfterPut(int nID)
         {
-            return "OK";
+
+            DoVac.Write(true);
+            if (!m_diWaferExistLoad.p_bIn)
+            {
+                m_alid_WaferExist.Run(true, "WTR Get WaferExist Error In Stage");
+                return "WTR Get WaferExist Error In Stage";
+            }
+            else
+            {
+                return "OK";
+            }
         }
 
         enum eCheckWafer
@@ -484,6 +502,8 @@ namespace Root_EFEM
             Reset,
             BeforeGet,
             BeforePut,
+            AfterGet,
+            AfterPut,
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
@@ -498,6 +518,8 @@ namespace Root_EFEM
                 case eRemoteRun.Reset: break;
                 case eRemoteRun.BeforeGet: run.m_nID = value; break;
                 case eRemoteRun.BeforePut: run.m_nID = value; break;
+                case eRemoteRun.AfterGet: run.m_nID = value; break;
+                case eRemoteRun.AfterPut: run.m_nID = value; break;
             }
             return run;
         }
@@ -548,6 +570,11 @@ namespace Root_EFEM
                     case eRemoteRun.BeforePut:
                         m_nID = tree.Set(m_nID, m_nID, "SlotID", "Slot ID", false);
                         break;
+
+                    case eRemoteRun.AfterGet:
+                    case eRemoteRun.AfterPut:
+                        m_nID = tree.Set(m_nID, m_nID, "SlotID", "Slot ID", false);
+                        break;
                 }
             }
 
@@ -560,6 +587,8 @@ namespace Root_EFEM
                     case eRemoteRun.Reset: m_module.Reset(); break;
                     case eRemoteRun.BeforeGet: return m_module.BeforeGet(m_nID);
                     case eRemoteRun.BeforePut: return m_module.BeforePut(m_nID);
+                    case eRemoteRun.AfterGet: return m_module.AfterGet(m_nID);
+                    case eRemoteRun.AfterPut: return m_module.AfterPut(m_nID);
                 }
                 return "OK";
             }
@@ -576,6 +605,7 @@ namespace Root_EFEM
             AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
             AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
             AddModuleRunList(new Run_VRSAlign(this), true, "Run VRSAlign");
+            AddModuleRunList(new Run_Centering(this), true, "Run Centering");
             //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
         }
         #endregion

@@ -336,7 +336,7 @@ namespace RootTools_Vision.Utility
 				builder.Append(_defectdata[i].m_nChipIndexY + " "); // Map Y
 				builder.Append(_defectdata[i].m_fWidth * resolutionX + " "); // Size X
 				builder.Append(_defectdata[i].m_fHeight * resolutionY + " "); // Size Y
-				builder.Append(0 + " "); // DEFECTAREA
+				builder.Append(_defectdata[i].m_fGV + " "); // DEFECTAREA
 				builder.Append(_defectdata[i].m_fSize * resolutionX + " "); // Defect Size
 				builder.Append(0 + " "); // ClassNumber
 				builder.Append(0 + " "); // TEST

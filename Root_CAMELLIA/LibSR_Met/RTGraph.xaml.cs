@@ -50,7 +50,7 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public void DrawReflectanceGraph(int nPointIndex, string xlabel, string ylabel, int nRepeatCount, double[] xvalues = null, double[] yvalues = null, double[] yvalues2 = null )
+        public void DrawReflectanceGraph(int nPointIndex, string xlabel, string ylabel, int nRepeatCount, double[] xvalues = null, double[] yvalues = null, double[] yvalues2 = null)
         {
             Dispatcher.Invoke(new Action(() =>
             {
@@ -102,12 +102,12 @@ namespace Root_CAMELLIA.LibSR_Met
                             GraphR.plt.Axis(350, 1500, -10, 100);
                         }
                     }
-                    catch(Exception)
+                    catch (Exception)
                     {
 
                     }
 
-                   
+
                     if (m_DM.bThickness && m_DM.bViewCalRGraph)
                     {
                         m_ReflectancePlotTable_Calc = GraphR.plt.PlotScatterHighlight(VIS_Wavelength, CalcReflectance, markerSize: 2.5);
@@ -118,17 +118,17 @@ namespace Root_CAMELLIA.LibSR_Met
                         int nPointIdx = 0;
                         if (nRepeatCount == 1)
                         {
-                            nPointIdx = nPointIndex+1;
+                            nPointIdx = nPointIndex + 1;
                         }
                         else
                         {
-                            nPointIdx = (nPointIndex % nRepeatCount)+1;
+                            nPointIdx = (nPointIndex % nRepeatCount) + 1;
                         }
-                                                sResult = string.Format("Point: {0}\nX Pos: {1}\nY Pos: {2}\nThickness:\n", nPointIdx, data.dX, data.dY);
+                        sResult = string.Format("Point: {0}\nX Pos: {1}\nY Pos: {2}\nThickness:\n", nPointIdx, data.dX, data.dY);
 
                         if (data.Thickness != null && data.Thickness.Count > 0)
                         {
-                            for (int n = 1; n < m_DM.m_LayerData.Count-1; n++)
+                            for (int n = 1; n < m_DM.m_LayerData.Count - 1; n++)
                             {
                                 sResult += string.Concat(m_DM.m_LayerData[n].hostname) + " : " + data.Thickness[n].ToString("0.####") + "Å\n";
                             }
@@ -138,7 +138,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             data.dGoF = 0.00000;
                         }
-                        
+
                         sResult += "GOF: " + data.dGoF.ToString("0.#####") + "\n";
                     }
 
@@ -158,7 +158,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
         public void DrawTransmittanceGraph(int nPointIndex, string xlabel, string ylabel, double[] xvalues = null, double[] yvalues = null)
         {
-            
+
             Dispatcher.Invoke(new Action(() =>
             {
                 if (m_DM.bTransmittance)
@@ -179,7 +179,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     if (m_DM.bTransmittance)
                     {
-                        if (!m_DM.bCalDCOLTransmittance)
+                        if (!App.m_nanoView.isCalDCOLTransmittance)
                         {
                             if (m_DM.bExcept_NIR)
                             {
@@ -203,7 +203,7 @@ namespace Root_CAMELLIA.LibSR_Met
                                     NIR_Transmittance[n] = data.Transmittance[n];
                                 }
                                 m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(NIR_Wavelength, NIR_Transmittance, markerSize: 2.5);
-                                GraphT.plt.Axis(350, 1550, -10, 100);
+                                GraphT.plt.Axis(350, 1500, -10, 100);
                             }
                         }
                         else
@@ -212,7 +212,7 @@ namespace Root_CAMELLIA.LibSR_Met
                             double[] DCOL_Wavelength = new double[DCOLWavelengthCount];
                             double[] DCOL_Transmittance = new double[DCOLWavelengthCount];
 
-                            for ( int n=0; n< DCOLWavelengthCount; n++)
+                            for (int n = 0; n < DCOLWavelengthCount; n++)
                             {
                                 DCOL_Wavelength[n] = data.DCOLTransmittance[n].Wavelength;
                                 DCOL_Transmittance[n] = data.DCOLTransmittance[n].RawTransmittance;
@@ -274,7 +274,7 @@ namespace Root_CAMELLIA.LibSR_Met
                             yvalues2[a] = Convert.ToDouble(column3[a + 1]);
                         }
 
-                        DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Reflectance [%]",1 ,xvalues, yvalues);
+                        DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Reflectance [%]", 1, xvalues, yvalues);
                         if (m_DM.bTransmittance)
                         {
                             DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Transmittance [%]", xvalues, yvalues2);
@@ -339,7 +339,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_strCurrentDir = System.IO.Path.GetDirectoryName(file.FullName);
                 }
 
-                if(comboBoxDataIndex.Items.Count > 0)
+                if (comboBoxDataIndex.Items.Count > 0)
                     comboBoxDataIndex.SelectedIndex = 0;
             }
         }
@@ -436,7 +436,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             int nGraphIndex = (n % m_DM.nRepeatCount);
                             int nPointIndex = (n / m_DM.nRepeatCount);
-                            string sGraphIndex = (nPointIndex+ 1).ToString() +"-"+ (nGraphIndex+1).ToString();                            
+                            string sGraphIndex = (nPointIndex + 1).ToString() + "-" + (nGraphIndex + 1).ToString();
                             comboBoxDataIndex.Items.Add(sGraphIndex);
                         }
                     }

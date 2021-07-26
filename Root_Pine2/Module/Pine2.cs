@@ -1,5 +1,4 @@
-﻿using QRCoder;
-using Root_Pine2.Engineer;
+﻿using Root_Pine2.Engineer;
 using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.Comm;
@@ -11,7 +10,6 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -149,6 +147,7 @@ namespace Root_Pine2.Module
             get { return _bEmergency; }
             set
             {
+                m_alidEMG.p_bSet = value;
                 if (_bEmergency == value) return;
                 _bEmergency = value;
                 if (value)
@@ -167,6 +166,7 @@ namespace Root_Pine2.Module
             get { return _bCDA; }
             set
             {
+                m_alidCDA.p_bSet = value; 
                 if (_bCDA == value) return;
                 _bCDA = value; 
                 if (value)
@@ -182,15 +182,23 @@ namespace Root_Pine2.Module
         {
             p_bEmergency = m_diEmergency.p_bIn;
             EQ.p_bDoorOpen = m_diDoorOpen.p_bIn;
+            m_alidDoorOpen.p_bSet = m_diDoorOpen.p_bIn;
             p_bCDA = m_diCDA.p_bIn;
         }
         #endregion
 
         #region GAF
+        ALID m_alidEMG;
+        ALID m_alidCDA;
+        ALID m_alidDoorOpen;
         public ALID m_alidNewLot;
         public ALID m_alidSummary;
         void InitALID()
         {
+            m_alidEMG = m_gaf.GetALID(this, "Emergency", "Emergency Button Pressed");
+            m_alidCDA = m_gaf.GetALID(this, "CDA", "Check CDA");
+            m_alidDoorOpen = m_gaf.GetALID(this, "DoorOpen", "Door Open");
+            m_alidDoorOpen.p_bEQError = false; 
             m_alidNewLot = m_gaf.GetALID(this, "NewLot", "New Lot Communication Error");
             m_alidSummary = m_gaf.GetALID(this, "Summary", "Summary Error");
         }
@@ -594,7 +602,11 @@ namespace Root_Pine2.Module
             p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
             RunTreeVisionOption(tree.GetTree("VisionOption"));
             m_printer.RunTree(tree.GetTree("Printer"));
-            RunTreePickerSet(tree.GetTree("PickerSet")); 
+            RunTreePickerSet(tree.GetTree("PickerSet"));
+            if (m_handler.m_aBoats.Count == 0) return; 
+            m_handler.m_aBoats[eVision.Top3D]?.RunTreeClean(tree.GetTree("Top3D Clean"));
+            m_handler.m_aBoats[eVision.Top2D]?.RunTreeClean(tree.GetTree("Top2D Clean"));
+            m_handler.m_aBoats[eVision.Bottom]?.RunTreeClean(tree.GetTree("Bottom Clean"));
         }
         #endregion
 
@@ -716,19 +728,19 @@ namespace Root_Pine2.Module
                 p_lBarcode = tree.Set(p_lBarcode, p_lBarcode, "Barcode Length", "Barcode Length (pixel)", p_bBarcode);
             }
         }
-        public Dictionary<Vision2D.eVision, VisionOption> m_aVisionOption = new Dictionary<Vision2D.eVision, VisionOption>(); 
+        public Dictionary<eVision, VisionOption> m_aVisionOption = new Dictionary<eVision, VisionOption>(); 
         void InitVisionOption()
         {
-            m_aVisionOption.Add(Vision2D.eVision.Top3D, new VisionOption());
-            m_aVisionOption.Add(Vision2D.eVision.Top2D, new VisionOption());
-            m_aVisionOption.Add(Vision2D.eVision.Bottom, new VisionOption());
+            m_aVisionOption.Add(eVision.Top3D, new VisionOption());
+            m_aVisionOption.Add(eVision.Top2D, new VisionOption());
+            m_aVisionOption.Add(eVision.Bottom, new VisionOption());
         }
 
         void RunTreeVisionOption(Tree tree)
         {
-            m_aVisionOption[Vision2D.eVision.Top3D].RunTree(tree.GetTree("Top3D"));
-            m_aVisionOption[Vision2D.eVision.Top2D].RunTree(tree.GetTree("Top2D"));
-            m_aVisionOption[Vision2D.eVision.Bottom].RunTree(tree.GetTree("Bottom"));
+            m_aVisionOption[eVision.Top3D].RunTree(tree.GetTree("Top3D"));
+            m_aVisionOption[eVision.Top2D].RunTree(tree.GetTree("Top2D"));
+            m_aVisionOption[eVision.Bottom].RunTree(tree.GetTree("Bottom"));
         }
         #endregion
 
@@ -736,7 +748,6 @@ namespace Root_Pine2.Module
         public class Printer
         {
             public SRP350 m_srp350;
-            QRCodeGenerator m_qrGenerator = new QRCodeGenerator(); 
 
             public class Doc
             {
@@ -745,22 +756,36 @@ namespace Root_Pine2.Module
                 public InfoStrip m_InfoStrip = null;
                 public int m_nStrip = 0;
                 public InfoStrip.eResult m_eResult = InfoStrip.eResult.Init; 
-                public DateTime m_dtNow = DateTime.Now; 
+                public DateTime m_dtNow = DateTime.Now;
+
+                public List<string> m_aRework = new List<string>(); 
+                public void AddStripInfo(MagazineEV.Magazine magazine)
+                {
+                    foreach (InfoStrip infoStrip in magazine.m_aStripDone)
+                    {
+                        switch (infoStrip.GetResult())
+                        {
+                            case InfoStrip.eResult.BCD: m_aRework.Add(infoStrip.p_id + " : Barcode"); break;
+                            case InfoStrip.eResult.POS: m_aRework.Add(infoStrip.p_id + " : Position"); break;
+                        }
+                    }
+                }
 
                 public Doc(int iSorter, int iBundle, int nStrip, InfoStrip.eResult eResult)
                 {
-                    m_eResult = eResult; 
-                    for (int n = 0; n < 8; n++) m_sSorter += ((n == iSorter) ? n.ToString() : "+");
+                    m_eResult = eResult;
+                    for (int n = 0; n < 8; n++) m_sSorter += ((n == iSorter) ? n.ToString() : "*");
                     m_sBundle = iBundle.ToString("00");
                     m_nStrip = nStrip; 
                 }
             }
             Queue<Doc> m_qDoc = new Queue<Doc>();
 
-            public void AddPrint(int iSorter, int iBundle, int nStrip)
+            public void AddPrint(int iSorter, MagazineEV.Magazine magazine)
             {
-                Doc doc = new Doc(iSorter, iBundle, nStrip, InfoStrip.eResult.Init);
-                m_qDoc.Enqueue(doc); 
+                Doc doc = new Doc(iSorter, magazine.p_iBundle, magazine.m_nStripCount, InfoStrip.eResult.Init);
+                doc.AddStripInfo(magazine); 
+                m_qDoc.Enqueue(doc);
             }
 
             public void AddPrint(int iSorter, int iBundle, int nStrip, InfoStrip.eResult eResult)
@@ -786,24 +811,36 @@ namespace Root_Pine2.Module
 
             void PrintDoc(Doc doc)
             {
-                string sVS = m_handler.m_pine2.p_sLotID + "_S00_C" + doc.m_sBundle; 
+                if (doc.m_nStrip == 0) return; 
+                string sRecipe = m_handler.p_sRecipe;
+                string sLot = m_handler.m_pine2.p_sLotID; 
+                string sVS = "-S00-C" + doc.m_sBundle; 
                 m_srp350.Start();
-                m_srp350.WriteText("Machine ID : Pine2 #" + m_iMachine.ToString());
-                m_srp350.WriteText("--------------------------------");
-                m_srp350.WriteText("Operator : " + m_handler.m_pine2.p_sOperator);
-                m_srp350.WriteText("Recipe : " + m_handler.p_sRecipe);
-                m_srp350.WriteText("Lot ID : " + m_handler.m_pine2.p_sLotID);
-                m_srp350.WriteText("3D Inspect : " + m_handler.m_pine2.p_b3D.ToString());
-                m_srp350.WriteText("VS File : " + sVS);
-                m_srp350.WriteText("--------------------------------");
-                if (doc.m_eResult != InfoStrip.eResult.Init) m_srp350.WriteText("Result : " + doc.m_eResult.ToString());
-                m_srp350.WriteText("Bundle : " + doc.m_sBundle);
-                m_srp350.WriteText("Sorter : " + doc.m_sSorter);
-                m_srp350.WriteText("Strip Count : " + doc.m_nStrip.ToString());
-                m_srp350.WriteText("");
-                m_srp350.WriteText(doc.m_dtNow.ToString("yyyy-MM-dd HH:mm:ss"));
-                m_srp350.WriteQR(sVS); 
+                Write("Machine ID : Pine2 #" + m_iMachine.ToString());
+                Write("--------------------------------");
+                Write("Operator : " + m_handler.m_pine2.p_sOperator);
+                Write("Recipe : " + sRecipe);
+                Write("Lot ID : " + sLot);
+                Write("3D Inspect : " + m_handler.m_pine2.p_b3D.ToString());
+                Write("VS File : " + sLot + sVS);
+                Write("--------------------------------");
+                if (doc.m_eResult != InfoStrip.eResult.Init) Write("Result : " + doc.m_eResult.ToString());
+                Write("Bundle : " + doc.m_sBundle);
+                Write("Sorter : " + doc.m_sSorter);
+                Write("Strip Count : " + doc.m_nStrip.ToString());
+                Write("");
+                Write(doc.m_dtNow.ToString("yyyy-MM-dd HH:mm:ss"));
+                string sRecipeLot = "/" + sRecipe + "_" + sLot; 
+                string sQR = "/M" + m_iMachine.ToString() + "V2/" + sRecipe + sRecipeLot + sRecipeLot + sVS; 
+                m_srp350.WriteQR(sQR, 7); 
+                foreach (string sWrite in doc.m_aRework) Write(sWrite);
                 m_srp350.End(); 
+            }
+
+            void Write(string sWrite)
+            {
+                m_srp350.WriteText(sWrite);
+                m_log.Info(sWrite); 
             }
 
             int m_iMachine = 1;
@@ -814,10 +851,12 @@ namespace Root_Pine2.Module
                 m_szFont = tree.Set(m_szFont, m_szFont, "Size", "Fonr Size");
             }
 
+            Log m_log; 
             Pine2_Handler m_handler; 
             public Printer(Pine2_Handler handler)
             {
-                m_handler = handler; 
+                m_handler = handler;
+                m_log = LogView.GetLog("Summary"); 
                 InitTimer();
             }
         }
@@ -874,7 +913,7 @@ namespace Root_Pine2.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_infoStrip.m_eWorks = (Vision2D.eWorks)tree.Set(m_infoStrip.m_eWorks, m_infoStrip.m_eWorks, "eWorks", "Select Boat", bVisible);
+                m_infoStrip.m_eWorks = (eWorks)tree.Set(m_infoStrip.m_eWorks, m_infoStrip.m_eWorks, "eWorks", "Select Boat", bVisible);
                 m_infoStrip.p_id = tree.Set(m_infoStrip.p_id, m_infoStrip.p_id, "StripID", "Strip ID", bVisible);
                 m_infoStrip.m_iBundle = tree.Set(m_infoStrip.m_iBundle, m_infoStrip.m_iBundle, "Bundle", "Bundle", bVisible);
             }
@@ -924,8 +963,8 @@ namespace Root_Pine2.Module
 
             public override string Run()
             {
-                m_infoStrip.SetResult(Vision2D.eVision.Top2D, m_eResultTop.ToString(), m_szMap.X.ToString(), m_szMap.Y.ToString(), m_sMapTop);
-                m_infoStrip.SetResult(Vision2D.eVision.Bottom, m_eResultBottom.ToString(), m_szMap.X.ToString(), m_szMap.Y.ToString(), m_sMapBottom);
+                m_infoStrip.SetResult(eVision.Top2D, m_eResultTop.ToString(), m_szMap.X.ToString(), m_szMap.Y.ToString(), m_sMapTop);
+                m_infoStrip.SetResult(eVision.Bottom, m_eResultBottom.ToString(), m_szMap.X.ToString(), m_szMap.Y.ToString(), m_sMapBottom);
                 return m_module.m_handler.m_summary.SetSort(false, m_infoStrip); 
             }
         }

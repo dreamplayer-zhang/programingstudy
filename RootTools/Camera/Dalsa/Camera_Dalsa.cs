@@ -228,6 +228,10 @@ namespace RootTools.Camera.Dalsa
             m_clrip.Cpp_CreatInterpolationData(0, m_dPReXScaleR, m_dPReXShiftR, m_nPreWidthR);
             m_clrip.Cpp_CreatInterpolationData(1, m_dPReXScaleG, m_dPReXShiftG, m_nPreWidthG);
             m_clrip.Cpp_CreatInterpolationData(2, m_dPReXScaleB, m_dPReXShiftB, m_nPreWidthB);
+
+            // SapManager Setting
+            SapManager.DisplayStatusMode = SapManager.StatusMode.Event;
+            SapManager.Error += SapManager_Error;
         }
 
         #region Tree
@@ -576,7 +580,7 @@ namespace RootTools.Camera.Dalsa
                 else
                     m_GrabThread = new Thread(new ThreadStart(RunGrabLineColorScanThread));
             }
-
+            m_GrabThread.Priority = ThreadPriority.Highest;
             m_GrabThread.Start();
         }
         public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData grabData = null)
@@ -765,8 +769,29 @@ namespace RootTools.Camera.Dalsa
             long lMemoryWidth = (long)m_Memory.W;
             int nMemoryOffsetX = m_cpScanOffset.X ;
             int nMemoryOffsetY = m_cpScanOffset.Y;
+
+            const int nTimeOut_10s = 10000; //ms            
+            const int nTimeOutInterval = 10; // ms
+            int nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
+            int previBlock = 0;
+
             while (iBlock < m_nGrabCount)
             {
+                if (previBlock == iBlock)
+                {
+                    Thread.Sleep(nTimeOutInterval);
+                    if (--nScanAxisTimeOut <= 0)
+                    {
+                        m_log.Info("TimeOut - RunGrabLineScanOverlapThread");
+                        m_nGrabTrigger = m_nGrabCount;
+                    }
+                }
+                else
+                {
+                    previBlock = iBlock;
+                    nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
+                }
+
                 if (iBlock < m_nGrabTrigger)
                 {
                     IntPtr ipSrc = m_pSapBuf[(iBlock) % c_nBuf];
@@ -1268,6 +1293,11 @@ namespace RootTools.Camera.Dalsa
             Camera_Dalsa cam = args.Context as Camera_Dalsa;
             cam.m_nGrabTrigger++;
             //Debug.WriteLine("XferTrigger : " + cam.m_nGrabTrigger);
+        }
+
+        private void SapManager_Error(object sender, SapErrorEventArgs e)
+        {
+            m_log.Info(string.Format("SapManager Error Code {0} : {1}", e.Code, e.Message));
         }
         #endregion
 

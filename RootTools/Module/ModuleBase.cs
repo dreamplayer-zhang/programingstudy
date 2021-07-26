@@ -456,6 +456,11 @@ namespace RootTools.Module
             return false;
         }
 
+        public virtual bool IsDocked()
+        {
+            return false;
+        }
+
         StopWatch m_swRun = new StopWatch(); 
         protected string StateRun()
         {
@@ -834,11 +839,18 @@ namespace RootTools.Module
 
         void RunTreeQueue(Tree tree)
         {
-            char c = (char)0; 
-            ModuleRunBase[] aModuleRemote = m_qModuleRemote.ToArray();
-            foreach (ModuleRunBase run in aModuleRemote) run.RunTree(tree.GetTree(c++, run.m_sModuleRun), true);
-            ModuleRunBase[] aModuleRun = m_qModuleRun.ToArray();
-            foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(c++, run.m_sModuleRun), true);
+            try
+            {
+                char c = (char)0;
+                ModuleRunBase[] aModuleRemote = m_qModuleRemote.ToArray();
+                foreach (ModuleRunBase run in aModuleRemote) run.RunTree(tree.GetTree(c++, run.m_sModuleRun), true);
+                ModuleRunBase[] aModuleRun = m_qModuleRun.ToArray();
+                foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(c++, run.m_sModuleRun), true);
+            }
+            catch (Exception e)
+            {
+                int n = 0;
+            }
         }
         #endregion
         

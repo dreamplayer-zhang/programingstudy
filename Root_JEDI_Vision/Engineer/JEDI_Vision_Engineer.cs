@@ -130,6 +130,7 @@ namespace Root_JEDI_Vision.Engineer
             EQ.c_sPathRecipe = m_treeRoot.GetTree("Recipe").Set(EQ.c_sPathRecipe, EQ.c_sPathRecipe, "Path", "Recipe Path");
             RunTreeControl(m_treeRoot.GetTree("Control"));
             RunTreeXGem(m_treeRoot.GetTree("XGem"));
+            m_handler.RunTree(m_treeRoot.GetTree("Handler")); 
         }
         #endregion
 

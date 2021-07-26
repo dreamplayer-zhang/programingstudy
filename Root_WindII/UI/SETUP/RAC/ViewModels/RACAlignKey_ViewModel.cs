@@ -177,13 +177,13 @@ namespace Root_WindII
 
                     if (VisionModule == null) return;
 
-                    if (!VisionModule.p_CamVRS.m_ConnectDone)
+                    if (VisionModule.p_CamVRS != null && !VisionModule.p_CamVRS.m_ConnectDone)
                     {
                         VisionModule.p_CamVRS.FunctionConnect();
                     }
                     else
                     {
-                        if (VisionModule.p_CamVRS.p_CamInfo._IsGrabbing == false)
+                        if (VisionModule.p_CamVRS != null &&  VisionModule.p_CamVRS.p_CamInfo._IsGrabbing == false)
                         {
                             VisionModule.p_CamVRS.GrabContinuousShot();
                         }
@@ -198,7 +198,8 @@ namespace Root_WindII
         {
             get => new RelayCommand(() =>
             {
-                VisionModule.p_CamVRS.StopGrab();
+                if(VisionModule.p_CamVRS != null)
+                    VisionModule.p_CamVRS.StopGrab();
             });
         }
 

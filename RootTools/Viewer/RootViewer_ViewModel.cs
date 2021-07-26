@@ -920,25 +920,34 @@ namespace RootTools
 										return;
 									if (imageptrB == null)
 										return;
-									Parallel.For(0, p_CanvasHeight, (yy) =>
-									{
-										{
-											long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-											for (int xx = 0; xx < p_CanvasWidth; xx++)
-											{
-												long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-												if (pix_x + (long)pix_y * sizeX >= 0)
-												{
-													viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[(long)pix_x + (long)pix_y * sizeX]);
-													viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[(long)pix_x + (long)pix_y * sizeX]);
-													viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[(long)pix_x + (long)pix_y * sizeX]);
-												}
-											}
-										}
-									});
+                                    StopWatch sw = new StopWatch();
 
-									p_ImgSource = ImageHelper.ToBitmapSource(view);
+                                    sw.Start();
+                                    Parallel.For(0, p_CanvasHeight, (yy) =>
+                                    {
+                                        {
+                                            //unsafe
+                                            {
+                                                long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                                                for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                                {
+                                                    long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+
+                                                    if (pix_x + (long)pix_y * sizeX >= 0)
+                                                    {
+                                                        viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[(long)pix_x + (long)pix_y * sizeX]);
+                                                        viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[(long)pix_x + (long)pix_y * sizeX]);
+                                                        viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[(long)pix_x + (long)pix_y * sizeX]);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+                                    sw.Stop();
+                                    System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
+
+                                    p_ImgSource = ImageHelper.ToBitmapSource(view);
 
 									p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
 									if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y) == 0)

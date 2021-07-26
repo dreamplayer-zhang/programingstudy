@@ -258,6 +258,7 @@
     <Compile Include="Module\EdgesideVision\Run_InspectEBR.cs" />
     <Compile Include="Module\EdgesideVision\Run_InspectEdge.cs" />
     <Compile Include="Module\EFEM_AOP.cs" />
+    <Compile Include="Module\FrontsideVision\Run_Centering.cs" />
     <Compile Include="Module\FrontsideVision\Run_GrabLineScan.cs" />
     <Compile Include="Module\FrontsideVision\Run_Inspect.cs" />
     <Compile Include="Module\FrontsideVision\Run_VRSAlign.cs" />

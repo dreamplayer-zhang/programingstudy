@@ -201,7 +201,7 @@
                             </Border>
                             <TextBlock  Grid.Row="1" Grid.Column="0" Text="Lot ID" VerticalAlignment="Center" Margin="10,0"/>
                             <Border Grid.Row="1" Grid.Column="1" Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
-                                <TextBlock Text="{Binding p_loadport.p_infoCarrier.p_sLotID}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding p_CurrentLotID, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Recipe ID" VerticalAlignment="Center" Margin="10,0"/>
                             <Border Grid.Row="2" Grid.Column="1" Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">

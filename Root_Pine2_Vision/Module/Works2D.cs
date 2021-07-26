@@ -74,123 +74,17 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        #region Protocol
-        public enum eProtocol
-        {
-            RecipeOpen,
-            SnapInfo,
-            Snap,
-            SnapDone,
-            SnapReady,
-            LotInfo,
-            InspDone,
-            SortingData,
-            WorksConnect,
-            ChangeUserset,
-        }
-
-        public class Protocol
-        {
-            public eProtocol m_eProtocol;
-            public string m_sRecipe = "";
-            public string m_sSend = "";
-            public string m_sInfo = "";
-
-            bool m_bWait = true; 
-            public void ReceiveData(string sSend)
-            {
-                m_sInfo = Receive(sSend); 
-                m_bWait = false; 
-            }
-
-            string Receive(string sSend)
-            {
-                int l = m_sSend.Length;
-                if (sSend.Length < l) return "Message Length Error";
-                if (m_sSend.Substring(0, l - 1) != sSend.Substring(0, l - 1)) return "Message not Correct";
-                return sSend.Substring(l, sSend.Length - l - 1); 
-            }
-
-            public string WaitReply(int secTimeout)
-            {
-                int msTimeout = 1000 * secTimeout; 
-                StopWatch sw = new StopWatch(); 
-                while (m_bWait)
-                {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return "EQ Stop";
-                    if (sw.ElapsedMilliseconds > msTimeout) return "Protocol Recieve Timeout"; 
-                }
-                return m_sInfo;
-            }
-
-            public Protocol(int nID, eProtocol eProtocol, string sRecipe)
-            {
-                m_eProtocol = eProtocol;
-                m_sRecipe = sRecipe;
-                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + ">";
-            }
-
-            public int m_iSnap = 0;          // Snap Done Line Index (0 Base)
-            public Protocol(int nID, eProtocol eProtocol, string sRecipe, int iSnap)
-            {
-                m_eProtocol = eProtocol;
-                m_sRecipe = sRecipe;
-                m_iSnap = iSnap;
-                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + "," + iSnap.ToString() + ">";
-            }
-
-            public int m_nSnapMode = 0;      // 0 : RGB 단일, 1 : PAS 단일, 2 : RGB, APS 모두
-            public int m_nLineNum = 0;
-            public Protocol(int nID, eProtocol eProtocol, string sRecipe, int nScanMode, int nLineNum)
-            {
-                m_eProtocol = eProtocol;
-                m_sRecipe = sRecipe;
-                m_nSnapMode = nScanMode;
-                m_nLineNum = nLineNum;
-                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + "," + m_nSnapMode.ToString() + "," + m_nLineNum.ToString() + ">";
-            }
-
-            public Vision2D.SnapInfo m_snapInfo = null; 
-            public Protocol(int nID, eProtocol eProtocol, Vision2D.SnapInfo snapInfo)
-            {
-                m_eProtocol = eProtocol;
-                m_snapInfo = snapInfo;
-                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + snapInfo.GetString() + ">";
-            }
-
-            public Vision2D.LotInfo m_lotInfo = null;
-            public Protocol(int nID, eProtocol eProtocol, Vision2D.LotInfo lotInfo)
-            {
-                m_eProtocol = eProtocol;
-                m_lotInfo = lotInfo;
-                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + lotInfo.GetString() + ">"; 
-            }
-
-            public Vision2D.SortInfo m_sortInfo = null;
-            public Protocol(int nID, eProtocol eProtocol, Vision2D.SortInfo sortInfo)
-            {
-                m_eProtocol = eProtocol;
-                m_sortInfo = sortInfo;
-                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sortInfo.GetString() + ">";
-            }
-        }
+        #region TCPIP
         Queue<Protocol> m_qProtocol = new Queue<Protocol>();
         Protocol m_protocolSend = null;
-        #endregion
 
-        #region TCPIP
         int m_iProtocol = 0;
         int m_secTimeout = 2; 
         string m_sRecipe = ""; 
         public string SendRecipe(string sRecipe)
         {
-            if (m_sRecipe == sRecipe) return "OK";
-            m_sRecipe = sRecipe; 
-            if (m_bStartProcess == false) return "OK";
-            Protocol protocol = new Protocol(m_iProtocol, eProtocol.RecipeOpen, sRecipe);
-            m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply(m_secTimeout); 
+            m_sRecipe = sRecipe;
+            return "OK";
         }
 
         public string SendSnapDone(int iSnap)
@@ -198,31 +92,58 @@ namespace Root_Pine2_Vision.Module
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapDone, m_sRecipe, iSnap);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply(m_secTimeout);
+            return WaitReply(m_secTimeout);
         }
 
-        public string SendSnapInfo(Vision2D.SnapInfo snapInfo)
+        public string SendSnapInfo(SnapInfo snapInfo)
         {
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapInfo, snapInfo);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply(m_secTimeout);
+            return WaitReply(m_secTimeout);
         }
 
-        public string SendLotInfo(Vision2D.LotInfo lotInfo)
+        public string SendLotInfo(LotInfo lotInfo)
         {
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.LotInfo, lotInfo);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply(m_secTimeout);
+            int secTimeOut = 10;     // Recipe Open 시간이 김.
+            return WaitReply(secTimeOut);
         }
 
-        public string SendSortInfo(Vision2D.SortInfo sortInfo)
+        public string SendSortInfo(SortInfo sortInfo)
         {
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.SortingData, sortInfo);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply(m_secTimeout);
+            return WaitReply(m_secTimeout);
+        }
+
+        public string SendReset()
+        {
+            if (m_bStartProcess == false) return "OK";
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.Reset);
+            m_qProtocol.Enqueue(protocol);
+            return WaitReply(m_secTimeout);
+        }
+
+        bool m_bWait = true;
+        string WaitReply(int secTimeout)
+        {
+            int msTimeout = 1000 * secTimeout;
+            StopWatch sw = new StopWatch();
+            try
+            {
+                while (m_bWait)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                    if (sw.ElapsedMilliseconds > msTimeout) return "Protocol Recieve Timeout";
+                }
+            }
+            finally { m_protocolSend = null; }
+            return "OK";
         }
 
         void ThreadSend()
@@ -243,7 +164,8 @@ namespace Root_Pine2_Vision.Module
             }
             if (m_protocolSend == null) return; 
             m_protocolSend.ReceiveData(sSend);
-            m_protocolSend = null; 
+            m_protocolSend = null;
+            m_bWait = false;
         }
 
         void Reply(string sSend)
@@ -282,13 +204,22 @@ namespace Root_Pine2_Vision.Module
             m_threadProcess.Start();
         }
 
-        bool m_bStartProcess = false;
         int m_nProcessID = -1;
+        void InitProcessReg(string sGroup)
+        {
+            m_reg = new Registry(sGroup + ".Process");
+            m_nProcessID = m_reg.Read("ProcessID", -1); 
+
+        }
+
+        bool m_bStartProcess = false;
+        Registry m_reg;
+        static readonly object g_csLock = new object();
         void RunThreadProcess()
         {
             int nProcess = 0; 
             m_bThreadProcess = true;
-            Thread.Sleep(7000);
+            Thread.Sleep(p_eWorks == eWorks.A ? 30000 : 33000);
             while (m_bThreadProcess)
             {
                 Thread.Sleep(10);
@@ -300,18 +231,22 @@ namespace Root_Pine2_Vision.Module
                     {
                         if (IsMemoryPool() && (IsProcessRun() == false))
                         {
-                            m_sRecipe = "";
-                            m_tcpip.ThreadStop();
-                            m_tcpip.InitClient();
-                            ProcessStartInfo startInfo = new ProcessStartInfo(m_sFileVisionWorks);
-                            startInfo.Arguments = p_id + "." + m_tcpip.p_nPort.ToString();
-                            startInfo.WorkingDirectory = "C://WisVision//";
-                            Process process = Process.Start(startInfo);
+                            lock (g_csLock)
+                            {
+                                m_sRecipe = "";
+                                m_tcpip.ThreadStop();
+                                m_tcpip.InitClient();
+                                ProcessStartInfo startInfo = new ProcessStartInfo(m_sFileVisionWorks);
+                                startInfo.Arguments = p_id + "." + m_tcpip.p_nPort.ToString();
+                                startInfo.WorkingDirectory = "C://WisVision//";
+                                Process process = Process.Start(startInfo);
 
-                            //Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
-                            m_nProcessID = process.Id;
-                            Thread.Sleep(2000);
-                            if (m_vision.m_lotInfo != null) SendLotInfo(m_vision.m_lotInfo); 
+                                //Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
+                                m_nProcessID = process.Id;
+                                m_reg.Write("ProcessID", m_nProcessID);
+                                Thread.Sleep(2000);
+                                if (m_vision.m_lotInfo != null) SendLotInfo(m_vision.m_lotInfo);
+                            }
                         }
                         else if (m_tcpip.p_bConnect == false)
                         {
@@ -346,8 +281,8 @@ namespace Root_Pine2_Vision.Module
 
         public void Reset()
         {
+            m_qProtocol.Clear();
             m_protocolSend = null;
-            m_qProtocol.Clear(); 
         }
 
         public void RunTree(Tree tree)
@@ -356,15 +291,16 @@ namespace Root_Pine2_Vision.Module
             {
                 m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "VisionWorks Process ID");
                 m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, "exe", "File", "VisionWorks File Name");
-                m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process");
+                m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start VisionWorks Process");
             }
         }
 
-        public Vision2D.eWorks p_eWorks { get; set; }
+        public eWorks p_eWorks { get; set; }
         public string p_id { get; set; }
         public Vision2D m_vision;
-        public Works2D(Vision2D.eWorks eWorks, Vision2D vision)
+        public Works2D(eWorks eWorks, Vision2D vision)
         {
+            InitProcessReg(vision.ToString() + eWorks.ToString()); 
             p_eWorks = eWorks;
             p_id = eWorks.ToString();
             m_vision = vision;

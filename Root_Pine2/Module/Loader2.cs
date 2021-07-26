@@ -2,6 +2,7 @@
 using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
 using System.Threading;
@@ -21,20 +22,30 @@ namespace Root_Pine2.Module
             m_toolBox.GetDIO(ref m_dioTurnUp, this, "Turn", "Down", "Up");
             m_toolBox.GetDIO(ref m_doVacuum, this, "Vacuum");
             m_toolBox.GetDIO(ref m_diCrash, this, "Crash");
-            if (bInit) InitPosition();
+            if (bInit)
+            {
+                InitPosition();
+                InitALID();
+            }
+        }
+
+        ALID m_alidCrash;
+        void InitALID()
+        {
+            m_alidCrash = m_gaf.GetALID(this, "Crash", "Crash with Loader1");
         }
 
         const string c_sReady = "Ready";
         void InitPosition()
         {
             m_axisXZ.AddPos(c_sReady);
-            m_axisXZ.AddPos(GetPosString(Vision2D.eWorks.A));
-            m_axisXZ.AddPos(GetPosString(Vision2D.eWorks.B));
+            m_axisXZ.AddPos(GetPosString(eWorks.A));
+            m_axisXZ.AddPos(GetPosString(eWorks.B));
         }
 
-        string GetPosString(Vision2D.eWorks eVisionWorks)
+        string GetPosString(eWorks eVisionWorks)
         {
-            return Vision2D.eVision.Bottom.ToString() + eVisionWorks.ToString(); 
+            return eVision.Bottom.ToString() + eVisionWorks.ToString(); 
         }
 
         public string RunMoveX(string sPos, bool bWait = true)
@@ -43,7 +54,7 @@ namespace Root_Pine2.Module
             return bWait ? m_axisXZ.p_axisX.WaitReady() : "OK";
         }
 
-        public string RunMoveX(Vision2D.eWorks ePos, bool bWait = true)
+        public string RunMoveX(eWorks ePos, bool bWait = true)
         {
             m_axisXZ.p_axisX.StartMove(GetPosString(ePos));
             return bWait ? m_axisXZ.p_axisX.WaitReady() : "OK";
@@ -61,9 +72,14 @@ namespace Root_Pine2.Module
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 
-        public string RunMoveZ(Vision2D.eWorks ePos, bool bWait = true)
+        double p_dZ
         {
-            m_axisXZ.p_axisY.StartMove(GetPosString(ePos));
+            get { return m_pine2.m_thicknessDefault - m_pine2.p_thickness; }
+        }
+
+        public string RunMoveZ(eWorks ePos, bool bWait = true)
+        {
+            m_axisXZ.p_axisY.StartMove(GetPosString(ePos), p_dZ);
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 
@@ -123,6 +139,7 @@ namespace Root_Pine2.Module
                     m_axisXZ.p_axisX.ServoOn(false);
                     p_loader1.m_axisXZ.p_axisX.ServoOn(false);
                 }
+                m_alidCrash.p_bSet = m_diCrash.p_bIn; 
             }
         }
         #endregion
@@ -133,7 +150,7 @@ namespace Root_Pine2.Module
             return "OK";
         }
 
-        public string RunUnload(Vision2D.eWorks eWorks)
+        public string RunUnload(eWorks eWorks)
         {
             Boat boat = m_boats.m_aBoat[eWorks];
             if (boat.p_eStep != Boat.eStep.Ready) return "Boat not Ready";
@@ -148,6 +165,7 @@ namespace Root_Pine2.Module
                 boat.RunVacuum(true);
                 Thread.Sleep((int)(1000 * m_secVacuum));
                 if (Run(RunMoveZ(c_sReady))) return p_sInfo;
+                boat.StartClean();
                 boat.p_infoStrip = p_infoStrip;
                 p_infoStrip = null;
                 if (Run(RunMoveX(c_sReady))) return p_sInfo;
@@ -155,8 +173,10 @@ namespace Root_Pine2.Module
             }
             finally
             {
+                m_axisXZ.p_axisY.m_bCheckStop = false;
                 RunMove(c_sReady);
                 RunTurnUp(true);
+                m_axisXZ.p_axisY.m_bCheckStop = true;
             }
             return "OK";
         }
@@ -187,6 +207,7 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            Thread.Sleep(1000); 
             p_sInfo = base.StateHome(m_axisXZ.p_axisY);
             if (p_sInfo != "OK") return p_sInfo;
             p_sInfo = base.StateHome(m_axisXZ.p_axisX);
@@ -219,7 +240,7 @@ namespace Root_Pine2.Module
             p_infoStrip = null;
             m_handler = handler; 
             m_pine2 = handler.m_pine2;
-            m_boats = handler.m_aBoats[Vision2D.eVision.Bottom];
+            m_boats = handler.m_aBoats[eVision.Bottom];
             base.InitBase(id, engineer);
             InitThreadCrash();
         }
@@ -251,7 +272,7 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public Vision2D.eWorks m_eWorks = Vision2D.eWorks.A;
+            public eWorks m_eWorks = eWorks.A;
             public override ModuleRunBase Clone()
             {
                 Run_Unload run = new Run_Unload(m_module);
@@ -261,7 +282,7 @@ namespace Root_Pine2.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eWorks = (Vision2D.eWorks)tree.Set(m_eWorks, m_eWorks, "Boat", "Select Boat", bVisible); 
+                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Boat", "Select Boat", bVisible); 
             }
 
             public override string Run()

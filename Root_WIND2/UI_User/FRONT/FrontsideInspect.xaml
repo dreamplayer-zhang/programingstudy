@@ -6,7 +6,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
              xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
-             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
+             xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="1200">
     <i:Interaction.Triggers>
@@ -61,14 +62,39 @@
             <RowDefinition Height="46"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal">
-            <Button Content="Start" Command="{Binding btnStart}"  Style="{StaticResource inspection_menu_button}"/>
-            <Button Content="Snap" Command="{Binding btnSnap}" Style="{StaticResource inspection_menu_button}"/>
-            <Button Content="Manual Align" Command="{Binding btnManualAlign}" Style="{StaticResource inspection_menu_button}"/>
-            <Button Content="Stop" Command="{Binding btnStop}" Style="{StaticResource inspection_menu_button}"/>
-            <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
-            <Button Content="Save Klarf" Command="{Binding btnSaveKlarf}" Style="{StaticResource inspection_menu_button}"/>
-        </StackPanel>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="80"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button Content="Start" Command="{Binding btnStart}"  Style="{StaticResource inspection_menu_button}"/>
+                <Button Content="Snap" Command="{Binding btnSnap}" Style="{StaticResource inspection_menu_button}"/>
+                <Button Content="Manual Align" Command="{Binding btnManualAlign}" Style="{StaticResource inspection_menu_button}"/>
+                <Button Content="Stop" Command="{Binding btnStop}" Style="{StaticResource inspection_menu_button}"/>
+                <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
+                <Button Content="Save Klarf" Command="{Binding btnSaveKlarf}" Style="{StaticResource inspection_menu_button}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,2,30,0">
+                <icon:PackIconMaterial          
+                    Kind="LightbulbOn"
+                    HorizontalAlignment="Center"
+                    Width="25"
+                    Height="25"
+                    Margin="0,3,0,0"
+                    Foreground="Yellow" 
+                    MouseDoubleClick="PackIconMaterial_MouseDoubleClick"/>
+                <TextBlock
+                    FontSize="10"
+                    Margin="0,4,0,0"
+                    Text="D2D"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Foreground="LightGray"/>
+            </StackPanel>
+        </Grid>
+        
         <Grid Grid.Row="1" Background="{StaticResource main_view_background}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="7*"/>

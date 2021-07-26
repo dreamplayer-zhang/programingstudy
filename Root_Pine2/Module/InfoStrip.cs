@@ -19,25 +19,25 @@ namespace Root_Pine2.Module
             Paper,
         }
 
-        Dictionary<Vision2D.eVision, bool> m_bInspect = new Dictionary<Vision2D.eVision, bool>();
+        Dictionary<eVision, bool> m_bInspect = new Dictionary<eVision, bool>();
         void InitInspect()
         {
-            m_bInspect.Add(Vision2D.eVision.Top3D, false);
-            m_bInspect.Add(Vision2D.eVision.Top2D, false);
-            m_bInspect.Add(Vision2D.eVision.Bottom, false);
+            m_bInspect.Add(eVision.Top3D, false);
+            m_bInspect.Add(eVision.Top2D, false);
+            m_bInspect.Add(eVision.Bottom, false);
         }
-        public void StartInspect(Vision2D.eVision eVision)
+        public void StartInspect(eVision eVision)
         {
             m_bInspect[eVision] = true; 
         }
 
         public bool p_bInspect
         {
-            get { return m_bInspect[Vision2D.eVision.Top3D] || m_bInspect[Vision2D.eVision.Top2D] || m_bInspect[Vision2D.eVision.Bottom]; }
+            get { return m_bInspect[eVision.Top3D] || m_bInspect[eVision.Top2D] || m_bInspect[eVision.Bottom]; }
         }
 
         public Summary.Data m_summary = new Summary.Data(); 
-        public string SetResult(Vision2D.eVision eVision, string sStripResult, string sX, string sY, string sMapResult)
+        public string SetResult(eVision eVision, string sStripResult, string sX, string sY, string sMapResult)
         {
             string sResult = "OK";
             try
@@ -76,8 +76,8 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Boat Flow
-        public Vision2D.eVision m_eVisionLoad = Vision2D.eVision.Top3D; 
-        public Vision2D.eWorks m_eWorks = Vision2D.eWorks.A;
+        public eVision m_eVisionLoad = eVision.Top3D; 
+        public eWorks m_eWorks = eWorks.A;
         #endregion
 
         string _id = ""; 
@@ -93,7 +93,7 @@ namespace Root_Pine2.Module
         public int p_iStrip { get; set; }
         public InfoStrip(int iStrip)
         {
-            InitInspect(); 
+            InitInspect();
             p_eMagazine = eMagazine.Magazine0; 
             p_iStrip = iStrip;
             p_id = iStrip.ToString("0000"); 
@@ -127,6 +127,7 @@ namespace Root_Pine2.Module
         public string m_sLED; 
         public InfoStrip(eMagazine eMagazine, eMagazinePos eMagazinePos, int iBundle, int iStrip)
         {
+            InitInspect();
             p_eMagazine = eMagazine;
             p_eMagazinePos = eMagazinePos;
             m_iBundle = iBundle; 

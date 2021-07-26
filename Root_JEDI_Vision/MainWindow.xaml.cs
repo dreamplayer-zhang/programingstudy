@@ -18,7 +18,7 @@ namespace Root_JEDI_Vision
         JEDI_Vision_Handler m_handler;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            m_engineer.Init("Pine2");
+            m_engineer.Init("JEDI Vision");
             engineerUI.Init(m_engineer);
             m_handler = (JEDI_Vision_Handler)m_engineer.ClassHandler();
             Init();

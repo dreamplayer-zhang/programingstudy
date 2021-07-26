@@ -37,6 +37,8 @@ namespace Root_Pine2.Module
             }
             textBlockA.Text = (m_transfer.m_gripper.p_infoStrip != null) ? m_transfer.m_gripper.p_infoStrip.p_id : "";
             textBlockB.Text = (m_transfer.m_pusher.p_infoStrip != null) ? m_transfer.m_pusher.p_infoStrip.p_id : "";
+            bool bInspect = (m_transfer.m_pusher.p_infoStrip != null) ? m_transfer.m_pusher.p_infoStrip.p_bInspect : false;
+            gridPusher.Background = bInspect ? Brushes.Orange : Brushes.Beige;
             OnRunTree();
         }
 

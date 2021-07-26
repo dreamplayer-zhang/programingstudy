@@ -1,7 +1,10 @@
-﻿using RootTools;
+﻿using Root_JEDI_Sorter.Module;
+using Root_JEDI_Vision.Module;
+using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
@@ -27,13 +30,30 @@ namespace Root_JEDI_Vision.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        //public Vision2D m_vision;
+        public Vision2D m_vision;
 
+        public enum eSide
+        {
+            Bottom,
+            Top,
+        }
+        eSide m_eSide = eSide.Top; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            //m_vision = new Vision2D("Vision", m_engineer, ModuleBase.eRemote.Server);
-            //InitModule(m_vision);
+            switch (m_eSide)
+            {
+                case eSide.Top:
+
+                    m_vision = new Vision2D(eVision.Top2D, m_engineer, ModuleBase.eRemote.Server);
+                    InitModule(m_vision);
+                    break;
+                case eSide.Bottom:
+
+                    m_vision = new Vision2D(eVision.Bottom, m_engineer, ModuleBase.eRemote.Server);
+                    InitModule(m_vision);
+                    break; 
+            }
         }
 
         void InitModule(ModuleBase module)
@@ -128,6 +148,13 @@ namespace Root_JEDI_Vision.Engineer
         {
         }
         #endregion
+
+        #region Tree
+        public void RunTree(Tree tree)
+        {
+            m_eSide = (eSide)tree.Set(m_eSide, m_eSide, "Side", "Top or Bottom"); 
+        }
+        #endregion 
 
         string m_id;
         public JEDI_Vision_Engineer m_engineer;

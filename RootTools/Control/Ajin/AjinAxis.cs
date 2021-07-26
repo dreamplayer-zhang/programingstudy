@@ -881,7 +881,7 @@ namespace RootTools.Control.Ajin
                     if (sAXM == sFunc) return uResult;
                 }
                 m_aAXM.Add(sFunc);
-                p_sInfo = sFunc + ", Error # = " + uResult.ToString();
+                p_log.Error(sFunc + ", Error # = " + uResult.ToString());
                 return uResult;
             }
         }
