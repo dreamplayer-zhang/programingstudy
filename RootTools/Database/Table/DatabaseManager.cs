@@ -820,7 +820,7 @@ namespace RootTools.Database
 		public void SetLotinfo(DateTime inspectionstart, DateTime inspectionend, string recipeid)
 		{
 			//Inspection ID 생성(KEY)
-			m_Loftinfo.SetLotinfo(inspectionstart, inspectionend, "LotID", "CSTID", "SetupID", "CSID", "WaferID", recipeid);
+			m_Loftinfo.SetLotinfo(inspectionstart, inspectionend, "LotID", "CSTID", "SetupID", "CSID", "WaferID", recipeid.Replace(".rcp", ""));
 			m_sInspectionID = MakeInspectionID(m_Loftinfo);
 			string sLotinfoQuery;
 
@@ -832,7 +832,7 @@ namespace RootTools.Database
 				, "null"
 				, "null"
 				, "null"
-				, "null"
+				, recipeid.Replace(".rcp", "")
 				);
 			SendQuery(sLotinfoQuery);
 		}

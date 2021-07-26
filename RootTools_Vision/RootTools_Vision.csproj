@@ -131,6 +131,7 @@
     <Compile Include="Database\defect.cs" />
     <Compile Include="ClonableWorkFactory.cs" />
     <Compile Include="DataTypes\CameraInfo.cs" />
+    <Compile Include="DataTypes\ModuleType.cs" />
     <Compile Include="DataTypes\SharedBufferInfo.cs" />
     <Compile Include="Inspection\BacksideAlignment.cs" />
     <Compile Include="Inspection\BacksideSurface.cs" />
@@ -217,6 +218,8 @@
     <Compile Include="RemoteProcess\StreamDataWriter.cs" />
     <Compile Include="ServerWorkFactory.cs" />
     <Compile Include="Settings\Constants.cs" />
+    <Compile Include="Settings\DefectCodeManager.cs" />
+    <Compile Include="Settings\IniFile.cs" />
     <Compile Include="Settings\ISettingItem.cs" />
     <Compile Include="Settings\SettingDialog.xaml.cs">
       <DependentUpon>SettingDialog.xaml</DependentUpon>
@@ -253,6 +256,10 @@
       <DependentUpon>DataListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\DataListView_ViewModel.cs" />
+    <Compile Include="UserControls\DefectViewer.xaml.cs">
+      <DependentUpon>DefectViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\DefectViewer_ViewModel.cs" />
     <Compile Include="UserControls\MapViewer.xaml.cs">
       <DependentUpon>MapViewer.xaml</DependentUpon>
     </Compile>
@@ -332,6 +339,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\DataListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\DefectViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

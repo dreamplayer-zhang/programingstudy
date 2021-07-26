@@ -84,9 +84,9 @@ namespace RootTools_Vision
 
 		public enum EdgeDefectCode
 		{
-			Top = 10000,
-			Side = 10100,
-			Btm = 10200,
+			Top = 20000,
+			Side = 20100,
+			Btm = 20200,
 		}
 
 		private void DoColorInspection(EdgeSurfaceParameterBase param, EdgeDefectCode defectCode, int channelIndex)
