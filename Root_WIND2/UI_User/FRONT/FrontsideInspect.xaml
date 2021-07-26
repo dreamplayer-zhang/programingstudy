@@ -82,8 +82,8 @@
                     HorizontalAlignment="Center"
                     Width="25"
                     Height="25"
-                    Margin="0,5,0,0"
-                    Foreground="LightGray" 
+                    Margin="0,3,0,0"
+                    Foreground="Yellow" 
                     MouseDoubleClick="PackIconMaterial_MouseDoubleClick"/>
                 <TextBlock
                     FontSize="10"

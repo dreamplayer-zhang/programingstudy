@@ -1879,39 +1879,25 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOr
 
     return pMapData_Trans;
 }
-int IP::CalcAdaptiveThresholdParam(BYTE* pSrc, BYTE* pMask, int nW, int nH, int nGap_DominantGV2ParamGV)
+int IP::FindDominantIntensity(BYTE* pSrc, BYTE* pMask, int nW, int nH)
 {
     uint64_t nCnt = 0; 
-    uint64_t nValidPixelCnt = 0;
     uint64_t pHist[256];
     int nBandwidth = 10;
     memset(pHist, 0, 256 * sizeof(uint64_t));
 
     uint64_t bufferLen = (uint64_t)nW * nH;
     for (uint64_t i = 0; i < bufferLen; i++) 
-    {
-        if(pMask != 0)
-        {
+        if(pMask[i] != 0)
             pHist[pSrc[i]]++;
-            nValidPixelCnt++;
-        }
-    }
 
-    for (int i = nGap_DominantGV2ParamGV; i < nGap_DominantGV2ParamGV + nBandwidth; i++) 
-    {
-        nCnt += pHist[i];
-    }
+    int nMaxBinIdx = 29;
 
-    for (int i = nGap_DominantGV2ParamGV; i < 254 - nBandwidth; i++) 
-    {
-        if (nCnt > nValidPixelCnt / 10) {
-            return i - nGap_DominantGV2ParamGV;
-        }
-        nCnt = nCnt - pHist[i];
-        nCnt += pHist[i + nBandwidth];
-    }
+    for (int i = 30; i < 220; i++) 
+        if (pHist[nMaxBinIdx] < pHist[i])
+            nMaxBinIdx = i;
 
-    return -1;    
+    return nMaxBinIdx;
 }
 // Image(Feature/Defect Image) Load/Save - (추후 C#단으로 올려야 할 듯) 
 void IP::SaveBMP(String sFilePath, BYTE* pSrc, int nW, int nH, int nByteCnt)

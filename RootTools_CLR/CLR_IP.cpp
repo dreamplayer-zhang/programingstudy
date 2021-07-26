@@ -583,12 +583,12 @@ namespace RootTools_CLR
 		return local;
 	}
 	
-	int CLR_IP::Cpp_CalcAdaptiveThresholdParam(array<byte>^ pSrcImg, array<byte>^ pMaskImg, int  nMemW, int  nMemH, int nGap_DominantGV2ParamGV)
+	int CLR_IP::Cpp_FindDominantIntensity(array<byte>^ pSrcImg, array<byte>^ pMaskImg, int  nMemW, int  nMemH)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pMask = &pMaskImg[0];
 	
-		int nThreshold = IP::CalcAdaptiveThresholdParam(pSrc, pMask, nMemW, nMemH, nGap_DominantGV2ParamGV);
+		int nThreshold = IP::FindDominantIntensity(pSrc, pMask, nMemW, nMemH);
 
 		pSrc = nullptr;
 		pMask = nullptr;

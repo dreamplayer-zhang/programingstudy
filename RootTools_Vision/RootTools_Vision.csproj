@@ -148,6 +148,18 @@
     <Compile Include="Inspection\ProcessMeasurement.cs" />
     <Compile Include="Inspection\Snap.cs" />
     <Compile Include="MainWindow_ViewModel.cs" />
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_RefCoordItem.xaml.cs">
+      <DependentUpon>VerticalWire_RefCoordItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_RefCoordItem_ViewModel.cs" />
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VericalWire_RecipeTeacing.xaml.cs">
+      <DependentUpon>VericalWire_RecipeTeacing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_RecipeTeaching_ViewModel.cs" />
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_ROIItem.xaml.cs">
+      <DependentUpon>VerticalWire_ROIItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_ROIItem_ViewModel.cs" />
     <Compile Include="Measurement\VerticalWire.cs" />
     <Compile Include="Measurement\PBI.cs" />
     <Compile Include="MVVM\Converter.cs" />
@@ -267,6 +279,7 @@
     <Compile Include="UserControls\SizeObserver.cs" />
     <Compile Include="UserControls\MapViewer_ViewModel.cs" />
     <Compile Include="Utility\Enums.cs" />
+    <Compile Include="Utility\Helper.cs" />
     <Compile Include="Utility\KlarfData.cs" />
     <Compile Include="Utility\KlarfData_Lot.cs" />
     <Compile Include="SingleObject.cs" />
@@ -311,6 +324,18 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_RefCoordItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Measurement\UI_RecipeSetting\VerticalWire\VericalWire_RecipeTeacing.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_ROIItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Settings\SettingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

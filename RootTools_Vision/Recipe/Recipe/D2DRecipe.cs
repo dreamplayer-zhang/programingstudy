@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace RootTools_Vision
 {
@@ -17,6 +18,7 @@ namespace RootTools_Vision
         #endregion
 
         #region [Getter Setter]
+        [XmlIgnore]
         public byte[][] PreGolden { get => _preGolden; set => _preGolden = value; }
         public int PreGoldenW { get => _preGoldenW; set => _preGoldenW = value; }
         public int PreGoldenH { get => _preGoldenH; set => _preGoldenH = value; }

@@ -77,7 +77,7 @@ namespace RootTools_CLR
 		static array<int>^ Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode);
 		// Map Size 넘겨주면 N * M 크기로 Map Data 생성
 		static array<int>^ Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, float& outChipSzX, float& outChipSzY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode);
-		static int Cpp_CalcAdaptiveThresholdParam(array<byte>^ pSrcImg, array<byte>^ pMaskImg, int  nMemW, int  nMemH, int nGap_DominantGV2ParamGV);
+		static int Cpp_FindDominantIntensity(array<byte>^ pSrcImg, array<byte>^ pMaskImg, int  nMemW, int  nMemH);
 
 		// Image(Feature/Defect Image) Load/Save
 		static void Cpp_SaveBMP(System::String^ strFilePath, array<byte>^ pSrcImg, int  nMemW, int  nMemH, int nByteCnt);
