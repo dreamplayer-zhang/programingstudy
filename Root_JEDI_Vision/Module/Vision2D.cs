@@ -711,6 +711,13 @@ namespace Root_JEDI_Vision.Module
         #endregion
 
         #region Snap
+        public string StartSnap(bool bReadRecipe)
+        {
+            Run_Snap run = (Run_Snap)m_runSnap.Clone();
+            run.m_bReadRecipe = bReadRecipe;
+            return StartRun(run); 
+        }
+
         public string RunSnap(bool bReadRecipe)
         {
             StopWatch sw = new StopWatch();
