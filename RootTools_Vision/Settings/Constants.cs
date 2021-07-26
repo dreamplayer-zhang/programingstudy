@@ -28,6 +28,7 @@ namespace RootTools_Vision
         public static class FilePath
         {
             public const string SettingFilePath = @"C:\Root\Setting.ini";
+            public const string DefectCodeFilePath = @"C:\Root\DefectCode.ini";
         }
 
         public static class ASCWaferMap

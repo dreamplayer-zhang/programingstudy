@@ -185,6 +185,8 @@ namespace Root_WIND2
             {
                 // Settings
                 Settings settings = GlobalObjects.Instance.Register<Settings>();
+                SettingItem_Setup setupSetting = settings.GetItem<SettingItem_Setup>();
+
 
                 // Engineer
                 WIND2_Engineer engineer = GlobalObjects.Instance.Register<WIND2_Engineer>();

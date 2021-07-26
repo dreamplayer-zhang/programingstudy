@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools_Vision;
+using RootTools_CLR;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,6 +23,11 @@ namespace Root_WindII
         private class DefineColors
         {
             public static SolidColorBrush OriginBoxColor = Brushes.Blue;
+            public static SolidColorBrush RefCoordBoxColor = Brushes.Yellow;
+            public static SolidColorBrush RefCoordCrossColor = Brushes.Magenta;
+
+            public static SolidColorBrush InspROIBoxColor = Brushes.Cyan;
+            public static SolidColorBrush FirstInspROIBoxColor = Brushes.Red;
         }
         /// <summary>
         /// 전체 Memory의 좌표와 ROI Memory 좌표의 Offset
@@ -38,14 +44,22 @@ namespace Root_WindII
         ToolProcess eToolProcess;
         ToolType eToolType;
         ModifyType eModifyType;
+        SelectedTeaching eSelectedTeaching;
 
-        public FrontsideMeasurement_ViewModel()
+        private readonly VerticalWire_RecipeTeaching_ViewModel vericalWireVM;
+        public VerticalWire_RecipeTeaching_ViewModel VericalWireVM
         {
+            get => this.vericalWireVM;
+        }
+        public FrontsideMeasurement_ViewModel()
+        { 
             if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode != ImageData.eMode.OtherPCMem)
                 return;
 
             base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
             p_VisibleMenu = Visibility.Collapsed;
+
+            this.vericalWireVM = new VerticalWire_RecipeTeaching_ViewModel();
 
             BufferInspROI.CollectionChanged += BufferInspROI_CollectionChanged;
             SetBackGroundWorker();
@@ -145,36 +159,7 @@ namespace Root_WindII
             }
         }
         private bool m_ToolEnable = false;
-        /// <summary>
-        /// Selected Tool Index
-        /// </summary>
-        public int p_SelectedToolIndex
-        {
-            get
-            {
-                return m_SelectedToolIndex;
-            }
-            set
-            {
-                eToolProcess = ToolProcess.None;
-                eToolType = (ToolType)value;
-                if (eToolType == ToolType.Crop)
-                    BufferInspROI.Clear();
-                else if (eToolType != ToolType.None)
-                {
-                    p_Cursor = Cursors.Cross;
-                    if (CropShape != null)
-                        if (BufferInspROI.Contains(CropShape))
-                        {
-                            BufferInspROI.Remove(CropShape);
-                            CropShape = null;
-                        }
-                }
 
-                SetProperty(ref m_SelectedToolIndex, value);
-            }
-        }
-        private int m_SelectedToolIndex = 0;
         /// <summary>
         /// ROI Page Opacity
         /// </summary>
@@ -220,6 +205,32 @@ namespace Root_WindII
             }
         }
         private double m_LoadingOpacity = 0;
+
+        private int selectedRefCoordItem;
+        public int SelectedRefCoordItem
+        {
+            get
+            {
+                return selectedRefCoordItem;
+            }
+            set
+            {
+                SetProperty(ref selectedRefCoordItem, value);
+            }
+        }
+
+        private int selectedROIItem;
+        public int SelectedROIItem
+        {
+            get
+            {
+                return selectedROIItem;
+            }
+            set
+            {
+                SetProperty(ref selectedROIItem, value);
+            }
+        }
         #endregion
 
         #region [Viewer Method]
@@ -297,7 +308,7 @@ namespace Root_WindII
             if (shapes.Count() == 0)
                 p_UIElement.Clear();
 
-            TShape[] Work = new TShape[20];
+            TShape[] Work = new TShape[50];
             shapes.CopyTo(Work, 0);
 
             History.Push(Work);
@@ -323,7 +334,7 @@ namespace Root_WindII
                     if (eToolType != ToolType.None)
                     {
                         BufferInspROI.Clear();
-                        if (eToolType == ToolType.Crop)
+                        if (eToolType == ToolType.Point)
                         {
                             if (BufferInspROI.Contains(CropShape))
                                 BufferInspROI.Remove(CropShape);
@@ -364,8 +375,6 @@ namespace Root_WindII
                     {
                         DrawDone(eToolType, memPt, canvasPt);
                         eToolProcess = ToolProcess.None;
-                        eToolType = ToolType.None;
-                        p_SelectedToolIndex = 0;
                     }
                     break;
                 case ToolProcess.Modifying:
@@ -429,7 +438,7 @@ namespace Root_WindII
 
             switch (type)
             {
-                case ToolType.Crop:
+                case ToolType.Point:
                     StartDrawCropTool(Brushes.Black, 1.5, 1, startMemPt, startCanvasPt);
                     break;
                 case ToolType.Line:
@@ -446,9 +455,7 @@ namespace Root_WindII
             }
             if (CurrentShape != null)
             {
-                CurrentShape.UIElement.MouseEnter += UIElement_MouseEnter;
                 CurrentShape.UIElement.MouseLeave += UIElement_MouseLeave;
-                CurrentShape.UIElement.MouseLeftButtonDown += UIElement_MouseLeftButtonDown;
             }
         }
 
@@ -474,7 +481,7 @@ namespace Root_WindII
             {
                 case ToolType.None:
                     break;
-                case ToolType.Crop:
+                case ToolType.Point:
                     DrawingSelectRect(startMemPt, startCanvasPt);
                     break;
                 case ToolType.Line:
@@ -496,7 +503,7 @@ namespace Root_WindII
             {
                 case ToolType.None:
                     break;
-                case ToolType.Crop:
+                case ToolType.Point:
                     DrawDoneSelectRect(startMemPt, startCanvasPt);
                     break;
                 case ToolType.Line:
@@ -597,27 +604,99 @@ namespace Root_WindII
         }
         private void DrawDoneRect(CPoint currentMemPt, CPoint currentCanvasPt)
         {
+            if (eSelectedTeaching == SelectedTeaching.None)
+                return;
+
             TRect rect = CurrentShape as TRect;
-            rect.CanvasRect.Fill = rect.FillBrush;
-            CreateModifyTool_Rect(rect);
+            BufferInspROI.Clear();
 
-            ContextMenu cMenu = new ContextMenu();
-            MenuItem menuAdd = new MenuItem();
-            menuAdd.Header = "Add";
-            menuAdd.Click += MenuAdd_Click;
-            MenuItem menuDelete = new MenuItem();
-            menuDelete.Header = "Delete";
-            menuDelete.Click += MenuDelete_Click;
-            MenuItem menuCancel = new MenuItem();
-            menuCancel.Header = "Cancel";
-            menuCancel.Click += MenuCancel_Click;
+            if (eSelectedTeaching == SelectedTeaching.RefCoord)
+            {
+                VerticalWire_RefCoordItem refCoordItem = (vericalWireVM.RefCoordListItem[this.SelectedRefCoordItem]) as VerticalWire_RefCoordItem;
+                VerticalWire_RefCoordItem_ViewModel refCoordItem_ViewModel = refCoordItem.DataContext as VerticalWire_RefCoordItem_ViewModel;
+                
+                refCoordItem_ViewModel.RefX = rect.MemoryRect.Left;
+                refCoordItem_ViewModel.RefY = rect.MemoryRect.Top;
+                refCoordItem_ViewModel.RefW = rect.MemoryRect.Width;
+                refCoordItem_ViewModel.RefH = rect.MemoryRect.Height;
 
-            cMenu.Items.Add(menuAdd);
-            cMenu.Items.Add(menuDelete);
-            cMenu.Items.Add(menuCancel);
+                switch(refCoordItem_ViewModel.eArrangeType)
+                {
+                    case VerticalWire_RefCoordItem_ViewModel.ArrangeType.LT :
+                        refCoordItem_ViewModel.RefCoord = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
+                        break;
+                    case VerticalWire_RefCoordItem_ViewModel.ArrangeType.LB:
+                        refCoordItem_ViewModel.RefCoord = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Bottom);
+                        break;
+                    case VerticalWire_RefCoordItem_ViewModel.ArrangeType.RT:
+                        refCoordItem_ViewModel.RefCoord = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Top);
+                        break;
+                    case VerticalWire_RefCoordItem_ViewModel.ArrangeType.RB:
+                        refCoordItem_ViewModel.RefCoord = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
+                        break;
+                    case VerticalWire_RefCoordItem_ViewModel.ArrangeType.Center:
+                        refCoordItem_ViewModel.RefCoord = new CPoint((rect.MemoryRect.Left + rect.MemoryRect.Right)/2, (rect.MemoryRect.Top + rect.MemoryRect.Bottom)/2);
+                        break;
+                }
+                DrawRefCoordElement();
+            }
 
-            rect.CanvasRect.ContextMenu = cMenu;
-            rect.CanvasRect.ContextMenu.IsOpen = true;
+            else if(eSelectedTeaching == SelectedTeaching.InspROI)
+            {
+                VerticalWire_ROIItem roiItem = (vericalWireVM.ROIListItem[this.SelectedRefCoordItem]) as VerticalWire_ROIItem;
+                VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+
+                int roiW = rect.MemoryRect.Right - rect.MemoryRect.Left;
+                int roiH = rect.MemoryRect.Bottom - rect.MemoryRect.Top;
+
+                IntPtr imgPtr  = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr(roiItemItem_ViewModel.SelectedChannel);
+                long stride = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").p_Stride;
+
+                byte[] roiBuffer = new byte[roiW * roiH];
+                int idx = 0;
+
+                unsafe
+                {
+                    byte *p = (byte*)imgPtr.ToPointer();
+                    for (Int64 r = rect.MemoryRect.Top; r < rect.MemoryRect.Bottom; r++)
+                    {
+                        for (Int64 c = rect.MemoryRect.Left; c < (long)rect.MemoryRect.Right; c++)
+                        {
+                            roiBuffer[idx++] = p[r * stride + c];
+                        }
+                    }
+                    
+                    CLR_IP.Cpp_Threshold(roiBuffer, roiBuffer, roiW, roiH, true, roiItemItem_ViewModel.Threshold);
+                    var detectList = CLR_IP.Cpp_Labeling(roiBuffer, roiBuffer, roiW, roiH);
+
+                    roiItemItem_ViewModel.WireRectList.Clear();
+                    
+                    foreach (Cpp_LabelParam list in detectList)
+                    {
+                        if (list.area < 5)
+                            continue;
+
+                        TRect tmpRect = new TRect();
+                        tmpRect.MemoryRect.Left = list.boundLeft + rect.MemoryRect.Left;
+                        tmpRect.MemoryRect.Right = list.boundRight + rect.MemoryRect.Left;
+                        tmpRect.MemoryRect.Top = list.boundTop + rect.MemoryRect.Top;
+                        tmpRect.MemoryRect.Bottom = list.boundBottom + rect.MemoryRect.Top;
+                        tmpRect.MemoryRect.Width = (int)list.width;
+                        tmpRect.MemoryRect.Height = (int)list.height;
+
+                        roiItemItem_ViewModel.WireRectList.Add(tmpRect);
+                    }
+
+                    if (roiItemItem_ViewModel.WireRectList.Count > 50)
+                        MessageBox.Show("Vertical Wire가 비정상적으로 많이 검출 되었습니다. \n Threshod 값을 조절하세요.", "Error");
+
+                    else { 
+                        roiItemItem_ViewModel.ArrangeDetectPoint();
+                        DrawInspROIElement(roiItemItem_ViewModel.WireRectList);
+                    }
+                }
+                
+            }
         }
         #endregion
 
@@ -679,40 +758,40 @@ namespace Root_WindII
         }
         private void DrawingSelectRect(CPoint currentMemPt, CPoint currentCanvasPt)
         {
-            TCropTool crop = CropShape as TCropTool;
+            //TCropTool crop = CropShape as TCropTool;
 
-            if (crop.MemPointBuffer.X > currentMemPt.X)
-            {
-                crop.MemoryRect.Left = currentMemPt.X;
-                crop.MemoryRect.Right = crop.MemPointBuffer.X;
-            }
-            else
-            {
-                crop.MemoryRect.Left = crop.MemPointBuffer.X;
-                crop.MemoryRect.Right = currentMemPt.X;
-            }
-            if (crop.MemPointBuffer.Y > currentMemPt.Y)
-            {
-                crop.MemoryRect.Top = currentMemPt.Y;
-                crop.MemoryRect.Bottom = crop.MemPointBuffer.Y;
-            }
-            else
-            {
-                crop.MemoryRect.Top = crop.MemPointBuffer.Y;
-                crop.MemoryRect.Bottom = currentMemPt.Y;
-            }
-            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
-            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
-            CPoint LT = new CPoint(crop.MemoryRect.Left, crop.MemoryRect.Top);
-            CPoint RB = new CPoint(crop.MemoryRect.Right, crop.MemoryRect.Bottom);
-            CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
-            CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+            //if (crop.MemPointBuffer.X > currentMemPt.X)
+            //{
+            //    crop.MemoryRect.Left = currentMemPt.X;
+            //    crop.MemoryRect.Right = crop.MemPointBuffer.X;
+            //}
+            //else
+            //{
+            //    crop.MemoryRect.Left = crop.MemPointBuffer.X;
+            //    crop.MemoryRect.Right = currentMemPt.X;
+            //}
+            //if (crop.MemPointBuffer.Y > currentMemPt.Y)
+            //{
+            //    crop.MemoryRect.Top = currentMemPt.Y;
+            //    crop.MemoryRect.Bottom = crop.MemPointBuffer.Y;
+            //}
+            //else
+            //{
+            //    crop.MemoryRect.Top = crop.MemPointBuffer.Y;
+            //    crop.MemoryRect.Bottom = currentMemPt.Y;
+            //}
+            //double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
+            //double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
+            //CPoint LT = new CPoint(crop.MemoryRect.Left, crop.MemoryRect.Top);
+            //CPoint RB = new CPoint(crop.MemoryRect.Right, crop.MemoryRect.Bottom);
+            //CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+            //CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
 
-            Canvas.SetLeft(crop.CanvasRect, canvasLT.X - pixSizeX / 2);
-            Canvas.SetTop(crop.CanvasRect, canvasLT.Y - pixSizeY / 2);
+            //Canvas.SetLeft(crop.CanvasRect, canvasLT.X - pixSizeX / 2);
+            //Canvas.SetTop(crop.CanvasRect, canvasLT.Y - pixSizeY / 2);
 
-            crop.CanvasRect.Width = Math.Abs(canvasRB.X - canvasLT.X + pixSizeX);
-            crop.CanvasRect.Height = Math.Abs(canvasRB.Y - canvasLT.Y + pixSizeY);
+            //crop.CanvasRect.Width = Math.Abs(canvasRB.X - canvasLT.X + pixSizeX);
+            //crop.CanvasRect.Height = Math.Abs(canvasRB.Y - canvasLT.Y + pixSizeY);
         }
         private void DrawDoneSelectRect(CPoint currentMemPt, CPoint currentCanvasPt)
         {
@@ -751,55 +830,9 @@ namespace Root_WindII
         }
         #endregion
 
-        private void MenuAdd_Click(object sender, RoutedEventArgs e)
-        {
-            byte r = p_SelectedROI.p_Color.R;
-            byte g = p_SelectedROI.p_Color.G;
-            byte b = p_SelectedROI.p_Color.B;
-            DrawRectBitmap((CurrentShape as TRect).MemoryRect, r, g, b, 255, OriginOffset);
-            BufferInspROI.Clear();
-
-            SetLayerSource();
-            _SaveROI();
-        }
-        private void MenuDelete_Click(object sender, RoutedEventArgs e)
-        {
-            DrawRectBitmap((CurrentShape as TRect).MemoryRect, 0, 0, 0, 0, OriginOffset);
-
-            BufferInspROI.Clear();
-            SetLayerSource();
-        }
-
-        private void MenuCancel_Click(object sender, RoutedEventArgs e)
-        {
-            BufferInspROI.Clear();
-        }
         #endregion
 
         #region Modify Method
-        private void UIElement_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (m_KeyEvent != null)
-                if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
-                    return;
-            if (p_SelectedToolIndex == 0)
-            {
-                TShape shape = (sender as Shape).Tag as TShape;
-                if (shape.isSelected)
-                {
-                    shape.isSelected = false;
-                }
-                else
-                {
-                    shape.isSelected = true;
-                }
-            }
-        }
-        private void UIElement_MouseEnter(object sender, MouseEventArgs e)
-        {
-            if (p_SelectedToolIndex == 0)
-                p_Cursor = Cursors.Hand;
-        }
         private void UIElement_MouseLeave(object sender, MouseEventArgs e)
         {
             p_Cursor = Cursors.Arrow;
@@ -1467,8 +1500,8 @@ namespace Root_WindII
         }
         private void RedrawRect(TRect rect)
         {
-            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
-            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
+            double pixSizeX = (double)p_CanvasWidth / (double)p_View_Rect.Width;
+            double pixSizeY = (double)p_CanvasHeight / (double)p_View_Rect.Height;
 
             CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
             CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
@@ -1568,6 +1601,70 @@ namespace Root_WindII
             if (!p_ViewElement.Contains(OriginBox))
             {
                 p_ViewElement.Add(OriginBox);
+            }
+        }
+
+        void DrawRefCoordElement()
+        {
+            VerticalWire_RefCoordItem refCoordItem = (vericalWireVM.RefCoordListItem[this.SelectedRefCoordItem]) as VerticalWire_RefCoordItem;
+            VerticalWire_RefCoordItem_ViewModel refCoordItem_ViewModel = refCoordItem.DataContext as VerticalWire_RefCoordItem_ViewModel;
+
+            TShape rectRefCoordBox = new TRect(DefineColors.RefCoordBoxColor, 2, 0.5);
+            TRect rect = rectRefCoordBox as TRect;
+
+            rect.MemoryRect.Left = refCoordItem_ViewModel.RefX;
+            rect.MemoryRect.Top = refCoordItem_ViewModel.RefY;
+            rect.MemoryRect.Right = refCoordItem_ViewModel.RefX + refCoordItem_ViewModel.RefW;
+            rect.MemoryRect.Bottom = refCoordItem_ViewModel.RefY + refCoordItem_ViewModel.RefH;
+
+            BufferInspROI.Add(rectRefCoordBox);
+            RedrawRect(rect);
+
+            if (refCoordItem_ViewModel.RefCoord != null)
+            {
+                TShape rectRefCoordCross1 = new TLine(DefineColors.RefCoordCrossColor, 4, 1);
+                TLine line1 = rectRefCoordCross1 as TLine;
+                line1.MemoryStartPoint = new CPoint(refCoordItem_ViewModel.RefCoord.X - 10, refCoordItem_ViewModel.RefCoord.Y - 10);
+                line1.MemoryEndPoint = new CPoint(refCoordItem_ViewModel.RefCoord.X + 10, refCoordItem_ViewModel.RefCoord.Y + 10);
+
+                BufferInspROI.Add(rectRefCoordCross1);
+                RedrawLine(line1);
+
+                TShape rectRefCoordCross2 = new TLine(DefineColors.RefCoordCrossColor, 4, 1);
+                TLine line2 = rectRefCoordCross2 as TLine;
+                line2.MemoryStartPoint = new CPoint(refCoordItem_ViewModel.RefCoord.X + 10, refCoordItem_ViewModel.RefCoord.Y - 10);
+                line2.MemoryEndPoint = new CPoint(refCoordItem_ViewModel.RefCoord.X - 10, refCoordItem_ViewModel.RefCoord.Y + 10);
+
+                BufferInspROI.Add(rectRefCoordCross2);
+                RedrawLine(line2);
+            }
+        }
+
+        void DrawInspROIElement(List<TRect> detectList)
+        {
+            bool isFirst = true;
+            foreach(TRect rt in detectList)
+            {
+                if (rt.MemoryRect.Width < 5 || rt.MemoryRect.Height < 5)
+                    continue;
+
+                TShape rectROIBox;
+                if (isFirst)
+                {
+                    rectROIBox = new TRect(DefineColors.FirstInspROIBoxColor, 2, 0.5);
+                    isFirst = false;
+                }
+                else
+                    rectROIBox = new TRect(DefineColors.InspROIBoxColor, 2, 0.5);
+
+                TRect rect = rectROIBox as TRect;
+                rect.MemoryRect.Left = rt.MemoryRect.Left;
+                rect.MemoryRect.Top = rt.MemoryRect.Top;
+                rect.MemoryRect.Right = rt.MemoryRect.Right;
+                rect.MemoryRect.Bottom = rt.MemoryRect.Bottom;
+
+                BufferInspROI.Add(rectROIBox);
+                RedrawRect(rect);
             }
         }
         #endregion
@@ -1988,6 +2085,39 @@ namespace Root_WindII
                 return new RelayCommand(_SaveROI);
             }
         }
+
+        public ICommand RefCoordItemClickedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                int selectedItem = this.VericalWireVM.SelectedItemIdx;
+                
+                
+                if(selectedItem < this.VericalWireVM.ROIItemOffset)
+                {
+                    this.SelectedRefCoordItem = selectedItem;
+                    eToolProcess = ToolProcess.None;
+                    eToolType = ToolType.Rect;
+                    eSelectedTeaching = SelectedTeaching.RefCoord;
+
+                    BufferInspROI.Clear();
+                    DrawRefCoordElement();
+                }
+                else
+                {
+                    this.SelectedROIItem = selectedItem - this.VericalWireVM.ROIItemOffset;
+                    eToolProcess = ToolProcess.None;
+                    eToolType = ToolType.Rect;
+                    eSelectedTeaching = SelectedTeaching.InspROI;
+
+                    BufferInspROI.Clear();
+
+                    VerticalWire_ROIItem roiItem = (vericalWireVM.ROIListItem[this.SelectedRefCoordItem]) as VerticalWire_ROIItem;
+                    VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+                    DrawInspROIElement(roiItemItem_ViewModel.WireRectList);
+                }
+            });
+        }
         #endregion
 
         #region Enum
@@ -2000,7 +2130,7 @@ namespace Root_WindII
         private enum ToolType
         {
             None,
-            Crop,
+            Point,
             Line,
             Rect,
             Circle,
@@ -2020,6 +2150,12 @@ namespace Root_WindII
             RightTop,
             LeftBottom,
             RightBottom,
+        }
+        public enum SelectedTeaching
+        {
+            None,
+            RefCoord,
+            InspROI,
         }
         #endregion
     }

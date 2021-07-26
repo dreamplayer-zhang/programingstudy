@@ -16,8 +16,8 @@ namespace Root_EFEM.Module.FrontsideVision
     public class Run_VRSAlign : ModuleRunBase
     {
         Vision_Frontside m_module;
-        //public RPoint m_firstPointPulse = new RPoint();
-        //public RPoint m_secondPointPulse = new RPoint();
+        public RPoint m_firstPointPulse = new RPoint();
+        public RPoint m_secondPointPulse = new RPoint();
         public int m_focusPosZ = 0;
         public Camera_Basler m_CamVRS;
         //public bool m_saveAlignFailImage = false;
@@ -74,8 +74,8 @@ namespace Root_EFEM.Module.FrontsideVision
         public override ModuleRunBase Clone()
         {
             Run_VRSAlign run = new Run_VRSAlign(m_module);
-            //run.m_firstPointPulse = m_firstPointPulse;
-            //run.m_secondPointPulse = m_secondPointPulse;
+            run.m_firstPointPulse = m_firstPointPulse;
+            run.m_secondPointPulse = m_secondPointPulse;
             run.m_focusPosZ = m_focusPosZ;
             run.m_score = m_score;
             //run.m_saveAlignFailImage = m_saveAlignFailImage;
@@ -97,8 +97,8 @@ namespace Root_EFEM.Module.FrontsideVision
 
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
-            //m_firstPointPulse = tree.Set(m_firstPointPulse, m_firstPointPulse, "First Align Point", "First Align Point (pulse)", bVisible);
-            //m_secondPointPulse = tree.Set(m_secondPointPulse, m_secondPointPulse, "Second Align Point", "Second Align Point (pulse)", bVisible);
+            m_firstPointPulse = tree.Set(m_firstPointPulse, m_firstPointPulse, "First Align Point", "First Align Point (pulse)", bVisible);
+            m_secondPointPulse = tree.Set(m_secondPointPulse, m_secondPointPulse, "Second Align Point", "Second Align Point (pulse)", bVisible);
             m_focusPosZ = tree.Set(m_focusPosZ, m_focusPosZ, "Focus Position Z", "Focus Position Z", bVisible);
             m_score = tree.Set(m_score, m_score, "Matching Score", "Matching Score", bVisible);
             //m_saveAlignFailImagePath = tree.SetFolder(m_saveAlignFailImagePath, m_saveAlignFailImagePath, "Align Feature Path", "Align Feature Path", bVisible);
@@ -193,9 +193,11 @@ namespace Root_EFEM.Module.FrontsideVision
                 return p_sInfo;
             }
 
-            RPoint centerPoint = axisXY.p_posActual;
+            //RPoint centerPoint = axisXY.p_posActual;
             //RPoint shotCenterPoint = new RPoint(centerPoint.X + m_shotOffsetX * PULSE_TO_UM, centerPoint.Y + m_shotOffsetY * PULSE_TO_UM);
             //RPoint initShotLBPoint = new RPoint(centerPoint.X - (m_diePitchX + m_scribeLineX) * m_shotSizeX / 2 * PULSE_TO_UM, centerPoint.Y - (m_diePitchY + m_scribeLineY) * m_shotSizeY / 2 * PULSE_TO_UM);
+            RPoint firstPoint = new RPoint(alignRecipe.FirstSearchPointX, alignRecipe.FirstSearchPointY); // or m_firstPointPulse
+            RPoint secondPoint = new RPoint(alignRecipe.SecondSearchPointX, alignRecipe.SecondSearchPointY); // or m_secondPointPulse
             RPoint foundShotLBPoint = new RPoint(0, 0);
 
             // Shot Center Point
@@ -219,8 +221,10 @@ namespace Root_EFEM.Module.FrontsideVision
             }*/
 
             long outX, outY;
-            long maxOutX = 0;
-            long maxOutY = 0;
+            long maxOutX1 = 0;
+            long maxOutY1 = 0;
+            long maxOutX2 = 0;
+            long maxOutY2 = 0;
             long outOffsetX, outOffsetY;
             long centerOutOffsetX = 0;
             long centerOutOffsetY = 0;
@@ -229,11 +233,12 @@ namespace Root_EFEM.Module.FrontsideVision
             double scoreMax = 0;
             int lineCount = 0;
 
-            for (int y = (int)centerPoint.Y - m_searchOffset; y < (int)centerPoint.Y + m_searchOffset; y+=m_searchInterval)
+            // First Point
+            for (int y = (int)firstPoint.Y - m_searchOffset; y < (int)firstPoint.Y + m_searchOffset; y+=m_searchInterval)
             {
                 if (lineCount % 2 == 0)
                 {
-                    for (int x = (int)centerPoint.X - m_searchOffset; x < (int)centerPoint.X + m_searchOffset; x += m_searchInterval)
+                    for (int x = (int)firstPoint.X - m_searchOffset; x < (int)firstPoint.X + m_searchOffset; x += m_searchInterval)
                     {
                         if (m_module.Run(axisXY.StartMove(new RPoint(x, y))))
                         {
@@ -249,8 +254,8 @@ namespace Root_EFEM.Module.FrontsideVision
                         if (score > scoreMax)
                         {
                             scoreMax = score;
-                            maxOutX = outX;
-                            maxOutY = outY;
+                            maxOutX1 = outX;
+                            maxOutY1 = outY;
                             centerOutOffsetX = outOffsetX;
                             centerOutOffsetY = outOffsetY;
                             foundShotLBPoint.X = x;
@@ -260,7 +265,7 @@ namespace Root_EFEM.Module.FrontsideVision
                 }
                 else
                 {
-                    for (int x = (int)centerPoint.X + m_searchOffset; x > (int)centerPoint.X - m_searchOffset; x -= m_searchInterval)
+                    for (int x = (int)firstPoint.X + m_searchOffset; x > (int)firstPoint.X - m_searchOffset; x -= m_searchInterval)
                     {
                         if (m_module.Run(axisXY.StartMove(new RPoint(x, y))))
                         {
@@ -276,8 +281,8 @@ namespace Root_EFEM.Module.FrontsideVision
                         if (score > scoreMax)
                         {
                             scoreMax = score;
-                            maxOutX = outX;
-                            maxOutY = outY;
+                            maxOutX1 = outX;
+                            maxOutY1 = outY;
                             centerOutOffsetX = outOffsetX;
                             centerOutOffsetY = outOffsetY;
                             foundShotLBPoint.X = x;
@@ -290,10 +295,9 @@ namespace Root_EFEM.Module.FrontsideVision
 
             if (scoreMax < m_score)
             {
-                return "VRS Align Fail [Score : " + score.ToString() + "]";
+                return "First VRS Align Fail [Score : " + score.ToString() + "]";
             }
 
-            // Found Shot Point
             foundShotLBPoint.X = foundShotLBPoint.X - centerOutOffsetX;
             foundShotLBPoint.Y = foundShotLBPoint.Y + centerOutOffsetY;
 
@@ -306,11 +310,94 @@ namespace Root_EFEM.Module.FrontsideVision
                 return p_sInfo;
             }
 
-            /*double dAngle = CalcAngle(, maxOutX, maxOutY);
+            // Second Point
+            centerOutOffsetX = 0;
+            centerOutOffsetY = 0;
+            score = 0;
+            scoreMax = 0;
+            lineCount = 0;
+
+            for (int y = (int)secondPoint.Y - m_searchOffset; y < (int)secondPoint.Y + m_searchOffset; y += m_searchInterval)
+            {
+                if (lineCount % 2 == 0)
+                {
+                    for (int x = (int)secondPoint.X - m_searchOffset; x < (int)secondPoint.X + m_searchOffset; x += m_searchInterval)
+                    {
+                        if (m_module.Run(axisXY.StartMove(new RPoint(x, y))))
+                        {
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(axisXY.WaitReady()))
+                        {
+                            return p_sInfo;
+                        }
+                        Thread.Sleep(1000); // need to reduce
+
+                        score = TemplateMatching(alignRecipe, out outX, out outY, out featureIndex, out outOffsetX, out outOffsetY);
+                        if (score > scoreMax)
+                        {
+                            scoreMax = score;
+                            maxOutX2 = outX;
+                            maxOutY2 = outY;
+                            centerOutOffsetX = outOffsetX;
+                            centerOutOffsetY = outOffsetY;
+                            foundShotLBPoint.X = x;
+                            foundShotLBPoint.Y = y;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int x = (int)secondPoint.X + m_searchOffset; x > (int)secondPoint.X - m_searchOffset; x -= m_searchInterval)
+                    {
+                        if (m_module.Run(axisXY.StartMove(new RPoint(x, y))))
+                        {
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(axisXY.WaitReady()))
+                        {
+                            return p_sInfo;
+                        }
+                        Thread.Sleep(1000); // need to reduce
+
+                        score = TemplateMatching(alignRecipe, out outX, out outY, out featureIndex, out outOffsetX, out outOffsetY);
+                        if (score > scoreMax)
+                        {
+                            scoreMax = score;
+                            maxOutX2 = outX;
+                            maxOutY2 = outY;
+                            centerOutOffsetX = outOffsetX;
+                            centerOutOffsetY = outOffsetY;
+                            foundShotLBPoint.X = x;
+                            foundShotLBPoint.Y = y;
+                        }
+                    }
+                }
+                lineCount = lineCount + 1;
+            }
+
+            if (scoreMax < m_score)
+            {
+                return "Second VRS Align Fail [Score : " + score.ToString() + "]";
+            }
+
+            foundShotLBPoint.X = foundShotLBPoint.X - centerOutOffsetX;
+            foundShotLBPoint.Y = foundShotLBPoint.Y + centerOutOffsetY;
+
+            if (m_module.Run(axisXY.StartMove(foundShotLBPoint)))
+            {
+                return p_sInfo;
+            }
+            if (m_module.Run(axisXY.WaitReady()))
+            {
+                return p_sInfo;
+            }
+
+            double dAngle = CalcAngle(maxOutX1, maxOutY1, maxOutX2, maxOutY2);
 
             Axis axisRotate = m_module.AxisRotate;
             axisRotate.StartMove(axisRotate.p_posActual - dAngle * 1000);
-            axisRotate.WaitReady();*/
+            axisRotate.WaitReady();
 
             // 정확도를 위해 반복성 수행
             /*for (int cnt = 1; cnt < m_AlignCount; cnt++)
@@ -365,10 +452,10 @@ namespace Root_EFEM.Module.FrontsideVision
             m_module.RunTree(Tree.eMode.RegWrite);
             m_module.RunTree(Tree.eMode.Init);
 
-            //m_grabMode.SetLight(false);
+            //m_grabMode.SetLight(false);*/
 
             timer.Stop();
-            System.Diagnostics.Debug.WriteLine(timer.ElapsedMilliseconds);*/
+            System.Diagnostics.Debug.WriteLine(timer.ElapsedMilliseconds);
 
             return "OK";
         }

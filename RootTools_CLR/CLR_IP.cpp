@@ -290,6 +290,18 @@ namespace RootTools_CLR
 		pSrc2 = nullptr;
 		pDst = nullptr;
 	}
+	void CLR_IP::Cpp_Subtract(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<byte> pSrc2 = &pSrcImg2[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Subtract(pSrc1, pSrc2, pDst, nMemW, nMemH);
+
+		pSrc1 = nullptr;
+		pSrc2 = nullptr;
+		pDst = nullptr;
+	}
 	void CLR_IP::Cpp_FindMinDiffLoc(array<byte>^ pSrcImg, array<byte>^ pInOutTarget, int nTransX, int nTransY, int nTargetW, int nTargetH, int nTrigger)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
@@ -301,7 +313,7 @@ namespace RootTools_CLR
 		pSrc = nullptr;
 		pTarget = nullptr;
 	}
-	void CLR_IP::Cpp_SelectMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH)
+	void CLR_IP::Cpp_SelectAbsMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pDst = &pDstImg[0];
@@ -311,12 +323,28 @@ namespace RootTools_CLR
 		for (int i = 0; i < RefROILT->Count; i++)
 			vtPoint.push_back(Point(RefROILT[i]->x, RefROILT[i]->y));
 
-		IP::SelectMinDiffinArea(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, Point(CurROILT->x, CurROILT->y), stride, nROIW, nROIH);
+		IP::SelectAbsMinDiffinArea(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, Point(CurROILT->x, CurROILT->y), stride, nROIW, nROIH);
 
 		pSrc = nullptr;
 		pDst = nullptr;
 	}
 
+	void CLR_IP::Cpp_SelectMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH, bool isDark)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		std::vector<Point> vtPoint;
+
+		for (int i = 0; i < RefROILT->Count; i++)
+			vtPoint.push_back(Point(RefROILT[i]->x, RefROILT[i]->y));
+
+		IP::SelectMinDiffinArea(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, Point(CurROILT->x, CurROILT->y), stride, nROIW, nROIH, isDark);
+
+		pSrc = nullptr;
+		pDst = nullptr;
+
+	}
 	void CLR_IP::Cpp_CreateGoldenImage_Avg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
@@ -583,12 +611,12 @@ namespace RootTools_CLR
 		return local;
 	}
 	
-	int CLR_IP::Cpp_CalcAdaptiveThresholdParam(array<byte>^ pSrcImg, array<byte>^ pMaskImg, int  nMemW, int  nMemH, int nGap_DominantGV2ParamGV)
+	int CLR_IP::Cpp_FindDominantIntensity(array<byte>^ pSrcImg, array<byte>^ pMaskImg, int  nMemW, int  nMemH)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pMask = &pMaskImg[0];
 	
-		int nThreshold = IP::CalcAdaptiveThresholdParam(pSrc, pMask, nMemW, nMemH, nGap_DominantGV2ParamGV);
+		int nThreshold = IP::FindDominantIntensity(pSrc, pMask, nMemW, nMemH);
 
 		pSrc = nullptr;
 		pMask = nullptr;

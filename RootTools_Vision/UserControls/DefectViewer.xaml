@@ -1,0 +1,369 @@
+﻿<UserControl x:Class="RootTools_Vision.DefectViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RootTools_Vision"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="800">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="stackpanel_background" Color="#88000000" />
+        <SolidColorBrush x:Key="stackpanel_fontcolor" Color="#EEEEEE" />
+        <SolidColorBrush x:Key="mainviewer_background" Color="#333333" />
+
+
+        <Style x:Key="checkbox_option" TargetType="{x:Type CheckBox}">
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource stackpanel_fontcolor}"/>
+        </Style>
+        <Style x:Key="checkbox_type" TargetType="{x:Type CheckBox}">
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource stackpanel_fontcolor}"/>
+        </Style>
+        <Style x:Key="label_type" TargetType="{x:Type Label}">
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="Height" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource stackpanel_fontcolor}"/>
+        </Style>
+        <Style x:Key="textblock_type_defect_count" TargetType="{x:Type TextBlock}">
+            <Setter Property="Width" Value="60"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="TextAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="8,0,8,0"/>
+            <Setter Property="Foreground" Value="{StaticResource stackpanel_fontcolor}"/>
+        </Style>
+        <Style x:Key="textblock_type_ea" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource stackpanel_fontcolor}"/>
+        </Style>
+        <Style x:Key="textblock_product_left" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="TextAlignment" Value="Left"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Foreground" Value="{StaticResource stackpanel_fontcolor}"/>
+        </Style>
+        <Style x:Key="textblock_product_right" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Foreground" Value="{StaticResource stackpanel_fontcolor}"/>
+        </Style>
+    </UserControl.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid Background="{StaticResource mainviewer_background}"
+          SnapsToDevicePixels="True">
+        <!-- Main Control -->
+        <ItemsControl ItemsSource="{Binding BaseElements}"
+                      SnapsToDevicePixels="True"
+                        local:SizeObserver.Observe="True"
+                        local:SizeObserver.ObservedWidth="{Binding CanvasWidth, Mode=OneWayToSource}"
+                        local:SizeObserver.ObservedHeight="{Binding CanvasHeight, Mode=OneWayToSource}">
+            
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas SnapsToDevicePixels="True">
+                    </Canvas>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SizeChanged">
+                    <i:InvokeCommandAction Command="{Binding SizeChangedCommand}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ItemsControl>
+
+        <ItemsControl ItemsSource="{Binding BaseDieList}"
+                      SnapsToDevicePixels="True"
+                        local:SizeObserver.Observe="True"
+                        local:SizeObserver.ObservedWidth="{Binding CanvasWidth, Mode=OneWayToSource}"
+                        local:SizeObserver.ObservedHeight="{Binding CanvasHeight, Mode=OneWayToSource}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas SnapsToDevicePixels="True">
+                    </Canvas>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SizeChanged">
+                    <i:InvokeCommandAction Command="{Binding SizeChangedCommand}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ItemsControl>
+
+        <ItemsControl ItemsSource="{Binding TrendMapDieList}"
+                      SnapsToDevicePixels="True"
+                        local:SizeObserver.Observe="True"
+                        local:SizeObserver.ObservedWidth="{Binding CanvasWidth, Mode=OneWayToSource}"
+                        local:SizeObserver.ObservedHeight="{Binding CanvasHeight, Mode=OneWayToSource}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas SnapsToDevicePixels="True">
+                    </Canvas>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SizeChanged">
+                    <i:InvokeCommandAction Command="{Binding SizeChangedCommand}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ItemsControl>
+
+        <!-- Front Defect -->
+        <ItemsControl ItemsSource="{Binding FrontItems}"
+                      SnapsToDevicePixels="True"
+                        local:SizeObserver.Observe="True"
+                        local:SizeObserver.ObservedWidth="{Binding CanvasWidth, Mode=OneWayToSource}"
+                        local:SizeObserver.ObservedHeight="{Binding CanvasHeight, Mode=OneWayToSource}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas SnapsToDevicePixels="True">
+                    </Canvas>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SizeChanged">
+                    <i:InvokeCommandAction Command="{Binding SizeChangedCommand}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ItemsControl>
+
+        <!-- Back Defect List-->
+        <ItemsControl ItemsSource="{Binding BackItems}"
+                      SnapsToDevicePixels="True"
+                        local:SizeObserver.Observe="True"
+                        local:SizeObserver.ObservedWidth="{Binding CanvasWidth, Mode=OneWayToSource}"
+                        local:SizeObserver.ObservedHeight="{Binding CanvasHeight, Mode=OneWayToSource}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas SnapsToDevicePixels="True">
+                    </Canvas>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SizeChanged">
+                    <i:InvokeCommandAction Command="{Binding SizeChangedCommand}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ItemsControl>
+
+        <!-- Edge Defect List -->
+        <ItemsControl ItemsSource="{Binding EdgeItems}"
+                      SnapsToDevicePixels="True"
+                        local:SizeObserver.Observe="True"
+                        local:SizeObserver.ObservedWidth="{Binding CanvasWidth, Mode=OneWayToSource}"
+                        local:SizeObserver.ObservedHeight="{Binding CanvasHeight, Mode=OneWayToSource}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas SnapsToDevicePixels="True">
+                    </Canvas>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SizeChanged">
+                    <i:InvokeCommandAction Command="{Binding SizeChangedCommand}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ItemsControl>
+
+        <!-- EBR Defect List -->
+        <ItemsControl ItemsSource="{Binding EBRItems}"
+                      SnapsToDevicePixels="True"
+                        local:SizeObserver.Observe="True"
+                        local:SizeObserver.ObservedWidth="{Binding CanvasWidth, Mode=OneWayToSource}"
+                        local:SizeObserver.ObservedHeight="{Binding CanvasHeight, Mode=OneWayToSource}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas SnapsToDevicePixels="True">
+                    </Canvas>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SizeChanged">
+                    <i:InvokeCommandAction Command="{Binding SizeChangedCommand}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ItemsControl>
+        
+        <!-- Viewer Option -->
+        <Border VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                Background="{StaticResource stackpanel_background}"
+                Margin="4"
+                CornerRadius="4">
+            <StackPanel Orientation="Vertical"
+                    Margin="8"
+                    >
+                <CheckBox Content="Display Wafer" IsChecked="{Binding IsCheckedDisplayWafer}" Style="{StaticResource checkbox_option}"/>
+                <CheckBox Content="Display Chip" IsChecked="{Binding IsCheckedDisplayChip}" Style="{StaticResource checkbox_option}"/>
+                <CheckBox Content="Display TrendMap" IsChecked="{Binding IsCheckedDisplayTrendMap}" Style="{StaticResource checkbox_option}"/>
+                <CheckBox Content="option4" IsChecked="False" Style="{StaticResource checkbox_option}"/>
+            </StackPanel>
+        </Border>
+
+
+        <!-- Product Info -->
+        <Border VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                Background="{StaticResource stackpanel_background}"
+                Margin="4"
+                CornerRadius="4">
+            <StackPanel Orientation="Vertical"
+                        Margin="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition  Width="24"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Inspection ID" Style="{StaticResource textblock_product_left}"/>
+                    <TextBlock Grid.Column="1" Text=":"  Width ="Auto" Style="{StaticResource textblock_product_left}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding InspectionID}" Style="{StaticResource textblock_product_right}"/>
+                </Grid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="24"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Recipe ID" Style="{StaticResource textblock_product_left}"/>
+                    <TextBlock Grid.Column="1" Text=":"  Width ="Auto" Style="{StaticResource textblock_product_left}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding RecipeID}" Style="{StaticResource textblock_product_right}"/>
+                </Grid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="24"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Wafer ID" Style="{StaticResource textblock_product_left}"/>
+                    <TextBlock Grid.Column="1" Text=":"  Width ="Auto" Style="{StaticResource textblock_product_left}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding WaferID}" Style="{StaticResource textblock_product_right}"/>
+                </Grid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="12"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="MapSize" Style="{StaticResource textblock_product_left}"/>
+                    <TextBlock Grid.Column="1" Text=":"  Width ="Auto" Style="{StaticResource textblock_product_left}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding MapSizeX}" Width="50" TextAlignment="Center" Style="{StaticResource textblock_product_right}"/>
+                    <TextBlock Grid.Column="3" Text="X" Width="24" Style="{StaticResource textblock_product_right}"/>
+                    <TextBlock Grid.Column="4" Text="{Binding MapSizeY}" Width="50" TextAlignment="Center" Style="{StaticResource textblock_product_right}"/>
+                </Grid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="24"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Gross Die" Style="{StaticResource textblock_product_left}"/>
+                    <TextBlock Grid.Column="1" Text=":"  Width ="Auto" Style="{StaticResource textblock_product_left}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding GrossDie}" Style="{StaticResource textblock_product_right}"/>
+                    <TextBlock Grid.Column="3" Text="[EA]" Width="Auto" Style="{StaticResource textblock_product_right}"/>
+                </Grid>
+
+
+            </StackPanel>
+        </Border>
+
+        <!-- Type Select -->
+        <Border VerticalAlignment="Bottom"
+                HorizontalAlignment="Left"
+                CornerRadius="4"
+                Background="{StaticResource stackpanel_background}"
+                Margin="8">
+            <StackPanel Orientation="Vertical"
+                    Margin="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox Grid.Column="0" IsChecked="{Binding IsCheckedFront}" Content="Front" Style="{StaticResource checkbox_type}"/>
+                    <Label Grid.Column="1" Background="Red" Style="{StaticResource label_type}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding FrontDefectCount}" Style="{StaticResource textblock_type_defect_count}"/>
+                    <TextBlock Grid.Column="3" Text="[EA]" Style="{StaticResource textblock_type_ea}"/>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox Grid.Column="0" IsChecked="{Binding IsCheckedBack}" Content="Back" Style="{StaticResource checkbox_type}"/>
+                    <Label Grid.Column="1" Background="Blue" Style="{StaticResource label_type}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding BackDefectCount}" Style="{StaticResource textblock_type_defect_count}"/>
+                    <TextBlock Grid.Column="3" Text="[EA]" Style="{StaticResource textblock_type_ea}"/>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox Grid.Column="0" IsChecked="{Binding IsCheckedEdge}" Content="Edge" Style="{StaticResource checkbox_type}"/>
+                    <Label Grid.Column="1" Background="YellowGreen" Style="{StaticResource label_type}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding EdgeDefectCount}" Style="{StaticResource textblock_type_defect_count}"/>
+                    <TextBlock Grid.Column="3" Text="[EA]" Style="{StaticResource textblock_type_ea}"/>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox Grid.Column="0" IsChecked="{Binding IsCheckedEBR}" Content="EBR" Style="{StaticResource checkbox_type}"/>
+                    <Label Grid.Column="1" Background="Orange" Style="{StaticResource label_type}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding EBRDefectCount}" Style="{StaticResource textblock_type_defect_count}"/>
+                    <TextBlock Grid.Column="3" Text="[EA]" Style="{StaticResource textblock_type_ea}"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

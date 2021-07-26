@@ -14,9 +14,13 @@ namespace RootTools_Vision
 
         private long shotOffsetX;
         private long shotOffsetY;
-
         private long mapOffsetX;
         private long mapOffsetY;
+
+        private long firstSearchPointX;
+        private long firstSearchPointY;
+        private long secondSearchPointX;
+        private long secondSearchPointY;
         #endregion
 
         #region [Getter Setter]
@@ -27,9 +31,13 @@ namespace RootTools_Vision
 
         public long MapOffsetX { get => this.mapOffsetX; set => this.mapOffsetX = value; }
         public long MapOffsetY { get => this.mapOffsetY; set => this.mapOffsetY = value; }
-
         public long ShotOffsetX { get => this.shotOffsetX; set => this.shotOffsetX = value; }
         public long ShotOffsetY { get => this.shotOffsetY; set => this.shotOffsetY = value; }
+
+        public long FirstSearchPointX { get => this.firstSearchPointX; set => this.firstSearchPointX = value; }
+        public long FirstSearchPointY { get => this.firstSearchPointY; set => this.firstSearchPointY = value; }
+        public long SecondSearchPointX { get => this.secondSearchPointX; set => this.secondSearchPointX = value; }
+        public long SecondSearchPointY { get => this.secondSearchPointY; set => this.secondSearchPointY = value; }
         #endregion
 
         public FrontVRSAlignRecipe()
@@ -38,6 +46,11 @@ namespace RootTools_Vision
             this.MapOffsetY = 0;
             this.ShotOffsetX = 0;
             this.ShotOffsetY = 0;
+
+            this.FirstSearchPointX = 0;
+            this.FirstSearchPointY = 0;
+            this.SecondSearchPointX = 0;
+            this.SecondSearchPointY = 0;
 
             this.alignFeatureVRSList = new List<RecipeType_ImageData>();
         }
@@ -104,6 +117,11 @@ namespace RootTools_Vision
             this.MapOffsetY = 0;
             this.ShotOffsetX = 0;
             this.ShotOffsetY = 0;
+
+            this.FirstSearchPointX = 0;
+            this.FirstSearchPointY = 0;
+            this.SecondSearchPointX = 0;
+            this.SecondSearchPointY = 0;
         }
     }
 }
