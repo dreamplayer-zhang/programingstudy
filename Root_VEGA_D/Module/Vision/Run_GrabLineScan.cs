@@ -788,6 +788,8 @@ namespace Root_VEGA_D.Module
                         
                         CPoint tmpMemOffset = new CPoint(cpMemoryOffset);
 
+                        m_grabMode.m_GD.nUserSet = (int)camMain.p_CamParam.p_eUserSetCurrent;
+
                         // IPU PC와 연결된 상태라면
                         m_bContinuousConnectedIPU = m_module.TcpipCommServer.IsConnected();
                         if (CheckIPUConnectStatus())
