@@ -108,7 +108,8 @@ namespace Root_Pine2_Vision.Module
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.LotInfo, lotInfo);
             m_qProtocol.Enqueue(protocol);
-            return WaitReply(m_secTimeout);
+            int secTimeOut = 10;     // Recipe Open 시간이 김.
+            return WaitReply(secTimeOut);
         }
 
         public string SendSortInfo(SortInfo sortInfo)
@@ -218,7 +219,7 @@ namespace Root_Pine2_Vision.Module
         {
             int nProcess = 0; 
             m_bThreadProcess = true;
-            Thread.Sleep(p_eWorks == eWorks.A ? 25000 : 28000);
+            Thread.Sleep(p_eWorks == eWorks.A ? 30000 : 33000);
             while (m_bThreadProcess)
             {
                 Thread.Sleep(10);

@@ -36,6 +36,8 @@ namespace Root_Pine2_Vision.Module
                 {
                     m_tcpRequest.EventReciveData += M_tcpRequest_EventReceiveData;
                     m_rs232RGBW.p_bConnect = true;
+                    m_rs232RGBW.Send("w");
+                    m_rs232RGBW.Send("off");
                     if (m_camera != null)
                         m_camera.Connect();
                 }
@@ -174,6 +176,7 @@ namespace Root_Pine2_Vision.Module
                 m_RunningRecipe[eWorks.A].RecipeOpen(lotInfo.m_sRecipe);
                 m_RunningRecipe[eWorks.B].RecipeOpen(lotInfo.m_sRecipe);
                 string sRunA = m_aWorks[eWorks.A].SendLotInfo(lotInfo);
+                Thread.Sleep(1000);
                 string sRunB = m_aWorks[eWorks.B].SendLotInfo(lotInfo);
                 if ((sRunA == "OK") && (sRunB == "OK")) return "OK";
                 return sRunA + ", " + sRunB;
