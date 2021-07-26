@@ -293,9 +293,9 @@ namespace Root_Pine2.Module
         public SnapInfo GetSnapInfo()
         {
             if (p_infoStrip == null)
-                return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, "", m_recipe.p_lSnap);
+                return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, "", m_recipe.p_lSnap, true);
 
-            return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, p_infoStrip.p_id, m_recipe.p_lSnap);
+            return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, p_infoStrip.p_id, m_recipe.p_lSnap, true);
         }
         #endregion
 
