@@ -38,7 +38,8 @@ namespace Root_Pine2_Vision.Module
                     m_rs232RGBW.p_bConnect = true;
                     m_rs232RGBW.Send("w");
                     m_rs232RGBW.Send("off");
-                    m_camera.Connect();
+                    if (m_camera != null)
+                        m_camera.Connect();
                 }
             }
             m_remote.GetTools(bInit);
