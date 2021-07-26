@@ -11,6 +11,13 @@ namespace Root_WindII
 {
     public partial class XMLParser
     {
+        public delegate void ParsingHandler();
+        public static event ParsingHandler Parsing;
+        static void ParsingDone()
+        {
+            if (Parsing != null)
+                Parsing();
+        }
         //static public void SelectedXmlFile(string filePath, XMLData xmlData, StepTableData stepData)    // Find PartID, StepID in the selected xml file
         //{
         //    string fileName;
@@ -107,6 +114,26 @@ namespace Root_WindII
                         xmlData.DieList.Add(pt);
                     }
                 }
+
+                int minX = 0, maxX = 0;
+                int minY = 0, maxY = 0;
+
+                foreach (Point pt in xmlData.DieList)
+                {
+                    int valX = (int)(pt.X - xmlData.OriginDieX);
+                    int valY = (int)(pt.Y - xmlData.OriginDieY);
+
+                    if (minX > valX) minX = valX;
+                    if (maxX < valX) maxX = valX;
+
+                    if (minY > valY) minY = valY;
+                    if (maxY < valY) maxY = valY;
+                }
+
+                xmlData.UnitX = maxX - minX + 1;
+                xmlData.UnitY = maxY - minY + 1;
+
+                ParsingDone();
             }
             catch (Exception ex)
             {

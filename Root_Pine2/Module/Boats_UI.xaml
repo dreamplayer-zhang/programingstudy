@@ -59,8 +59,8 @@
             <Grid Grid.Row="3" x:Name="gridInfo" Margin="3" Background="White" PreviewMouseLeftButtonDown="GridInfo_PreviewMouseLeftButtonDown">
                 <TextBlock x:Name="textBlockInfo" Text="{Binding p_sInfo}"/>
             </Grid>
-            <tree:TreeUI Grid.Row="4" x:Name="treeRootUI" IsEnabled="False"/>
-            <tree:TreeUI Grid.Row="5" x:Name="treeVisionUI" IsEnabled="False"/>
+            <tree:TreeUI Grid.Row="4" x:Name="treeRootUI" IsEnabled="False" Margin="3,0,3,0"/>
+            <tree:TreeUI Grid.Row="5" x:Name="treeVisionUI" IsEnabled="False" Margin="3,0,3,0"/>
         </Grid>
     </GroupBox>
 </UserControl>

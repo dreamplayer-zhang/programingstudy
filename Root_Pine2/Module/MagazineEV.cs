@@ -212,7 +212,7 @@ namespace Root_Pine2.Module
             }
 
             public bool m_bPusherSafe = true; 
-            string MoveElevator(Enum ePos, double fOffset = 0)
+            public string MoveElevator(Enum ePos, double fOffset = 0)
             {
                 if (IsProtrude()) return "Strip Protrude";
                 while (m_bPusherSafe == false)
@@ -448,10 +448,15 @@ namespace Root_Pine2.Module
                 return infoStrip; 
             }
 
+            public List<InfoStrip> m_aStripDone = new List<InfoStrip>();
             public int m_nStripCount = 0; 
             public void PutInfoStrip(InfoStrip infoStrip)
             {
-                if (infoStrip != null) m_nStripCount++; 
+                if (infoStrip != null)
+                {
+                    m_nStripCount++;
+                    m_aStripDone.Add(infoStrip); 
+                }
                 m_aStripRun.Remove(infoStrip);
                 m_magazineEV.CheckMagazineDone(); 
             }
@@ -653,6 +658,7 @@ namespace Root_Pine2.Module
                 m_conveyor.RunMoveStop();
                 if (Run(m_elevator.MoveToConveyor(eMagazinePos, (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 7 : 0))) return p_sInfo;
                 if (Run(m_elevator.RunAlign(true))) return p_sInfo;
+                if (Run(m_elevator.MoveElevator(eMagazinePos))) return p_sInfo; 
                 m_magazineSet.MagazineLoaded(p_eMagazine, eMagazinePos); 
             }
             finally
@@ -687,11 +693,7 @@ namespace Root_Pine2.Module
                     if ((m_aMagazine[ePos] != null) || m_elevator.m_bProduct[ePos])
                     {
                         sRun = RunUnload(ePos);
-                        if (m_aMagazine[ePos] != null)
-                        {
-                            int nStrip = m_aMagazine[ePos].m_nStripCount; 
-                            m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos].p_iBundle, nStrip);
-                        }
+                        if (m_aMagazine[ePos] != null) m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos]);
                         m_aMagazine[ePos] = null;
                         if (Run(m_elevator.RunAlign(true))) return p_sInfo;
                         return sRun;
@@ -700,11 +702,7 @@ namespace Root_Pine2.Module
                     if ((m_aMagazine[ePos] != null) || m_elevator.m_bProduct[ePos])
                     {
                         sRun = RunUnload(ePos); 
-                        if (m_aMagazine[ePos] != null)
-                        {
-                            int nStrip = m_aMagazine[ePos].m_nStripCount; 
-                            m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos].p_iBundle, nStrip);
-                        }
+                        if (m_aMagazine[ePos] != null) m_pine2.m_printer.AddPrint((int)p_eMagazine, m_aMagazine[ePos]);
                         m_aMagazine[ePos] = null;
                         return sRun;
                     }

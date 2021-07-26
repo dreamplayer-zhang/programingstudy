@@ -15,7 +15,7 @@ namespace Root_EFEM.Module
         #region class Data
         public class Data
         {
-            public int m_gvEdge = 50;
+            public int m_gvEdge = 120;
             public CPoint m_szMargin = new CPoint(100, 20);
             public CPoint m_szSmooth = new CPoint(0, 0);
             public CPoint m_szNotch = new CPoint(35, 35);
