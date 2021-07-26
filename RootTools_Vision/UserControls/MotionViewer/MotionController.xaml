@@ -25,7 +25,7 @@
                                 Height="{TemplateBinding Height}"
                                 CornerRadius="6"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                
                                 HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
                             <ContentPresenter  VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
@@ -59,7 +59,7 @@
                                 Height="{TemplateBinding Height}"
                                 CornerRadius="100"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                
                                 HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
                             <ContentPresenter  VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>

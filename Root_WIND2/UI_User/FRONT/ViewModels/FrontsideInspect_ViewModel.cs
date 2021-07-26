@@ -235,6 +235,9 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
 
+                DefectCodeManager defectCodeManager = new DefectCodeManager(Constants.FilePath.SettingFilePath);
+                defectCodeManager.ReadDefectCodes();
+
                 if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
                 {
                     GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").Start();                    

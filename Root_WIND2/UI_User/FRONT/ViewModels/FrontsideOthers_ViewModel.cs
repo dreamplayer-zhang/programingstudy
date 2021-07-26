@@ -753,7 +753,7 @@ namespace Root_WIND2.UI_User
                 IsEnabledSave = true;
                 p_ImageData = null;
                 p_ImageData = new ImageData(originRecipe.OriginWidth, originRecipe.OriginHeight, 1);
-                
+
                 IntPtr ptrMem = p_ImageData.GetPtr();
 
                 unsafe { 

@@ -404,6 +404,10 @@
       <DependentUpon>SequenceRecipe.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\HOME\SequenceRecipe_ViewModel.cs" />
+    <Compile Include="UI_User\REVIEW\Review.xaml.cs">
+      <DependentUpon>Review.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\REVIEW\Review_ViewModel.cs" />
     <Compile Include="UI_User\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -873,6 +877,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_User\HOME\SequenceRecipe.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\REVIEW\Review.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
