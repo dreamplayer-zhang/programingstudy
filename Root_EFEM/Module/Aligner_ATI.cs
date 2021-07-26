@@ -540,7 +540,7 @@ namespace Root_EFEM.Module
         #endregion
 
         #region Axis Rotate
-        int m_lRotate = 40000;
+        int m_lRotate = 360000;
         int m_nRotateBack = 0;
         string Rotate(double fPulse)
         {
