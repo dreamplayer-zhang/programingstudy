@@ -27,6 +27,7 @@ using Rectangle = System.Windows.Shapes.Rectangle;
 using Size = System.Windows.Size;
 using System.Collections;
 using System.Reflection;
+using RootTools_Vision.Utility;
 
 namespace Root_WIND2.UI_User
 {
@@ -635,6 +636,67 @@ namespace Root_WIND2.UI_User
                 return new RelayCommand(SaveTrendImg);
             }
         }
+
+        public ICommand btnExportToCSVCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                if (pDefect_Datatable == null) return;
+
+                System.Windows.Forms.SaveFileDialog saveDlg = new System.Windows.Forms.SaveFileDialog();
+                saveDlg.Filter = "csv (*.csv)|*.csv|txt (*txt)|*.txt|All files (*.*)|*.*";
+                if (saveDlg.ShowDialog() == System.Windows.Forms.DialogResult.Cancel)
+                {
+                    return;
+                }
+
+                SimpleCSVFile csvFile = new SimpleCSVFile(saveDlg.FileName);
+
+                csvFile.WriteDataTable(pDefect_Datatable);
+
+                int sizeX = Convert.ToInt32(DefectViewerVM.MapSizeX);
+                int sizeY = Convert.ToInt32(DefectViewerVM.MapSizeY);
+                int[] defectMap = DefectViewerVM.DefectCountMap;
+                if(defectMap != null)
+                {
+                    SimpleCSVFile csvFile2 = new SimpleCSVFile(
+                        Path.Combine(
+                        Path.GetDirectoryName(saveDlg.FileName),
+                        Path.GetFileName(saveDlg.FileName).Replace(".csv", "") + "_DefectCount.csv"));
+
+                    StringBuilder builder = new StringBuilder();
+                    builder.Append("X,Y,DNUM\n");
+
+                    for (int j = 0; j < sizeX; j++)
+                    {
+                        for (int i = 0; i < sizeY; i++)
+                        {
+                            if (defectMap[i * sizeX + j] != -1)
+                            {
+                                builder.AppendFormat("{0},{1},{2}\n", j, i, defectMap[i * sizeX + j]);
+                            }
+                        }
+                    }
+                    csvFile2.WriteString(builder.ToString());
+
+                    //csvFile2.WriteString("\n");
+
+                    //builder.Clear();
+
+                    //for (int i = 0; i < sizeY; i++)
+                    //{
+                    //    for (int j = 0; j < sizeX; j++)
+                    //    {
+                    //        if (defectMap[i * sizeX + j] != -1)
+                    //        {
+                    //            builder.AppendFormat("{0},{1},{2}\n", j, i, defectMap[i * sizeX + j]);
+                    //        }
+                    //    }
+                    //}
+                }
+            });
+        }
+
         public void GoldenImagelist_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //if (e.AddedItems.Count > 0) ;

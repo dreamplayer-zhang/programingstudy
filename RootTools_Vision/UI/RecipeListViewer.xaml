@@ -45,7 +45,7 @@
         </Grid.RowDefinitions>
 
         <TextBox Margin="4"  Text="{Binding SearchName, UpdateSourceTrigger=PropertyChanged}" />
-        <DataGrid Margin="4,0,4,4" Grid.Row="1" ItemsSource="{Binding RecipeListViewerItems}" IsReadOnly="True">
+        <DataGrid Margin="4,0,4,4" Grid.Row="1" ItemsSource="{Binding RecipeListViewerItems}" IsReadOnly="True" ColumnWidth="*">
 
         </DataGrid>
     </Grid>
