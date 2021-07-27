@@ -19,37 +19,6 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    
-    <!--<UserControl.Resources>
-        <Style x:Key="use_checkbox_button" TargetType="CheckBox">
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="IsChecked" Value="{Binding IsChecked}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <Border x:Name="bd" CornerRadius="10">
-                            <TextBlock x:Name="tb" Text="USE" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{StaticResource groupbox_button_normal}"/>
-                                <Setter TargetName="tb" Property="Text" Value="On"/>
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="bd" Property="Background" Value="#222222"/>
-                                <Setter TargetName="tb" Property="Text" Value="Off"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>-->
 
     <Grid Background="{StaticResource main_view_background}">
         <Grid.ColumnDefinitions>
@@ -153,7 +122,7 @@
                                      PropertySort="Categorized"/>
             </GroupBox>
 
-            
+
         </Grid>
 
 
@@ -243,15 +212,17 @@
                       Background="{StaticResource GroupBoxBackground}"
                       Style="{StaticResource main_view_groupbox}"
                       Margin="4">
+
                 <GroupBox.Resources>
                     <local:PropertyConverter x:Key="PropertyConverter" />
                 </GroupBox.Resources>
 
                 <StackPanel Margin="4">
                     <DataGrid ItemsSource="{Binding OptionDefectList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              SelectionMode="Single"
-                                              IsReadOnly="False"
-                                              AutoGenerateColumns="False">
+                                      SelectedItem="{Binding SelectedOptionDefect, Mode=TwoWay}"
+                                      SelectionMode="Single"
+                                      IsReadOnly="False"
+                                      AutoGenerateColumns="False">
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -276,17 +247,28 @@
                         </DataGrid.Resources>
 
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Angle" Width="200"
+
+                            <!--<DataGridTextColumn Header="Angle" Width="200"
                                                                     ElementStyle="{StaticResource TextInCellCenter}"
                                                                     Binding="{Binding Angle, UpdateSourceTrigger=PropertyChanged}"/>
-                            <DataGridTextColumn Header="Defect Code" Width="*"
+                                <DataGridTextColumn Header="Defect Code" Width="*"
                                                                     ElementStyle="{StaticResource TextInCellCenter}"
-                                                                    Binding="{Binding Code, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    Binding="{Binding Code, UpdateSourceTrigger=PropertyChanged}"/>-->
+                            <DataGridTextColumn Header="Min Angle" Width="1*"
+                                                                        ElementStyle="{StaticResource TextInCellCenter}"
+                                                                        Binding="{Binding MinAngle, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Max Angle" Width="1*"
+                                                                        ElementStyle="{StaticResource TextInCellCenter}"
+                                                                        Binding="{Binding MaxAngle, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Defect Code" Width="1*"
+                                                                        ElementStyle="{StaticResource TextInCellCenter}"
+                                                                        Binding="{Binding Code, UpdateSourceTrigger=PropertyChanged}"/>
                         </DataGrid.Columns>
                     </DataGrid>
 
                     <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                         <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
@@ -297,16 +279,20 @@
                             Command="{Binding btnAddOptionDefect}"
                             Style="{StaticResource groupbox_button}"/>
 
-                        <Button Content="Save" Grid.Column="1"
+                        <Button Content="Delete" Grid.Column="1"
+                            Margin="4" 
+                            Height="30"
+                            Command="{Binding btnDeleteOptionDefect}"
+                            Style="{StaticResource groupbox_button}"/>
+
+                        <Button Content="Save" Grid.Column="2"
                             Margin="4" 
                             Height="30"
                             Command="{Binding btnSaveOptionDefect}"
                             Style="{StaticResource groupbox_button}"/>
-                        
                     </Grid>
                 </StackPanel>
             </GroupBox>
         </Grid>
-
     </Grid>
 </UserControl>

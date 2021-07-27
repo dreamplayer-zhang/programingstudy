@@ -12,11 +12,13 @@ namespace RootTools_Vision
     {
         public ProcessDefectEdgeParameter() : base(typeof(ProcessDefect_Edge))
         {
-            angles = new List<double>();
+            minAngles = new List<double>();
+            maxAngles = new List<double>();
             defectCodes = new List<int>();
         }
 
         private bool useProcessDefectEdge = true;
+        [Browsable(false)]
         public bool Use
         {
             get => this.useProcessDefectEdge;
@@ -57,16 +59,29 @@ namespace RootTools_Vision
         }
 
         [XmlArray("OptionDefectAngle")]
-        private List<double> angles;
+        private List<double> minAngles;
         [Browsable(false)]
-        public List<double> Angles
+        public List<double> MinAngles
         {
-            get => this.angles;
+            get => this.minAngles;
             set
             {
-                SetProperty(ref angles, value);
+                SetProperty(ref minAngles, value);
             }
         }
+
+        [XmlArray("OptionDefectAngle")]
+        private List<double> maxAngles;
+        [Browsable(false)]
+        public List<double> MaxAngles
+        {
+            get => this.maxAngles;
+            set
+            {
+                SetProperty(ref maxAngles, value);
+            }
+        }
+        
         [XmlArray("OptionDefectCode")]
         private List<int> defectCodes;
         [Browsable(false)]

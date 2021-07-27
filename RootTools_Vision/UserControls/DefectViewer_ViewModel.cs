@@ -51,6 +51,8 @@ namespace RootTools_Vision
     public class DefectViewer_ViewModel : ObservableObject
     {
 
+        int[] defectCountMap = null;
+
         private RecipeBase recipeFront = new RecipeBase();
         private RecipeBase recipeBack = new RecipeBase();
         private RecipeBase recipeEdge = new RecipeBase();
@@ -80,6 +82,11 @@ namespace RootTools_Vision
 
 
         #region [Properties]
+
+        public int[] DefectCountMap
+        {
+            get => this.defectCountMap;
+        }
 
         private bool isCheckedDisplayWafer = true;
         public bool IsCheckedDisplayWafer
@@ -130,12 +137,6 @@ namespace RootTools_Vision
                 RedrawTrendMap();
             }
         }
-
-
-
-
-
-
 
         private int frontDefectCount = 0;
         public int FrontDefectCount
@@ -410,6 +411,8 @@ namespace RootTools_Vision
                 this.MapSizeY = this.recipeFront.WaferMap.MapSizeY.ToString();
                 this.GrossDie = this.recipeFront.WaferMap.GrossDie.ToString();
 
+                
+
                 CreateMap(this.recipeFront.WaferMap);
             }
             else
@@ -472,6 +475,9 @@ namespace RootTools_Vision
             ClassifyDefectListFront();
             ClassifyDefectListBack();
             ClassifyDefectListEdge();
+
+
+            CreateDefectCountMap();
         }
 
         private void ClassifyDefectListFront()
@@ -928,8 +934,36 @@ namespace RootTools_Vision
 
             this.waferMap = waferMap;
 
+           
+
+
             RedrawMap();
             RedrawTrendMap();
+        }
+
+        public void CreateDefectCountMap()
+        {
+            RecipeType_WaferMap waferMap = this.recipeFront.WaferMap;
+            int sizeX = waferMap.MapSizeX;
+            int sizeY = waferMap.MapSizeY;
+
+            this.defectCountMap = new int[sizeX * sizeY];
+            int[] mapdata = waferMap.Data;
+
+            for(int i =0; i < sizeY; i++)
+            {
+                for(int j = 0; j < sizeX; j++)
+                {
+                    if(mapdata[i * sizeX + j] == (int)CHIP_TYPE.NO_CHIP)
+                    {
+                        this.defectCountMap[i * sizeX + j] = -1;
+                    }
+                    else
+                    {
+                        this.defectCountMap[i * sizeX + j] = GetDefectCountChip(frontDefectList, j, i);
+                    }
+                }
+            }
         }
 
         private void RedrawMap()

@@ -10,6 +10,9 @@ namespace RootTools_Vision
 {
     public class VerticalWire_ROIItem_ViewModel : ObservableObject
     {
+        public delegate void ChangedEventHandler();
+        public event ChangedEventHandler CollectionChanged;
+
         public ArrangeType eArrangeType;
         public List<TRect> WireRectList = new List<TRect>();
 
@@ -37,6 +40,18 @@ namespace RootTools_Vision
             }
         }
 
+        private int wireSize = 20;
+        public int WireSize
+        {
+            get => this.wireSize;
+            set
+            {
+                int wireSize = (value < 0) ? 0 : value;
+
+                SetProperty<int>(ref this.threshold, wireSize);
+            }
+
+        }
         private string roiHeader;
         public string ROIHeader
         {
@@ -68,6 +83,8 @@ namespace RootTools_Vision
                 
                 if(WireRectList != null)
                     ArrangeDetectPoint();
+
+                CollectionChanged?.Invoke();
             }
         }
 
@@ -81,7 +98,7 @@ namespace RootTools_Vision
             }
         }
 
-        private int selectedRefCoord = 0;
+        private int selectedRefCoord;
         public int SelectedRefCoord
         {
             get => this.selectedRefCoord;
@@ -91,16 +108,15 @@ namespace RootTools_Vision
             }
         }
 
-        private int refCoordNum = 1;
+        private int refCoordNum = 0;
         public int RefCoordNum
         {
             get => this.refCoordNum;
             set
             {
                 SetProperty<int>(ref this.refCoordNum, value);
+                this.RefCoordList.Clear();
 
-                this.RefCoordList = new ObservableCollection<string>();
-                
                 for (int i = 1; i <= value; i++)
                 {
                     this.RefCoordList.Add("ROI # " + i.ToString());
@@ -142,10 +158,10 @@ namespace RootTools_Vision
         public VerticalWire_ROIItem Main;
         public VerticalWire_ROIItem_ViewModel(int ROIIdx)
         {
-            Main = new VerticalWire_ROIItem();
+            this.Main = new VerticalWire_ROIItem();
             this.ItemIndex = ROIIdx;
             this.ROIHeader = "ROI # " + this.ItemIndex.ToString();
-            Main.DataContext = this;
+            this.Main.DataContext = this;
 
             this.ArrangeMethod = new ObservableCollection<string>();
             this.ArrangeMethod.Add("Top -> Bottom");
@@ -157,6 +173,10 @@ namespace RootTools_Vision
             this.ChannelList.Add("Red");
             this.ChannelList.Add("Green");
             this.ChannelList.Add("Blue");
+
+            this.RefCoordList = new ObservableCollection<string>();
+            this.RefCoordNum = 1;
+            this.SelectedRefCoord = 0;
         }
 
         public void ArrangeDetectPoint()
