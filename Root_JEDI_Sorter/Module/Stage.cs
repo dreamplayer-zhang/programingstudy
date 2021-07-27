@@ -11,11 +11,12 @@ namespace Root_JEDI_Sorter.Module
         public DIO_I4O m_dioAlignY;
         public DIO_I2O m_dioAlignX;
         public DIO_Is m_diCheck;
+        public string m_sGroup = ""; 
         public void GetTools(ToolBox toolBox, ModuleBase module, bool bInit)
         {
-            toolBox.GetDIO(ref m_dioAlignX, module, p_id + ".AlignX", "Off", "Align");
-            toolBox.GetDIO(ref m_dioAlignY, module, p_id + ".AlignY", "Off", "Align");
-            toolBox.GetDIO(ref m_diCheck, module, p_id + ".Check", new string[2] { "0", "1" });
+            toolBox.GetDIO(ref m_dioAlignX, module, m_sGroup + "AlignX", "Off", "Align");
+            toolBox.GetDIO(ref m_dioAlignY, module, m_sGroup + "AlignY", "Off", "Align");
+            toolBox.GetDIO(ref m_diCheck, module, m_sGroup + "Check", new string[2] { "0", "1" });
         }
         #endregion
 
@@ -69,9 +70,10 @@ namespace Root_JEDI_Sorter.Module
         }
 
         public string p_id { get; set; }
-        public Stage(string id)
+        public Stage(string id, string sGroup = "")
         {
-            p_id = id; 
+            p_id = id;
+            m_sGroup = sGroup; 
         }
 
         public void ThreadStop()

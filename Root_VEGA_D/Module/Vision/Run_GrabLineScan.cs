@@ -322,9 +322,9 @@ namespace Root_VEGA_D.Module
                 // Align Key 찾기
                 if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
                     return p_sInfo;
-                if (m_module.Run(FindAlignKey(mem, imgBot, imgBot_div4, m_grabMode.m_nCenterX, eFindAlignKeyDir.LeftTop, m_grabMode.p_sTempLeftTopAlignKeyFile, out rectLeftTop)))
+                if (m_module.Run(FindAlignKey(mem, imgBot, imgBot_div4, m_grabMode.m_nTopCenterY, eFindAlignKeyDir.LeftTop, m_grabMode.p_sTempLeftTopAlignKeyFile, out rectLeftTop)))
                     return p_sInfo;
-                if (m_module.Run(FindAlignKey(mem, imgBot, imgBot_div4, m_grabMode.m_nCenterX, eFindAlignKeyDir.LeftBottom, m_grabMode.p_sTempLeftBottomAlignKeyFile, out rectLeftBottom)))
+                if (m_module.Run(FindAlignKey(mem, imgBot, imgBot_div4, m_grabMode.m_nBottomCenterY, eFindAlignKeyDir.LeftBottom, m_grabMode.p_sTempLeftBottomAlignKeyFile, out rectLeftBottom)))
                     return p_sInfo;
 
                 rectLeftTop.Left += m_grabMode.m_ptLeftTopAlignKeyOffset.X;
@@ -337,8 +337,8 @@ namespace Root_VEGA_D.Module
                 rectLeftBottom.Right += m_grabMode.m_ptLeftBotAlignKeyOffset.X;
                 rectLeftBottom.Bottom += m_grabMode.m_ptLeftBotAlignKeyOffset.Y;
 
-                m_log.Info(string.Format("LeftTop Align Key is found - {0}, {1}", rectLeftTop.Left, rectLeftTop.Top));
-                m_log.Info(string.Format("LeftBottom Align Key is found - {0}, {1}", rectLeftBottom.Left, rectLeftBottom.Bottom));
+                m_log.Info(string.Format("LeftTop Align Key is found - {0}, {1}", (int)(rectLeftTop.Left + rectLeftTop.Width * 0.5), (int)(rectLeftTop.Top + rectLeftTop.Height * 0.5)));
+                m_log.Info(string.Format("LeftBottom Align Key is found - {0}, {1}", (int)(rectLeftBottom.Left + rectLeftBottom.Width * 0.5), (int)(rectLeftBottom.Top + rectLeftBottom.Height * 0.5)));
 
                 bOk = true;
             }
@@ -705,10 +705,10 @@ namespace Root_VEGA_D.Module
                 {
                     // 'LineStart' 메세지 전달
                     Dictionary<string, string> mapParam = new Dictionary<string, string>();
-                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LEFTTOP_ALIGN_MARKER_POS_X] = rectLeftTop.Left.ToString();
-                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LEFTTOP_ALIGN_MARKER_POS_Y] = rectLeftTop.Top.ToString();
-                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LEFTBOT_ALIGN_MARKER_POS_X] = rectLeftBot.Left.ToString();
-                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LEFTBOT_ALIGN_MARKER_POS_Y] = rectLeftBot.Bottom.ToString();
+                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LEFTTOP_ALIGN_MARKER_POS_X] = ((int)(rectLeftTop.Left + rectLeftTop.Width * 0.5)).ToString();
+                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LEFTTOP_ALIGN_MARKER_POS_Y] = ((int)(rectLeftTop.Top + rectLeftTop.Height * 0.5)).ToString();
+                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LEFTBOT_ALIGN_MARKER_POS_X] = ((int)(rectLeftBot.Left + rectLeftBot.Width * 0.5)).ToString();
+                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LEFTBOT_ALIGN_MARKER_POS_Y] = ((int)(rectLeftBot.Top + rectLeftBot.Height * 0.5)).ToString();
 
                     m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.RcpName, mapParam);
                 }

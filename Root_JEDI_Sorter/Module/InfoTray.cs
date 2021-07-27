@@ -15,17 +15,16 @@ namespace Root_JEDI_Sorter.Module
         Bottom,
     }
 
+    public enum eResult
+    {
+        Good,
+        Reject,
+        Rework,
+    }
+
     public class InfoTray : NotifyProperty
     {
         #region Result
-        public enum eResult
-        {
-            Init,
-            GOOD,
-            DEF,
-            POS,
-            BCD,
-        }
 
         Dictionary<eVision, bool> m_bInspect = new Dictionary<eVision, bool>();
         void InitInspect()

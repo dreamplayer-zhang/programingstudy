@@ -3,65 +3,78 @@ using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_JEDI_Sorter.Module
 {
-    public class In : ModuleBase
+    public class Good : ModuleBase
     {
         #region ToolBox
-        Axis m_axis; 
+        Axis m_axis;
         public override void GetTools(bool bInit)
         {
-            m_toolBox.GetAxis(ref m_axis, this, "Stage"); 
-            m_loadEV.GetTools(m_toolBox, this, bInit);
-            m_stage.GetTools(m_toolBox, this, bInit); 
-            if (bInit) InitPosition(); 
+            m_toolBox.GetAxis(ref m_axis, this, "Stage");
+            m_unloadEV.GetTools(m_toolBox, this, bInit);
+            m_stage[eStage.Taker].GetTools(m_toolBox, this, bInit);
+            m_stage[eStage.Giver].GetTools(m_toolBox, this, bInit);
+            if (bInit) InitPosition();
         }
         #endregion
 
         #region Stage Axis
+        public enum eStage
+        {
+            Taker,
+            Giver,
+        }
         public enum ePos
         {
             Elevator,
-            Transfer
+            TakerTransfer,
+            GiverTransfer,
+            TakerPicker,
+            GiverPicker,
+        }
+        public enum ePicker
+        {
+            PickerA,
+            PickerB
         }
         void InitPosition()
         {
             m_axis.AddPos(Enum.GetNames(typeof(ePos)));
         }
 
-        public string MoveStage(ePos ePos, bool bWait)
+        public string MoveStage(ePos ePos, bool bWait, double fOffset = 0)
         {
-            m_axis.StartMove(ePos);
+            m_axis.StartMove(ePos, fOffset);
             return bWait ? m_axis.WaitReady() : "OK";
         }
         #endregion
 
-        #region RunLoad
-        public string StartLoad()
+        #region RunUnload
+        public string StartUnload()
         {
-            Run_Load run = (Run_Load)m_runLoad.Clone();
-            return StartRun(run); 
+            Run_Unload run = (Run_Unload)m_runUnload.Clone();
+            return StartRun(run);
         }
-        public string RunLoad()
+        public string RunUnload()
         {
-            if (m_stage.p_infoTray != null) return "RunLoad : p_infoTray != null";
-            if (Run(m_loadEV.RunMove(LoadEV.ePos.Up, false))) return p_sInfo; 
-            if (Run(m_stage.RunAlign(false, false))) return p_sInfo;
-            if (Run(MoveStage(ePos.Elevator, true))) return p_sInfo; 
-            if (Run(m_stage.RunAlign(false, true))) return p_sInfo;
+            Stage stage = m_stage[(int)eStage.Taker]; 
+            if (stage.p_infoTray == null) return "RunUnload : p_infoTray == null";
             //forget
             return "OK";
         }
         #endregion
 
-        public LoadEV m_loadEV;
-        public Stage m_stage; 
-        public In(string id, IEngineer engineer)
+        public UnloadEV m_unloadEV;
+        public Dictionary<eStage, Stage> m_stage = new Dictionary<eStage, Stage>(); 
+        public Good(string id, IEngineer engineer)
         {
-            m_loadEV = new LoadEV(id + ".LoadEV");
-            m_stage = new Stage(id + ".Stage");
+            m_unloadEV = new UnloadEV(id + ".UnloadEV");
+            m_stage.Add(eStage.Taker, new Stage(id + ".Taker", "Taker."));
+            m_stage.Add(eStage.Giver, new Stage(id + ".Giver", "Giver.")); 
             base.InitBase(id, engineer);
         }
 
@@ -71,17 +84,17 @@ namespace Root_JEDI_Sorter.Module
         }
 
         #region ModuleRun
-        ModuleRunBase m_runLoad;
+        ModuleRunBase m_runUnload;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-            m_runLoad = AddModuleRunList(new Run_Load(this), true, "Run Load Tray");
+            m_runUnload = AddModuleRunList(new Run_Unload(this), true, "Run Unload Tray");
         }
 
         public class Run_Delay : ModuleRunBase
         {
-            In m_module;
-            public Run_Delay(In module)
+            Good m_module;
+            public Run_Delay(Good module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -107,18 +120,19 @@ namespace Root_JEDI_Sorter.Module
             }
         }
 
-        public class Run_Load : ModuleRunBase
+        public class Run_Unload : ModuleRunBase
         {
-            In m_module;
-            public Run_Load(In module)
+            Good m_module;
+            public Run_Unload(Good module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
 
+            public eStage m_eStage = eStage.Taker; 
             public override ModuleRunBase Clone()
             {
-                Run_Load run = new Run_Load(m_module);
+                Run_Unload run = new Run_Unload(m_module);
                 return run;
             }
 
@@ -128,7 +142,7 @@ namespace Root_JEDI_Sorter.Module
 
             public override string Run()
             {
-                return m_module.RunLoad();
+                return m_module.RunUnload();
             }
         }
         #endregion

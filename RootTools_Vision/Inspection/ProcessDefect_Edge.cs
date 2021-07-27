@@ -240,33 +240,46 @@ namespace RootTools_Vision
 
 			return calAngleDefect;
 		}
+
 		private List<Defect> AddOptionDefectData(List<Defect> defectList)
 		{
 			EdgeSurfaceParameterBase param = this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 			int startPosition = param.StartPosition;
 			int endPosition = param.EndPosition;
 
-			List<double> optionDefectAngle = recipe.GetItem<ProcessDefectEdgeParameter>().Angles;
+			List<double> minAngle = recipe.GetItem<ProcessDefectEdgeParameter>().MinAngles;
+			List<double> maxAngle = recipe.GetItem<ProcessDefectEdgeParameter>().MaxAngles;
 			List<int> optionDefectCodes = recipe.GetItem<ProcessDefectEdgeParameter>().DefectCodes;
+
+			Settings settings = new Settings();
+			SettingItem_SetupEdgeside settings_edgeside = settings.GetItem<SettingItem_SetupEdgeside>();
+			int imageHeight = settings_edgeside.DefectImageHeight;
+			float angle = (float) imageHeight / ((endPosition - startPosition) / 360);	// imageHeight 만큼에 해당하는 angle
 
 			string inspectionID = DatabaseManager.Instance.GetInspectionID();
 
-			for (int i = 0; i < optionDefectAngle.Count; i++)
+			for (int i = 0; i < minAngle.Count; i++)
 			{
-				float imageTop = startPosition + (((endPosition - startPosition) / 360) * (float)optionDefectAngle[i]);
-				Defect defect = new Defect(inspectionID,
+				float minImageTop = startPosition + (((endPosition - startPosition) / 360) * (float)minAngle[i]);
+				float maxImageTop = startPosition + (((endPosition - startPosition) / 360) * (float)maxAngle[i]);
+
+				for (float j = minImageTop, k = 0; j <= maxImageTop; j += imageHeight, k++)
+				{
+					Defect defect = new Defect(inspectionID,
 											(int)optionDefectCodes[i],
 											0,
 											0,
 											1,
 											1,
 											0,
-											(float)optionDefectAngle[i],
+											(float)minAngle[i] + (angle * k),
 											1,
-											imageTop,
+											j,
 											0,
 											0);
-				defectList.Add(defect);
+
+					defectList.Add(defect);
+				}
 			}
 
 			return defectList;
@@ -283,12 +296,15 @@ namespace RootTools_Vision
 			int gap90 = surfaceParam.EdgeParamBaseTop.StartPosition - surfaceParam.EdgeParamBaseBtm.StartPosition;
 			int gap45 = surfaceParam.EdgeParamBaseSide.StartPosition - surfaceParam.EdgeParamBaseBtm.StartPosition;
 
+			Settings settings = new Settings();
+			SettingItem_SetupEdgeside settings_edgeside = settings.GetItem<SettingItem_SetupEdgeside>();
+
 			// Defect 중심 원본 Image
 			Rect defectRect = defect.GetRect();
-			int imageWidth = this.currentWorkplace.SharedBufferWidth;
-			int imageHeight = 500; //this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.ROIHeight;			
+			int imageWidth = this.currentWorkplace.SharedBufferInfo.Width;
+			int imageHeight = settings_edgeside.DefectImageHeight; //500;
 			int defectImageLeftPt = 0;
-			int defectImageTopPt = (int)(defectRect.Top + (defectRect.Height / 2) - (imageHeight / 2)); //141520;
+			int defectImageTopPt = (int)(defectRect.Top + (defectRect.Height / 2) - (imageHeight / 2));
 			
 			Bitmap topImage, sideImage, btmImage;
 			if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Top)
@@ -405,7 +421,9 @@ namespace RootTools_Vision
 			Bitmap bitmap = new Bitmap(topImage.Width + sideImage.Width + btmImage.Width, imageHeight);
 			Graphics g = Graphics.FromImage(bitmap);
 			g.DrawImage(filpTop, 0, 0);
+			g.DrawLine(new System.Drawing.Pen(System.Drawing.Color.Green, 7), new System.Drawing.Point(filpTop.Width, 0), new System.Drawing.Point(filpTop.Width, imageHeight));
 			g.DrawImage(filpSide, filpTop.Width, 0);
+			g.DrawLine(new System.Drawing.Pen(System.Drawing.Color.Green, 7), new System.Drawing.Point(filpTop.Width + filpSide.Width, 0), new System.Drawing.Point(filpTop.Width + filpSide.Width, imageHeight));
 			g.DrawImage(btmImage, filpTop.Width + filpSide.Width, 0);
 
 			Tools.DrawBitmapText(ref bitmap, "Angle : " + defect.m_fRelY.ToString("F3"), 50, 50, 30, PenColor.RED);

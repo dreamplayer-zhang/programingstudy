@@ -11,6 +11,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision.Utility;
+using RootTools.RADS;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -43,6 +44,9 @@ namespace Root_EFEM
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
         Camera_Basler m_CamVRS;
+        Camera_Basler m_CamRADS;
+
+        RADSControl m_RADSControl;
 
         public Camera_Basler p_CamVRS
         {
@@ -85,6 +89,7 @@ namespace Root_EFEM
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         public Camera_Basler CamVRS { get => m_CamVRS; private set => m_CamVRS = value; }
         public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
+        public RADSControl RADSControl { get => m_RADSControl; private set => m_RADSControl = value; }
         #endregion
 
         public override void GetTools(bool bInit)
@@ -104,7 +109,9 @@ namespace Root_EFEM
                 p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRSCam");
+                p_sInfo = m_toolBox.GetCamera(ref m_CamRADS, this, "RADS");
                 p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
+                p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", true);
             }
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
