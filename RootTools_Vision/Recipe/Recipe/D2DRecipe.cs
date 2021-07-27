@@ -12,12 +12,14 @@ namespace RootTools_Vision
     public class D2DRecipe : RecipeItemBase
     {
         #region [Parameter]
+
         private byte[][] _preGolden = new byte[3][];
         private int _preGoldenW = -1;
         private int _preGoldenH = -1;
         #endregion
 
         #region [Getter Setter]
+
         [XmlIgnore]
         public byte[][] PreGolden { get => _preGolden; set => _preGolden = value; }
         public int PreGoldenW { get => _preGoldenW; set => _preGoldenW = value; }
