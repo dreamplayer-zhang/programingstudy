@@ -11,5 +11,20 @@
 #include "framework.h"
 typedef unsigned char byte;
 
+//3D
 
+
+#include <time.h>
+#include <math.h>
+#include <basetsd.h>
+
+
+#undef _WINDOWS_
+#include <afx.h>
+//#include <atlstr.h>
+#include <atltypes.h>
+#include <afxwin.h>
+
+#define BLOCK_SIZE 1000
+#define MAX_SAME_FRAME_COUNT 10000
 #endif //PCH_H

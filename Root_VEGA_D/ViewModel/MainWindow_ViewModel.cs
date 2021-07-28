@@ -1,4 +1,5 @@
-﻿using Root_VEGA_D.Module;
+﻿using Root_VEGA_D.Engineer;
+using Root_VEGA_D.Module;
 using Root_VEGA_D.Module.Recipe;
 using RootTools;
 using System;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
@@ -21,6 +23,24 @@ namespace Root_VEGA_D
 
         #region Dialog
         public DialogService m_dialogService;
+        #endregion
+
+        #region UI
+
+        UserControl m_CurrentPanel;
+        public UserControl p_CurrentPanel
+        {
+            get => m_CurrentPanel;
+            set
+            {
+                SetProperty(ref m_CurrentPanel, value);
+            }
+        }
+
+        Information_UI info;
+        RecipeManager_UI recipe;
+        Run_UI run;
+        VEGA_D_Engineer_UI engineer;
         #endregion
 
         #region ViewModel
@@ -47,6 +67,31 @@ namespace Root_VEGA_D
             set
             {
                 SetProperty(ref m_recipeManager_ViewModel, value);
+            }
+        }
+
+        Information_ViewModel m_informantion_ViewModel;
+        public Information_ViewModel p_information_ViewModel
+        {
+            get
+            {
+                return m_informantion_ViewModel;
+            }
+            set
+            {
+                SetProperty(ref m_informantion_ViewModel, value);
+            }
+        }
+        Run_ViewModel m_run_ViewModel;
+        public Run_ViewModel p_run_ViewModel
+        {
+            get
+            {
+                return m_run_ViewModel;
+            }
+            set
+            {
+                SetProperty(ref m_run_ViewModel, value);
             }
         }
         #endregion
@@ -97,18 +142,33 @@ namespace Root_VEGA_D
             m_MainWindow = mainwindow;
             m_recipe = recipe;
 
+
+            InitUI();
             InitViewModel();
             DialogInit(m_MainWindow);
         }
 
+        void InitUI()
+        {
+            info = new Information_UI();
+            recipe = new RecipeManager_UI();
+            run = new Run_UI();
+            engineer = new VEGA_D_Engineer_UI();
+            engineer.Init(App.m_engineer);
+            p_CurrentPanel = info;
+        }
         void InitViewModel()
         {
             p_recipeManager_ViewModel = new RecipeManager_VM(m_recipe);
-            //p_recipeWizard_ViewModel = new RecipeWizard_VM();
+            p_information_ViewModel = new Information_ViewModel(this);
+            p_run_ViewModel = new Run_ViewModel(this);
         }
         private void DialogInit(MainWindow main)
         {
             m_dialogService = new DialogService(main);
+            info.DataContext = p_information_ViewModel;
+            recipe.DataContext = p_recipeManager_ViewModel;
+            run.DataContext = p_run_ViewModel;
         }
 
 
@@ -124,7 +184,54 @@ namespace Root_VEGA_D
             }
         }
 
+        public ICommand CmdInfo
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(info);
+                });
+            }
+        }
+        public ICommand CmdRun
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(run);
+                });
+            }
+        }
+        public ICommand CmdEngineer
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(engineer);
+                });
+            }
+        }
+
+        public ICommand CmdRecipe
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(recipe);
+                });
+            }
+        }
+
         #endregion
+
+        void SetPage(UserControl userControl)
+        {
+            p_CurrentPanel = userControl;
+        }
 
         public void M_vision_LineScanStatusChanged(Vision vision, Run_GrabLineScan moduleRun, Vision.LineScanStatus status, object data)
         {
