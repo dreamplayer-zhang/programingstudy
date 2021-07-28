@@ -6,14 +6,18 @@
              xmlns:control="clr-namespace:Root_VEGA_D.Control"
              xmlns:local="clr-namespace:Root_VEGA_D"
              mc:Ignorable="d"
-             d:DesignHeight="900"
+             d:DesignHeight="1060"
              d:DesignWidth="1052">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="0.15*"/>
+        </Grid.RowDefinitions>
         <TabControl>
             <TabItem Header="Info">
                 <ScrollViewer Background="White" Grid.Row="1">
                     <StackPanel>
-                        <Grid Height="849">
+                        <Grid Height="729">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="2*" />
@@ -130,7 +134,7 @@
                                 <Grid Grid.Column="0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="3*" />
-                                        <RowDefinition />
+                                        <RowDefinition Height="0.5*"/>
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
                                     <GroupBox Header="Coordinate">
@@ -151,9 +155,6 @@
                                                    HorizontalAlignment="Left" />
                                                 <TextBlock Text="D:\DieInfoFile.xml"
                                                    Grid.Column="1" />
-                                                <Button Content="..."
-                                                VerticalAlignment="Center"
-                                                Grid.Column="2" />
                                             </Grid>
                                             <UniformGrid Columns="2"
                                                  Margin="0,5"
@@ -177,12 +178,7 @@
                                             </UniformGrid>
                                             <Grid Grid.Row="2"
                                           Grid.ColumnSpan="2"/>
-                                            <CheckBox Content="Manual Input"
-                                              Grid.ColumnSpan="2"
-                                              x:Name="cbManualMap"
-                                              Margin="0,5,0,0"
-                                              Grid.Row="2" />
-                                            <Grid IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                            <Grid IsEnabled="False"
                                           Grid.Row="3">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="40" />
@@ -200,7 +196,6 @@
                                                     <RowDefinition />
                                                     <RowDefinition />
                                                     <RowDefinition />
-                                                    <RowDefinition Height="30" />
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Text="Index"
                                                    Grid.Column="0"
@@ -344,11 +339,6 @@
                                                  Grid.Row="8"
                                                  Margin="3,0"
                                                  VerticalAlignment="Center" />
-                                                <Button Content="Adjust"
-                                                Grid.ColumnSpan="4"
-                                                Grid.Row="9"
-                                                Height="25"
-                                                VerticalAlignment="Bottom" />
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
@@ -358,117 +348,155 @@
                                             <Grid.RowDefinitions>
                                                 <RowDefinition />
                                                 <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition Height="30" />
-                                                <RowDefinition Height="30" />
                                             </Grid.RowDefinitions>
                                             <UniformGrid Columns="3"
                                                  Rows="1">
                                                 <TextBlock Text="Reticle Type"
-                                                   HorizontalAlignment="Left" />
+                                                   HorizontalAlignment="Left" VerticalAlignment="Center" />
                                                 <CheckBox Content="EUV"
-                                                  Margin="0,1,0,0" />
+                                                  Margin="0,2,0,0" VerticalAlignment="Center" />
                                                 <CheckBox Content="DUV"
-                                                  Margin="0,1,0,0" />
+                                                  Margin="0,2,0,0" VerticalAlignment="Center" />
                                             </UniformGrid>
                                             <UniformGrid Columns="3"
                                                  Rows="1"
                                                  Grid.Row="1">
-                                                <TextBlock Text="Option"
-                                                   HorizontalAlignment="Left" />
-                                                <CheckBox Content="2 Point"
-                                                  Margin="0,1,0,0" />
-                                                <CheckBox Content="3 Point"
-                                                  Margin="0,1,0,0" />
-                                                <Grid />
+                                                <TextBlock Text="Option" VerticalAlignment="Center"
+                                                   HorizontalAlignment="Left" TextAlignment="Center"/>
+
                                                 <CheckBox Content="Use Edge"
-                                                  Margin="0,2,0,0" />
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="Score"
-                                                       Margin="0,0,5,0" />
+                                                  Margin="0,0,0,0" VerticalAlignment="Center" />
+                                                <Grid VerticalAlignment="Stretch">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="0.5*"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="Score" VerticalAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Width="50"
+                                                     VerticalAlignment="Center" />
+                                                </Grid>                                                
+                                                <!--<StackPanel Margin="0,2,0,0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Text="Score" VerticalAlignment="Center"
+                                                       Margin="0,2,5,0" Height="18" />
                                                     <TextBox Width="50"
                                                      VerticalAlignment="Center" />
-                                                </StackPanel>
+                                                </StackPanel>-->
                                             </UniformGrid>
-                                            <Button Content="Align Test"
-                                            Height="25"
-                                            Grid.Row="3"
-                                            VerticalAlignment="Bottom" />
-                                            <Button Content="Auto Align"
-                                            Height="25"
-                                            Grid.Row="4"
-                                            VerticalAlignment="Bottom" />
                                         </Grid>
                                     </GroupBox>
-                                    <GroupBox Header="Illumination"
-                                      Grid.Row="2"
+                                    <Grid Grid.Row="2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <GroupBox Header="Illumination"
                                       TextElement.FontSize="15">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition />
-                                                <ColumnDefinition Width="8*" />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Text="R"
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="R" Foreground="Red"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="0" />
-                                            <TextBlock Text="G"
+                                                <TextBlock Text="G" Foreground="Green"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="1" />
-                                            <TextBlock Text="B"
+                                                <TextBlock Text="B" Foreground="Blue"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="2" />
-                                            <TextBlock Text="W"
+                                                <TextBlock Text="W" Foreground="LightSlateGray"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="3" />
-                                            <Slider Grid.Row="0"
-                                            Grid.Column="1"
-                                            VerticalAlignment="Center" />
-                                            <Slider Grid.Row="1"
-                                            Grid.Column="1"
-                                            VerticalAlignment="Center" />
-                                            <Slider Grid.Row="2"
-                                            Grid.Column="1"
-                                            VerticalAlignment="Center" />
-                                            <Slider Grid.Row="3"
-                                            Grid.Column="1"
-                                            VerticalAlignment="Center" />
-                                            <TextBlock Text="0"
+                                                <TextBlock Text="0"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="0"
                                                Grid.Column="2" />
-                                            <TextBlock Text="0"
+                                                <TextBlock Text="0"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="1"
                                                Grid.Column="2" />
-                                            <TextBlock Text="0"
+                                                <TextBlock Text="0"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="2"
                                                Grid.Column="2" />
-                                            <TextBlock Text="0"
+                                                <TextBlock Text="0"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="3"
                                                Grid.Column="2" />
-                                        </Grid>
-                                    </GroupBox>
+                                            </Grid>
+                                        </GroupBox>
+                                        <GroupBox Header="Align Illumination"
+                                      Grid.Column="1"
+                                      TextElement.FontSize="15">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="R" Foreground="Red"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0" />
+                                                <TextBlock Text="G" Foreground="Green"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1" />
+                                                <TextBlock Text="B" Foreground="Blue"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2" />
+                                                <TextBlock Text="W" Foreground="LightSlateGray"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3" />
+                                                <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0"
+                                               Grid.Column="2" />
+                                                <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1"
+                                               Grid.Column="2" />
+                                                <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2"
+                                               Grid.Column="2" />
+                                                <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3"
+                                               Grid.Column="2" />
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
                                 </Grid>
                                 <Grid Grid.Column="1">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="3*" />
+                                        <RowDefinition Height="5*" />
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
@@ -478,24 +506,18 @@
                                     </GroupBox>
                                     <GroupBox Header="Align Key" Grid.Row="1" Grid.RowSpan="2">
                                         <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition/>
-                                                <RowDefinition/>
-                                                <RowDefinition/>
-                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
                                             <Border Background="Black" Margin="3">
                                                 <TextBlock Foreground="White">
                                                     <Image x:Name="imageLeftTopAlignKey" Source="{Binding p_bmpLeftTopAlignKeySrc}" />
                                                 </TextBlock>
                                             </Border>
-                                            <Border Background="Black" Margin="3" Grid.Row="1">
+                                            <Border Background="Black" Margin="3" Grid.Column="1">
                                                 <TextBlock Foreground="White">
                                                     <Image x:Name="imageLeftBottomAlignKey" Source="{Binding p_bmpLeftBottomAlignKeySrc}" />
-                                                </TextBlock>
-                                            </Border>
-                                            <Border Background="Black" Margin="3" Grid.Row="2">
-                                                <TextBlock Foreground="White">
-                                                    Align Key
                                                 </TextBlock>
                                             </Border>
                                         </Grid>
@@ -932,20 +954,200 @@
                                            Grid.Row="2"
                                            Grid.Column="2" />
                             </Grid>
-                        </GroupBox>
+                        </GroupBox> 
                         
                     </Grid>
                 </Grid>-->
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
+            <TabItem Header="Align Key">
+                <local:AlignTeaching_UI DataContext="{Binding p_alignTeaching_ViewModel}"/>
+            </TabItem>
             <TabItem Header="Point">
                 <local:RecipeWizard_UI DataContext="{Binding p_recipeWizard_ViewModel}"/>
-            </TabItem>
-            <TabItem Header="Align Key">                
             </TabItem>
             <TabItem Header="Filtering">
             </TabItem>
         </TabControl>
+        <Grid Grid.Row="1" Background="White">
+            <Grid.ColumnDefinitions> 
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0.47*"/>
+            </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                <GroupBox Header="Illumination"
+                                      Grid.Row="3" Width="200"
+                                      TextElement.FontSize="15">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="8*" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="R"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0" />
+                        <TextBlock Text="G"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1" />
+                        <TextBlock Text="B"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2" />
+                        <TextBlock Text="W"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3" />
+                        <Slider Grid.Row="0"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="1"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="2"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="3"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3"
+                                               Grid.Column="2" />
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Align Illumination"
+                                      Grid.Row="3" Width="200"
+                                      TextElement.FontSize="15">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="8*" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="R"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0" />
+                        <TextBlock Text="G"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1" />
+                        <TextBlock Text="B"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2" />
+                        <TextBlock Text="W"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3" />
+                        <Slider Grid.Row="0"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="1"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="2"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="3"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3"
+                                               Grid.Column="2" />
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Snap Option">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Button Content="Snap" Background="AntiqueWhite"
+                    Margin="2,5" Command="{Binding CmdSnap}"
+                    Style="{StaticResource SetupPanelBtn}"/>
+                        <Button Content="Stop" Grid.Column="1"
+                    Margin="2,5" Command="{Binding CmdSnap}"
+                    Style="{StaticResource SetupPanelBtn}"/>
+                        <UniformGrid Columns="4" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Center">
+                            <TextBlock Text="Start Swathe" FontWeight="Bold" TextAlignment="Right" VerticalAlignment="Center" RenderTransformOrigin="0.678,0.594" Margin="11,0,-11,0"/>
+                            <TextBox Height="25" Width="30" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                            <TextBlock Margin="11,0,-7,0" Text="End Swathe" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox Width="30" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+                <Grid Background="#55ff0000" Width="100" Margin="5,10,5,10">
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <TextBlock TextAlignment="Center" Text="Align" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+                <Grid Background="#5500ff00" Width="100"  Margin="5,10,5,10">
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <TextBlock TextAlignment="Center" Text="Point" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+                <Grid Background="#550000ff" Width="100"  Margin="5,10,5,10">
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <TextBlock TextAlignment="Center" Text="???" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

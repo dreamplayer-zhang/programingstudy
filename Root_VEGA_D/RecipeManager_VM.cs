@@ -39,6 +39,16 @@ namespace Root_VEGA_D
             }
         }
 
+        AlignTeaching_VM m_alignTeaching_ViewModel;
+        public AlignTeaching_VM p_alignTeaching_ViewModel
+        {
+            get => m_alignTeaching_ViewModel;
+            set
+            {
+                SetProperty(ref m_alignTeaching_ViewModel, value);
+            }
+        }
+
         DateTime m_selectedStartDate;
         public DateTime p_selectedStartDate
         {
@@ -113,6 +123,7 @@ namespace Root_VEGA_D
         void InitViewModel()
         {
             p_recipeWizard_ViewModel = new RecipeWizard_VM(m_recipe);
+            p_alignTeaching_ViewModel = new AlignTeaching_VM();
         }
 
         void SearchRecipe()
