@@ -341,8 +341,23 @@ namespace RootTools_Vision.Utility
 				builder.Append(0 + " "); // ClassNumber
 				builder.Append(0 + " "); // TEST
 				builder.Append(0 + " "); // CLUSTERNUMBER
-				builder.Append(0 + " "); // Rough Bin Number
-				builder.Append(0 + " "); // Find Bin Number
+
+				Settings settings = new Settings();
+				SettingItem_SetupEdgeside settings_edgeside = settings.GetItem<SettingItem_SetupEdgeside>();
+				int roughBin = (int)(_defectdata[i].m_fSize * resolutionX / settings_edgeside.DefectSizeInterval) + 1;
+				if (roughBin > settings_edgeside.DefectSizeIntervalCnt)
+					roughBin = settings_edgeside.DefectSizeIntervalCnt;
+
+				builder.Append(roughBin + " "); // Rough Bin Number
+
+				int findBin = 0;
+				if (_defectdata[i].m_fSize * resolutionX > settings_edgeside.DefectSizeStandard)
+					findBin = 1;
+
+				builder.Append(findBin + " "); // Find Bin Number
+
+				//builder.Append(0 + " "); // Rough Bin Number
+				//builder.Append(0 + " "); // Find Bin Number
 				builder.Append(0 + " "); // Review Sample
 
 				if (useTDIReview && useVrsReview)  // 이미지 TDI VRS 둘다 저장할 때,

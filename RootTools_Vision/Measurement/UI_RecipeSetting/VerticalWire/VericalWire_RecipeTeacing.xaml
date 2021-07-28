@@ -164,10 +164,10 @@
                     <StackPanel Grid.Row="1"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Center">
-                        <Button Content="▲" Width ="40" Style="{StaticResource groupbox_button}" Margin="20,2,20,2" Command="{Binding CreateROI}"/>
-                        <Button Content="▼" Width ="40" Style="{StaticResource groupbox_button}" Margin="20,2,20,2" Command="{Binding DeleteROI}"/>
-                        <Button Content="◀" Width ="40" Style="{StaticResource groupbox_button}" Margin="20,2,20,2" Command="{Binding CreateROI}"/>
-                        <Button Content="▶" Width ="40" Style="{StaticResource groupbox_button}" Margin="20,2,20,2" Command="{Binding DeleteROI}"/>
+                        <Button Content="▲" Width ="40" Style="{StaticResource groupbox_button}" Margin="20,2,20,2" Command="{Binding ROIUp}"/>
+                        <Button Content="▼" Width ="40" Style="{StaticResource groupbox_button}" Margin="20,2,20,2" Command="{Binding ROIDown}"/>
+                        <Button Content="◀" Width ="40" Style="{StaticResource groupbox_button}" Margin="20,2,20,2" Command="{Binding ROILeft}"/>
+                        <Button Content="▶" Width ="40" Style="{StaticResource groupbox_button}" Margin="20,2,20,2" Command="{Binding ROIRight}"/>
                     </StackPanel>
                     <StackPanel Grid.Row="2"
                                 Orientation="Horizontal"
@@ -178,7 +178,7 @@
                 </Grid>
             </GroupBox>
 
-            <Button Content="Save" Margin="4" Style="{StaticResource groupbox_button}"/>
+            <Button Content="Save" Margin="4" Style="{StaticResource groupbox_button}" Command="{Binding Save}"/>
         </StackPanel>
     </Grid>
 </UserControl>

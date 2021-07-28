@@ -13,7 +13,15 @@ namespace RootTools_Vision
     public class VerticalWire_RecipeTeaching_ViewModel : ObservableObject
     {
         public int ROIItemOffset = 1000;
-        
+
+        #region [EVENT]
+        public delegate void MoveEventHandler();
+        public delegate void VerticalWireSaveHandler();
+
+        public event MoveEventHandler CollectionChanged;
+        public event VerticalWireSaveHandler RecipeSave;
+        #endregion
+
         #region [Properties]
         private int selectedItemIdx;
 
@@ -89,8 +97,9 @@ namespace RootTools_Vision
             VerticalWire_RefCoordItem_ViewModel refItem = new VerticalWire_RefCoordItem_ViewModel(this.ChipNuminOrigin);
             RefCoordListItem.Add(refItem.Main);
 
-            VerticalWire_ROIItem_ViewModel roiItem = new VerticalWire_ROIItem_ViewModel(this.ChipNuminOrigin);
-            ROIListItem.Add(roiItem.Main);
+            VerticalWire_ROIItem_ViewModel roiItem = new VerticalWire_ROIItem_ViewModel(this.ROIListItem.Count + 1);
+            roiItem.CollectionChanged += InspROIItem_CollectionChanged;
+            this.ROIListItem.Add(roiItem.Main);
         }
 
         public void AddRefItem()
@@ -98,14 +107,18 @@ namespace RootTools_Vision
             VerticalWire_RefCoordItem_ViewModel item = new VerticalWire_RefCoordItem_ViewModel(this.ChipNuminOrigin);
             RefCoordListItem.Add(item.Main);
 
-            VerticalWire_ROIItem_ViewModel roiItem = new VerticalWire_ROIItem_ViewModel(this.ChipNuminOrigin);
             for (int i = 0; i < ROIListItem.Count; i++)
-                roiItem.RefCoordNum = chipNuminOrigin;
+            {
+                VerticalWire_ROIItem roiItem = ROIListItem[i] as VerticalWire_ROIItem;
+                VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+                roiItemItem_ViewModel.RefCoordNum = chipNuminOrigin;
+            }
         }
 
         public void AddROIItem()
         {
-            VerticalWire_ROIItem_ViewModel roiItem = new VerticalWire_ROIItem_ViewModel(this.ChipNuminOrigin);
+            VerticalWire_ROIItem_ViewModel roiItem = new VerticalWire_ROIItem_ViewModel(this.ROIListItem.Count + 1);
+            roiItem.CollectionChanged += InspROIItem_CollectionChanged;
             ROIListItem.Add(roiItem.Main);            
         
         }
@@ -114,9 +127,12 @@ namespace RootTools_Vision
         {
             RefCoordListItem.RemoveAt(RefCoordListItem.Count - 1);
 
-            VerticalWire_ROIItem_ViewModel roiItem = new VerticalWire_ROIItem_ViewModel(this.ChipNuminOrigin);
             for (int i = 0; i < ROIListItem.Count; i++)
-                roiItem.RefCoordNum = chipNuminOrigin;
+            {
+                VerticalWire_ROIItem roiItem = ROIListItem[i] as VerticalWire_ROIItem;
+                VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+                roiItemItem_ViewModel.RefCoordNum = chipNuminOrigin;
+            }
         }
 
         public void RemoveROIItem() 
@@ -135,12 +151,50 @@ namespace RootTools_Vision
 
         #region [Command]
 
+        void RecipeLoad()
+        {
+            VerticalWireRecipe recipe = GlobalObjects.Instance.Get<VerticalWireRecipe>();
+            
+            //recipe.Clear();
+
+            //ROIListItem.Clear();
+            //for(int i = 0; i < recipe.InspROI.Count; i++)
+            //{
+            //    VerticalWire_ROIItem_ViewModel roiItem = new VerticalWire_ROIItem_ViewModel(this.ROIListItem.Count + 1);
+            //    roiItem.CollectionChanged += InspROIItem_CollectionChanged;
+            //    this.ROIListItem.Add(roiItem.Main);
+            //}
+            //RefCoordListItem.Clear();
+            //for (int i = 0; i < recipe.RefCoord.Count; i++)
+            //{
+            //    VerticalWire_RefCoordItem_ViewModel refItem = new VerticalWire_RefCoordItem_ViewModel(this.ChipNuminOrigin);
+            //    RefCoordListItem.Add(refItem.Main);
+            //}
+
+            //foreach (UIElement item in ROIListItem)
+            //{
+            //    VerticalWire_ROIItem roiItem = item as VerticalWire_ROIItem;
+            //    VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+
+            //    recipe.InspROI.Add(new VerticalWire_InspROI_Info(roiItemItem_ViewModel.WireRectList, roiItemItem_ViewModel.SelectedRefCoord));
+            //}
+
+            //foreach (UIElement item in RefCoordListItem)
+            //{
+            //    VerticalWire_RefCoordItem refItem = item as VerticalWire_RefCoordItem;
+            //    VerticalWire_RefCoordItem_ViewModel refItem_ViewModel = refItem.DataContext as VerticalWire_RefCoordItem_ViewModel;
+
+            //    recipe.RefCoord.Add(new VerticalWire_RefCoord_Info(refItem_ViewModel.RefX, refItem_ViewModel.RefY, refItem_ViewModel.RefW, refItem_ViewModel.RefH));
+            //}
+        }
+
         public ICommand LoadedCommand
         {
             get
             {
                 return new RelayCommand(() =>
                 {
+                    RecipeLoad();
                 });
             }
         }
@@ -205,6 +259,117 @@ namespace RootTools_Vision
             {
                 SelectedItemIdx = ROIItemOffset + roiItemIdx;
             });
+        }
+
+        public ICommand ROIUp
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if(SelectedItemIdx >= ROIItemOffset)
+                    {
+                        int itemIdx = SelectedItemIdx - ROIItemOffset;
+
+                        VerticalWire_ROIItem roiItem = ROIListItem[itemIdx] as VerticalWire_ROIItem;
+                        VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+
+                        foreach(TRect rt in roiItemItem_ViewModel.WireRectList)
+                        {
+                            rt.MemoryRect.Top -= 1;
+                            rt.MemoryRect.Bottom -= 1;
+                        }
+                        this.CollectionChanged?.Invoke();
+                    }
+                });
+            }
+        }
+
+        public ICommand ROIDown
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (SelectedItemIdx >= ROIItemOffset)
+                    {
+                        int itemIdx = SelectedItemIdx - ROIItemOffset;
+
+                        VerticalWire_ROIItem roiItem = ROIListItem[itemIdx] as VerticalWire_ROIItem;
+                        VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+
+                        foreach (TRect rt in roiItemItem_ViewModel.WireRectList)
+                        {
+                            rt.MemoryRect.Top += 1;
+                            rt.MemoryRect.Bottom += 1;
+                        }
+                        this.CollectionChanged?.Invoke();
+                    }
+                });
+            }
+        }
+
+        public ICommand ROILeft
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (SelectedItemIdx >= ROIItemOffset)
+                    {
+                        int itemIdx = SelectedItemIdx - ROIItemOffset;
+
+                        VerticalWire_ROIItem roiItem = ROIListItem[itemIdx] as VerticalWire_ROIItem;
+                        VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+
+                        foreach (TRect rt in roiItemItem_ViewModel.WireRectList)
+                        {
+                            rt.MemoryRect.Left -= 1;
+                            rt.MemoryRect.Right -= 1;
+                        }
+                        this.CollectionChanged?.Invoke();
+                    }
+                });
+            }
+        }
+
+        public ICommand ROIRight
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (SelectedItemIdx >= ROIItemOffset)
+                    {
+                        int itemIdx = SelectedItemIdx - ROIItemOffset;
+
+                        VerticalWire_ROIItem roiItem = ROIListItem[itemIdx] as VerticalWire_ROIItem;
+                        VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+
+                        foreach (TRect rt in roiItemItem_ViewModel.WireRectList)
+                        {
+                            rt.MemoryRect.Left += 1;
+                            rt.MemoryRect.Right += 1;
+                        }
+                        this.CollectionChanged?.Invoke();
+                    }
+                });
+            }
+        }
+
+        public ICommand Save
+        {
+            get => new RelayCommand(() =>
+            {
+                this.RecipeSave?.Invoke();
+            });
+        }
+        #endregion
+
+        #region [Callback]
+        void InspROIItem_CollectionChanged()
+        {
+            this.CollectionChanged?.Invoke();
         }
         #endregion
     }
