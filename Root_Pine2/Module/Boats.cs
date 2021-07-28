@@ -48,7 +48,7 @@ namespace Root_Pine2.Module
         public string RunMoveSnapStart(eWorks eWorks, Vision2D.Recipe.Snap snapData, int xLine, bool bWait = true)
         {
             double xp = m_xCamScale * snapData.m_dpAxis.X + ((m_aCamOffset != null) ? 10 * m_aCamOffset[xLine].X : 0);
-            double yp = m_pine2.m_thicknessDefault - m_pine2.p_thickness; 
+            double yp = (m_pine2.m_thicknessDefault - m_pine2.p_thickness) * 10; 
             m_axisCam.StartMove(eWorks, new RPoint(xp, yp));
             int yOffset = (m_aCamOffset != null) ? (int)(10 * m_aCamOffset[xLine].Y) : 0;
             if (Run(m_aBoat[eWorks].RunMoveSnapStart(snapData, yOffset, bWait))) return p_sInfo;
@@ -58,7 +58,7 @@ namespace Root_Pine2.Module
         public string RunMoveSnapStart(eWorks eWorks, Vision3D.Recipe.Snap snapData, int xLine, bool bWait = true)
         {
             double xp = m_xCamScale * snapData.m_dpAxis.X + ((m_aCamOffset != null) ? 10 * m_aCamOffset[xLine].X : 0);
-            double yp = m_pine2.m_thicknessDefault - m_pine2.p_thickness;
+            double yp = (m_pine2.m_thicknessDefault - m_pine2.p_thickness) * 10;
             m_axisCam.StartMove(eWorks, new RPoint(xp, yp));
             int yOffset = (m_aCamOffset != null) ? (int)(10 * m_aCamOffset[xLine].Y) : 0;
             if (Run(m_aBoat[eWorks].RunMoveSnapStart(snapData, yOffset, bWait))) return p_sInfo;

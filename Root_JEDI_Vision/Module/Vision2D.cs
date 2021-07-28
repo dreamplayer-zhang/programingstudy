@@ -711,7 +711,14 @@ namespace Root_JEDI_Vision.Module
         #endregion
 
         #region Snap
-        public string RunSnap(SnapInfo snapInfo, bool bReadRecipe)
+        public string StartSnap(bool bReadRecipe)
+        {
+            Run_Snap run = (Run_Snap)m_runSnap.Clone();
+            run.m_bReadRecipe = bReadRecipe;
+            return StartRun(run); 
+        }
+
+        public string RunSnap(bool bReadRecipe)
         {
             StopWatch sw = new StopWatch();
             try
@@ -726,12 +733,16 @@ namespace Root_JEDI_Vision.Module
                     if (Run(m_boat.RunMove(snap.m_eDirection, mmOffsetY, false))) return p_sInfo; 
                     if (bSendSnapInfo == false)
                     {
-                        if (Run(m_process.SendSnapInfo(snapInfo))) return p_sInfo;
+                        if (p_infoTray != null)
+                        {
+                            SnapInfo snapInfo = new SnapInfo(m_recipe.m_eSnapMode, p_infoTray.p_id, m_recipe.p_lSnap); 
+                            if (Run(m_process.SendSnapInfo(snapInfo))) return p_sInfo;
+                        }
                         bSendSnapInfo = true; 
                     }
                     if (Run(m_boat.m_axis.WaitReady())) return p_sInfo;
                     if (Run(m_camAxis.m_axis.WaitReady())) return p_sInfo;
-                    if (Run(StartSnap(snap))) return p_sInfo;
+                    if (Run(StartCameraSnap(snap))) return p_sInfo;
                     if (Run(m_boat.StartSnap())) return p_sInfo; 
                     if (Run(WaitSnap())) return p_sInfo;
                     if (Run(m_boat.WaitSnap())) return p_sInfo;
@@ -748,7 +759,7 @@ namespace Root_JEDI_Vision.Module
             }
         }
 
-        string StartSnap(Recipe.Snap snap)
+        string StartCameraSnap(Recipe.Snap snap)
         {
             try
             {
@@ -815,6 +826,19 @@ namespace Root_JEDI_Vision.Module
                 case Boat.eDirection.Backward: return new CPoint(snap.m_iLine * m_grabData.m_nFovSize, 0);
             }
             return new CPoint(snap.m_iLine * m_grabData.m_nFovSize, m_grabData.m_nReverseOffset);
+        }
+        #endregion
+
+        #region InfoTray
+        InfoTray _infoTray = null; 
+        public InfoTray p_infoTray
+        {
+            get { return _infoTray; }
+            set
+            {
+                _infoTray = value;
+                OnPropertyChanged(); 
+            }
         }
         #endregion
 
@@ -987,6 +1011,98 @@ namespace Root_JEDI_Vision.Module
         }
         #endregion
 
+        #region ModuleRun
+        ModuleRunBase m_runSnap;
+        protected override void InitModuleRuns()
+        {
+            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+            AddModuleRunList(new Run_MoveBoat(this), false, "Move Boat");
+            m_runSnap = AddModuleRunList(new Run_Snap(this), false, "Run Snap");
+        }
 
+        public class Run_Delay : ModuleRunBase
+        {
+            Vision2D m_module;
+            public Run_Delay(Vision2D module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            double m_secDelay = 2;
+            public override ModuleRunBase Clone()
+            {
+                Run_Delay run = new Run_Delay(m_module);
+                run.m_secDelay = m_secDelay;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
+            }
+
+            public override string Run()
+            {
+                Thread.Sleep((int)(1000 * m_secDelay / 2));
+                return "OK";
+            }
+        }
+
+        public class Run_MoveBoat : ModuleRunBase
+        {
+            Vision2D m_module;
+            public Run_MoveBoat(Vision2D module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public Boat.ePos m_ePos = Boat.ePos.Ready;
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveBoat run = new Run_MoveBoat(m_module);
+                run.m_ePos = m_ePos;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_ePos = (Boat.ePos)tree.Set(m_ePos, m_ePos, "Position", "Boat Position", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.m_boat.RunMove(m_ePos);
+            }
+        }
+
+        public class Run_Snap : ModuleRunBase
+        {
+            Vision2D m_module;
+            public Run_Snap(Vision2D module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public bool m_bReadRecipe = true;
+            public override ModuleRunBase Clone()
+            {
+                Run_Snap run = new Run_Snap(m_module);
+                run.m_bReadRecipe = m_bReadRecipe;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunSnap(m_bReadRecipe);
+            }
+        }
+        #endregion
     }
 }

@@ -32,6 +32,8 @@ namespace Root_WIND2
         {
             public const string BacksideExclusiveRegionFileName = "Backside_ExclusivePolygonList.xml";
             public const string BacksideCenterPointFileName = "Backside_CenterPoint.xml";
+            public const string SettingFilePath = @"C:\Root\Setting.ini";
+            public const string DefectCodeFilePath = @"C:\Root\DefectCode.ini";
         }
 
         public static class FilePath

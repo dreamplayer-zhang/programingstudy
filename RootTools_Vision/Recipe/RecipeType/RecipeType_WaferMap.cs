@@ -219,6 +219,25 @@ namespace RootTools_Vision
         public int ExtraDieOffsetX { get => extraDieOffsetX; set => extraDieOffsetX = value; }
         public int ExtraDieOffsetY { get => extraDieOffsetY; set => extraDieOffsetY = value; }
 
+
+        public int GrossDie
+        {
+            get
+            {
+                int grossDie = 0;
+                if (mapdata != null && mapdata.Length != 0)
+                {
+                    for(int i = 0;  i < mapdata.Length; i++)
+                    {
+                        if(mapdata[i] == (int)CHIP_TYPE.NORMAL)
+                        {
+                            grossDie++;
+                        }
+                    }
+                }
+                return grossDie;
+            }
+        }
         #endregion
 
         public RecipeType_WaferMap()

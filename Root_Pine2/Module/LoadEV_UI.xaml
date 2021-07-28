@@ -32,7 +32,7 @@
             <Grid Grid.Row="2" x:Name="gridInfo" Margin="3" Background="White" PreviewMouseLeftButtonDown="gridInfo_PreviewMouseLeftButtonDown">
                 <TextBlock x:Name="textBlockInfo" Text="{Binding p_sInfo}"/>
             </Grid>
-            <tree:TreeUI Grid.Row="3" x:Name="treeRootUI" IsEnabled="False"/>
+            <tree:TreeUI Grid.Row="3" x:Name="treeRootUI" IsEnabled="False" Margin="3,0,3,0"/>
         </Grid>
     </GroupBox>
 </UserControl>

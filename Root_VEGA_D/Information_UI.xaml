@@ -1,0 +1,519 @@
+﻿<UserControl x:Class="Root_VEGA_D.Information_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_D"
+             xmlns:module="clr-namespace:Root_VEGA_D.Module"
+             mc:Ignorable="d" 
+             d:DesignHeight="1000" d:DesignWidth="1920">
+    <UserControl.Resources>
+        <local:StateToColorConverter x:Key="StateToColorConverters"/>
+        <local:NullToBrushConverter x:Key="NullConverter"/>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily"
+                    Value="Arial" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Left" />
+        </Style>
+        <Style TargetType="{x:Type ToggleButton}" x:Key="IO_indicator">
+            <Setter Property="BorderThickness" Value="0"></Setter>
+            <Setter Property="Background" Value="{PriorityBinding}"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid Background="Transparent" Name="grd" Grid.Column="1"
+                                    Margin="{TemplateBinding Padding}" VerticalAlignment="Center"
+                                  Height="20"
+                                    Width="20">
+                                <Ellipse x:Name="ellipse" Stroke="{TemplateBinding BorderBrush}"
+                                        StrokeThickness="2" Stretch="Uniform"
+                                        Fill="{TemplateBinding  Background}"></Ellipse>
+                            </Grid>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter TargetName="ellipse" Property="Fill" Value="#FFBBBBBB" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid Background="White">
+        <ScrollViewer Background="Transparent" FontSize="17">
+            <Grid Grid.Column="0"
+                                          Background="Transparent"
+                                          Height="856">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="0.15*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Header="Recipe Info">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="11*" />
+                            <RowDefinition Height="10*" />
+                            <RowDefinition Height="15*" />
+                            <RowDefinition Height="15*" />
+                            <RowDefinition Height="8*" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Column="0" Grid.Row="0" DataContext="">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Header="Product Info" DataContext="">
+                                <UniformGrid Margin="5,2">
+                                    <TextBlock Text="Reticle ID"
+                                                           HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding p_sSlotID}" x:Name="TextBlockRetID"
+                                                           HorizontalAlignment="Left" />
+                                    <TextBlock Text="Reticle Type"
+                                                           HorizontalAlignment="Left" />
+                                    <TextBlock Text="EUV"
+                                                           HorizontalAlignment="Left" />
+                                </UniformGrid>
+                            </GroupBox>
+                            <GroupBox Header="Illumination Info"
+                                                  Grid.Column="1"
+                                                  Grid.Row="1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <GroupBox Header="Illum">
+                                        <UniformGrid Margin="5,2"
+                                                         Columns="2">
+                                            <TextBlock Text="Red" Foreground="Red"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="Green" Foreground="Green"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="Blue" Foreground="Blue"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="White" Foreground="LightSlateGray"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                        </UniformGrid>
+                                    </GroupBox>
+                                    <GroupBox Header="Align Illum" Grid.Column="1">
+                                        <UniformGrid Margin="5,2"
+                                                         Columns="2">
+                                            <TextBlock Text="Red" Foreground="Red"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="Green" Foreground="Green"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="Blue" Foreground="Blue"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="White" Foreground="LightSlateGray"
+                                                           HorizontalAlignment="Left" />
+                                            <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                        </UniformGrid>
+                                    </GroupBox>
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
+                        <GroupBox Header="Coordinate Info" Grid.Row="1">
+                            <Grid Margin="5,2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <UniformGrid Columns="2"
+                                                             Grid.Row="0">
+                                    <TextBlock Text="File"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="D:\DieInfoFile.xml"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="Die Size"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="17972, 50504"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="Scribe Lane Size"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="280, 280"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="Shot Size"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="127484, 101288"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="Shot"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="64.18, 180.37"
+                                                               HorizontalAlignment="Left" />
+                                </UniformGrid>
+                            </Grid>
+                        </GroupBox>
+                        <Grid Grid.Column="0" Grid.Row="2" Grid.RowSpan="3">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="450"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="450"/>
+                                </Grid.RowDefinitions>
+                                <GroupBox Header="Key">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Border Background="Black" Margin="3">
+                                            <Image x:Name="imageLeftTopAlignKey" Source="{Binding p_main.p_bmpLeftTopAlignKeySrc}"/>
+                                        </Border>
+                                        <Border Background="Black" Grid.Row="1" Margin="3">
+                                            <Image x:Name="imageLeftBottomAlignKey" Source="{Binding p_main.p_bmpLeftBottomAlignKeySrc}"/>
+                                        </Border>
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Header="Inspection Area"
+                                                  Grid.Column="1"
+                                                  Grid.Row="3"
+                                                  Grid.RowSpan="3">
+
+                                    <Viewbox Grid.Column="1">
+                                        <Canvas Width="1000" Background="Black"
+                                                            Height="1000">
+                                            <TextBlock Text="Pattern Area"
+                                                                   Canvas.Left="230"
+                                                                   Canvas.Top="70"
+                                                                   FontSize="15"
+                                                                   FontWeight="Bold"
+                                                                   Panel.ZIndex="5"
+                                                                   Height="20" />
+                                            <TextBlock Text="NonPattern Area"
+                                                                   Canvas.Left="160"
+                                                                   Canvas.Top="20"
+                                                                   FontSize="15"
+                                                                   FontWeight="Bold"
+                                                                   Panel.ZIndex="5"
+                                                                   Height="20" />
+                                            <Rectangle Stroke="Coral"
+                                                                   Fill="Coral"
+                                                                   StrokeThickness="4"
+                                                                   Opacity="0.3"
+                                                                   Panel.ZIndex="2"
+                                                                   Width="558"
+                                                                   Height="856"
+                                                                   Canvas.Left="225"
+                                                                   Canvas.Top="70" />
+                                            <Rectangle Stroke="SteelBlue"
+                                                                   Fill="SteelBlue"
+                                                                   StrokeThickness="4"
+                                                                   Opacity="0.3"
+                                                                   Width="708"
+                                                                   Height="956"
+                                                                   Canvas.Left="155"
+                                                                   Canvas.Top="20" />
+
+                                        </Canvas>
+                                    </Viewbox>
+                                </GroupBox>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <Grid Grid.Row="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Header="FDC" Grid.Column="0">
+                        <Grid Margin="5,2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="0.65*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="CDA 1" FontSize="12" HorizontalAlignment="Left"/>
+                            <TextBlock Grid.Column="1" HorizontalAlignment="Left" DataContext="{Binding m_handler.m_interlock}" FontSize="12" Text="{Binding p_CDA1_Value}"/>
+                            <TextBlock Grid.Column="2" Text="MPa" FontSize="12" HorizontalAlignment="Left"/>
+                            <TextBlock  Grid.Row="1"  Grid.Column="0" Text="INSPECT CDA" FontSize="12" HorizontalAlignment="Left"/>
+                            <TextBlock  Grid.Row="1"  Grid.Column="1"  DataContext="{Binding m_handler.m_interlock}" FontSize="12" Text="{Binding p_CDA2_Value}" HorizontalAlignment="Left" />
+                            <TextBlock  Grid.Row="1"  Grid.Column="2" Text="MPa" FontSize="12" HorizontalAlignment="Left"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="FFU" Grid.Column="1">
+                        <Grid Margin="5,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <module:FFU_Fan_UI Grid.Row="0" DataContext="{Binding m_handler.m_FFU.p_aUnit[0].p_aFan[0]}"/>
+                            <module:FFU_Fan_UI Grid.Column="1" DataContext="{Binding m_handler.m_FFU.p_aUnit[0].p_aFan[1]}"/>
+                            <module:FFU_Fan_UI Grid.Column="2" DataContext="{Binding m_handler.m_FFU.p_aUnit[0].p_aFan[2]}"/>
+                            <module:FFU_Fan_UI Grid.Column="3" DataContext="{Binding m_handler.m_FFU.p_aUnit[0].p_aFan[3]}"/>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <GroupBox Header="Inspection Info">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="11*" />
+                                <RowDefinition Height="10*" />
+                                <RowDefinition Height="15*" />
+                                <RowDefinition Height="8*" />
+                            </Grid.RowDefinitions>
+                            <GroupBox Header="Reticle Location"
+                                                  Grid.Column="1"
+                                                  Grid.Row="0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Column="0" Grid.Row="0">
+                                        <TextBlock Text="LoadportA"
+                                           FontWeight="SemiBold"/>
+                                    </Border>
+                                    <Border Grid.Column="1" Grid.Row="0">
+                                        <TextBlock Text="LoadportB"
+                                           FontWeight="SemiBold"/>
+                                    </Border>
+                                    <Border Grid.Column="2" Grid.Row="0">
+                                        <TextBlock Text="Robot"
+                                           FontWeight="SemiBold"/>
+                                    </Border>
+                                    <Border Grid.Column="3" Grid.Row="0">
+                                        <TextBlock Text="Vision"        
+                               FontWeight="SemiBold"/>
+                                    </Border>
+                                    <Border Grid.Column="0" Grid.Row="1" x:Name="LoadportABack" Background="AliceBlue">
+                                        <TextBlock x:Name="LoadportAState" Text="{Binding p_eState}" DataContext="{Binding m_handler.m_loadport[0]}"
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding m_handler.m_aLoadport[0].p_bPlaced}" Value="True"/>
+                                                            <Condition Binding="{Binding m_handler.m_aLoadport[0].p_bPresent}" Value="True"></Condition>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Background" Value="MediumSlateBlue"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+                                    <Border Grid.Column="1" Grid.Row="1" x:Name="LoadportBBack" Background="AliceBlue">
+                                        <TextBlock x:Name="LoadportBState" Text="{Binding p_eState}" DataContext="{Binding m_handler.m_loadport[1]}" 
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding m_handler.m_aLoadport[1].p_bPlaced}" Value="True"/>
+                                                            <Condition Binding="{Binding m_handler.m_aLoadport[1].p_bPresent}" Value="True"></Condition>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Background" Value="MediumSlateBlue"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+                                    <Border Grid.Column="2" Grid.Row="1" x:Name="RobotBack" Background="{Binding m_handler.m_wtr.m_dicArm[0].p_infoWafer, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullConverter}}">
+                                        <TextBlock x:Name="RobotState" Text="{Binding p_eState}" DataContext="{Binding  m_handler.m_wtr}"
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                    </Border>
+                                    <Border Grid.Column="3" Grid.Row="1" x:Name="VisionBack" Background="{Binding m_handler.m_vision.p_infoWafer, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullConverter}}">
+                                        <TextBlock x:Name="VisionState" Text="{Binding p_eState}" DataContext="{Binding  m_handler.m_vision}"
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                    </Border>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox  Header="Inspection Info"
+                                                       Grid.Row="1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1.5*" />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="2*" />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="2*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="Pattern"
+                                                               Grid.Column="0"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="True"
+                                                               Foreground="Green"
+                                                               Grid.Column="1"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Center" />
+                                    <TextBlock Text="X, Y"
+                                                               Grid.Column="2"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Center" />
+                                    <TextBlock Text="12315, 465547"
+                                                               Grid.Column="3"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="Size"
+                                                               Grid.Column="4"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Center" />
+                                    <TextBlock Text="34555, 273433"
+                                                               Grid.Column="5"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="NonPattern"
+                                                               Grid.Column="0"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="True"
+                                                               Foreground="Green"
+                                                               Grid.Column="1"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Center" />
+                                    <TextBlock Text="X, Y"
+                                                               Grid.Column="2"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Center" />
+                                    <TextBlock Text="2315, 765547"
+                                                               Grid.Column="3"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="Size"
+                                                               Grid.Column="4"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Center" />
+                                    <TextBlock Text="74555, 573433"
+                                                               Grid.Column="5"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Left" />
+                                </Grid>
+                            </GroupBox>
+                            <Grid Grid.Row="2" Grid.RowSpan="2">
+                                <GroupBox Header="Inspection Summary">
+                                    <DataGrid>
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="No." Width="40"/>
+                                            <DataGridTextColumn Header="Inspection Recipe" Width="auto"/>
+                                            <DataGridTextColumn Header="Pod ID" Width="auto"/>
+                                            <DataGridTextColumn Header="Lot ID" Width="auto"/>
+                                            <DataGridTextColumn Header="Inspection Time" Width="auto"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </GroupBox>
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Row="1" Grid.Column="1">
+                    <GroupBox Header="Isolator IO"
+                                                  Grid.Column="1"
+                                                  Grid.Row="6" Grid.ColumnSpan="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1*"/>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.4*"/>
+                                <RowDefinition Height="1*"/>
+                                <RowDefinition Height="2*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="FP Isolator" Grid.Column="0" Grid.Row="0" 
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                            <ToggleButton  x:Name="btnFP_Isolator" Width ="{PriorityBinding}" Background="Green" Grid.Column="0" Grid.Row="1" IsHitTestVisible="false" IsChecked="{Binding m_handler.m_interlock.p_diFP_Isolator.p_bIn, Mode=OneWay}"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Isolator V" Grid.Column="1" Grid.Row="0"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                            <ToggleButton x:Name="btnIsolator_V" Width ="{PriorityBinding}" Background="Green" Grid.Column="1" Grid.Row="1" IsHitTestVisible="false" IsChecked="{Binding m_handler.m_interlock.p_diIsolator_VPre.p_bIn, Mode=OneWay}"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Factory Air Pad" Grid.Column="2" Grid.Row="0"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                            <ToggleButton x:Name="btn_Factory_Air_Pad" Width ="{PriorityBinding}" Background="Green" Grid.Column="2" Grid.Row="1" IsHitTestVisible="false" IsChecked="{Binding m_handler.m_interlock.p_diFactory_Air_PadPre.p_bIn, Mode=OneWay}"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Air Tank" Grid.Column="3" Grid.Row="0"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                            <ToggleButton x:Name="btn_Air_Tank" Width ="{PriorityBinding}" Background="Green" Grid.Column="3" Grid.Row="1" IsHitTestVisible="false" IsChecked="{Binding m_handler.m_interlock.p_diAir_TankPre.p_bIn, Mode=OneWay}"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="X Bottom" Grid.Column="4" Grid.Row="0"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                            <ToggleButton x:Name="btn_X_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="4" Grid.Row="1" IsHitTestVisible="false" IsChecked="{Binding m_handler.m_interlock.p_diX_BottomPre.p_bIn, Mode=OneWay}"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="X Side Master" Grid.Column="0" Grid.Row="3"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                            <ToggleButton x:Name="btn_X_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="0" Grid.Row="4" IsHitTestVisible="false" IsChecked="{Binding m_handler.m_interlock.p_diX_SideMasterPre.p_bIn, Mode=OneWay}"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="X Side Slave" Grid.Column="1" Grid.Row="3"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                            <ToggleButton x:Name="btn_X_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="1" Grid.Row="4" IsHitTestVisible="false" IsChecked="{Binding m_handler.m_interlock.p_diX_SideSlavePre.p_bIn, Mode=OneWay}"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Y Bottom" Grid.Column="2" Grid.Row="3"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                            <ToggleButton x:Name="btn_Y_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="2" Grid.Row="4" IsHitTestVisible="false" IsChecked="{Binding m_handler.m_interlock.p_diY_BottomPre.p_bIn, Mode=OneWay}"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Y Side Master" Grid.Column="3" Grid.Row="3"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                            <ToggleButton x:Name="btn_Y_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="3" Grid.Row="4" IsHitTestVisible="false" IsChecked="{Binding m_handler.m_interlock.p_diY_SideMasterPre.p_bIn, Mode=OneWay}"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Y Side Slave" Grid.Column="4" Grid.Row="3"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                            <ToggleButton x:Name="btn_Y_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="4" Grid.Row="4" IsHitTestVisible="false" IsChecked="{Binding m_handler.m_interlock.p_diY_SideSlavePre.p_bIn, Mode=OneWay}"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

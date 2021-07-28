@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_JEDI_Sorter.Module;
+using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
@@ -27,13 +28,15 @@ namespace Root_JEDI_Sorter.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        //public Vision2D m_vision;
-
+        public In[] m_aIn = new In[2] { null, null };
+        public Good[] m_aGood = new Good[2] { null, null };
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            //m_vision = new Vision2D("Vision", m_engineer, ModuleBase.eRemote.Server);
-            //InitModule(m_vision);
+            InitModule(m_aIn[0] = new In("InA", m_engineer));
+            InitModule(m_aIn[1] = new In("InB", m_engineer));
+            InitModule(m_aGood[0] = new Good("GoodA", m_engineer));
+            InitModule(m_aGood[1] = new Good("GoodB", m_engineer));
         }
 
         void InitModule(ModuleBase module)

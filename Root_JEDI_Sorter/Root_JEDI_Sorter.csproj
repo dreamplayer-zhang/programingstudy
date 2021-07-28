@@ -210,6 +210,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\Bad.cs" />
+    <Compile Include="Module\Good.cs" />
     <Compile Include="Module\In.cs" />
     <Compile Include="Module\InfoTray.cs" />
     <Compile Include="Module\LoadEV.cs" />

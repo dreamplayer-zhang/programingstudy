@@ -25,6 +25,12 @@ namespace RootTools_Vision
         MedianAverage,
         Median,
     }
+    public enum CreateDiffMethod
+    {
+        Absolute = 0,
+        Bright,
+        Dark,
+    }
     public enum RefImageUpdateFreq
     {
         Chip = 0,
@@ -46,7 +52,7 @@ namespace RootTools_Vision
         private int intensity = 0;
         private int size = 0;
         private int sizeLimit = 0;
-        private bool isBright = false;
+        private CreateDiffMethod createDiffMethod = CreateDiffMethod.Absolute;
         private bool scaleMap = false;
         private bool histWeightMap = false;
         private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
@@ -85,12 +91,12 @@ namespace RootTools_Vision
             }
         }
         [Category("Option")]
-        public bool IsBright
+        public CreateDiffMethod CreateDiffMethod
         {
-            get => this.isBright;
+            get => this.createDiffMethod;
             set
             {
-                SetProperty<bool>(ref this.isBright, value);
+                SetProperty<CreateDiffMethod>(ref this.createDiffMethod, value);
             }
         }
         [Category("Option")]
