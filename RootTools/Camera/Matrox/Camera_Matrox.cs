@@ -543,6 +543,78 @@ namespace RootTools.Camera.Matrox
                 this.memoffset = memoffset;
             }
         }
+
+        public void Grab3DScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
+        {
+            m_nGrabCount = (int)Math.Truncate(1.0 * nLine / p_nHeight);
+            m_nGrabTrigger = 0;
+            m_Memory = memory;
+            m_MemPtr = memory.GetPtr();
+            m_cpScanOffset = cpScanOffset;
+            p_CamInfo.p_eState = eCamState.GrabMem;
+
+            MIL_INT licenseModules = 0;
+            MIL_INT frameCount = 0;
+            MIL_INT frameMissed = 0;
+            MIL_INT compressAttribute = 0;
+
+            // implement
+            if (m_MilApplication == MIL.M_NULL)
+                return;
+            if (m_MilSystem == MIL.M_NULL)
+                return;
+            if (m_MilDisplay == MIL.M_NULL)
+                return;
+            if (m_MilDigitizer == MIL.M_NULL)
+                return;
+            for (int i = 0; i < p_nBuf; i++)
+            {
+                if (m_MilBuffers[i] == MIL.M_NULL)
+                    return;
+            }
+            userObjectHandle = GCHandle.Alloc(this);
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, MIL.M_INFINITE); // Grab 대기 시간
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
+            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_SEQUENCE + MIL.M_COUNT(m_nGrabCount), MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            //MdigProcess(MilDigitizer, MilGrabBuf, GRAB_NUM, M_SEQUENCE + M_COUNT(TOTAL_FRAME_NUM), M_ASYNCHRONOUS + M_TRIGGER_FOR_FIRST_GRAB, ProcessingFunction, &UserHookData);
+
+            // m_clr3D.
+            m_GrabThread = new Thread(new ThreadStart(RunGrab3DScanThread));
+            m_GrabThread.Start();
+            return;
+        }
+        unsafe void RunGrab3DScanThread()
+        {
+            StopWatch swGrab = new StopWatch();
+            int DelayGrab = (int)(1000 * m_nGrabCount);
+            byte[] srcarray = new byte[p_nWidth * p_nHeight];
+
+            int lY = m_nGrabCount * Convert.ToInt32(p_nHeight);
+            int iBlock = 0;
+            while (iBlock < m_nGrabCount)
+            {
+                if (iBlock < m_nGrabTrigger)
+                {
+                    MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarray);
+                    Parallel.For(0, p_nHeight, (y) =>
+                    {
+                        int yp = y + (iBlock) * p_nHeight;
+                        fixed (byte* p = srcarray)
+                        {
+                            IntPtr srcPtr = (IntPtr)p + p_nWidth * y;
+                            IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
+                            Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
+                        }
+                    });
+                    iBlock++;
+                    //GrabEvent();
+                    //if (m_nGrabCount != 0)
+                    //    p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+                }
+            }
+            p_CamInfo.p_eState = eCamState.Ready;
+            userObjectHandle.Free();
+        }
         unsafe void RunGrabZScanThread(object scanParam)
         {
             ScanParam param = (ScanParam)scanParam;
