@@ -271,18 +271,25 @@ namespace Root_CAMELLIA.LibSR_Met
         private void PointTransmittanceData(double[] CalWL, int nPointidx)
         {
             int nDCOLTransDataNum = 0;
-            for (int n=0; n < m_DM.m_RawData[0].nNIRDataNum; n++)
+            m_DM.m_RawData[nPointidx].DCOLTransmittance.Clear();
+            for (int indexT = 0; indexT < m_DM.m_ContourMapDataT.Count; indexT++)
             {
-                //int nDCOLTransDataNum = 0;//CalWL.Length;
-                if (nDCOLTransDataNum < CalWL.Length && m_DM.m_RawData[nPointidx].Wavelength [n] == m_DM.m_ContourMapDataT[nDCOLTransDataNum].Wavelength)
+                for (int n = 0; n < m_DM.m_RawData[0].nNIRDataNum; n++)
                 {
-                    double DCOLTransData = m_DM.m_RawData[nPointidx].Transmittance[n];
-                    m_DM.m_RawData[nPointidx].DCOLTransmittance.Add(DCOLTransData);
-                    nDCOLTransDataNum++;
+                    if (nDCOLTransDataNum < CalWL.Length && m_DM.m_RawData[nPointidx].Wavelength[n] == m_DM.m_ContourMapDataT[nDCOLTransDataNum].Wavelength)
+                    {
+                        DCOLTransmittanceData DCOLData = new DCOLTransmittanceData();
+                        DCOLData.Wavelength = m_DM.m_ScalesListT[nDCOLTransDataNum].p_waveLength;
+                        DCOLData.RawTransmittance = m_DM.m_RawData[nPointidx].Transmittance[n];
+                        m_DM.m_RawData[nPointidx].DCOLTransmittance.Add(DCOLData);
+                        nDCOLTransDataNum++;
+
+                        break;
+                    }
                 }
             }
         }
-        public void PointCalcTransmittance_OptimizingSi(int nPointIdx, int nSiAvgOffsetRange, int nSiAvgOffsetStep, int nDNum, double[] mPn, double [] CalWL)
+        public void PointCalcTransmittance_OptimizingSi(int nPointIdx, int nSiAvgOffsetRange, int nSiAvgOffsetStep, int nDNum, double[] mPn, double[] CalWL)
         {
             int nDataMin = 9999;
             int nDataMinLayerIdx = 0;
@@ -291,32 +298,17 @@ namespace Root_CAMELLIA.LibSR_Met
             {
                 if (m_DM.m_LayerData[n].wavelength.Count < nDataMin)
                 {
-                    nDataMin =CalWL.Length;
+                    nDataMin = CalWL.Length;
                     nDataMinLayerIdx = n;
                 }
             }
-
-            //m_DM.m_RawData[nPointIdx].Transmittance = new double[nDataMin];
-
             int[][] arrNKIndexes = new int[nDataMin][];
             for (int i = 0; i < nDataMin; i++)
             {
                 arrNKIndexes[i] = new int[nLayerCount];
             }
-
-            //투과율계산
-            //Task task1 = new Task(() =>
-            //{
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
             var MaxWorkingCount = nDataMin;
             int nWorkingRangeSize = MaxWorkingCount / ConstValue.MULTI_THREAD_COUNT;
-
-            //var part = System.Collections.Concurrent.Partitioner.Create(0, MaxWorkingCount, nWorkingRangeSize);
-            //var part = System.Collections.Concurrent.Partitioner.Create(0, MaxWorkingCount);
-
-            //Parallel.ForEach(part, (num, state) =>
-            //{
             for (int i = 0; i < CalWL.Length; i++)
             {
                 double dWavelength = CalWL[i];
@@ -332,13 +324,6 @@ namespace Root_CAMELLIA.LibSR_Met
                     arrNKIndexes[i][n] = nNKIdx;
                 }
             }
-            //});
-
-            sw.Stop();
-            Debug.WriteLine("task1 >> " + sw.ElapsedMilliseconds.ToString());
-            //});
-            //task1.Start();
-            //task1.Wait();
 
             var mPPTemp = new double[nDNum];//Matrix<double>.Build.Dense(nDNum, 1, 0.0);
             mPn.CopyTo(mPPTemp, 0);
@@ -348,20 +333,8 @@ namespace Root_CAMELLIA.LibSR_Met
                 PP[n] = mPPTemp[n];
             }
 
-            //Task task2 = new Task(() =>
-            //{
-            //var MaxWorkingCount = nDataMin;
-            //int nWorkingRangeSize = MaxWorkingCount / ConstValue.MULTI_THREAD_COUNT;
-
-            //var part = System.Collections.Concurrent.Partitioner.Create(0, MaxWorkingCount, nWorkingRangeSize);
-            sw.Start();
-            //Parallel.ForEach(part, (numm, state) =>
-            //{
             for (int i = 0; i < CalWL.Length; i++)
             {
-
-                //for (int i = 0; i < MaxWorkingCount; i++)
-                //{
                 double dTSum = 0;
                 int nRange = -nSiAvgOffsetRange;
                 int nStep = nSiAvgOffsetStep;
@@ -392,15 +365,11 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     dTAvg = 0.0;
                 }
-
-                m_DM.m_RawData[nPointIdx].DCOLTransmittance.Add(dTAvg);
+                DCOLTransmittanceData DCOLData = new DCOLTransmittanceData();
+                DCOLData.Wavelength = CalWL[i];
+                DCOLData.RawTransmittance = dTAvg;
+                m_DM.m_RawData[nPointIdx].DCOLTransmittance.Add(DCOLData);
             }
-           // });
-            sw.Stop();
-            Debug.WriteLine("task2 >> " + sw.ElapsedMilliseconds.ToString());
-            //});
-            //task2.Start();
-            //task2.Wait();
         }
         public bool CalcThickness(int nPointIndex, double dWLStart, double dWLEnd, int nNum_Iteration, double dEigenValue, ref List<double> GoFs, ref List<double> Thickness, ref long lCalcTime, ref int nMaxGoFInit)
         {
@@ -754,7 +723,7 @@ namespace Root_CAMELLIA.LibSR_Met
             {
                 double dTHK = mPn[n];
                 //dTHK *= m_DM.m_LayerData[n].scales.dScale;
-               // dTHK += m_DM.m_LayerData[n].scales.dOffset;
+                // dTHK += m_DM.m_LayerData[n].scales.dOffset;
 
                 if (double.IsNaN(dTHK) || double.IsNegativeInfinity(dTHK) || double.IsPositiveInfinity(dTHK))
                 {

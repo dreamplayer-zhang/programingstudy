@@ -98,8 +98,6 @@ namespace RootTools_Vision
 
             CLR_IP.Cpp_Masking(arrBinImg, arrBinImg, maskStartPoint.ToArray(), maskLength.ToArray(), chipW, chipH);
 
-
-
             // Labeling
             var Label = CLR_IP.Cpp_Labeling(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp);
             //var Label = CLR_IP.Cpp_Labeling_SubPix(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel, 3);
@@ -116,6 +114,12 @@ namespace RootTools_Vision
                 {
                     if (Label[i].area > nDefectSz)
                     {
+                        if(parameterSurface.SizeLimit > 0)
+                        {
+                            if(parameterSurface.SizeLimit < Label[i].area)
+                                continue;
+                        }
+
                         this.currentWorkplace.AddDefect(sInspectionID,
                             1000 + (int)this.parameterSurface.IndexChannel * 100 + this.parameterSurface.MaskIndex,
                             Label[i].area,

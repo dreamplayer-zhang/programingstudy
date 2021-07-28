@@ -87,6 +87,12 @@ namespace Root_Rinse_Unloader.Engineer
 
         protected string StateHome(List<ModuleBase> aModule)
         {
+            if (m_rail.IsStripExist())
+            {
+                EQ.p_bStop = true;
+                EQ.p_eState = EQ.eState.Init;
+                return "Check Strip in Rail";
+            }
             m_rail.RunPusherDown(true); 
             foreach (ModuleBase module in aModule) module.StartHome();
             bool bHoming = true;
@@ -148,6 +154,8 @@ namespace Root_Rinse_Unloader.Engineer
         {
             throw new NotImplementedException();
         }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         #region Thread

@@ -133,8 +133,47 @@ namespace RootTools.Camera.Dalsa
             UserSet14,
             UserSet15,
             UserSet16,
+            Factory,
         }
 
+        public enum eFlatFieldUserSet
+        {
+            Factory = 0,
+            UserSet1,
+            UserSet2,
+            UserSet3,
+            UserSet4,
+            UserSet5,
+            UserSet6,
+            UserSet7,
+            UserSet8,
+            UserSet9,
+            UserSet10,
+            UserSet11,
+            UserSet12,
+            UserSet13,
+            UserSet14,
+            UserSet15,
+            UserSet16,
+        }
+
+        public enum eAnalogGain
+        {
+            One,
+            Two,
+            Four,
+            Eight,
+        }
+        public static string[] m_aAnalogGain = new string[4] { "1", "2", "4", "8" };
+
+        public enum eGainSelector
+        {
+            System,
+            All,
+            Blue,
+            Green,
+            Red,
+        }
 
         public Log m_log;
         SapAcqDevice m_sapCam;
@@ -243,6 +282,22 @@ namespace RootTools.Camera.Dalsa
                     m_nRotaryEncoderDivider = value;
             }
         }
+        eFlatFieldUserSet m_eFlatFieldUserSet = eFlatFieldUserSet.Factory;
+        public eFlatFieldUserSet p_eFlatFieldCorrection
+        {
+            get { return m_eFlatFieldUserSet; }
+            set
+            {
+                //if (m_eFlatFieldUserSet == value) return;
+                if (SetFlatFieldUserSet(value))
+                {
+                    if (LoadCalibration())
+                        m_eFlatFieldUserSet = value;
+                }
+            }
+        }
+
+
         eDir m_eDir = eDir.Forward;
         public eDir p_eDir
         {
@@ -401,6 +456,10 @@ namespace RootTools.Camera.Dalsa
             if (GetRotaryEncoderMultiplier(ref nEncoderVal)) m_nRotaryEncoderMultiplier = nEncoderVal;
             if (GetRotaryEncoderDivider(ref nEncoderVal)) m_nRotaryEncoderDivider = nEncoderVal;
 
+            // Get default Flat Field UserSet
+            eFlatFieldUserSet FlatFieldUserset = eFlatFieldUserSet.Factory;
+            if (GetFlatFieldoUserSet(ref FlatFieldUserset)) m_eFlatFieldUserSet = FlatFieldUserset;
+
         }
         public void SetAreaParams()
         {
@@ -492,10 +551,62 @@ namespace RootTools.Camera.Dalsa
 
             return bOk;
         }
+
+        public bool SetFlatFieldUserSet(eFlatFieldUserSet userset)
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("flatfieldCorrectionCurrentActiveSet", userset.ToString());
+        }
+        public bool GetFlatFieldoUserSet(ref eFlatFieldUserSet userset)
+        {
+            if (m_sapCam == null) return false;
+
+            string sReturn;
+            bool bOk = m_sapCam.GetFeatureValue("flatfieldCorrectionCurrentActiveSet", out sReturn);
+            if (bOk)
+                userset = (eFlatFieldUserSet)Enum.Parse(typeof(eFlatFieldUserSet), sReturn);
+
+            return bOk;
+        }
+        public bool LoadCalibration()
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("flatfieldCalibrationLoad", "");
+        }
+
+        public bool SetAnalogGain(eAnalogGain eGain)
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("AnalogGain", eGain.ToString());
+        }
+
+        public bool ChangeGainSelector(eGainSelector eSelector)
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("GainSelector", eSelector.ToString());
+        }
+
+        public bool SetGain(double dGain)
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("Gain", dGain);
+        }
+
         public void SetCamHandle(SapAcqDevice device, SapAcquisition acquisition)
         {
             m_sapCam = device;
             m_SapGrabber = acquisition;
+        }
+
+        public void DisconnectCamHandle()
+        {
+            m_sapCam = null;
+            m_SapGrabber = null;
         }
 
         public void ValueChange(object value, [CallerMemberName] string propertyName = null)

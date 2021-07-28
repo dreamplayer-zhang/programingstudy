@@ -10,17 +10,21 @@ namespace Root_CAMELLIA.LibSR_Met
     {
         //PM
         public const string PATH_LOG = @"C:\Log\";
-        public const string PATH_PM_RESULT_FOLDER = @"C:\Camellia\PM\PM_Result\";
-        public const string PATH_PM_FILE = @"C:\Camellia\Init\PM.cpm";
-        public const string PATH_PM_REFLECTANCE_FILE = @"C:\Camellia\Init\PMReflectance.csv";
-        public const string PATH_MONITORING_RESULT_FOLDER = @"C:\Camellia\Data\Monitoring_Result\";
+        public const string PATH_PM_RESULT_FOLDER = @"C:\Camellia2\PM\PM_Result\";
+        public const string PATH_PM_FILE = @"C:\Camellia2\Init\PM.cpm";
+        public const string PATH_PM_REFLECTANCE_FILE = @"C:\Camellia2\Init\PMReflectance.csv";
+        public const string PATH_MONITORING_RESULT_FOLDER = @"C:\Camellia2\Data\Monitoring_Result\";
+        public const string PATH_LAMP_INITIAL_FILE = @"C:\Camellia2\Init\Timedata.txt";
         public const int PM_REFLECTANCE_CHECK_WAVELENGTH_COUNT = 10;
         //PM-Align
         public const double PM_CAMERA_PIXEL_RESOLUTION = 1.098;
         public const double PM_STAGE_PULSE = 10;
         //
-        public const int SPECTROMETER_MAX_PIXELSIZE = 5001;  //350nm ~ 1500nm (1nm 간격)
-        public const int RAWDATA_POINT_MAX_SIZE = 100;
+        public const int SPECTROMETER_MAX_PIXELSIZE = 5001;  
+        //350nm ~ 1500nm (1nm 간격)
+        //5001 값 바꾸면   SR_Background Measure 함수에서 에러 발생
+        public const int RAWDATA_POINT_MAX_SIZE = 3000;
+        public const int RE_SNAP_COUNT = 5;
 
         public const string NONE = "None";
 

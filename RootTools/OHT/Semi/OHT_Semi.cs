@@ -436,7 +436,7 @@ namespace RootTools.OHT.Semi
                     m_carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Auto;
                     if (m_bOHTErr)
                     {
-                        m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                        m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                     }
                     else
                     {
@@ -459,11 +459,11 @@ namespace RootTools.OHT.Semi
                     //m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad; khd
                     if (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual && !m_bPresent && !m_bPlaced && m_carrier.p_eTransfer != GemCarrierBase.eTransfer.ReadyToUnload)
                     {
-                        m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                        m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                     }
                     else if (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual && m_bPresent && m_bPlaced)
                     {
-                        m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                        m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                     }
                 }
                     m_bAuto_p = m_bAuto;
@@ -542,6 +542,7 @@ namespace RootTools.OHT.Semi
                 {
                     p_bES = m_bOHTErr || m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual;
                     p_bHoAvailable = m_carrier.p_eTransfer == GemCarrierBase.eTransfer.TransferBlocked || m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual;
+                    //p_bHoAvailable = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.TransferBlocked || m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual) && !m_module.IsDocked(); 기억이..
                 }
                     //p_bES = m_diLightCurtain.p_bOn 
                     //p_bHoAvailable = p_bES
@@ -583,8 +584,8 @@ namespace RootTools.OHT.Semi
                                 }
                                 CheckDI(m_diBusy, false);
                                 CheckDI(m_diComplete, false);
-                                m_doLoadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
-                                m_doUnloadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
+                                m_doLoadReq.p_bWait = m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad;
+                                m_doUnloadReq.p_bWait = m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload;
                                 m_doReady.p_bWait = false;
                                 break;
                             case eState.Ready_On:
@@ -631,17 +632,14 @@ namespace RootTools.OHT.Semi
                                 CheckPresent(true);
                                 if ((IsCS(false) == false) && (m_diValid.p_bOn == false) && (m_diComplete.p_bOn == false))
                                 {
-                                    switch (m_carrier.p_eTransfer)
+                                    switch (m_carrier.p_ePresentSensor)
                                     {
-                                        case GemCarrierBase.eTransfer.ReadyToLoad:
-                                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
-                                        //rfid
+                                        case GemCarrierBase.ePresent.Exist:
+                                            m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                                         m_bRFIDRead = true;
-                                        //m_bPIOComplete = true;
-
                                             break;
-                                        case GemCarrierBase.eTransfer.ReadyToUnload:
-                                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                                        case GemCarrierBase.ePresent.Empty:
+                                            m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
                                             break;
                                     }
                                     p_eState = eState.All_Off;

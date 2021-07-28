@@ -29,9 +29,11 @@ namespace Root_Rinse_Unloader.Module
 
         #region GAF
         ALID m_alidMagazineFull;
+        ALID m_alidProtrusion;
         void InitALID()
         {
             m_alidMagazineFull = m_gaf.GetALID(this, "MagazineFull", "MagazineFull Error");
+            m_alidProtrusion = m_gaf.GetALID(this, "Protrusion", "Protrusion");
         }
         #endregion
 
@@ -125,11 +127,22 @@ namespace Root_Rinse_Unloader.Module
             return "OK";
         }
 
-        public bool IsMagazineProtrusion()
+        public bool IsProtrusion()
         {
             foreach (Magazine magazine in m_aMagazine)
             {
-                if (magazine.IsProtrusion()) return true;
+                if (magazine.IsProtrusion())
+                {
+                    m_alidProtrusion.Run(true, "Check Storage : Strip Protrusion");
+                    m_handler.m_rail.RunRotate(false);
+                    m_handler.m_roller.RunRotate(false);
+                    return true;
+                }
+            }
+            if (m_handler.m_rail.IsArriveOn())
+            {
+                m_alidProtrusion.Run(true, "Check Rail Sensor");
+                return true;
             }
             return false;
         }
@@ -198,21 +211,26 @@ namespace Root_Rinse_Unloader.Module
             m_axis.AddPos("Stack");
         }
 
+        string MoveElevator(double fPos, bool bWait = true)
+        {
+            if (fPos == m_axis.p_posCommand) return "OK";
+            if (IsProtrusion()) return "Protrusion Error";
+            m_axis.StartMove(fPos);
+            return bWait ? m_axis.WaitReady() : "OK";
+        }
+
         int m_dZ = 6000;
         public string MoveMagazine(eMagazine eMagazine, int iIndex, bool bWait)
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
-            if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion";
             if (IsLoaderDanger()) return "Check Loader Position";
-            m_axis.StartMove(eMagazine, -iIndex * m_dZ);
-            if (bWait) return m_axis.WaitReady();
-            return "OK"; 
+            double fPos = m_axis.GetPosValue(eMagazine) - iIndex * m_dZ;
+            return MoveElevator(fPos, bWait);
         }
 
         public string MoveStack()
         {
-            m_axis.StartMove("Stack");
-            return m_axis.WaitReady();
+            return MoveElevator(m_axis.GetPosValue("Stack"));
         }
 
         public bool IsHighPos()
@@ -292,6 +310,11 @@ namespace Root_Rinse_Unloader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            if (IsProtrusion())
+            {
+                p_eState = eState.Error; 
+                return "Protrusion Error";
+            }
             foreach (Magazine magazine in m_aMagazine) magazine.RunClamp(magazine.p_bCheck);
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
@@ -313,10 +336,12 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         RinseU m_rinse;
+        RinseU_Handler m_handler;
         public Storage(string id, IEngineer engineer, RinseU rinse)
         {
             p_id = id;
             m_rinse = rinse;
+            m_handler = (RinseU_Handler)engineer.ClassHandler(); 
             InitMagazine();
             InitStack();
             InitBase(id, engineer);

@@ -16,6 +16,7 @@ namespace RootTools_Vision
         private string name = "";
         private string recipePath = "";
         private string recipeFolderPath = "";
+        private string waferID = "";
 
         RecipeType_WaferMap waferMap = new RecipeType_WaferMap();
 
@@ -30,6 +31,7 @@ namespace RootTools_Vision
 
         #region [Getter Setter]
         public string Name { get => name; set => name = value; }
+        public string WaferID { get => this.waferID; set => this.waferID = value; }
         public RecipeType_WaferMap WaferMap { get => waferMap; set => waferMap = value; }
 
         public int CameraInfoIndex
@@ -197,7 +199,7 @@ namespace RootTools_Vision
             {
                 using (Stream reader = new FileStream(recipeFolderPath + "Base.xml", FileMode.Open))
                 {
-                    XmlSerializer xml = new XmlSerializer(this.GetType().BaseType);
+                    XmlSerializer xml = new XmlSerializer(typeof(RecipeBase));
                     RecipeBase temp = this;
                     temp = (RecipeBase)xml.Deserialize(reader);
 
@@ -342,6 +344,7 @@ namespace RootTools_Vision
             recipe.MasterImage.Save(this.RecipeFolderPath);
         }
 
+
         public void LoadMasterImage()
         {
             if (this.RecipeFolderPath == "") return;
@@ -350,6 +353,17 @@ namespace RootTools_Vision
 
             recipe.MasterImage = new RecipeType_ImageData();
             recipe.MasterImage.FileName = "MasterImage.bmp";
+            recipe.MasterImage.Read(this.RecipeFolderPath);
+        }
+
+        public void LoadMasterImage(string fileName)
+        {
+            if (this.RecipeFolderPath == "") return;
+
+            OriginRecipe recipe = this.GetItem<OriginRecipe>();
+
+            recipe.MasterImage = new RecipeType_ImageData();
+            recipe.MasterImage.FileName = fileName;
             recipe.MasterImage.Read(this.RecipeFolderPath);
         }
 

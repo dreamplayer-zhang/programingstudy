@@ -17,7 +17,7 @@ namespace Root_MarsLogView
         #region Property
         public string p_sModule { get; set; }
    
-        public string p_sEvent { get; set; }
+        public string p_sCategory { get; set; }
 
         public string p_sCfgID { get; set; }
 
@@ -36,7 +36,7 @@ namespace Root_MarsLogView
         {
             m_asLog = asLog;
             if (GetString(2) != p_sModule) return false;
-            if (GetString(4) != p_sEvent) return false;
+            if (GetString(4) != p_sCategory) return false;
             if (GetString(5) != p_sCfgID) return false;
             if (GetString(6) != p_sValue) return false;
             return true;
@@ -62,8 +62,8 @@ namespace Root_MarsLogView
             m_asLog = asLog;
             m_sDate = GetString(0);
             m_sTime = GetString(1);
-            p_sModule = GetString(2);//EFEM or Vision
-            p_sEvent = GetString(4);//Version
+            p_sModule = GetString(2);//EFEM or Vision`
+            p_sCategory = GetString(4);//Version
             p_sCfgID = GetString(5);//'Software Version'
             p_sValue = GetString(6);
             p_sUnit = GetString(7);

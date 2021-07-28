@@ -63,6 +63,10 @@ namespace RootTools.Comm
             Queue<string> m_qSend = new Queue<string>();
             public string Send(string sMsg)
             {
+                if(sMsg == null)
+                {
+                    return "OK";
+                }
                 m_qSend.Enqueue(sMsg);
                 return "OK"; 
             }
@@ -119,22 +123,30 @@ namespace RootTools.Comm
                     int nReadLength = socket.EndReceive(ar);
                     if (nReadLength > 0)
                     {
+                        byte[] buf = new byte[m_aReadBuff.Length];
+                        Array.Copy(m_aReadBuff, buf, nReadLength);
+
                         m_commLog.Add(CommLog.eType.Receive, (nReadLength < 1024) ? Encoding.ASCII.GetString(m_aReadBuff, 0, nReadLength) : "...");
 
+                        if (EventReciveData != null) EventReciveData(buf, nReadLength, socket);
+
                         socket.BeginReceive(m_aReadBuff, 0, m_aReadBuff.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
-                        if (EventReciveData != null) EventReciveData(m_aReadBuff, nReadLength, socket);
                     }
                     else m_commLog.Add(CommLog.eType.Info, "CallBack_Receive Close");
                 }
                 catch (SocketException ex)
                 {
                     // SocketException 발생
-                    m_commLog.Add(CommLog.eType.Info, "Receive SocketException : " + ex.Message);
-
                     if (ex.SocketErrorCode == SocketError.ConnectionReset)
                     {
+                        m_commLog.Add(CommLog.eType.Info, "Disconnected from client !!");
+
                         if (EventReciveData != null) EventReciveData(m_aReadBuff, 0, socket);
                         socket.Close();
+                    }
+                    else
+                    {
+                        m_commLog.Add(CommLog.eType.Info, "Receive SocketException : " + ex.Message + ex.StackTrace);
                     }
                 }
                 catch (Exception eX)

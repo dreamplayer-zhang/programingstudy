@@ -38,6 +38,14 @@ namespace Root_WindII
             set => SetProperty(ref this.maintVM, value);
         }
 
+        public Operation_UI OperationUI;
+        private OperationUI_ViewModel operationVM = new OperationUI_ViewModel();
+        public OperationUI_ViewModel OperationVM
+        {
+            get => this.operationVM;
+            set => SetProperty(ref this.operationVM, value);
+        }
+
         private UserControl m_CurrentPanel;
         public UserControl p_CurrentPanel
         {
@@ -51,7 +59,7 @@ namespace Root_WindII
             }
         }
 
-
+        
         Warning_UI warnui;
         private UserControl m_CurrentSubPanel;
         public UserControl p_CurrentSubPanel
@@ -148,6 +156,9 @@ namespace Root_WindII
                     SetProperty(ref this.isCheckModeSetup, false, "IsCheckModeSetup");
                     SetProperty(ref this.isCheckModeReview, false, "IsCheckModeReview");
                     SetProperty(ref this.isCheckModeEngineer, false, "IsCheckModeEngineer");
+
+                    p_CurrentPanel = OperationUI;
+                    p_CurrentPanel.DataContext = OperationVM;
                 }
                 else if (value == false && this.isCheckModeOperation == true)
                 {
@@ -206,6 +217,27 @@ namespace Root_WindII
             get => new RelayCommand(() =>
             {
                 GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eReqControl = XGem.eControl.OFFLINE;
+            });
+        }
+
+
+        public ICommand btnPopUpSetting
+        {
+            get => new RelayCommand(() =>
+            {
+                var viewModel = new SettingDialog_ViewModel(GlobalObjects.Instance.Get<Settings>());
+                Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+                if (result.HasValue)
+                {
+                    if (result.Value)
+                    {
+
+                    }
+                    else
+                    {
+
+                    }
+                }
             });
         }
         #endregion
@@ -290,12 +322,14 @@ namespace Root_WindII
             SettingItem_Database frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_Database>();
             DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
             DatabaseManager.Instance.ValidateDatabase();
+            OperationUI = new Operation_UI();
+            OperationVM.Init();
 
             //logView.Init(LogView._logView);
             //InitTimer();
-        }
+    }
 
-        private void CreateGlobalPaths()
+    private void CreateGlobalPaths()
         {
             Type t = typeof(Constants.RootPath);
             FieldInfo[] fields = t.GetFields(BindingFlags.Static | BindingFlags.Public);
@@ -319,6 +353,10 @@ namespace Root_WindII
         private string memoryEdgeBottom = "EdgeBottom";
         private string memoryEdgeEBR = "EBR";
 
+        //private string memoryRACPool = "RAC.Memory";
+        //private string memoryRACGroup = "RAC";
+        //private string memoryRAC = "RACMain";
+
         private bool RegisterGlobalObjects()
         {
             try
@@ -328,19 +366,19 @@ namespace Root_WindII
 
                 // Engineer
                 WindII_Engineer engineer = GlobalObjects.Instance.Register<WindII_Engineer>();
-                //DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
+                DialogService dialogService = GlobalObjects.Instance.Get<DialogService>();
                 WindII_Warning warning = GlobalObjects.Instance.Register<WindII_Warning>();
                 engineer.Init("WIND2F");
 
                 MemoryTool memoryTool = engineer.ClassMemoryTool();
                 ImageData frontImage;
                 ImageData maskLayer;
-
+                //ImageData racImage;
                 
                 // ImageData
                 frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
                 maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
-
+                //racImage = GlobalObjects.Instance.RegisterNamed<ImageData>("RACImage", memoryTool.GetMemory(memoryRACPool, memoryRACGroup, memoryRAC));
                 //ImageData backImage = GlobalObjects.Instance.RegisterNamed<ImageData>("BackImage", memoryTool.GetMemory(memoryBackPool, memoryBackGroup, memoryBack));
                 //ImageData edgeTopImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeTopImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop));
                 //ImageData edgeSideImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeSideImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeSide));
@@ -352,6 +390,12 @@ namespace Root_WindII
                     frontImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nByte;
                     frontImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nCount;
                 }
+
+                //if(racImage.m_MemData != null)
+                //{
+                //    racImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryRACPool, memoryRACGroup, memoryRAC).p_nByte;
+                //    racImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryRACPool, memoryRACGroup, memoryRAC).p_nCount;
+                //}
 
                 //if (edgeTopImage.m_MemData != null)
                 //{
@@ -379,13 +423,10 @@ namespace Root_WindII
                 
                 // Recipe
                 RecipeFront recipeFront = GlobalObjects.Instance.Register<RecipeFront>();
-                RecipeBack recipeBack = GlobalObjects.Instance.Register<RecipeBack>();
-                RecipeEdge recipeEdge = GlobalObjects.Instance.Register<RecipeEdge>();
-                RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
 
                 if (frontImage.GetPtr() != IntPtr.Zero)
                 {
-                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4);
+                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4, true);
 
                     frontInspection.SetRecipe(recipeFront);
                     frontInspection.SetSharedBuffer(new SharedBufferInfo(
@@ -400,6 +441,8 @@ namespace Root_WindII
                     CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_VisionFront.GetGrabMode(recipeFront.CameraInfoIndex));
                     frontInspection.SetCameraInfo(camInfo);
                 }
+
+                Root_EFEM.Module.RecipeAlign recipeAlign = GlobalObjects.Instance.Register<Root_EFEM.Module.RecipeAlign>();
 
                 /*if (backImage.GetPtr() == IntPtr.Zero)
                 {
@@ -449,12 +492,16 @@ namespace Root_WindII
                 }
                 */
 
+                //RAC XMLData
+                XMLData xmlData = GlobalObjects.Instance.Register<XMLData>();
+
                 // DialogService
-                //dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
-                //dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
-                //dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
-                //dialogService.Register<TK4S, TK4SModuleUI>();
-                //dialogService.Register<FFUModule, FFUModuleUI>();
+                dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+                dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
+                dialogService.Register<ManualAlignViewer_ViewModel, ManualAlignViewer>();
+                dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
+                dialogService.Register<TK4S, TK4SModuleUI>();
+                dialogService.Register<FFUModule, FFUModuleUI>();
             }
             catch (Exception ex)
             {

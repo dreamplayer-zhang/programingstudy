@@ -28,7 +28,8 @@
             <Button x:Name="buttonOpen" Content="Open" Margin="2,22,2,2" Click="ButtonOpen_Click"/>
             <Button x:Name="buttonSave" Content="Save" Margin="2" Click="ButtonSave_Click"/>
             <Button x:Name="buttonClear" Content="Clear" Margin="2,12,2,2" Click="ButtonClear_Click"/>
-            <ComboBox x:Name="comboBoxModule" Margin="2" SelectionChanged="ComboBoxModule_SelectionChanged"/>
+            <Button x:Name="buttonUndo" Content="Undo" Margin="2" Click="buttonUndo_Click"/>
+            <ComboBox x:Name="comboBoxModule" Margin="2,12,2,2" SelectionChanged="ComboBoxModule_SelectionChanged"/>
             <ComboBox x:Name="comboBoxModuleRun" Margin="2" SelectionChanged="ComboBoxModuleRun_SelectionChanged"/>
             <Button x:Name="buttonAdd" Content="Add" Margin="2" Visibility="Hidden" Click="ButtonAdd_Click"/>
             <Button x:Name="buttonRnR" Content="RnR" Margin="2,12,2,2" Visibility="{Binding p_visibleRnR}" Click="buttonRnR_Click"/>

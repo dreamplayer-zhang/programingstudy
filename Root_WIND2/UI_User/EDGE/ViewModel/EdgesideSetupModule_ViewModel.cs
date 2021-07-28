@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace Root_WIND2.UI_User
 {
@@ -50,6 +51,60 @@ namespace Root_WIND2.UI_User
 			set
 			{
 				SetProperty(ref processDefectParameter, value);
+			}
+		}
+
+		//private ObservableCollection<OptionDefect> optionDefectList;
+		//public ObservableCollection<OptionDefect> OptionDefectList
+		//{
+		//	get
+		//	{
+		//		return optionDefectList;
+		//	}
+		//	set
+		//	{
+		//		SetParameter();
+		//		SetProperty(ref optionDefectList, value);
+		//	}
+		//}
+
+		//private OptionDefect selectedOptionDefect;
+		//public OptionDefect SelectedOptionDefect
+		//{
+		//	get
+		//	{
+		//		return selectedOptionDefect;
+		//	}
+		//	set
+		//	{
+		//		SetProperty(ref selectedOptionDefect, value);
+		//	}
+		//}
+
+		private ObservableCollection<OptionDefect2> optionDefectList;
+		public ObservableCollection<OptionDefect2> OptionDefectList
+		{
+			get
+			{
+				return optionDefectList;
+			}
+			set
+			{
+				SetParameter();
+				SetProperty(ref optionDefectList, value);
+			}
+		}
+
+		private OptionDefect2 selectedOptionDefect;
+		public OptionDefect2 SelectedOptionDefect
+		{
+			get
+			{
+				return selectedOptionDefect;
+			}
+			set
+			{
+				SetProperty(ref selectedOptionDefect, value);
 			}
 		}
 
@@ -169,9 +224,9 @@ namespace Root_WIND2.UI_User
 			Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop;
 			Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 			ProcessDefectParameter = recipe.GetItem<ProcessDefectEdgeParameter>();
+			OptionDefectList = new ObservableCollection<OptionDefect2>();
 
 			this.camInfoDataListVM = new DataListView_ViewModel();
-
 			SetOriginInfo();
 		}
 
@@ -219,6 +274,106 @@ namespace Root_WIND2.UI_User
 			this.OriginY = OriginRecipe.OriginY;
 			this.OriginWidth = OriginRecipe.OriginWidth;
 			this.OriginHeight = OriginRecipe.OriginHeight;
+		}
+
+		public void SetOptionDefect()
+		{
+			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+			int count = recipe.GetItem<ProcessDefectEdgeParameter>().MinAngles.Count;
+
+			if (OptionDefectList == null)
+				OptionDefectList = new ObservableCollection<OptionDefect2>();
+
+			OptionDefectList.Clear();
+			for (int i = 0; i < count; i++)
+			{
+				OptionDefectList.Add(new OptionDefect2(recipe.GetItem<ProcessDefectEdgeParameter>().MinAngles[i], recipe.GetItem<ProcessDefectEdgeParameter>().MaxAngles[i], recipe.GetItem<ProcessDefectEdgeParameter>().DefectCodes[i]));
+			}
+		}
+
+		public void SetParameter()
+		{
+			if (OptionDefectList == null)
+				return;
+
+			List<double> minAngleList = new List<double>();
+			List<double> maxAngleList = new List<double>();
+			List<int> defectCodeList = new List<int>();
+
+			foreach (OptionDefect2 item in OptionDefectList)
+			{
+				minAngleList.Add(item.MinAngle);
+				maxAngleList.Add(item.MaxAngle);
+				defectCodeList.Add(item.Code);
+			}
+
+			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+			recipe.GetItem<ProcessDefectEdgeParameter>().MinAngles = minAngleList;
+			recipe.GetItem<ProcessDefectEdgeParameter>().MaxAngles = maxAngleList;
+			recipe.GetItem<ProcessDefectEdgeParameter>().DefectCodes = defectCodeList;
+			SetOptionDefect();
+		}
+
+		public ICommand btnAddOptionDefect
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					OptionDefect2 item = new OptionDefect2(0, 0, 0);
+					OptionDefectList.Add(item);
+				});
+			}
+		}
+
+		public ICommand btnDeleteOptionDefect
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					OptionDefectList.Remove(SelectedOptionDefect);
+				});
+			}
+		}
+		
+
+		public ICommand btnSaveOptionDefect
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					SetParameter();
+				});
+			}
+		}
+	}
+	
+	public class OptionDefect
+	{
+		public double Angle { get; set; }
+		public int Code { get; set; }
+
+		public OptionDefect(double angle, int code)
+		{
+			this.Angle = angle;
+			this.Code = code;
+		}
+	}
+
+	public class OptionDefect2
+	{
+		public double MinAngle { get; set; }
+		public double MaxAngle { get; set; }
+
+		public int Code { get; set; }
+
+		public OptionDefect2(double minAngle, double maxAngle, int code)
+		{
+			this.MinAngle = minAngle;
+			this.MaxAngle = maxAngle;
+			this.Code = code;
 		}
 	}
 }

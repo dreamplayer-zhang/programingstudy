@@ -1,6 +1,9 @@
-﻿using RootTools;
+﻿using Root_WindII_Option.UI;
+using RootTools;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,152 +58,171 @@ namespace Root_WindII_Option
                 SetProperty<bool>(ref this.isEnableSpec, value);
             }
         }
+		#endregion
+
+		#region [Views]
+		// HOME
+		//public readonly HomeRecipe homeRecipe = new HomeRecipe();
+
+		//// FRONT
+		//public readonly FrontsideSummary frontsideSummary = new FrontsideSummary();
+		//public readonly FrontsideProduct frontsideProduct = new FrontsideProduct();
+		//public readonly FrontsideOrigin frontsideOrigin = new FrontsideOrigin();
+		//public readonly FrontsideAlignment frontsideAlignment = new FrontsideAlignment();
+		//public readonly FrontsideMask frontsideMask = new FrontsideMask();
+		//public readonly FrontsideSpec frontsideSpec = new FrontsideSpec();
+		//public readonly FrontsideInspect frontsideInspect = new FrontsideInspect();
+
+		// BACK
+		public readonly BacksideProduct backsideProduct = new BacksideProduct();
+		public readonly BacksideSetup backsideSetup = new BacksideSetup();
+		public readonly BacksideInspect backsideInspect = new BacksideInspect();
+		public readonly BacksideSpec backsideSpec = new BacksideSpec();
+
+		// EDGE
+		public readonly EdgesideSetup edgesideSetup = new EdgesideSetup();
+		public readonly EdgesideInspect edgesideInspect = new EdgesideInspect();
+
+		// EBR
+		public readonly EBRSetup ebrSetup = new EBRSetup();
+		public readonly EBRInspect ebrInspect = new EBRInspect();
 
 
+		//// Camera
+		//public readonly CameraVRS cameraVrs = new CameraVRS();
+		//public readonly CameraAlign cameraAlign = new CameraAlign();
+		#endregion
 
-        #endregion
+		//#region [ViewModels]
 
-        #region [Views]
-        // HOME
-        //public readonly HomeRecipe homeRecipe = new HomeRecipe();
+		//#region [Home ViewModels]
+		//private HomeRecipe_ViewModel homeRecipeVM = new HomeRecipe_ViewModel();
+		//public HomeRecipe_ViewModel HomeRecipeVM
+		//{
+		//    get => homeRecipeVM;
+		//}
+		//#endregion
 
-        //// FRONT
-        //public readonly FrontsideSummary frontsideSummary = new FrontsideSummary();
-        //public readonly FrontsideProduct frontsideProduct = new FrontsideProduct();
-        //public readonly FrontsideOrigin frontsideOrigin = new FrontsideOrigin();
-        //public readonly FrontsideAlignment frontsideAlignment = new FrontsideAlignment();
-        //public readonly FrontsideMask frontsideMask = new FrontsideMask();
-        //public readonly FrontsideSpec frontsideSpec = new FrontsideSpec();
-        //public readonly FrontsideInspect frontsideInspect = new FrontsideInspect();
+		//#region [Front ViewModels]
+		//private .FrontsideProduct_ViewModel frontsideSummaryVM = new FrontsideProduct_ViewModel();
+		//public .FrontsideProduct_ViewModel FrontsideSummaryVM
+		//{
+		//    get => frontsideSummaryVM;
+		//}
 
-        //// BACK
-        //public readonly BacksideSetup backsideSetup = new BacksideSetup();
-        //public readonly BacksideInspect backsideInspect = new BacksideInspect();
+		//private .FrontsideProduct_ViewModel frontsideProductVM = new FrontsideProduct_ViewModel();
+		//public .FrontsideProduct_ViewModel FrontsideProductVM
+		//{
+		//    get => frontsideProductVM;
+		//}
 
-        //// EDGE
-        //public readonly EdgesideSetup edgesideSetup = new EdgesideSetup();
-        //public readonly EdgesideInspect edgesideInspect = new EdgesideInspect();
+		//private .FrontsideOrigin_ViewModel frontsideOriginVM = new .FrontsideOrigin_ViewModel();
+		//public .FrontsideOrigin_ViewModel FrontsideOriginVM
+		//{
+		//    get => frontsideOriginVM;
+		//}
 
-        //// EBR
-        //public readonly EBRSetup ebrSetup = new EBRSetup();
+		//private .FrontsideAlignment_ViewModel frontsideAlignmentVM = new .FrontsideAlignment_ViewModel();
+		//public .FrontsideAlignment_ViewModel FrontsideAlignmentVM
+		//{
+		//    get => frontsideAlignmentVM;
+		//}
 
-        //// Camera
-        //public readonly CameraVRS cameraVrs = new CameraVRS();
-        //public readonly CameraAlign cameraAlign = new CameraAlign();
-        #endregion
+		//private .FrontsideMask_ViewModel frontsideMaskVM = new .FrontsideMask_ViewModel();
+		//public .FrontsideMask_ViewModel FrontsideMaskVM
+		//{
+		//    get => frontsideMaskVM;
+		//}
 
-        //#region [ViewModels]
+		//private .FrontsideSpec_ViewModel frontsideSpecVM = new .FrontsideSpec_ViewModel();
+		//public .FrontsideSpec_ViewModel FrontsideSpecVM
+		//{
+		//    get => frontsideSpecVM;
+		//}
 
-        //#region [Home ViewModels]
-        //private HomeRecipe_ViewModel homeRecipeVM = new HomeRecipe_ViewModel();
-        //public HomeRecipe_ViewModel HomeRecipeVM
-        //{
-        //    get => homeRecipeVM;
-        //}
-        //#endregion
+		//private .FrontsideInspect_ViewModel frontsideInspectVM = new .FrontsideInspect_ViewModel();
+		//public .FrontsideInspect_ViewModel FrontsideInspectVM
+		//{
+		//    get => frontsideInspectVM;
+		//}
 
-        //#region [Front ViewModels]
-        //private .FrontsideProduct_ViewModel frontsideSummaryVM = new FrontsideProduct_ViewModel();
-        //public .FrontsideProduct_ViewModel FrontsideSummaryVM
-        //{
-        //    get => frontsideSummaryVM;
-        //}
+		//#region [Camera ViewModes]
+		//private .CameraVRS_ImageViewer_ViewModel cameraVrsVM = new .CameraVRS_ImageViewer_ViewModel();
+		//public .CameraVRS_ImageViewer_ViewModel CameraVrsVM
+		//{
+		//    get => cameraVrsVM;
+		//}
 
-        //private .FrontsideProduct_ViewModel frontsideProductVM = new FrontsideProduct_ViewModel();
-        //public .FrontsideProduct_ViewModel FrontsideProductVM
-        //{
-        //    get => frontsideProductVM;
-        //}
-
-        //private .FrontsideOrigin_ViewModel frontsideOriginVM = new .FrontsideOrigin_ViewModel();
-        //public .FrontsideOrigin_ViewModel FrontsideOriginVM
-        //{
-        //    get => frontsideOriginVM;
-        //}
-
-        //private .FrontsideAlignment_ViewModel frontsideAlignmentVM = new .FrontsideAlignment_ViewModel();
-        //public .FrontsideAlignment_ViewModel FrontsideAlignmentVM
-        //{
-        //    get => frontsideAlignmentVM;
-        //}
-
-        //private .FrontsideMask_ViewModel frontsideMaskVM = new .FrontsideMask_ViewModel();
-        //public .FrontsideMask_ViewModel FrontsideMaskVM
-        //{
-        //    get => frontsideMaskVM;
-        //}
-
-        //private .FrontsideSpec_ViewModel frontsideSpecVM = new .FrontsideSpec_ViewModel();
-        //public .FrontsideSpec_ViewModel FrontsideSpecVM
-        //{
-        //    get => frontsideSpecVM;
-        //}
-
-        //private .FrontsideInspect_ViewModel frontsideInspectVM = new .FrontsideInspect_ViewModel();
-        //public .FrontsideInspect_ViewModel FrontsideInspectVM
-        //{
-        //    get => frontsideInspectVM;
-        //}
-
-        //#region [Camera ViewModes]
-        //private .CameraVRS_ImageViewer_ViewModel cameraVrsVM = new .CameraVRS_ImageViewer_ViewModel();
-        //public .CameraVRS_ImageViewer_ViewModel CameraVrsVM
-        //{
-        //    get => cameraVrsVM;
-        //}
-
-        //#endregion
+		//#endregion
 
 
-        //#endregion
+		//#endregion
 
-        //#region [Back ViewModels]
-        //private .BacksideSetup_ViewModel backsideSetupVM = new .BacksideSetup_ViewModel();
-        //public .BacksideSetup_ViewModel BacksideROIVM
-        //{
-        //    get => this.backsideSetupVM;
-        //}
+		#region [Back ViewModels]
+		private BacksideProduct_ViewModel backsideProductVM = new BacksideProduct_ViewModel();
+		public BacksideProduct_ViewModel BacksideProductVM
+		{
+			get => this.backsideProductVM;
+		}
 
-        //private .BacksideInspect_ViewModel backsideInspectVM = new .BacksideInspect_ViewModel();
-        //public .BacksideInspect_ViewModel BacksideInspectVM
-        //{
-        //    get => this.backsideInspectVM;
-        //}
-        //#endregion
+		private BacksideSetup_ViewModel backsideSetupVM = new BacksideSetup_ViewModel();
+		public BacksideSetup_ViewModel BacksideROIVM
+		{
+			get => this.backsideSetupVM;
+		}
 
-        //#region [Edge ViewModels]
-        //private .EdgesideSetup_ViewModel edgesideSetupVM = new .EdgesideSetup_ViewModel();
-        //public .EdgesideSetup_ViewModel EdgesideSetupVM
-        //{
-        //    get => edgesideSetupVM;
-        //}
-        //private .EdgesideInspect_ViewModel edgesideInspectionVM = new .EdgesideInspect_ViewModel();
-        //public .EdgesideInspect_ViewModel EdgesideInspectionVM
-        //{
-        //    get => edgesideInspectionVM;
-        //}
-        //#endregion
+		private BacksideSpec_ViewModel backsideSpecVM = new BacksideSpec_ViewModel();
+		public BacksideSpec_ViewModel BacksideSpecVM
+		{
+			get => this.backsideSpecVM;
+		}
 
-        //#region [EBR ViewModels]
-        //private .EBRSetup_ViewModel ebrSetupVM = new .EBRSetup_ViewModel();
-        //public .EBRSetup_ViewModel EBRSetupVM
-        //{
-        //    get => ebrSetupVM;
-        //}
-        //#endregion
+		private BacksideInspect_ViewModel backsideInspectVM = new BacksideInspect_ViewModel();
+		public BacksideInspect_ViewModel BacksideInspectVM
+		{
+			get => this.backsideInspectVM;
+		}
+		#endregion
 
-        //#region [Camera ViewModels]
-        //private .CameraAlign_ViewModel cameraAlignVM = new .CameraAlign_ViewModel();
-        //public .CameraAlign_ViewModel CameraAlignVM
-        //{
-        //    get => cameraAlignVM;
-        //}
-        //#endregion
+		#region [Edge ViewModels]
+		private EdgesideSetup_ViewModel edgesideSetupVM = new EdgesideSetup_ViewModel();
+		public EdgesideSetup_ViewModel EdgesideSetupVM
+		{
+			get => edgesideSetupVM;
+		}
+		private EdgesideInspect_ViewModel edgesideInspectionVM = new EdgesideInspect_ViewModel();
+		public EdgesideInspect_ViewModel EdgesideInspectionVM
+		{
+			get => edgesideInspectionVM;
+		}
+		#endregion
 
-        //#endregion
+		#region [EBR ViewModels]
+		private EBRSetup_ViewModel ebrSetupVM = new EBRSetup_ViewModel();
+		public EBRSetup_ViewModel EBRSetupVM
+		{
+			get => ebrSetupVM;
+		}
+
+		private EBRInspect_ViewModel ebrInspectVM = new EBRInspect_ViewModel();
+		public EBRInspect_ViewModel EBRInspectVM
+		{
+			get => ebrInspectVM;
+		}
+		#endregion
+
+		//#region [Camera ViewModels]
+		//private .CameraAlign_ViewModel cameraAlignVM = new .CameraAlign_ViewModel();
+		//public .CameraAlign_ViewModel CameraAlignVM
+		//{
+		//	get => cameraAlignVM;
+		//}
+		//#endregion
+
+		//#endregion
 
 
-        public SetupMenuPanel_ViewModel()
+		public SetupMenuPanel_ViewModel()
         {
             Initialize();
 
@@ -253,67 +275,67 @@ namespace Root_WindII_Option
         }
 
 
-        #region [Command]
+		#region [Command]
 
-        //#region [Command Parent RadioButton]
-        //public ICommand btnHomeClickedCommand
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(homeRecipe);
-        //            //homeRecipe.DataContext = homeRecipeVM;
-        //        });
-        //    }
-        //}
-        //public ICommand btnFrontClickedCommand
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(frontsideProduct);
-        //            //frontsideProduct.DataContext = frontsideProductVM;
-        //        });
-        //    }
-        //}
+		//#region [Command Parent RadioButton]
+		//public ICommand btnHomeClickedCommand
+		//{
+		//    get
+		//    {
+		//        return new RelayCommand(() =>
+		//        {
+		//            SetPage(homeRecipe);
+		//            //homeRecipe.DataContext = homeRecipeVM;
+		//        });
+		//    }
+		//}
+		//public ICommand btnFrontClickedCommand
+		//{
+		//    get
+		//    {
+		//        return new RelayCommand(() =>
+		//        {
+		//            SetPage(frontsideProduct);
+		//            //frontsideProduct.DataContext = frontsideProductVM;
+		//        });
+		//    }
+		//}
 
-        //public ICommand btnBackClickedCommand
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(backsideSetup);
-        //            //backsideSetup.DataContext = backsideSetupVM;
-        //        });
-        //    }
-        //}
+		//public ICommand btnBackClickedCommand
+		//{
+		//    get
+		//    {
+		//        return new RelayCommand(() =>
+		//        {
+		//            SetPage(backsideSetup);
+		//            //backsideSetup.DataContext = backsideSetupVM;
+		//        });
+		//    }
+		//}
 
-        //public ICommand btnEdgeClickedCommand
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(edgesideSetup);
-        //            //edgesideSetup.DataContext = edgesideSetupVM;
-        //        });
-        //    }
-        //}
+		public ICommand btnEdgeClickedCommand
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					SetPage(edgesideSetup);
+					edgesideSetup.DataContext = edgesideSetupVM;
+				});
+			}
+		}
 
-        //public ICommand btnEBRClickedCommand
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(ebrSetup);
-        //            //ebrSetup.DataContext = ebrSetupVM;
-        //        });
-        //    }
-        //}
+        public ICommand btnEBRClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(ebrSetup);
+                    ebrSetup.DataContext = ebrSetupVM;
+                });
+            }
+        }
 
         //public ICommand btnCameraClickedCommand
         //{
@@ -355,8 +377,6 @@ namespace Root_WindII_Option
         //        });
         //    }
         //}
-
-
 
         //public ICommand btnFrontProduct
         //{
@@ -514,192 +534,438 @@ namespace Root_WindII_Option
         //}
         //#endregion
 
-        //#region [Command Edge]
-        //public ICommand btnEdgeSetup
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(edgesideSetup);
-        //            //edgesideSetup.DataContext = edgesideSetupVM;
-        //        });
-        //    }
-        //}
+        #region [Command Edge]
+        public ICommand btnEdgeSetup
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					SetPage(edgesideSetup);
+					edgesideSetup.DataContext = edgesideSetupVM;
+				});
+			}
+		}
 
-        //public ICommand btnEdgeInspect
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(edgesideInspect);
-        //            //edgesideInspect.DataContext = EdgesideInspectionVM;
-        //        });
-        //    }
-        //}
+		public ICommand btnEdgeInspect
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					SetPage(edgesideInspect);
+					edgesideInspect.DataContext = EdgesideInspectionVM;
+				});
+			}
+		}
 
 
-        //public ICommand btnNewRecipeEdge
-        //{
-        //    get => new RelayCommand(() =>
-        //    {
+		public ICommand btnNewRecipeEdge
+		{
+			get => new RelayCommand(() =>
+			{
+				System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+				dlg.InitialDirectory = Constants.RootPath.RecipeEdgeRootPath;
+				dlg.Title = "Save Recipe";
+				dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+				if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+				{
+					string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+					string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+					string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+					string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+					string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
 
-        //    });
-        //}
+					DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+					if (!dir.Exists)
+						dir.Create();
 
-        //public ICommand btnSaveRecipeEdge
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
+					RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+					recipe.Clear();
 
-        //        });
-        //    }
-        //}
+					recipe.Name = sFileNameNoExt;
+					recipe.RecipePath = sFullPath;
+					recipe.RecipeFolderPath = sRecipeFolderPath;
 
-        //public ICommand btnLoadRecipeEdge
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
+					recipe.Save(sFullPath);
+				}
+			});
+		}
 
-        //        });
-        //    }
-        //}
-        //#endregion
+		public ICommand btnSaveRecipeEdge
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+					if (recipe.RecipePath != "")
+					{
+						recipe.Save(recipe.RecipePath);
+					}
+					else
+					{
+						System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+						dlg.InitialDirectory = Constants.RootPath.RecipeEdgeRootPath;
+						dlg.Title = "Save Recipe";
+						dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+						if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+						{
+							string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+							string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+							string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+							string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+							string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
 
-        //#region [Command EBR]
-        //public ICommand btnEBRSetup
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(ebrSetup);
-        //            //ebrSetup.DataContext = ebrSetupVM;
-        //        });
-        //    }
-        //}
+							DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+							if (!dir.Exists)
+								dir.Create();
 
-        //public ICommand btnNewRecipeEBR
-        //{
-        //    get => new RelayCommand(() =>
-        //    {
+							recipe.Name = sFileNameNoExt;
+							recipe.RecipePath = sFullPath;
+							recipe.RecipeFolderPath = sRecipeFolderPath;
 
-        //    });
-        //}
+							recipe.Save(sFullPath);
+						}
+					}
+				});
+			}
+		}
 
-        //public ICommand btnSaveRecipeEBR
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
+		public ICommand btnLoadRecipeEdge
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+					dlg.InitialDirectory = Constants.RootPath.RecipeEdgeRootPath;
+					dlg.Title = "Load Recipe";
+					dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+					if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+					{
+						string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+						string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+						string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+						string sFullPath = Path.Combine(sFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
 
-        //        });
-        //    }
-        //}
+						DirectoryInfo dir = new DirectoryInfo(sFolderPath);
+						if (!dir.Exists)
+							dir.Create();
 
-        //public ICommand btnLoadRecipeEBR
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
+						RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+						recipe.Read(sFullPath);
 
-        //        });
-        //    }
-        //}
-        //#endregion
+						edgesideSetupVM.LoadParameter();
+					}
+				});
+			}
+		}
+		#endregion
 
-        //#region [Command Back]
-        //public ICommand btnBackSetup
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(backsideSetup);
-        //            //backsideSetup.DataContext = backsideSetupVM;
-        //        });
-        //    }
-        //}
+		#region [Command EBR]
+		public ICommand btnEBRSetup
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					SetPage(ebrSetup);
+					ebrSetup.DataContext = ebrSetupVM;
+				});
+			}
+		}
 
-        //public ICommand btnBackInspect
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(backsideInspect);
-        //            //backsideInspect.DataContext = backsideInspectVM;
-        //        });
-        //    }
-        //}
+		public ICommand btnEBRInspect
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					SetPage(ebrInspect);
+					ebrInspect.DataContext = ebrInspectVM;
+				});
+			}
+		}
 
-        //public ICommand btnNewRecipeBack
-        //{
-        //    get => new RelayCommand(() =>
-        //    {
+		public ICommand btnNewRecipeEBR
+		{
+			get => new RelayCommand(() =>
+			{
+				System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+				dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
+				dlg.Title = "Save Recipe";
+				dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+				if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+				{
+					string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+					string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+					string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+					string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+					string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
 
-        //    });
-        //}
+					DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+					if (!dir.Exists)
+						dir.Create();
 
-        //public ICommand btnSaveRecipeBack
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
+					RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+					recipe.Clear();
 
-        //        });
-        //    }
-        //}
+					recipe.Name = sFileNameNoExt;
+					recipe.RecipePath = sFullPath;
+					recipe.RecipeFolderPath = sRecipeFolderPath;
 
-        //public ICommand btnLoadRecipeBack
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
+					recipe.Save(sFullPath);
+				}
+			});
+		}
 
-        //        });
-        //    }
-        //}
-        //#endregion
+		public ICommand btnSaveRecipeEBR
+		{
+			get => new RelayCommand(() =>
+			{
+				RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+				if (recipe.RecipePath != "")
+				{
+					recipe.Save(recipe.RecipePath);
+				}
+				else
+				{
+					System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+					dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
+					dlg.Title = "Save Recipe";
+					dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+					if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+					{
+						string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+						string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+						string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+						string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+						string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
 
-        //#region [Command Camera]
-        //public ICommand btnCameraVRS
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(cameraVrs);
-        //            //cameraVrs.DataContext = CameraVrsVM;
-        //        });
-        //    }
-        //}
+						DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+						if (!dir.Exists)
+							dir.Create();
 
-        //public ICommand btnCameraAlign
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            SetPage(cameraAlign);
-        //            //cameraAlign.DataContext = CameraAlignVM;
-        //        });
-        //    }
-        //}
-        //#endregion
+						recipe.Name = sFileNameNoExt;
+						recipe.RecipePath = sFullPath;
+						recipe.RecipeFolderPath = sRecipeFolderPath;
 
-        #endregion
+						recipe.Save(sFullPath);
+					}
+				}
+			});
+		}
 
-        public void SetPage(UserControl page)
+		public ICommand btnLoadRecipeEBR
+		{
+			get => new RelayCommand(() =>
+			{
+				System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+				dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
+				dlg.Title = "Load Recipe";
+				dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+				if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+				{
+					string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+					string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+					string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+					string sFullPath = Path.Combine(sFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+					DirectoryInfo dir = new DirectoryInfo(sFolderPath);
+					if (!dir.Exists)
+						dir.Create();
+
+					RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+					recipe.Read(sFullPath);
+
+					ebrSetupVM.LoadParameter();
+				}
+			});
+		}
+		#endregion
+
+		#region [Command Back]
+		public ICommand btnBackProduct
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					SetPage(backsideProduct);
+					backsideProduct.DataContext = backsideProductVM;
+				});
+			}
+		}
+		public ICommand btnBackSetup
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					SetPage(backsideSetup);
+					backsideSetup.DataContext = backsideSetupVM;
+				});
+			}
+		}
+
+		public ICommand btnBackSpec
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					SetPage(backsideSpec);
+					backsideSpec.DataContext = backsideSpecVM;
+				});
+			}
+		}
+
+		public ICommand btnBackInspect
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					SetPage(backsideInspect);
+					backsideInspect.DataContext = backsideInspectVM;
+				});
+			}
+		}
+
+		public ICommand btnNewRecipeBack
+		{
+			get => new RelayCommand(() =>
+			{
+				System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+				dlg.InitialDirectory = Constants.RootPath.RecipeBackRootPath;
+				dlg.Title = "Save Recipe";
+				dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+				if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+				{
+					string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+					string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+					string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+					string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+					string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+					DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+					if (!dir.Exists)
+						dir.Create();
+
+					RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
+					recipe.Clear();
+
+					recipe.Name = sFileNameNoExt;
+					recipe.RecipePath = sFullPath;
+					recipe.RecipeFolderPath = sRecipeFolderPath;
+
+					recipe.Save(sFullPath);
+				}
+			});
+		}
+
+		public ICommand btnSaveRecipeBack
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
+					if (recipe.RecipePath != "")
+					{
+						recipe.Save(recipe.RecipePath);
+					}
+					else
+					{
+						System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+						dlg.InitialDirectory = Constants.RootPath.RecipeBackRootPath;
+						dlg.Title = "Save Recipe";
+						dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+						if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+						{
+							string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+							string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+							string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+							string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+							string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+							DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+							if (!dir.Exists)
+								dir.Create();
+
+							recipe.Name = sFileNameNoExt;
+							recipe.RecipePath = sFullPath;
+							recipe.RecipeFolderPath = sRecipeFolderPath;
+
+							recipe.Save(sFullPath);
+						}
+					}
+				});
+			}
+		}
+
+		public ICommand btnLoadRecipeBack
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+					dlg.InitialDirectory = Constants.RootPath.RecipeBackRootPath;
+					dlg.Title = "Load Recipe";
+					dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+					if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+					{
+						string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+						string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+						string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+						string sFullPath = Path.Combine(sFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+						DirectoryInfo dir = new DirectoryInfo(sFolderPath);
+						if (!dir.Exists)
+							dir.Create();
+
+						RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
+						recipe.Read(sFullPath);
+
+						UpdateCurrentPanel();
+						//WIND2EventManager.OnRecipeUpdated(this, new RecipeEventArgs());
+					}
+				});
+			}
+		}
+		#endregion
+
+		//#region [Command Camera]
+		//public ICommand btnCameraVRS
+		//{
+		//    get
+		//    {
+		//        return new RelayCommand(() =>
+		//        {
+		//            SetPage(cameraVrs);
+		//            //cameraVrs.DataContext = CameraVrsVM;
+		//        });
+		//    }
+		//}
+
+		//public ICommand btnCameraAlign
+		//{
+		//    get
+		//    {
+		//        return new RelayCommand(() =>
+		//        {
+		//            SetPage(cameraAlign);
+		//            //cameraAlign.DataContext = CameraAlignVM;
+		//        });
+		//    }
+		//}
+		//#endregion
+
+		#endregion
+
+		public void SetPage(UserControl page)
         {
             p_CurrentPanel = page;
         }

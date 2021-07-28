@@ -131,11 +131,14 @@
     <Compile Include="Database\defect.cs" />
     <Compile Include="ClonableWorkFactory.cs" />
     <Compile Include="DataTypes\CameraInfo.cs" />
+    <Compile Include="DataTypes\ModuleType.cs" />
     <Compile Include="DataTypes\SharedBufferInfo.cs" />
     <Compile Include="Inspection\BacksideAlignment.cs" />
     <Compile Include="Inspection\BacksideSurface.cs" />
+    <Compile Include="Inspection\PreCreateGolden.cs" />
     <Compile Include="Inspection\EUVPodSurface.cs" />
     <Compile Include="Inspection\ProcessDefect_Backside.cs" />
+    <Compile Include="Inspection\ProcessDefect_EUVPod.cs" />
     <Compile Include="Inspection\ReticleSurface.cs" />
     <Compile Include="GlobalObjects.cs" />
     <Compile Include="Inspection\D2D.cs" />
@@ -146,6 +149,18 @@
     <Compile Include="Inspection\ProcessMeasurement.cs" />
     <Compile Include="Inspection\Snap.cs" />
     <Compile Include="MainWindow_ViewModel.cs" />
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_RefCoordItem.xaml.cs">
+      <DependentUpon>VerticalWire_RefCoordItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_RefCoordItem_ViewModel.cs" />
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VericalWire_RecipeTeacing.xaml.cs">
+      <DependentUpon>VericalWire_RecipeTeacing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_RecipeTeaching_ViewModel.cs" />
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_ROIItem.xaml.cs">
+      <DependentUpon>VerticalWire_ROIItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_ROIItem_ViewModel.cs" />
     <Compile Include="Measurement\VerticalWire.cs" />
     <Compile Include="Measurement\PBI.cs" />
     <Compile Include="MVVM\Converter.cs" />
@@ -157,7 +172,10 @@
     <Compile Include="Recipe\Interfaces\IOptionParameter.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
     <Compile Include="Recipe\Parameter\BacksideSurfaceParameter.cs" />
+    <Compile Include="Recipe\Parameter\FrontsideOthersParameterBase.cs" />
+    <Compile Include="Recipe\Parameter\PreCreateGoldenParameter.cs" />
     <Compile Include="Recipe\Parameter\EUVPodSurfaceParameter.cs" />
+    <Compile Include="Recipe\Parameter\ProcessDefectEUVPodParameter.cs" />
     <Compile Include="Recipe\Parameter\VerticalWireParameter.cs" />
     <Compile Include="Recipe\Parameter\PBIParameter.cs" />
     <Compile Include="Recipe\Parameter\ProcessDefectBacksideParameter.cs" />
@@ -185,7 +203,14 @@
     <Compile Include="Recipe\Recipe\D2DRecipe.cs" />
     <Compile Include="Recipe\Recipe\EBRRecipe.cs" />
     <Compile Include="Recipe\Recipe\EdgeSurfaceRecipe.cs" />
-    <Compile Include="Recipe\Recipe\EUVPodSurfaceRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\EUVOriginRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\EUVPodSurfaceRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\EUVPositionRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\HighResRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\LowResRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\SideRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPod\StainRecipe.cs" />
+    <Compile Include="Recipe\Recipe\FrontVRSAlignRecipe.cs" />
     <Compile Include="Recipe\Recipe\FrontAlignRecipe.cs" />
     <Compile Include="Recipe\Recipe\OriginRecipe.cs" />
     <Compile Include="Recipe\Recipe\VerticalWireRecipe.cs" />
@@ -205,6 +230,8 @@
     <Compile Include="RemoteProcess\StreamDataWriter.cs" />
     <Compile Include="ServerWorkFactory.cs" />
     <Compile Include="Settings\Constants.cs" />
+    <Compile Include="Settings\DefectCodeManager.cs" />
+    <Compile Include="Settings\IniFile.cs" />
     <Compile Include="Settings\ISettingItem.cs" />
     <Compile Include="Settings\SettingDialog.xaml.cs">
       <DependentUpon>SettingDialog.xaml</DependentUpon>
@@ -241,12 +268,26 @@
       <DependentUpon>DataListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\DataListView_ViewModel.cs" />
+    <Compile Include="UserControls\DefectViewer.xaml.cs">
+      <DependentUpon>DefectViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\DefectViewer_ViewModel.cs" />
     <Compile Include="UserControls\MapViewer.xaml.cs">
       <DependentUpon>MapViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\MotionViewer\MotionController.xaml.cs">
+      <DependentUpon>MotionController.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\MotionViewer\MotionController_ViewModel.cs" />
+    <Compile Include="UserControls\MotionViewer\MotionViewer.xaml.cs">
+      <DependentUpon>MotionViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\MotionViewer\MotionViewer_ViewModel.cs" />
     <Compile Include="UserControls\SizeObserver.cs" />
     <Compile Include="UserControls\MapViewer_ViewModel.cs" />
+    <Compile Include="Utility\SimpleCSVFile.cs" />
     <Compile Include="Utility\Enums.cs" />
+    <Compile Include="Utility\Helper.cs" />
     <Compile Include="Utility\KlarfData.cs" />
     <Compile Include="Utility\KlarfData_Lot.cs" />
     <Compile Include="SingleObject.cs" />
@@ -291,6 +332,18 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_RefCoordItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Measurement\UI_RecipeSetting\VerticalWire\VericalWire_RecipeTeacing.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_ROIItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Settings\SettingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -315,9 +368,21 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControls\DefectViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\MapViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\MotionViewer\MotionController.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\MotionViewer\MotionViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

@@ -88,7 +88,15 @@
                         <Button Content="Open" Command="{Binding btnOpenCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                         <Button Content="Save" Command="{Binding btnSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                         <Button Content="Clear" Command="{Binding btnClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
-                        <Button IsEnabled="False" Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>
+
+                        <TextBlock Text="Channel" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <CheckBox Content="Color" IsChecked="{Binding IsColorChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                        <CheckBox Content="R" IsChecked="{Binding IsRChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                        <CheckBox Content="G" IsChecked="{Binding IsGChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                        <CheckBox Content="B" IsChecked="{Binding IsBChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+
+                        <TextBlock Text="View" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <CheckBox Content="Defct" IsChecked="{Binding IsDefectChecked, Mode=TwoWay}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                     </StackPanel>
                     <Grid Grid.Row="1">
                         <tools:RootViewer />
@@ -107,11 +115,36 @@
                     <vision:MapViewer DataContext="{Binding MapViewerVM}"  Margin="4"/>
                 </GroupBox>
                 <GroupBox Grid.Row="1" 
-                      Header="Defect List"
+                      Header="Defect Viewer"
                       Margin="4,0,4,4"
-                      Style="{StaticResource main_view_groupbox}">
-                    <tools:Database_DataView DataContext="{Binding p_DataViewer_VM}" Margin="4">
-                    </tools:Database_DataView>
+                      Style="{StaticResource main_view_groupbox}" >
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="32"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Inspection ID"  
+                                   VerticalAlignment="Center" 
+                                   HorizontalAlignment="Center"/>
+                        <TextBox Margin="4,4,4,0"
+                                 Grid.Column="1"
+                                 VerticalContentAlignment="Center"
+                                 Text="{Binding InspectionID, Mode=TwoWay}"/>
+                        <Button Margin="4,4,4,0"
+                                Grid.Column="2"
+                                Content="Search"
+                                Command="{Binding btnInspectionIDSearchCommand}"
+                                Style="{StaticResource groupbox_griditem_button}"/>
+                        <tools:Database_DataView Grid.Row="1"
+                                                 Grid.ColumnSpan="3"
+                                                 DataContext="{Binding p_DataViewer_VM}" Margin="4">
+                        </tools:Database_DataView>
+                    </Grid>
                 </GroupBox>
             </Grid>
         </Grid>

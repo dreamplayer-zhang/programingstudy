@@ -1,5 +1,6 @@
 ﻿using Root_WindII_Option.Engineer;
 using RootTools;
+using RootTools.Gem.XGem;
 using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools_Vision;
@@ -167,7 +168,29 @@ namespace Root_WindII_Option
 
         #endregion
         #region [Command]
+        public ICommand GemOnlineClickCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                GlobalObjects.Instance.Get<WindII_Option_Engineer>().ClassGem().p_eReqControl = XGem.eControl.ONLINEREMOTE;
+            });
+        }
 
+        public ICommand GemLocalClickCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                GlobalObjects.Instance.Get<WindII_Option_Engineer>().ClassGem().p_eReqControl = XGem.eControl.LOCAL;
+            });
+        }
+
+        public ICommand GemOfflineClickCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                GlobalObjects.Instance.Get<WindII_Option_Engineer>().ClassGem().p_eReqControl = XGem.eControl.OFFLINE;
+            });
+        }
         #endregion
         #endregion
 
@@ -214,7 +237,11 @@ namespace Root_WindII_Option
 
             this.SetupVM = new Setup_ViewModel();
 			this.MaintVM = new MaintenancePanel_ViewModel();
-		}
+
+            //warnui = new Warning_UI();
+            //p_CurrentSubPanel = warnui;
+            //p_CurrentSubPanel.DataContext = GlobalObjects.Instance.Get<WindII_Warning>();
+        }
 
         private void ThreadStop()
         {
@@ -255,17 +282,12 @@ namespace Root_WindII_Option
                 Directory.CreateDirectory(field.GetValue(null).ToString());
         }
 
-        private string memoryFrontPool = "Vision.Memory";
-        private string memoryFrontGroup = "Vision";
-        private string memoryFront = "Main";
-        private string memoryMask = "Layer";
-
-        private string memoryBackPool = "BackSide Vision.BackSide Memory";
-        private string memoryBackGroup = "BackSide Vision";
+        private string memoryBackPool = "BackVision.Memory";
+        private string memoryBackGroup = "BackVision";
         private string memoryBack = "BackSide";
 
-        private string memoryEdgePool = "EdgeSide Vision.Memory";
-        private string memoryEdgeGroup = "EdgeSide Vision";
+        private string memoryEdgePool = "EdgeVision.Memory";
+        private string memoryEdgeGroup = "EdgeVision";
         private string memoryEdgeTop = "EdgeTop";
         private string memoryEdgeSide = "EdgeSide";
         private string memoryEdgeBottom = "EdgeBottom";
@@ -280,38 +302,17 @@ namespace Root_WindII_Option
 
                 // Engineer
                 WindII_Option_Engineer engineer = GlobalObjects.Instance.Register<WindII_Option_Engineer>();
-                //DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
-                //WIND2_Warning warning = GlobalObjects.Instance.Register<WIND2_Warning>();
-                engineer.Init("WIND2F_Option");
+				//DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
+				//WIND2_Warning warning = GlobalObjects.Instance.Register<WIND2_Warning>();
+				engineer.Init("WIND2F_Option");
 
-                MemoryTool memoryTool = engineer.ClassMemoryTool();
-                ImageData frontImage;
-                ImageData maskLayer;
-
-				// ImageData
-				//if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
-				//{
-				//    MemoryData memoryData = memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront);
-				//    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryFrontPool, memoryFrontGroup, memoryFront, memoryTool, memoryData.p_nCount, memoryData.p_nByte);
-				//    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
-				//}
-				//else
-				//{
-				frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
-				maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
-				//}
-
+				#region Register Memory
+				MemoryTool memoryTool = engineer.ClassMemoryTool();
 				ImageData backImage = GlobalObjects.Instance.RegisterNamed<ImageData>("BackImage", memoryTool.GetMemory(memoryBackPool, memoryBackGroup, memoryBack));
 				ImageData edgeTopImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeTopImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop));
 				ImageData edgeSideImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeSideImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeSide));
 				ImageData edgeBottomImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeBottomImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeBottom));
 				ImageData ebrImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EBRImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR));
-
-                //if (frontImage.m_MemData != null)
-                //{
-                //    frontImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nByte;
-                //    frontImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nCount;
-                //}
 
                 if (backImage.m_MemData != null)
                 {
@@ -342,36 +343,16 @@ namespace Root_WindII_Option
 					ebrImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR).p_nByte;
 					ebrImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR).p_nCount;
 				}
+				#endregion
 
-				/*
-                // Recipe
-                RecipeFront recipeFront = GlobalObjects.Instance.Register<RecipeFront>();
-                RecipeBack recipeBack = GlobalObjects.Instance.Register<RecipeBack>();
+				#region Register Recipe / Inspection
+				RecipeBack recipeBack = GlobalObjects.Instance.Register<RecipeBack>();
                 RecipeEdge recipeEdge = GlobalObjects.Instance.Register<RecipeEdge>();
-                RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
+				RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
 
-                if (frontImage.GetPtr() != IntPtr.Zero)
+                if (backImage.GetPtr() != IntPtr.Zero)
                 {
-                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4);
-
-                    frontInspection.SetRecipe(recipeFront);
-                    frontInspection.SetSharedBuffer(new SharedBufferInfo(
-                            frontImage.GetPtr(0),
-                            frontImage.p_Size.X,
-                            frontImage.p_Size.Y,
-                            frontImage.GetBytePerPixel(),
-                            frontImage.GetPtr(1),
-                            frontImage.GetPtr(2),
-                                new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
-                }
-
-                if (backImage.GetPtr() == IntPtr.Zero)
-                {
-                    //MessageBox.Show("Back Inspection 생성 실패, 메모리 할당 없음");
-                }
-                else
-                {
-                    RootTools_Vision.WorkManager3.WorkManager backInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("backInspection", 4);
+                    RootTools_Vision.WorkManager3.WorkManager backInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("backInspection", 4, true);
 
                     backInspection.SetRecipe(recipeBack);
                     backInspection.SetSharedBuffer(new SharedBufferInfo(
@@ -381,37 +362,51 @@ namespace Root_WindII_Option
                             backImage.GetBytePerPixel(),
                             backImage.GetPtr(1),
                             backImage.GetPtr(2),
-                            new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
-                }
+                            new MemoryID(memoryBackPool, memoryBackGroup, memoryBack)));
+				}
 
                 if (edgeTopImage.GetPtr() != IntPtr.Zero)
                 {
-                    RootTools_Vision.WorkManager3.WorkManager edgeTopInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("edgeTopInspection", 5);
+                    RootTools_Vision.WorkManager3.WorkManager edgeInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("edgeInspection");
 
-                    edgeTopInspection.SetRecipe(recipeEdge);
-                    edgeTopInspection.SetSharedBuffer(new SharedBufferInfo(
-                                edgeTopImage.GetPtr(0),
+                    edgeInspection.SetRecipe(recipeEdge);
+                    edgeInspection.SetSharedBuffer(new SharedBufferInfo(
                                 edgeTopImage.p_Size.X,
                                 edgeTopImage.p_Size.Y,
                                 edgeTopImage.GetBytePerPixel(),
-                                edgeTopImage.GetPtr(1),
-                                edgeTopImage.GetPtr(2),
-                                new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
+                                new List<IntPtr>()
+                                {
+                                    edgeTopImage.GetPtr(0),
+                                    edgeTopImage.GetPtr(1),
+                                    edgeTopImage.GetPtr(2),
+                                    edgeBottomImage.GetPtr(0),
+                                    edgeBottomImage.GetPtr(1),
+                                    edgeBottomImage.GetPtr(2),
+                                    edgeSideImage.GetPtr(0),
+                                    edgeSideImage.GetPtr(1),
+                                    edgeSideImage.GetPtr(2),
+                                }
+                                ));
+
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_VisionEdge.GetGrabMode(recipeEdge.CameraInfoIndex));
+                    edgeInspection.SetCameraInfo(camInfo);
                 }
 
-                if (ebrImage.GetPtr() == IntPtr.Zero)
+                if (ebrImage.GetPtr() != IntPtr.Zero)
                 {
-                    //MessageBox.Show("EBR Inspection 생성 실패, 메모리 할당 없음");
+                    RootTools_Vision.WorkManager3.WorkManager ebrInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("ebrInspection");
+
+                    ebrInspection.SetRecipe(recipeEBR);
+                    ebrInspection.SetSharedBuffer(new SharedBufferInfo(
+                            ebrImage.GetPtr(0),
+                            ebrImage.p_Size.X,
+                            ebrImage.p_Size.Y,
+                            ebrImage.GetBytePerPixel()));
+
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_VisionEdge.GetGrabMode(recipeEBR.CameraInfoIndex));
+                    ebrInspection.SetCameraInfo(camInfo);
                 }
-                else
-                {
-                    InspectionManagerEBR inspectionEBR = GlobalObjects.Instance.Register<InspectionManagerEBR>
-                    (
-                    recipeEBR,
-                    new SharedBufferInfo(ebrImage.GetPtr(0), ebrImage.p_Size.X, ebrImage.p_Size.Y, ebrImage.GetBytePerPixel(), ebrImage.GetPtr(1), ebrImage.GetPtr(2))
-                    );
-                }
-                */
+				#endregion
 
 				// DialogService
 				//dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
@@ -420,7 +415,7 @@ namespace Root_WindII_Option
 				//dialogService.Register<TK4S, TK4SModuleUI>();
 				//dialogService.Register<FFUModule, FFUModuleUI>();
 			}
-            catch (Exception ex)
+			catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
                 return false;

@@ -248,10 +248,10 @@
             </Style>
         </Grid.Style>
         <Grid.RowDefinitions>
-            <RowDefinition Height="4*"/>
-            <RowDefinition Height="0.3*"/>
+            <RowDefinition Height="3*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
+            <RowDefinition Height="1.5*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Grid.ColumnSpan="2">
             <GroupBox FontSize="20" Header="Information" Foreground="White" Margin="5">
@@ -313,14 +313,14 @@
             </GroupBox>
         </Grid>
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
-            <GroupBox FontSize="20" Header="Recipe Select" Foreground="White" Margin="5" Visibility="Collapsed">
+            <GroupBox FontSize="20" Header="Recipe Select" Foreground="White" Margin="5" Visibility="Visible">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Recipe ID = "
                                VerticalAlignment="Center"
                                FontSize="30"
                                FontWeight="Bold"
                                Margin="15"/>
-                    <ComboBox x:Name="comboRecipeID" MinWidth="300"
+                    <ComboBox x:Name="comboRecipeID" MinWidth="570"
                               VerticalAlignment="Center"
                               FontSize="30"
                               SelectionChanged="comboRecipeID_SelectionChanged"/>

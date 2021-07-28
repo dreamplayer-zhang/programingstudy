@@ -24,5 +24,20 @@ namespace Root_VEGA_D
         {
             InitializeComponent();
         }
+
+        private void DateTimePicker_TargetUpdated(object sender, DataTransferEventArgs e)
+        {
+            int a = 10;
+        }
+
+        private void DateTimePicker_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            int t = 10;
+        }
+
+        private void DateTimePicker_DateChanged(object sender, RoutedEventArgs e)
+        {
+            int a = 10;
+        }
     }
 }

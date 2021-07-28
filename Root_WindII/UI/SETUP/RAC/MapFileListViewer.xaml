@@ -1,0 +1,74 @@
+﻿<UserControl x:Class="Root_WindII.MapFileListViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_WindII"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding UnloadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <UserControl.Resources>
+        <Style TargetType="ItemsControl" x:Key="LogViewerStyle">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <ScrollViewer CanContentScroll="True">
+                            <ItemsPresenter/>
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate DataType="{x:Type local:MapFileListViewerItem}">
+            <Grid IsSharedSizeScope="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="600"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{Binding MapFileName}" Grid.Column="1"
+                       FontWeight="Bold" Margin="0,0,2,0" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition  Height="30"/>
+            <RowDefinition  Height="30"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Border Background="{StaticResource ControlBackGround}" Margin="3" BorderBrush="Black" BorderThickness="1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Path : " VerticalAlignment="Center" Margin="3" Foreground="Black" FontWeight="Bold"></TextBlock>
+                <TextBlock Text="{Binding MapFileRootPath}" ToolTip="{Binding MapFileRootPath}" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold"></TextBlock>
+            </StackPanel>
+        </Border>
+        <Grid Grid.Row="1">
+            <TextBox Margin="4"  Text="{Binding SearchName, UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
+        <DataGrid Grid.Row="2" Margin="4,0,4,4" ItemsSource="{Binding MapFileListViewerItems}" IsReadOnly="True" SelectedItem ="{Binding SelectedItem, Mode=TwoWay}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectedCellsChanged">
+                    <i:InvokeCommandAction 
+                        Command="{Binding SelectedCellsChangedCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </DataGrid>
+    </Grid>
+</UserControl>

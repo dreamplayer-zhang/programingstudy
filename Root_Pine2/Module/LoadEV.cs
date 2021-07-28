@@ -45,19 +45,6 @@ namespace Root_Pine2.Module
             }
         }
 
-        bool _bUsePaper = true;
-        public bool p_bUsePaper
-        {
-            get { return _bUsePaper; }
-            set
-            {
-                if (_bUsePaper == value) return;
-                m_log.Info("p_bUsePaper = " + value.ToString());
-                _bUsePaper = value;
-                OnPropertyChanged();
-            }
-        }
-
         bool _bCheck = false;
         public bool p_bCheck
         {
@@ -71,9 +58,6 @@ namespace Root_Pine2.Module
             }
         }
 
-        bool m_bUseBlow = true;
-        bool m_bUseIonBlow = true;
-        bool m_bUseAlignBlow = true;
         bool _bBlow = false;
         public bool p_bBlow
         {
@@ -84,9 +68,9 @@ namespace Root_Pine2.Module
                 _bBlow = value;
                 m_log.Info("p_bBlow = " + value.ToString());
                 OnPropertyChanged();
-                m_doBlow.Write(value && m_bUseBlow);
-                m_doAlignBlow.Write(value && m_bUseAlignBlow);
-                m_doIonBlow.Write(value && m_bUseIonBlow);
+                m_doBlow.Write(value && m_pine2.p_bUseBlow);
+                m_doAlignBlow.Write(value && m_pine2.p_bUseAlignBlow);
+                m_doIonBlow.Write(value && m_pine2.p_bUseIonBlow);
             }
         }
 
@@ -102,15 +86,20 @@ namespace Root_Pine2.Module
             }
         }
 
-        void RunTreeBlow(Tree tree)
+        bool _bCycleStop = false; 
+        public bool p_bCycleStop
         {
-            m_bUseBlow = tree.Set(m_bUseBlow, m_bUseBlow, "Blow", "Use Blow");
-            m_bUseIonBlow = tree.Set(m_bUseIonBlow, m_bUseIonBlow, "Ion Blow", "Use Blow");
-            m_bUseAlignBlow = tree.Set(m_bUseAlignBlow, m_bUseAlignBlow, "Align Blow", "Use Blow");
+            get { return _bCycleStop; }
+            set
+            {
+                _bCycleStop = value;
+                OnPropertyChanged(); 
+            }
         }
         #endregion
 
         #region InfoStrip
+        Registry m_reg = new Registry("LoadEV");
         int _iStrip = 0;
         public int p_iStrip
         {
@@ -120,6 +109,7 @@ namespace Root_Pine2.Module
                 if (_iStrip == value) return;
                 _iStrip = value;
                 OnPropertyChanged();
+                m_reg.Write("iStrip", value); 
             }
         }
 
@@ -134,6 +124,11 @@ namespace Root_Pine2.Module
         public void NewLot()
         {
             p_iStrip = 0; 
+        }
+
+        public void CheckPaper()
+        {
+            p_bPaper = m_diPaper.p_bIn && m_pine2.p_bCheckPaper;
         }
         #endregion
 
@@ -170,8 +165,16 @@ namespace Root_Pine2.Module
         #region StateReady
         public override string StateReady()
         {
-            if (m_diTop.p_bIn && p_eMove == eMove.Stop) p_eMove = eMove.Down;
-            if (!m_diTop.p_bIn && p_eMove == eMove.Down) p_eMove = eMove.Stop;
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Run:
+                    if (m_diCheck.p_bIn && (p_bDone == false)) StartLoad();
+                    break;
+                default:
+                    if (m_diTop.p_bIn && p_eMove == eMove.Stop) p_eMove = eMove.Down;
+                    if (!m_diTop.p_bIn && p_eMove == eMove.Down) p_eMove = eMove.Stop;
+                    break; 
+            }
             return "OK";
         }
         #endregion
@@ -184,6 +187,12 @@ namespace Root_Pine2.Module
                 StopWatch sw = new StopWatch();
                 int msTimeout = (int)(1000 * secTimeout);
                 p_bCheck = m_diCheck.p_bIn;
+                if (p_bCheck == false)
+                {
+                    p_bDone = false; 
+                    m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Finish); 
+                    return "OK"; 
+                }
                 try
                 {
                     if (m_dioEV.m_aBitDI[1].p_bOn)
@@ -213,8 +222,7 @@ namespace Root_Pine2.Module
                         if (sw.ElapsedMilliseconds > msTimeout) return "RunLoad Timeout : Top Sensor Up";
                     }
                     p_eMove = eMove.Stop;
-                    p_bPaper = m_diPaper.p_bIn && p_bUsePaper;
-                    p_bDone = p_bCheck;
+                    p_bDone = m_diCheck.p_bIn;
                     return "OK";
                 }
                 finally
@@ -251,18 +259,12 @@ namespace Root_Pine2.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeSetup(tree.GetTree("Setup"));
-            RunTreeBlow(tree.GetTree("Use Blow"));
-        }
-
-        void RunTreeSetup(Tree tree)
-        {
-            p_bUsePaper = tree.Set(p_bUsePaper, p_bUsePaper, "Use Paper", "Use Paper");
         }
 
         public override void Reset()
         {
             base.Reset();
+            p_bDone = false; 
             StartLoad();
         }
         #endregion
@@ -275,8 +277,11 @@ namespace Root_Pine2.Module
         #endregion
 
         readonly object m_csLock = new object();
-        public LoadEV(string id, IEngineer engineer)
+        Pine2 m_pine2; 
+        public LoadEV(string id, IEngineer engineer, Pine2 pine2)
         {
+            m_pine2 = pine2;
+            p_iStrip = m_reg.Read("iStrip", 0);
             base.InitBase(id, engineer);
         }
 

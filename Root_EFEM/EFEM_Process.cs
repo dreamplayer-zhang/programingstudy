@@ -5,6 +5,7 @@ using RootTools.OHTNew;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 
 namespace Root_EFEM
@@ -234,9 +235,9 @@ namespace Root_EFEM
         public void MakeRnRSeq()
         {
             Queue<Sequence> aSequence = new Queue<Sequence>();
-            ModuleRunBase runUndocking = m_aLoadport[0].GetModuleRunDocking().Clone();
-            EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, null);
-            m_qRNRSequence.Enqueue(sequenceUndock);
+            ModuleRunBase runDocking = m_aLoadport[EQ.p_nRunLP].GetModuleRunDocking().Clone();
+            EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, null);
+            m_qRNRSequence.Enqueue(sequenceDock);
             //    m_qRNRSequence.Enqueue();
             while (m_qSequence.Count > 0)
             {
@@ -652,10 +653,10 @@ namespace Root_EFEM
         public string m_id;
         IEngineer m_engineer;
         public IHandler m_handler;
-        List<ILoadport> m_aLoadport = new List<ILoadport>();
+        ObservableCollection<ILoadport> m_aLoadport = new ObservableCollection<ILoadport>();
         IWTR m_wtr;
         Log m_log;
-        public EFEM_Process(string id, IEngineer engineer, IWTR wtr, List<ILoadport> loadports)
+        public EFEM_Process(string id, IEngineer engineer, IWTR wtr, ObservableCollection<ILoadport> loadports)
         {
             m_id = id;
             m_engineer = engineer;

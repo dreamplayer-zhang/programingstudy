@@ -14,6 +14,21 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <PublishUrl>게시\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -228,13 +243,33 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constants.cs" />
-    <Compile Include="DataConverter.cs" />
+    <Compile Include="Converter\AxisBoolToBrushConverter.cs" />
+    <Compile Include="Converter\AxisStateToLoadingOpacityConverter.cs" />
+    <Compile Include="Converter\AxisStateToOpacityConverter.cs" />
+    <Compile Include="Converter\AxisToMotionUIConverter.cs" />
+    <Compile Include="Converter\AxisToPositionConverter.cs" />
+    <Compile Include="Converter\BoolConverter.cs" />
+    <Compile Include="Converter\ColorToBrushConverter.cs" />
+    <Compile Include="Converter\HumidityToGradientOffsetConverter.cs" />
+    <Compile Include="Converter\ImageConverter.cs" />
+    <Compile Include="Converter\ListToValueConverter.cs" />
+    <Compile Include="Converter\ModuleStateToLoadingOpacityConverter.cs" />
+    <Compile Include="Converter\PathConverter.cs" />
+    <Compile Include="Converter\TextBoxToIntConverter.cs" />
+    <Compile Include="Converter\ValueToColorConverter.cs" />
+    <Compile Include="Converter\ValueToUIValueConverter.cs" />
+    <Compile Include="ManualJobSchedule.cs" />
+    <Compile Include="ManualJobSchedule_UI.xaml.cs">
+      <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OPERATION\Loadport_UI.xaml.cs">
+      <DependentUpon>Loadport_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\DataConverter.cs" />
     <Compile Include="Engineer\WIND2EventArgs.cs" />
     <Compile Include="Engineer\WIND2EventManager.cs" />
     <Compile Include="Engineer\WindII_Warning.cs" />
     <Compile Include="MainWindow_ViewModel.cs" />
-    <Compile Include="Module\InspectionManagerFrontside.cs" />
-    <Compile Include="Module\Vision.cs" />
     <Compile Include="Module\WIND2.cs" />
     <Compile Include="MvvmTools\Converter.cs" />
     <Compile Include="MvvmTools\Helper.cs" />
@@ -242,10 +277,27 @@
     <Compile Include="MvvmTools\PropertySupport.cs" />
     <Compile Include="MvvmTools\RelayCommand.cs" />
     <Compile Include="MvvmTools\SizeObserver.cs" />
-    <Compile Include="Recipe\RecipeBack.cs" />
-    <Compile Include="Recipe\RecipeEBR.cs" />
-    <Compile Include="Recipe\RecipeEdge.cs" />
     <Compile Include="Recipe\RecipeFront.cs" />
+    <Compile Include="Tools\KlarfFileReader.cs" />
+    <Compile Include="Tools\XMLCreator.cs" />
+    <Compile Include="UI\Dialog\Dialog_PortSelect.xaml.cs">
+      <DependentUpon>Dialog_PortSelect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Dialog\Dialog_Scan.xaml.cs">
+      <DependentUpon>Dialog_Scan.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Dialog\Dialog_Scan_ViewModel.cs" />
+    <Compile Include="UI\Dialog\ManualAlignViewer.xaml.cs">
+      <DependentUpon>ManualAlignViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Dialog\ManualAlignViewer_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\Dialog\ManualAlignViewer_ViewModel.cs" />
+    <Compile Include="Tools\PositionConverter.cs" />
+    <Compile Include="Tools\StepTableData.cs" />
+    <Compile Include="UI\OPERATION\Operation_UI.xaml.cs">
+      <DependentUpon>Operation_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OPERATION\OperationUI_ViewModel.cs" />
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
@@ -269,9 +321,10 @@
       <DependentUpon>MotionController.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionController_ViewModel.cs" />
-    <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionControlViewer.xaml.cs">
-      <DependentUpon>MotionControlViewer.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraAlign_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraAlign_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraVRS_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraVRS_ViewModel.cs" />
     <Compile Include="UI\SETUP\EBR\EBRSetup.xaml.cs">
       <DependentUpon>EBRSetup.xaml</DependentUpon>
     </Compile>
@@ -332,6 +385,32 @@
       <DependentUpon>ModuleView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\Interfaces\IPage.cs" />
+    <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionViewer.xaml.cs">
+      <DependentUpon>MotionViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\MapFileSelectionViewer.xaml.cs">
+      <DependentUpon>MapFileSelectionViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\RAC\RACAlignKey.xaml.cs">
+      <DependentUpon>RACAlignKey.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\RAC\MapFileListViewer.xaml.cs">
+      <DependentUpon>MapFileListViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\RAC\RACProduct.xaml.cs">
+      <DependentUpon>RACProduct.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\RAC\RACSetup.xaml.cs">
+      <DependentUpon>RACSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\RAC\ViewModels\MapFileSelectionViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACAlignKey_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\MapFileListViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACAlignKey_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACProduct_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACSetup_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACSetup_ViewModel.cs" />
     <Compile Include="UI\SETUP\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -366,6 +445,8 @@
     <Compile Include="Warning_UI.xaml.cs">
       <DependentUpon>Warning_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tools\XMLData.cs" />
+    <Compile Include="Tools\XMLParser.cs" />
     <Page Include="Engineer\WindII_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -377,6 +458,14 @@
     <Page Include="Engineer\WindII_ToolBox_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ManualJobSchedule_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\OPERATION\Loadport_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -401,6 +490,22 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\Dialog\Dialog_PortSelect.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Dialog\Dialog_Scan.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Dialog\ManualAlignViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\OPERATION\Operation_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\SelectMode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -426,10 +531,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\SETUP\CAMERA\MotionViewer\MotionController.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\SETUP\CAMERA\MotionViewer\MotionControlViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -492,6 +593,30 @@
     <Page Include="UI\SETUP\HOME\ModuleView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\CAMERA\MotionViewer\MotionViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\RAC\MapFileSelectionViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\RAC\RACAlignKey.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\RAC\MapFileListViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\RAC\RACProduct.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\RAC\RACSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\SETUP\Setup.xaml">
       <SubType>Designer</SubType>
@@ -567,6 +692,10 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
+      <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
+      <Name>RootTools_CLR</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RootTools_Vision\RootTools_Vision.csproj">
       <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
       <Name>RootTools_Vision</Name>
@@ -579,6 +708,18 @@
       <Project>{280678a3-0e0d-4e62-8803-48b4c68fb8fc}</Project>
       <Name>Root_WindII_Option</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2%28x86 및 x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

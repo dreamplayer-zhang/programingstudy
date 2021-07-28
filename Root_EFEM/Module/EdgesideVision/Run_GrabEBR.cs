@@ -34,9 +34,6 @@ namespace Root_EFEM.Module.EdgesideVision
 		}
 		#endregion
 
-		public double startDegree = 0;
-		public double scanDegree = 360;
-
 		public Run_GrabEBR(Vision_Edgeside module)
 		{
 			this.module = module;
@@ -52,16 +49,11 @@ namespace Root_EFEM.Module.EdgesideVision
 		{
 			Run_GrabEBR run = new Run_GrabEBR(module);
 			run.p_sGrabModeEBR = p_sGrabModeEBR;
-			run.startDegree = startDegree;
-			run.scanDegree = scanDegree;
 			return run;
 		}
 
 		public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 		{
-			startDegree = tree.Set(startDegree, startDegree, "Start Angle", "Degree", bVisible);
-			scanDegree = tree.Set(scanDegree, scanDegree, "Scan Angle", "Degree", bVisible);
-
 			p_sGrabModeEBR = tree.Set(p_sGrabModeEBR, p_sGrabModeEBR, module.p_asGrabMode, "Grab Mode : EBR", "Select GrabMode", bVisible);
 			//if (m_gmEBR != null)
 			//	m_gmEBR.RunTree(tree.GetTree("Grab Mode : EBR", false), bVisible, true);
@@ -77,32 +69,50 @@ namespace Root_EFEM.Module.EdgesideVision
 			{
 				gmEBR.SetLight(true);
 
+				if (!module.diWaferExist.p_bIn)
+                {
+					module.alid_WaferExist.Run(true, "Wafer Exist Fail");
+					return "Wafer Not Exist";
+                }
+
 				Axis axisR = module.AxisRotate;
+				Axis axisX = module.AxisEbrX;
+				Axis axisZ = module.AxisEbrZ;
 
 				double pulsePerDegree = module.Pulse360 / 360;
 				int camHeight = module.CamEBR.GetRoiSize().Y;
-				int trigger = 1;
-				int scanSpeed = Convert.ToInt32((double)gmEBR.m_nMaxFrame* camHeight * trigger * (double)gmEBR.m_nScanRate/ 100); //5000;
+				int scanSpeed = 10000;// Convert.ToInt32((double)gmEBR.m_nMaxFrame* camHeight * trigger * (double)gmEBR.m_nScanRate/ 100);
 
-				//double currPos = axisR.p_posActual - axisR.p_posActual % m_module.dPulse360;
-				//double triggerStart = currPos + (m_fStartDegree * pulsePerDegree);
-				double triggerStart = startDegree * pulsePerDegree;
-				double triggerDest = triggerStart + (scanDegree * pulsePerDegree);
+                //double currPos = axisR.p_posActual - axisR.p_posActual % m_module.dPulse360;
+                //double triggerStart = currPos + (m_fStartDegree * pulsePerDegree);
+                double triggerStart = gmEBR.m_nStartDegree * pulsePerDegree;
+				double triggerDest = triggerStart + (gmEBR.m_nScanDegree * pulsePerDegree);
+				
+				// 시계 방향
+				//double moveStart = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed*4;   //y 축 이동 시작 지점
+				//double moveEnd = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;  // Y 축 이동 끝 지점
+				// 반시계 방향
+				double moveStart = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;  // Y 축 이동 끝 지점
+                double moveEnd = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;   //y 축 이동 시작 지점
+                
+				int grabCount = Convert.ToInt32((gmEBR.m_nScanDegree / 360.0) * gmEBR.m_nWaferSize_mm * pulsePerDegree * Math.PI / gmEBR.m_dRealResX_um);
 
-                //double moveStart = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed*4;   //y 축 이동 시작 지점 
-                //double moveEnd = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;  // Y 축 이동 끝 지점.
-                double moveEnd = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;   //y 축 이동 시작 지점 
-                double moveStart = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;  // Y 축 이동 끝 지점.
-                int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * gmEBR.m_dCamTriggerRatio);
-
+				if (module.Run(axisX.StartMove(gmEBR.m_nFocusX)))
+					return p_sInfo;
+				if (module.Run(axisX.WaitReady()))
+					return p_sInfo;
+				if (module.Run(axisZ.StartMove(gmEBR.m_nFocusZ)))
+					return p_sInfo;
+				if (module.Run(axisZ.WaitReady()))
+					return p_sInfo;
 				if (module.Run(axisR.StartMove(moveStart)))
 					return p_sInfo;
 				if (module.Run(axisR.WaitReady()))
 					return p_sInfo;
 
-				axisR.SetTrigger(triggerStart, triggerDest, trigger, 10,true);
+                axisR.SetTrigger(triggerStart, triggerDest, 1, 10, true);
 				gmEBR.StartGrab(gmEBR.m_memoryData, new CPoint(0, 0), grabCount, gmEBR.m_GD);
-                gmEBR.Grabed += GmEBR_Grabed; ;
+                gmEBR.Grabed += GmEBR_Grabed;
 
 				if (module.Run(axisR.StartMove(moveEnd, scanSpeed, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc)))
 					return p_sInfo;

@@ -48,16 +48,24 @@ namespace RootTools_Vision
                 }
             }
 
-            T obj = (T)Activator.CreateInstance(typeof(T), args: param);
-            objectDictionary.Add(_name, obj);
+            T obj;
+            if(typeof(T) == typeof(string) || typeof(T).IsValueType)
+            {
+                obj = (T)param[0];
+            }
+            else
+            {
+                obj = (T)Activator.CreateInstance(typeof(T), args: param);
+            }
+            objectDictionary.Add(_name.ToLower(), obj);
             return obj;
         }
 
         public T GetNamed<T>(string name)
         {
-            if (objectDictionary.ContainsKey(name) == true)
+            if (objectDictionary.ContainsKey(name.ToLower()) == true)
             {
-                return (T)objectDictionary[name];
+                return (T)objectDictionary[name.ToLower()];
             }
             else
             {
@@ -66,11 +74,25 @@ namespace RootTools_Vision
             }
         }
 
+        public bool SetNamed<T>(string name, T t)
+        {
+            if (objectDictionary.ContainsKey(name.ToLower()) == true)
+            {
+                objectDictionary[name.ToLower()] = t;
+                return true;
+            }
+            else
+            {
+                MessageBox.Show("객체가 등록되지 않았습니다.\nRegister 메서드를 통해 등록하세요.\n" + name + "(type:" + typeof(T).Name + ")");
+                return false;
+            }
+        }
+
         public void DelistNamed(string name)
         {
-            if (objectDictionary.ContainsKey(name) == true)
+            if (objectDictionary.ContainsKey(name.ToLower()) == true)
             {
-                objectDictionary.Remove(name);
+                objectDictionary.Remove(name.ToLower());
             }
             else
             {
@@ -95,7 +117,15 @@ namespace RootTools_Vision
                 }
             }
 
-            T t = (T)Activator.CreateInstance(typeof(T), args: param);
+            T t;
+            if (typeof(T) == typeof(string) || typeof(T).IsValueType)
+            {
+                t = (T)param[0];
+            }
+            else
+            {
+                t = (T)Activator.CreateInstance(typeof(T), args: param);
+            }
             objectList.Add(t);
             return t;
         }
@@ -126,6 +156,19 @@ namespace RootTools_Vision
             //throw new ArgumentException("객체가 등록되지 않았습니다.(Type :", typeof(T).ToString());
             //MessageBox.Show("객체가 등록되지 않았습니다.\n RegisterObject 메서드를 통해 등록하세요.");
             return default(T);
+        }
+
+        public bool Set<T>(T val)
+        {
+            for (int i = 0; i < objectList.Count; i++)
+            {
+                if(objectList[i].GetType() == typeof(T))
+                {
+                    objectList[i] = val;
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void Clear()

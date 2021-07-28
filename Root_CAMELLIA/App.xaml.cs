@@ -18,8 +18,7 @@ namespace Root_CAMELLIA
     {
         public static CAMELLIA_Engineer m_engineer = new CAMELLIA_Engineer();
         public static Nanoview m_nanoView = new Nanoview();
-        public static SSLoggerNet m_SSLoggerNet = new SSLoggerNet();
-
+        public static ConstValue m_constValue = new ConstValue();
 
         public App()
 

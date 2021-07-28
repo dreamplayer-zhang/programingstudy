@@ -17,9 +17,6 @@
                 <TabItem Header="GAF" Background="{Binding p_brushHandler}">
                     <gaf:GAF_UI x:Name="gafUI"/>
                 </TabItem>
-                <TabItem Header="Process" Background="{Binding p_brushHandler}">
-                    <local:Pine2_Process_UI x:Name="processUI"/>
-                </TabItem>
             </TabControl>
         </TabItem>
         <TabItem Header="Module" Background="{Binding p_brushModule}">

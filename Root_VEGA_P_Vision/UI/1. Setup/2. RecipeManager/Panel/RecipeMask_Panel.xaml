@@ -8,232 +8,150 @@
              xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              d:DesignHeight="818"
              d:DesignWidth="1912"
-             Background="{StaticResource PanelBackGround}">
+             Background="{StaticResource MainBackGroundColor}">
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="12*" />
-            <ColumnDefinition Width="88*" />
+            <ColumnDefinition Width="80*"/>
+            <ColumnDefinition Width="20*"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0">
-            <Border Grid.Column="0" BorderBrush="{StaticResource Splitter}"
-                BorderThickness="0,0,1,0">
-                <StackPanel Margin="0,10,0,0">
-                    <RadioButton x:Name="radiobtnStain" Content="Stain" Command="{Binding btnStain}" Style="{StaticResource SetupPannelRadioBtn}"/>
-                    <RadioButton Content="2D TDI" Command="{Binding btn6um}" Style="{StaticResource SetupPannelRadioBtn}"/>
-                    <RadioButton Content="Z Stack" Command="{Binding btn1um}" Style="{StaticResource SetupPannelRadioBtn}"/>
-                    <RadioButton Content="Side" Command="{Binding btnSide}" Style="{StaticResource SetupPannelRadioBtn}"/>
-                </StackPanel>
-            </Border>
-        </Grid>
+        <local:ImageViewerBase_Panel Grid.Column="0" DataContext="{Binding p_BaseViewer}"/>
         <Grid Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80*"/>
-                <ColumnDefinition Width="20*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0">
-                <Grid>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2.5*" />
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="4*" />
+                    <RowDefinition Height="0.1*" />
+                </Grid.RowDefinitions>
+                <local:MaskTools_Panel Grid.Row="0" DataContext="{Binding MaskTools}"/>
+
+                    <local:SurfaceParam_Tree DataContext="{Binding SurfaceParamTree}" Grid.Row="1"/>
+                <Grid Visibility="{Binding IsHighRes,Converter={StaticResource BooleanToVisiblity}}" Grid.Row="2" Margin="10,10,10,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="0.5*"/>
-                        <RowDefinition Height="9*"/>
+                        <RowDefinition Height="0.4*"/>
+                        <RowDefinition Height="1"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="5*"/>
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Orientation="Horizontal">
-                        <Button Content="Snap" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_MaskPanel.DataContext.btnSnap}"/>
-                        <Button Content="Inspection" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_MaskPanel.DataContext.btnInsp}"/>
-                    </StackPanel>
-                    <ContentControl Grid.Row="1" Content="{Binding p_MaskPanel}"/>
-                </Grid>
-            </Grid>
-            <Grid Grid.Column="1">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="3*" />
-                        <RowDefinition Height="3*" />
-                        <RowDefinition Height="3*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <GroupBox Header="Tools" Grid.Row="0">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="3*"/>
-                                <RowDefinition Height="7*"/>
-                            </Grid.RowDefinitions>
-                            <GroupBox Grid.Row="0" Margin="3,5">
-                                <GroupBox.Header>
-                                    <TextBlock Text="Thickness(Pixel)"
-                                                           FontSize="11" />
-                                </GroupBox.Header>
-                                <ComboBox HorizontalContentAlignment="Left"
-                                                      SelectedIndex="{Binding p_nThickness}">
-                                    <ComboBoxItem Content="0" Visibility="Collapsed"/>
-                                    <ComboBoxItem Content="1" />
-                                    <ComboBoxItem Content="2" />
-                                    <ComboBoxItem Content="3" />
-                                    <ComboBoxItem Content="4" />
-                                    <ComboBoxItem Content="5" />
-                                    <ComboBoxItem Content="6" />
-                                    <ComboBoxItem Content="7" />
-                                    <ComboBoxItem Content="8" />
-                                    <ComboBoxItem Content="9" />
-                                    <ComboBoxItem Content="10" />
-                                    <ComboBoxItem Content="11" />
-                                    <ComboBoxItem Content="12" />
-                                    <ComboBoxItem Content="13" />
-                                    <ComboBoxItem Content="14" />
-                                    <ComboBoxItem Content="15" />
-                                </ComboBox>
-                            </GroupBox>
-                            <Grid Grid.Row="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                    <RadioButton Content="Pen"
-                                                      Margin="5" 
-                                                      Style="{StaticResource {x:Type ToggleButton}}"
-                                                      IsChecked="{Binding bPenCheck}"/>
-                                    <RadioButton Content="Eraser"
-                                                      Margin="5"
-                                                     Style="{StaticResource {x:Type ToggleButton}}"
-                                                      IsChecked="{Binding bEraserCheck}" />
-                                    <RadioButton Content="Rect"
-                                                      Margin="5"
-                                                     Style="{StaticResource {x:Type ToggleButton}}"
-                                                      IsChecked="{Binding bRectCheck}" />
-                                    <RadioButton Content="Circle"
-                                                      Grid.Row="4"
-                                                      Margin="5"
-                                                     Style="{StaticResource {x:Type ToggleButton}}"
-                                                      IsChecked="{Binding bPolygonCheck}" />
-                                    <RadioButton Content="Crop"
-                                                      Grid.Row="5"
-                                                      Margin="5"
-                                                     Style="{StaticResource {x:Type ToggleButton}}"
-                                                      IsChecked="{Binding bCropCheck}" />
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                                    <GroupBox Margin="3,5"
-                                                  Grid.Row="6">
-                                        <GroupBox.Header>
-                                            <TextBlock Text="Threshold(Gv)"
-                                                           FontSize="11" />
-                                        </GroupBox.Header>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2*"/>
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBox Margin="2.5,0" 
-                                                         HorizontalContentAlignment="Center"
-                                                         Text="{Binding p_nThreshold}"/>
-
-                                            <ComboBox Grid.Column="1" Margin="2.5,0"
-                                                          HorizontalContentAlignment="Center"
-                                                          SelectedIndex="{Binding p_nThresholdMode}">
-                                                <ComboBoxItem Content="Down" />
-                                                <ComboBoxItem Content="Up" />
-                                            </ComboBox>
-                                        </Grid>
-                                    </GroupBox>
-                                    <RadioButton Content="Threshold"
-                                                      Grid.Row="7"
-                                                      Margin="5"
-                                                     Style="{StaticResource {x:Type ToggleButton}}"
-                                                      IsChecked="{Binding bThresholdCheck}" />
-                                </StackPanel>
-
-
-
-                            </Grid>
-
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="Inspection Parameter"
-                                          Grid.Row="1"
-                                          VerticalAlignment="Top">
-                        <DataGrid RowHeaderWidth="0"
-                                              GridLinesVisibility="Vertical"
-                                              AlternatingRowBackground="AliceBlue">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Parameter"
-                                                                Width="1.5*"
-                                                                Binding="{Binding a}" />
-                                <DataGridTemplateColumn Header="Value"
-                                                                    Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBox Text="{Binding b}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                            <local:Data a="Absolute"
-                                                        b="True" />
-                            <local:Data a="Pit Level (GV)"
-                                                        b="0" />
-                            <local:Data a="Level Min (GV)"
-                                                        b="0" />
-                            <local:Data a="Level Max (GV)"
-                                                        b="0" />
-                            <local:Data a="Pit Size (Pxl)"
-                                                        b="0" />
-                            <local:Data a="Size Max (Pxl)"
-                                                        b="0" />
-                            <local:Data a="Size Min (Pxl)"
-                                                        b="0" />
-
-                        </DataGrid>
-                    </GroupBox>
-
-                    <GroupBox Grid.Row="2" Header="Similarity" Visibility="Visible">
-                        <!--{Binding pGBsimilar}-->
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <GroupBox Grid.Row="0" Header="Horizontal">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="3*"/>
-                                        <ColumnDefinition Width="7*"/>
-                                        <ColumnDefinition Width="3*"/>
-                                        <ColumnDefinition Width="7*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="X" Grid.Column="0" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                    <TextBox Grid.Column="1" Margin="0,10,0,10"/>
-                                    <TextBlock Text="Y" Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                    <TextBox Grid.Column="3" Margin="0,10,0,10"/>
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Grid.Row="1" Header="Vertical">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="3*"/>
-                                        <ColumnDefinition Width="7*"/>
-                                        <ColumnDefinition Width="3*"/>
-                                        <ColumnDefinition Width="7*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="X" Grid.Column="0" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                    <TextBox Grid.Column="1" Margin="0,10,0,10"/>
-                                    <TextBlock Text="Y" Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                    <TextBox Grid.Column="3" Margin="0,10,0,10"/>
-                                </Grid>
-                            </GroupBox>
-                        </Grid>
-                    </GroupBox>
+                    <TextBlock Grid.Row="0" Text="ROI" Style="{StaticResource HeaderTextBlock}"/>
+                    <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+                    <UniformGrid Grid.Row="2" Rows="1" HorizontalAlignment="Stretch">
+                        <RadioButton x:Name="btnDraw" Content="Draw" Style="{StaticResource SelecteRadioBtn}" Command="{Binding p_BaseViewer.p_SubViewer.DataContext.btnDraw}"/>
+                        <RadioButton x:Name="btnAdd" Content="Add"  Style="{StaticResource SelecteRadioBtn}" Command="{Binding p_BaseViewer.p_SubViewer.DataContext.btnAdd}"/>
+                        <RadioButton x:Name="btnDelete" Content="Delete" Style="{StaticResource SelecteRadioBtn}" Command="{Binding p_BaseViewer.p_SubViewer.DataContext.btnDelete}"/>
+                    </UniformGrid>
                     <Grid Grid.Row="3">
-                        <Button Content="Clear"
-                                            Command="{Binding p_MaskPanel.DataContext.Clear}"
-                                            VerticalAlignment="Bottom"
-                                            Height="35"
-                                            Margin="5" />
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.2*"/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Background="{StaticResource MainThema}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource ROIListHeader}" Text="Parts"/>
+                            <TextBlock Grid.Column="1" Style="{StaticResource ROIListHeader}" Text="X"/>
+                            <TextBlock Grid.Column="2" Style="{StaticResource ROIListHeader}" Text="Y"/>
+                        </Grid>
+                        <ListBox Grid.Row="1" Background="Transparent" ItemsSource="{Binding p_BaseViewer.p_SubViewer.DataContext.ROIList}" SelectedIndex="{Binding p_BaseViewer.p_SubViewer.DataContext.ROIListIdx}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical" />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
                     </Grid>
+                    <!--<StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Pen" Style="{StaticResource MaskButton}" Command="{Binding p_BaseViewer.p_SubViewer.btnDot}"/>
+                        <Button Content="Rect" Style="{StaticResource MaskButton}" Command="{Binding p_BaseViewer.p_SubViewer.btnRect}"/>
+                        <Button Content="Select" Style="{StaticResource MaskButton}" Command="{Binding p_BaseViewer.p_SubViewer.btnSelect}"/>
+                    </StackPanel>-->
                 </Grid>
+
+                <!--"{Binding IsSide, Converter={StaticResource BooleanToVisiblity}}"-->
+                <!--<Grid Visibility="{Binding IsSide, Converter={StaticResource BooleanToVisiblity}}" Grid.Row="2" Margin="10,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.1*"/>
+                        <RowDefinition Height="0.1*"/>
+                        <RowDefinition Height="0.5*"/>
+                        <RowDefinition Height="0.5*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Similarity" Style="{StaticResource HeaderTextBlock}"/>
+                    <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Horizontal" Style="{StaticResource HeaderTextBlock}" HorizontalAlignment="Center"/>
+                        <Grid Margin="10,0,10,0" Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="X" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                            <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                                <TextBox Text="{Binding Origin.X}" BorderBrush="White" Margin="6,2,6,2"/>
+                            </Border>
+                        </Grid>
+                        <Grid Margin="10,0,10,0" Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Y" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                            <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                                <TextBox Text="{Binding Origin.X}" BorderBrush="White" Margin="6,2,6,2"/>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Row="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Vertical" Style="{StaticResource HeaderTextBlock}" HorizontalAlignment="Center"/>
+                        <Grid Margin="10,0,10,0" Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="X" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                            <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                                <TextBox Text="{Binding Origin.X}" BorderBrush="White" Margin="6,2,6,2"/>
+                            </Border>
+                        </Grid>
+                        <Grid Margin="10,0,10,0" Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Y" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                            <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                                <TextBox Text="{Binding Origin.X}" BorderBrush="White" Margin="6,2,6,2"/>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Grid>-->
             </Grid>
         </Grid>
-
-
     </Grid>
+
+
+
 </UserControl>

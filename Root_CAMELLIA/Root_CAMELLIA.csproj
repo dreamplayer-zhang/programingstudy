@@ -71,6 +71,7 @@
     <Prefer32Bit>true</Prefer32Bit>
     <WarningLevel>3</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -103,6 +104,10 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Basler.Pylon, Version=1.1.0.0, Culture=neutral, PublicKeyToken=e389355f398382ab, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
@@ -266,7 +271,8 @@
     <Reference Include="ScottPlot.WPF, Version=4.0.39.0, Culture=neutral, PublicKeyToken=e53b06131e34a3aa, processorArchitecture=MSIL">
       <HintPath>..\packages\ScottPlot.WPF.4.0.39\lib\net472\ScottPlot.WPF.dll</HintPath>
     </Reference>
-    <Reference Include="SSLNet">
+    <Reference Include="SSLNet, Version=1.0.7853.18320, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\MarsLog\SSLNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -460,6 +466,9 @@
     </Compile>
     <Compile Include="Control\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Engineer\Camellia_Process_UI.xaml.cs">
+      <DependentUpon>Camellia_Process_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_UserControl\CustomMessageBox.xaml.cs">
       <DependentUpon>CustomMessageBox.xaml</DependentUpon>
@@ -705,6 +714,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI_Engineer\Camellia_Process_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI_UserControl\CustomMessageBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -854,6 +867,7 @@ copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$
 copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
 copy /Y "$(SolutionDir)Lib\XGEM\XSmNet_M40_01_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\XSmNet_M40_01_64.dll"
 copy /Y "$(SolutionDir)Lib\MarsLog\SSL.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\SSL.dll"
+copy /Y "$(SolutionDir)Lib\MarsLog\SSLNet.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\SSLNet.dll"
 IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"

@@ -88,10 +88,10 @@ namespace Root_CAMELLIA
             CurrentCandidatePoint = -1;
             CurrentSelectPoint = -1;
 
-          
-            
+
+
             //dialogService = new DialogService(this);
-            
+
 
             //DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.SystemIdle);    //객체생성
 
@@ -124,6 +124,18 @@ namespace Root_CAMELLIA
         }
         private ObservableCollection<UIElement> m_DrawElement = new ObservableCollection<UIElement>();
 
+        public ObservableCollection<UIElement> p_DrawGuideElement
+        {
+            get
+            {
+                return m_DrawGuideElement;
+            }
+            set
+            {
+                SetProperty(ref m_DrawGuideElement, value);
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawGuideElement = new ObservableCollection<UIElement>();
         /// <summary>
         /// Preview Stage Canvas
         /// </summary>
@@ -212,6 +224,7 @@ namespace Root_CAMELLIA
         public List<ShapeManager> Shapes = new List<ShapeManager>();
         public List<ShapeManager> ShapesCandidatePoint = new List<ShapeManager>();
         public List<GeometryManager> Geometry = new List<GeometryManager>();
+        public List<GeometryManager> GuideGeometry = new List<GeometryManager>();
         public List<GeometryManager> ViewRectGeometry = new List<GeometryManager>();
         public List<GeometryManager> SelectGeometry = new List<GeometryManager>();
         public List<TextManager> TextBlocks = new List<TextManager>();
@@ -696,7 +709,7 @@ namespace Root_CAMELLIA
                 else if (int.TryParse(value, out val))
                 {
                     _VISIntegrationTime = val.ToString();
-                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = val;     
+                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = val;
                 }
                 else
                 {
@@ -721,7 +734,7 @@ namespace Root_CAMELLIA
                     _NIRIntegrationTime = "0";
                     dataManager.recipeDM.TeachingRD.NIRIntegrationTime = 0;
                 }
-                else if(int.TryParse(value, out val))
+                else if (int.TryParse(value, out val))
                 {
                     _NIRIntegrationTime = val.ToString();
                     dataManager.recipeDM.TeachingRD.NIRIntegrationTime = val;
@@ -730,9 +743,42 @@ namespace Root_CAMELLIA
                 {
                     _NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime.ToString();
                 }
-               
-              
+
+
                 RaisePropertyChanged("NIRIntegrationTime");
+            }
+        }
+
+        private string _MeasureRepeatCount = "1";
+        public string MeasureRepeatCount
+        {
+            get
+            {
+                return _MeasureRepeatCount;
+            }
+            set
+            {
+                int val;
+                if (value == "")
+                {
+                    _MeasureRepeatCount = "1";
+                    dataManager.recipeDM.TeachingRD.MeasureRepeatCount = 0;
+                }
+                else if (int.TryParse(value, out val))
+                {
+                    if (val >= 30)
+                    {
+                        val = 30;
+                    }
+                    _MeasureRepeatCount = val.ToString();
+                    dataManager.recipeDM.TeachingRD.MeasureRepeatCount = val;
+                }
+                else
+                {
+                    _MeasureRepeatCount = dataManager.recipeDM.TeachingRD.MeasureRepeatCount.ToString();
+                }
+                SetProperty(ref _MeasureRepeatCount, value);
+                RaisePropertyChanged("MeasureRepeatCount");
             }
         }
 
@@ -862,7 +908,7 @@ namespace Root_CAMELLIA
             set
             {
                 double val;
-                if(double.TryParse(value, out val))
+                if (double.TryParse(value, out val))
                 {
                     _WaveLengthValue = val.ToString("N3");
                 }
@@ -895,7 +941,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                SetProperty(ref _WaveLenghOffset,value);
+                SetProperty(ref _WaveLenghOffset, value);
             }
         }
 
@@ -1038,6 +1084,13 @@ namespace Root_CAMELLIA
 
         public Arc[] viewStageTopHoleArc = new Arc[2];
         public Arc[] viewStageBotHoleArc = new Arc[2];
+
+        public Circle viewStageGuideField = new Circle();
+        public ShapeDraw.Line viewStageGuideLineHole = new ShapeDraw.Line();
+        public Arc[] viewStageGuideEdgeHoleArc = new Arc[8];
+        public Arc[] viewStageGuideDoubleHoleArc = new Arc[8];
+        public Arc[] viewStageGuideTopHoleArc = new Arc[2];
+        public Arc[] viewStageGuideBotHoleArc = new Arc[2];
         #endregion
 
         #region Geometry, Shape
@@ -1053,7 +1106,9 @@ namespace Root_CAMELLIA
 
         #region CircleHole
         private Circle viewStageCircleHole = new Circle();
+        private Circle viewStageGuideCircleHole = new Circle();
         public List<Circle> dataStageCircleHole = new List<Circle>();
+        public List<Circle> dataStageGuideCircleHole = new List<Circle>();
         #endregion
 
         #region ViewRect
@@ -1323,7 +1378,7 @@ namespace Root_CAMELLIA
             int idx = 0;
             if (p_isCustomize)
             {
-                foreach(ShapeEllipse se in listCandidateSelectedPoint)
+                foreach (ShapeEllipse se in listCandidateSelectedPoint)
                 {
                     se.SetBrush(GeneralTools.CustomSelectBrush);
                 }
@@ -1371,7 +1426,7 @@ namespace Root_CAMELLIA
                     se.SetBrush(GeneralTools.GbHole);
                 }
             }
-           
+
         }
         public void OnMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
@@ -1594,7 +1649,7 @@ namespace Root_CAMELLIA
                 }
             }
 
-          
+
             //else
             //{
             //    if (StageMouseHoverUpdate)
@@ -1696,7 +1751,7 @@ namespace Root_CAMELLIA
 
             System.Windows.Point pt = e.GetPosition((UIElement)sender);
 
-            
+
 
             int nOffsetDiffX = (int)(CenterX - pt.X);
             int nOffsetDiffY = (int)(-CenterY + pt.Y);
@@ -1713,7 +1768,7 @@ namespace Root_CAMELLIA
                     {
                         OffsetY -= (int)(CenterY - pt.Y);
                     }
-                    
+
                     //OffsetX += (CenterX - (int)pt.X);
                     //OffsetY += -(CenterY - (int)pt.Y);
                 }
@@ -1809,12 +1864,12 @@ namespace Root_CAMELLIA
             }
             else if (p_isCustomize)
             {
-                if(p_isPoint)
+                if (p_isPoint)
                 {
                     CustomizeStageMap(pt);
-                  
+
                 }
-                else if(p_isSelect)
+                else if (p_isSelect)
                 {
                     if (Math.Abs(SelectStartPoint.X - SelectEndPoint.X) > Limit || Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y) > Limit)
                     {
@@ -1849,7 +1904,7 @@ namespace Root_CAMELLIA
                                     if (!ContainsData(m_customizeRD.DataCandidateSelectedPoint, circle, out _index))
                                     {
                                         //dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count);
-                                         m_customizeRD.DataCandidateSelectedPoint.Add(circle);
+                                        m_customizeRD.DataCandidateSelectedPoint.Add(circle);
                                         //RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
                                     }
                                 }
@@ -1947,12 +2002,12 @@ namespace Root_CAMELLIA
                 System.Diagnostics.Debug.WriteLine(swa.ElapsedMilliseconds);
                 swa.Start();
                 UpdateView();
-               
+
                 swa.Stop();
                 System.Diagnostics.Debug.WriteLine(swa.ElapsedMilliseconds);
 
 
-                
+
             }
 
 
@@ -1991,7 +2046,7 @@ namespace Root_CAMELLIA
                 OffsetX = -(int)((nPreviewX * ZoomScale));
                 OffsetY = (int)((nPreviewY * ZoomScale));
 
-                
+
 
                 RedrawStage();
             }
@@ -2050,14 +2105,13 @@ namespace Root_CAMELLIA
             OpenStageCircleHole();
         }
 
+
+
         bool CheckActiveTest(System.Windows.Point pt)
         {
-            for (int i = 0; i < Geometry.Count; i++)
+            for (int i = 0; i < GuideGeometry.Count; i++)
             {
-                //Geometry g = new Geometry();
-
-                //Geometry[i].path.fillcon
-                if (Geometry[i].path.Data.FillContains(pt) && Geometry[i].path.Fill == GeneralTools.ActiveBrush)
+                if (GuideGeometry[i].path.Data.FillContains(pt))
                 {
                     return true;
                 }
@@ -2070,6 +2124,7 @@ namespace Root_CAMELLIA
             if (dataStageCircleHole.Count != 0)
             {
                 dataStageCircleHole.Clear();
+                dataStageGuideCircleHole.Clear();
             }
 
             string fileName = BaseDefine.Dir_StageHole; //Todo 수정해야함
@@ -2092,6 +2147,9 @@ namespace Root_CAMELLIA
 
                         Circle circle = new Circle(double.Parse(str[0]), double.Parse(str[1]), double.Parse(str[2]), double.Parse(str[2]));
                         dataStageCircleHole.Add(circle);
+
+                        circle = new Circle(double.Parse(str[0]), double.Parse(str[1]), double.Parse(str[2]) - 2, double.Parse(str[2]) - 2);
+                        dataStageGuideCircleHole.Add(circle);
                     }
                 }
             }
@@ -2124,6 +2182,8 @@ namespace Root_CAMELLIA
         private void RedrawStage()
         {
             int index = 0;
+
+
             //stage.
             CustomEllipseGeometry stageField = Geometry[index] as CustomEllipseGeometry;
             viewStageField.Set(GeneralTools.DataStageField);
@@ -2151,6 +2211,8 @@ namespace Root_CAMELLIA
                 index++;
             }
 
+
+
             // 엣지부분 흰색 영역
             for (int i = 0; i < 2 * GeneralTools.EdgeNum; i++)
             {
@@ -2159,7 +2221,7 @@ namespace Root_CAMELLIA
                 viewStageEdgeHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
             }
 
- 
+
             for (int n = 0; n < GeneralTools.EdgeNum; n++)
             {
                 CustomPathGeometry edgeArc = Geometry[index] as CustomPathGeometry;
@@ -2169,7 +2231,6 @@ namespace Root_CAMELLIA
                 index++;
                 drawGeometryManager.ClearSegments();
             }
-
 
             // 긴 타원형 홀
             for (int i = 0; i < 2 * GeneralTools.DoubleHoleNum; i++)
@@ -2190,6 +2251,7 @@ namespace Root_CAMELLIA
 
                 drawGeometryManager.ClearSegments();
             }
+
 
             // 윗부분 및 아랫부분 타원홀
             for (int i = 0; i < 2; i++)
@@ -2240,7 +2302,6 @@ namespace Root_CAMELLIA
                 idx++;
             }
 
-
             // 스테이지 엣지
 
             CustomEllipseGeometry stageEdge = Geometry[index] as CustomEllipseGeometry;
@@ -2271,6 +2332,38 @@ namespace Root_CAMELLIA
 
             if (p_isCustomize)
             {
+
+                int tempIndex = 0;
+
+                CustomRectangleGeometry rectGuideLine = GuideGeometry[tempIndex] as CustomRectangleGeometry;
+                viewStageGuideLineHole.Set(GeneralTools.DataStageGuideLineHole);
+                viewStageGuideLineHole.Transform(RatioX, RatioY);
+                viewStageGuideLineHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                rectGuideLine.SetData(drawGeometryManager.GetRect(viewStageGuideLineHole, CenterX, CenterY), thickness: 1 * ZoomScale);
+                GuideGeometry[tempIndex] = rectGuideLine;
+                tempIndex++;
+
+                for (int i = 0; i < 2 * GeneralTools.EdgeNum; i++)
+                {
+                    viewStageGuideEdgeHoleArc[i].Set(GeneralTools.DataStageGuideEdgeHoleArc[i]);
+                    viewStageGuideEdgeHoleArc[i].Transform(RatioX, RatioY);
+                    viewStageGuideEdgeHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                }
+
+                for (int n = 0; n < GeneralTools.EdgeNum; n++)
+                {
+                    CustomPathGeometry edgePath = GuideGeometry[tempIndex] as CustomPathGeometry;
+
+                    PathFigure path = drawGeometryManager.AddDoubleHole(viewStageGuideEdgeHoleArc[2 * n + 0], viewStageGuideEdgeHoleArc[2 * n + 1], CenterX, CenterY);
+
+                    edgePath.SetData(path, 1 * ZoomScale);
+                    GuideGeometry[tempIndex] = edgePath;
+                    tempIndex++;
+                    drawGeometryManager.ClearSegments();
+                }
+
+
+
                 for (int i = 0; i < m_customizeRD.DataCandidatePoint.Count; i++)
                 {
                     ShapeEllipse dataCandidatePoint = ShapesCandidatePoint[i] as ShapeEllipse;
@@ -2283,6 +2376,72 @@ namespace Root_CAMELLIA
                     Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                     dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height), 95);
                     ShapesCandidatePoint[i] = dataCandidatePoint;
+                }
+
+                for (int i = 0; i < 2 * GeneralTools.DoubleHoleNum; i++)
+                {
+                    viewStageGuideDoubleHoleArc[i].Set(GeneralTools.DataStageGuideDoubleHoleArc[i]);
+                    viewStageGuideDoubleHoleArc[i].Transform(RatioX, RatioY);
+                    viewStageGuideDoubleHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                }
+
+                for (int i = 0; i < GeneralTools.DoubleHoleNum; i++)
+                {
+                    CustomPathGeometry doubleHole = GuideGeometry[tempIndex] as CustomPathGeometry;
+                    PathFigure path = drawGeometryManager.AddDoubleHole(viewStageGuideDoubleHoleArc[2 * i + 0], viewStageGuideDoubleHoleArc[2 * i + 1], CenterX, CenterY);
+
+                    doubleHole.SetData(path, 1 * ZoomScale);
+                    GuideGeometry[tempIndex] = doubleHole;
+
+                    drawGeometryManager.ClearSegments();
+                    tempIndex++;
+                }
+
+                for (int i = 0; i < 2; i++)
+                {
+                    //Top
+                    viewStageGuideTopHoleArc[i].Set(GeneralTools.DataStageGuideTopHoleArc[i]);
+                    viewStageGuideTopHoleArc[i].Transform(RatioX, RatioY);
+                    viewStageGuideTopHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+
+                    //Bot
+                    viewStageGuideBotHoleArc[i].Set(GeneralTools.DataStageGuideBotHoleArc[i]);
+                    viewStageGuideBotHoleArc[i].Transform(RatioX, RatioY);
+                    viewStageGuideBotHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                }
+
+                for (int i = 0; i < 2; i++)
+                {
+                    CustomPathGeometry topBotDoubleHole = GuideGeometry[tempIndex] as CustomPathGeometry;
+                    if (i == 0)
+                    {
+                        arc = viewStageGuideTopHoleArc;
+                    }
+                    else
+                    {
+                        arc = viewStageGuideBotHoleArc;
+                    }
+
+                    PathFigure path = drawGeometryManager.AddDoubleHole(arc[0], arc[1], CenterX, CenterY);
+
+                    topBotDoubleHole.SetData(path, 1 * ZoomScale);
+                    GuideGeometry[tempIndex] = topBotDoubleHole;
+                    tempIndex++;
+                    drawGeometryManager.ClearSegments();
+                }
+
+                foreach (Circle circle in dataStageGuideCircleHole)
+                {
+                    CustomEllipseGeometry circleHole = GuideGeometry[tempIndex] as CustomEllipseGeometry;
+                    viewStageGuideCircleHole.Set(circle);
+                    viewStageGuideCircleHole.Transform(RatioX, RatioY);
+                    viewStageGuideCircleHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                    drawGeometryManager.GetRect(ref viewStageGuideCircleHole, CenterX, CenterY);
+                    circleHole.SetData(viewStageGuideCircleHole, (int)(viewStageGuideCircleHole.Width / 2),
+                        (int)(viewStageGuideCircleHole.Y + (viewStageGuideCircleHole.Height / 2) + viewStageGuideCircleHole.Y), 1 * ZoomScale);
+                    GuideGeometry[tempIndex] = circleHole;
+
+                    tempIndex++;
                 }
 
             }
@@ -2414,7 +2573,7 @@ namespace Root_CAMELLIA
                     Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                     dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), 96, true);
 
-                   // else
+                    // else
                     {
                         dataSelectedPoint.SetBrush(GeneralTools.CustomSelectBrush);
                     }
@@ -2424,7 +2583,7 @@ namespace Root_CAMELLIA
 
                 }
             }
-          
+
             Rect rect = DataViewPosition;
             rect.X = rect.X / ZoomScale - OffsetX / ZoomScale * 1000 / (double)1000;
             rect.Y = rect.Y / ZoomScale - OffsetY / ZoomScale * 1000 / (double)1000;
@@ -2498,18 +2657,18 @@ namespace Root_CAMELLIA
 
         public void SetSelectRect()
         {
-                selectRectangle = new CustomRectangleGeometry(GeneralTools.SelectPointBrush);
-                CustomRectangleGeometry select = selectRectangle as CustomRectangleGeometry;
+            selectRectangle = new CustomRectangleGeometry(GeneralTools.SelectPointBrush);
+            CustomRectangleGeometry select = selectRectangle as CustomRectangleGeometry;
 
-                Rect selectRect = new Rect(Math.Min(SelectStartPoint.X, SelectEndPoint.X), Math.Min(SelectStartPoint.Y, SelectEndPoint.Y),
-                    Math.Abs(SelectStartPoint.X - SelectEndPoint.X), Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y));
+            Rect selectRect = new Rect(Math.Min(SelectStartPoint.X, SelectEndPoint.X), Math.Min(SelectStartPoint.Y, SelectEndPoint.Y),
+                Math.Abs(SelectStartPoint.X - SelectEndPoint.X), Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y));
 
-                select.SetData(selectRect, 99);
-                SelectGeometry.Add(select);
-                m_DrawSelectElement.Add(select.path);
+            select.SetData(selectRect, 99);
+            SelectGeometry.Add(select);
+            m_DrawSelectElement.Add(select.path);
         }
 
-      
+
         public ObservableCollection<ModelData.LayerData> GetLayerData()
         {
             UpdateLayerGridView(false);
@@ -2576,7 +2735,7 @@ namespace Root_CAMELLIA
                     circleData[i].height, circleData[i].MeasurementOffsetX, circleData[i].MeasurementOffsetY);
                 circle.Transform(RatioX, RatioY);
 
-                circle.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                circle.ScaleOffset(1, 0, 0);
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                 dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height), 95);
 
@@ -2619,7 +2778,7 @@ namespace Root_CAMELLIA
                 }
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                 dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height), 95);
-                
+
                 temp.Add(dataCandidatePoint.UIElement);
                 if (!preview)
                 {
@@ -2698,7 +2857,7 @@ namespace Root_CAMELLIA
                 CurrentCandidatePoint = -1;
                 CurrentSelectPoint = -1;
                 sw.Start();
-             
+
                 p_DrawPointElement.Clear();
                 Shapes.Clear();
                 TextBlocks.Clear();
@@ -2845,10 +3004,10 @@ namespace Root_CAMELLIA
             {
                 App.m_nanoView.m_LayerList.Clear();
                 LibSR_Met.DataManager.GetInstance().m_ThicknessData.Clear();
-                dataManager.recipeDM.MeasureModelData.AddLayer(isSave : false);
-                dataManager.recipeDM.MeasureModelData.AddLayer(isSave : false);
+                dataManager.recipeDM.MeasureModelData.AddLayer(isSave: false);
+                dataManager.recipeDM.MeasureModelData.AddLayer(isSave: false);
             }
-            
+
         }
 
         private void UpdateParameter()
@@ -2861,7 +3020,7 @@ namespace Root_CAMELLIA
         {
             NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime.ToString();
             VISIntegrationTime = dataManager.recipeDM.TeachingRD.VISIntegrationTime.ToString();
-
+            MeasureRepeatCount = dataManager.recipeDM.TeachingRD.MeasureRepeatCount.ToString();
             p_UseThickness = dataManager.recipeDM.TeachingRD.UseThickness;
             p_UseTransmittance = dataManager.recipeDM.TeachingRD.UseTransmittance;
 
@@ -2985,7 +3144,7 @@ namespace Root_CAMELLIA
                 CCircle circle = new CCircle(data[i].x, data[i].y, data[i].width,
                     data[i].height, data[i].MeasurementOffsetX, data[i].MeasurementOffsetY);
                 circle.Transform(RatioX, RatioY);
-                circle.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                circle.ScaleOffset(1, 0, 0);
 
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                 dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), 96, true);
@@ -3122,7 +3281,7 @@ namespace Root_CAMELLIA
 
                         Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                         dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), 96, true);
-                      
+
                         if (!preview)
                         {
                             Shapes.Add(dataSelectedPoint);
@@ -3141,6 +3300,173 @@ namespace Root_CAMELLIA
                     }
                 }
             }));
+        }
+
+        public void SetGuideStage()
+        {
+            p_DrawGuideElement.Clear();
+            ObservableCollection<UIElement> temp = new ObservableCollection<UIElement>();
+            GeneralTools.GbHole.GradientOrigin = new System.Windows.Point(0.3, 0.3);
+            // 스테이지
+
+            //stage = new CustomEllipseGeometry(System.Windows.Media.Brushes.Red, System.Windows.Media.Brushes.Red);
+            //CustomEllipseGeometry stageField = stage as CustomEllipseGeometry;
+
+            //Circle newCircle = new Circle();
+            //newCircle.X = GeneralTools.DataStageField.X;
+            //newCircle.Y = GeneralTools.DataStageField.Y;
+            //newCircle.Width = GeneralTools.DataStageField.Width - 2;
+            //newCircle.Height = GeneralTools.DataStageField.Height - 2;
+            //viewStageGuideField.Set(newCircle);
+            //viewStageGuideField.Transform(RatioX, RatioY);
+            //viewStageGuideField.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            //stageField.SetData(viewStageGuideField, CenterX, CenterY);
+
+            //GuideGeometry.Add(stageField);
+            // temp.Add(stageField.path);
+
+            // Stage 중간 흰색 라인
+            stage = new CustomRectangleGeometry(GeneralTools.GuideCustomLineBrush, "3,1", 1, 0.5d);
+            CustomRectangleGeometry rectLine = stage as CustomRectangleGeometry;
+            viewStageGuideLineHole.Set(GeneralTools.DataStageGuideLineHole);
+            viewStageGuideLineHole.Transform(RatioX, RatioY);
+            viewStageGuideLineHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            rectLine.SetData(drawGeometryManager.GetRect(viewStageGuideLineHole, CenterX, CenterY));
+            GuideGeometry.Add(rectLine);
+            temp.Add(rectLine.path);
+            //stage = new CustomRectangleGeometry(GeneralTools.ActiveBrush, GeneralTools.ActiveBrush);
+            //CustomRectangleGeometry rectLine = stage as CustomRectangleGeometry;
+            //viewStageGuideLineHole.Set(GeneralTools.DataStageGuideLineHole);
+            //viewStageGuideLineHole.Transform(RatioX, RatioY);
+            //viewStageGuideLineHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            //rectLine.SetData(drawGeometryManager.GetRect(viewStageGuideLineHole, CenterX, CenterY));
+            //GuideGeometryGeometry.Add(rectLine);
+            //temp.Add(rectLine.path);
+
+            //// Stage 점선 가이드라인
+            //for (int i = 0; i < GeneralTools.GuideLineNum; i++)
+            //{
+
+            //    stage = new CustomEllipseGeometry(GeneralTools.GuideLineBrush, "3,1", 5, 0.1d);
+
+            //    CustomEllipseGeometry guideLine = stage as CustomEllipseGeometry;
+            //    ViewStageGuideLine[i] = new Circle();
+            //    ViewStageGuideLine[i].Set(GeneralTools.DataStageGuideLine[i]);
+            //    ViewStageGuideLine[i].Transform(RatioX, RatioY);
+
+            //    ViewStageGuideLine[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            //    guideLine.SetData(ViewStageGuideLine[i], CenterX, CenterY, 5 * ZoomScale);
+            //    Geometry.Add(guideLine);
+            //    temp.Add(guideLine.path);
+
+            //}
+
+            // 엣지부분 흰색 영역
+            for (int i = 0; i < 2 * GeneralTools.EdgeNum; i++)
+            {
+                viewStageGuideEdgeHoleArc[i] = new Arc();
+                viewStageGuideEdgeHoleArc[i].Set(GeneralTools.DataStageGuideEdgeHoleArc[i]);
+                viewStageGuideEdgeHoleArc[i].Transform(RatioX, RatioY);
+                viewStageGuideEdgeHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            }
+
+            for (int n = 0; n < GeneralTools.EdgeNum; n++)
+            {
+                stage = new CustomPathGeometry(GeneralTools.GuideCustomLineBrush, "3,1", 1, 0.5d);
+                CustomPathGeometry edgePath = stage as CustomPathGeometry;
+
+                PathFigure path = drawGeometryManager.AddDoubleHole(viewStageGuideEdgeHoleArc[2 * n + 0], viewStageGuideEdgeHoleArc[2 * n + 1], CenterX, CenterY);
+
+                edgePath.SetData(path);
+                GuideGeometry.Add(edgePath);
+                temp.Add(edgePath.path);
+                drawGeometryManager.ClearSegments();
+            }
+
+
+            // 긴 타원형 홀
+            for (int i = 0; i < 2 * GeneralTools.DoubleHoleNum; i++)
+            {
+
+                viewStageGuideDoubleHoleArc[i] = new Arc();
+                viewStageGuideDoubleHoleArc[i].Set(GeneralTools.DataStageGuideDoubleHoleArc[i]);
+                viewStageGuideDoubleHoleArc[i].Transform(RatioX, RatioY);
+                viewStageGuideDoubleHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            }
+
+            for (int i = 0; i < GeneralTools.DoubleHoleNum; i++)
+            {
+                stage = new CustomPathGeometry(GeneralTools.GuideCustomLineBrush, "3,1", 1, 0.5d);
+                CustomPathGeometry doubleHole = stage as CustomPathGeometry;
+
+                PathFigure path = drawGeometryManager.AddDoubleHole(viewStageGuideDoubleHoleArc[2 * i + 0], viewStageGuideDoubleHoleArc[2 * i + 1], CenterX, CenterY);
+
+                doubleHole.SetData(path);
+                GuideGeometry.Add(doubleHole);
+                temp.Add(doubleHole.path);
+                drawGeometryManager.ClearSegments();
+            }
+
+            // 윗부분 및 아랫부분 타원홀
+            for (int i = 0; i < 2; i++)
+            {
+                //Top
+                viewStageGuideTopHoleArc[i] = new Arc();
+                viewStageGuideTopHoleArc[i].Set(GeneralTools.DataStageGuideTopHoleArc[i]);
+                viewStageGuideTopHoleArc[i].Transform(RatioX, RatioY);
+                viewStageGuideTopHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+
+                //Bot
+                viewStageGuideBotHoleArc[i] = new Arc();
+                viewStageGuideBotHoleArc[i].Set(GeneralTools.DataStageGuideBotHoleArc[i]);
+                viewStageGuideBotHoleArc[i].Transform(RatioX, RatioY);
+                viewStageGuideBotHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            }
+
+            Arc[] arc;
+            for (int i = 0; i < 2; i++)
+            {
+                stage = new CustomPathGeometry(GeneralTools.GuideCustomLineBrush, "3,1", 1, 0.5d);
+                CustomPathGeometry topBotDoubleHole = stage as CustomPathGeometry;
+                if (i == 0)
+                {
+                    arc = viewStageGuideTopHoleArc;
+                }
+                else
+                {
+                    arc = viewStageGuideBotHoleArc;
+                }
+
+                PathFigure path = drawGeometryManager.AddDoubleHole(arc[0], arc[1], CenterX, CenterY);
+
+                topBotDoubleHole.SetData(path);
+                GuideGeometry.Add(topBotDoubleHole);
+                temp.Add(topBotDoubleHole.path);
+                drawGeometryManager.ClearSegments();
+            }
+
+
+            // 스테이지 홀
+            foreach (Circle circle in dataStageCircleHole)
+            {
+                stage = new CustomEllipseGeometry(GeneralTools.GuideCustomLineBrush, "3,1", 1, 0.5d);
+                CustomEllipseGeometry circleHole = stage as CustomEllipseGeometry;
+                Circle guideCircle = new Circle();
+                guideCircle.X = circle.X;
+                guideCircle.Y = circle.Y;
+                guideCircle.Width = circle.Width - 2;
+                guideCircle.Height = circle.Height - 2;
+                viewStageGuideCircleHole.Set(guideCircle);
+                viewStageGuideCircleHole.Transform(RatioX, RatioY);
+                viewStageGuideCircleHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                drawGeometryManager.GetRect(ref viewStageGuideCircleHole, CenterX, CenterY);
+                circleHole.SetData(viewStageGuideCircleHole, (int)(viewStageGuideCircleHole.Width / 2),
+                    (int)(viewStageGuideCircleHole.Y + (viewStageGuideCircleHole.Height / 2) + viewStageGuideCircleHole.Y));
+                GuideGeometry.Add(circleHole);
+                temp.Add(circleHole.path);
+            }
+
+            p_DrawGuideElement = temp;
         }
 
         public void SetStage()
@@ -3242,7 +3568,7 @@ namespace Root_CAMELLIA
                 viewStageTopHoleArc[i].Set(GeneralTools.DataStageTopHoleArc[i]);
                 viewStageTopHoleArc[i].Transform(RatioX, RatioY);
                 viewStageTopHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
-                
+
                 //Bot
                 viewStageBotHoleArc[i] = new Arc();
                 viewStageBotHoleArc[i].Set(GeneralTools.DataStageBotHoleArc[i]);
@@ -3549,7 +3875,7 @@ namespace Root_CAMELLIA
                 {
                     MessageBox.Show("Check Size");
                 }
-               
+
             }
             else
             {
@@ -3612,7 +3938,7 @@ namespace Root_CAMELLIA
                     {
                         SetStartEndPointMode = false;
                         ReorderCnt = 0;
-                       // ReorderBrush = normalBrush;
+                        // ReorderBrush = normalBrush;
                     }
                 }
             }
@@ -3773,6 +4099,26 @@ namespace Root_CAMELLIA
             }
         }
 
+        public void DeleteCandidatePointCumstomize(int nIndex, int nRange)
+        {
+            for (int i = nIndex; i < nIndex + nRange; i++)
+            {
+                double dPointX = m_customizeRD.DataCandidatePoint[nIndex].x;
+                double dPointY = m_customizeRD.DataCandidatePoint[nIndex].y;
+
+                m_customizeRD.DataCandidatePoint.RemoveAt(nIndex);
+                //int nDeleteIndex = dataManager.recipeDM.TeachingRD.DataMeasurementRoute.FindIndex(s => s.Equals(nIndex));
+                //dataManager.recipeDM.TeachingRD.DataMeasurementRoute.RemoveAt(nDeleteIndex);
+                //for (int j = 0; j < dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Count; j++)
+                //{
+                //    if (dataManager.recipeDM.TeachingRD.DataMeasurementRoute[j] > nIndex)
+                //    {
+                //        dataManager.recipeDM.TeachingRD.DataMeasurementRoute[j] = dataManager.recipeDM.TeachingRD.DataMeasurementRoute[j] - 1;
+                //    }
+                //}
+            }
+        }
+
         public void DeletePoint(int nIndex, int nRange)
         {
             for (int i = nIndex; i < nIndex + nRange; i++)
@@ -3841,7 +4187,7 @@ namespace Root_CAMELLIA
 
         public bool CheckSaveLayerData()
         {
-            if(p_UseThickness && dataManager.recipeDM.SaveRecipeRD.ModelRecipePath == "")
+            if (p_UseThickness && dataManager.recipeDM.SaveRecipeRD.ModelRecipePath == "")
             {
                 CustomMessageBox.Show("Caution", "Model Not Saved!", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Warning);
                 return false;
@@ -3910,13 +4256,16 @@ namespace Root_CAMELLIA
                 PointAddMode = "Normal";
             }
 
-            p_isCustomize = false;
-            CheckSelectPoint();
-            m_customizeRD.Clone(dataManager.recipeDM.TeachingRD);
-            //dataManager.recipeDM.TeachingRD.test(
-            p_TabIndex = 0;
-            InitCandidatePoint(dataManager.recipeDM.TeachingRD);
-            UpdateView();
+            if (p_isCustomize)
+            {
+                p_isCustomize = false;
+                CheckSelectPoint();
+                m_customizeRD.Clone(dataManager.recipeDM.TeachingRD);
+                //dataManager.recipeDM.TeachingRD.test(
+                p_TabIndex = 0;
+                InitCandidatePoint(dataManager.recipeDM.TeachingRD);
+                UpdateView();
+            }
         }
 
         public void UpdateGridCombo(bool isSave = true)
@@ -3951,7 +4300,7 @@ namespace Root_CAMELLIA
             }
             else
             {
-                foreach(string str in MaterialMeasureListItem)
+                foreach (string str in MaterialMeasureListItem)
                 {
                     exist = false;
                     Material = Path.GetFileNameWithoutExtension(str);
@@ -3975,7 +4324,7 @@ namespace Root_CAMELLIA
                     }
                 }
             }
-           
+
         }
 
         public void DeleteGridCombo(bool isSave = true)
@@ -4006,7 +4355,7 @@ namespace Root_CAMELLIA
                     }
                 }
             }
-           
+
         }
 
         public bool CheckMaterialUse()
@@ -4047,7 +4396,7 @@ namespace Root_CAMELLIA
                     cnt--;
                 }
             }
-           
+
         }
 
         private void UpdateLayerModel()
@@ -4063,7 +4412,7 @@ namespace Root_CAMELLIA
         private bool CheckLayerHost()
         {
             int cnt = LayerCount - 1;
-            for(int i = 0; i < GridLayerData.Count; i++)
+            for (int i = 0; i < GridLayerData.Count; i++)
             {
                 if (!GridLayerData[i].CheckLayerHost(cnt))
                 {
@@ -4115,18 +4464,18 @@ namespace Root_CAMELLIA
             else
             {
                 MeasureLayerCount = dataManager.recipeDM.MeasureModelData.GetLayerCount(false);
-                if(MeasureLayerCount == 0)
+                if (MeasureLayerCount == 0)
                 {
                     MeasureLayerCount = 2;
                 }
                 loop = MeasureLayerCount;
             }
-             
 
-           
+
+
             string[] strHeader = { "Sub.", "1st L.", "2nd L.", "3rd L.", "4th L.", "5th L.", "6th L.", "7th L.", "8th L.", "9th L.", "10th L." };
 
-            
+
             int rows = loop - 1;
             for (int i = 0; i < loop; i++)
             {
@@ -4139,7 +4488,7 @@ namespace Root_CAMELLIA
                 }
                 else
                 {
-                    if(isSave)
+                    if (isSave)
                         GridLayerData.Add(new ModelData.LayerData(strHeader[rows]));
                     else
                         GridMeasureLayerData.Add(new ModelData.LayerData(strHeader[rows]));
@@ -4241,7 +4590,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     double x, y;
-                    if(double.TryParse(p_SettingPointX, out x) && double.TryParse(p_SettingPointY, out y))
+                    if (double.TryParse(p_SettingPointX, out x) && double.TryParse(p_SettingPointY, out y))
                     {
                         CustomizeStageMap(x, y);
                     }
@@ -4250,6 +4599,130 @@ namespace Root_CAMELLIA
                         MessageBox.Show("Check Value!");
                     }
 
+                });
+            }
+        }
+
+        string m_SettingRRangeMin = "150";
+        public string p_SettingRRangeMin
+        {
+            get
+            {
+                return m_SettingRRangeMin;
+            }
+            set
+            {
+                SetProperty(ref m_SettingRRangeMin, value);
+            }
+        }
+
+        string m_SettingRRangeMax = "200";
+        public string p_SettingRRangeMax
+        {
+            get
+            {
+                return m_SettingRRangeMax;
+            }
+            set
+            {
+                SetProperty(ref m_SettingRRangeMax, value);
+            }
+        }
+
+        string m_SettingRStep = "5";
+        public string p_SettingRStep
+        {
+            get
+            {
+                return m_SettingRStep;
+            }
+            set
+            {
+                SetProperty(ref m_SettingRStep, value);
+            }
+        }
+        string m_SettingAngle = "5";
+        public string p_SettingAngle
+        {
+            get
+            {
+                return m_SettingAngle;
+            }
+            set
+            {
+                SetProperty(ref m_SettingAngle, value);
+            }
+        }
+        void SetCandidateCircle()
+        {
+            double dStartR, dEndR, dStepR, dStepAngle, dSize;
+
+            if (!double.TryParse(p_circleSize, out dSize) || !double.TryParse(p_SettingRRangeMin, out dStartR) || !double.TryParse(p_SettingRRangeMax, out dEndR) || !double.TryParse(p_SettingRStep, out dStepR)
+                || !double.TryParse(p_SettingAngle, out dStepAngle))
+            {
+                return;
+            }
+            List<CCircle> temp = new List<CCircle>();
+            foreach (var item in m_customizeRD.DataCandidatePoint)
+            {
+                temp.Add(item);
+            }
+            m_customizeRD.DataCandidatePoint.Clear();
+            foreach (var item in temp)
+            {
+                m_customizeRD.DataCandidatePoint.Add(item);
+            }
+
+            double dDeg = 0;
+            double dR = 0;
+            double dX = 0;
+            double dY = 0;
+
+            //dRatioX = (double)pictureBoxMain.Width / General.ViewSize;
+            //dRatioY = (double)pictureBoxMain.Height / General.ViewSize;
+            //m_customizeRD.DataCandidateSelectedPoint.Clear();
+
+            for (dDeg = -180; dDeg < 180; dDeg += dStepAngle)
+            {
+                for (dR = dStartR; dR <= dEndR; dR += dStepR)
+                {
+                    dX = Math.Round(dR * Math.Cos(dDeg / 180 * Math.PI), 2);
+                    dY = Math.Round(dR * Math.Sin(dDeg / 180 * Math.PI), 2);
+
+
+                    CCircle circle = new CCircle(dX, dY, dSize, dSize, 0, 0);
+
+                    CCircle c = new CCircle(dX, dY, dSize, dSize, 0, 0);
+                    c.Transform(RatioX, RatioY);
+                    c.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                    System.Windows.Point pointF = new System.Windows.Point((float)(c.x + CenterX), (float)(-c.y + CenterY));
+
+                    if (CheckActiveTest(pointF))
+                    {
+                        int nIndex = -1;
+                        if (ContainsData(m_customizeRD.DataCandidatePoint, circle, out nIndex))
+                        {
+                            DeleteCandidatePointCumstomize(nIndex, 1);
+                        }
+
+                        m_customizeRD.DataCandidatePoint.Add(circle);
+
+                        //m_customizeRD.DataCandidateSelectedPoint.Add(circle);
+                    }
+                }
+            }
+            InitCandidatePoint(m_customizeRD);
+            UpdateListView();
+            UpdateView();
+        }
+
+        public ICommand CmdSetCandidateCircle
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetCandidateCircle();
                 });
             }
         }
@@ -4286,14 +4759,14 @@ namespace Root_CAMELLIA
 
                             UpdateListView();
                         }
-                     
+
                         //dataManager.recipeDM.MeasurementRD.CheckCircleSize();
 
                         //dataManager.recipeDM.MeasurementRD.Clone(dataManager.recipeDM.TeachingRD);
 
                         customizePath = dialog.FileName;
 
-                      
+
                         UpdateView();
                     }
                 });
@@ -4306,9 +4779,9 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    for(int i = 0; i < m_customizeRD.DataCandidateSelectedPoint.Count; i++)
+                    for (int i = 0; i < m_customizeRD.DataCandidateSelectedPoint.Count; i++)
                     {
-                        for(int j = 0; j < m_customizeRD.DataCandidatePoint.Count; j++)
+                        for (int j = 0; j < m_customizeRD.DataCandidatePoint.Count; j++)
                         {
                             if (m_customizeRD.DataCandidateSelectedPoint[i].x == m_customizeRD.DataCandidatePoint[j].x
                             && m_customizeRD.DataCandidateSelectedPoint[i].y == m_customizeRD.DataCandidatePoint[j].y)
@@ -4369,13 +4842,13 @@ namespace Root_CAMELLIA
                         ListReorderPoint.Clear();
                         ReorderCnt = 0;
                         SetStartEndPointMode = true;
-                      //  ReorderBrush = buttonSelectBrush;
+                        //  ReorderBrush = buttonSelectBrush;
                         PointAddMode = "Reorder Mode";
                     }
                     else
                     {
                         SetStartEndPointMode = false;
-                    //    ReorderBrush = normalBrush;
+                        //    ReorderBrush = normalBrush;
                         PointAddMode = "Normal";
                     }
                     UpdateView();
@@ -4390,12 +4863,12 @@ namespace Root_CAMELLIA
                 {
                     if (IsShowIndex)
                     {
-                       // ShowIndexBrush = normalBrush;
+                        // ShowIndexBrush = normalBrush;
                         IsShowIndex = false;
                     }
                     else
                     {
-                       // ShowIndexBrush = buttonSelectBrush;
+                        // ShowIndexBrush = buttonSelectBrush;
                         IsShowIndex = true;
 
                     }
@@ -4412,13 +4885,13 @@ namespace Root_CAMELLIA
                 {
                     if (IsLockUI)
                     {
-                       // LockBrush = normalBrush;
+                        // LockBrush = normalBrush;
                         LockState = "Lock UI";
                         IsLockUI = false;
                     }
                     else
                     {
-                      //  LockBrush = buttonSelectBrush;
+                        //  LockBrush = buttonSelectBrush;
                         LockState = "UnLock UI";
                         IsLockUI = true;
 
@@ -4665,8 +5138,8 @@ namespace Root_CAMELLIA
                         m_customizeRD.DataCandidatePoint = (List<CCircle>)GeneralFunction.Read(m_customizeRD.DataCandidatePoint, BaseDefine.Dir_StageMap + "Preset 1.smp");
                         InitCandidatePoint(m_customizeRD);
                     }
-                  
-                    
+
+
                     UpdateView();
 
                 });
@@ -4822,7 +5295,7 @@ namespace Root_CAMELLIA
                     {
                         if (m_customizeRD.DataMeasurementRoute[j] > idx)
                         {
-                           m_customizeRD.DataMeasurementRoute[j] = m_customizeRD.DataMeasurementRoute[j] - 1;
+                            m_customizeRD.DataMeasurementRoute[j] = m_customizeRD.DataMeasurementRoute[j] - 1;
                         }
                     }
                     //i = 0;
@@ -4847,6 +5320,7 @@ namespace Root_CAMELLIA
                         dataManager.recipeDM.TeachingRD.Clone(m_customizeRD);
                         p_TabIndex = 1;
                         InitCandidatePoint(m_customizeRD);
+                        SetGuideStage();
                     }
                     else
                     {
@@ -4855,6 +5329,8 @@ namespace Root_CAMELLIA
                         m_customizeRD.Clone(dataManager.recipeDM.TeachingRD);
                         p_TabIndex = 0;
                         InitCandidatePoint(dataManager.recipeDM.TeachingRD);
+                        m_DrawGuideElement.Clear();
+                        GuideGeometry.Clear();
                     }
                     UpdateListView();
                     UpdateView();
@@ -4880,7 +5356,7 @@ namespace Root_CAMELLIA
                         UpdateParameter();
                         ClearViewData();
                         UpdateView();
-                        
+
                         RecipePath = dataManager.recipeDM.TeachingRecipePath;
                     }
                 });
@@ -5029,7 +5505,7 @@ namespace Root_CAMELLIA
                     double value = Convert.ToDouble(WaveLengthValue);
                     if (p_SettingViewModel.p_ExceptNIR)
                     {
-                        if(value < 350 || value > 950)
+                        if (value < 350 || value > 950)
                         {
                             MessageBox.Show("350nm ~ 950nm");
                             WaveLengthValue = "0";
@@ -5039,7 +5515,7 @@ namespace Root_CAMELLIA
                     }
                     else
                     {
-                        if(value < 350 || value > 1500)
+                        if (value < 350 || value > 1500)
                         {
                             MessageBox.Show("350nm ~ 1500nm");
                             WaveLengthValue = "0";
@@ -5058,17 +5534,11 @@ namespace Root_CAMELLIA
                     {
                         dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Add(item);
                         ReflectanceListItem.Add(item);
-                        ReflectanceListItem = new ObservableCollection<WavelengthItem>(ReflectanceListItem.OrderBy(x => x.p_waveLength));
-                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Sort((x1, x2) => x1.p_waveLength.CompareTo(x2.p_waveLength));
-                        //ReflectanceListItem.Add(value);
-                        //ReflectanceListItem = new ObservableCollection<double>(ReflectanceListItem.OrderBy(x=>x));
                     }
-                    else if(IsTransmittanceCheck)
+                    else if (IsTransmittanceCheck)
                     {
                         dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Add(item);
                         TransmittanceListItem.Add(item);
-                        TransmittanceListItem = new ObservableCollection<WavelengthItem>(TransmittanceListItem.OrderBy(x => x.p_waveLength));
-                        dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Sort((x1, x2) => x1.p_waveLength.CompareTo(x2.p_waveLength));
                     }
                     //WaveLengthValue = "0";
                     MyIsFocused = true;
@@ -5081,9 +5551,9 @@ namespace Root_CAMELLIA
             if (IsReflectanceCheck)
             {
                 int nRWLCount = 0;
-                foreach(WavelengthItem item in dataManager.recipeDM.TeachingRD.WaveLengthReflectance)
+                foreach (WavelengthItem item in dataManager.recipeDM.TeachingRD.WaveLengthReflectance)
                 {
-                    if(item.p_waveLength == wave && item.p_scale == Scale && item.p_offset == Offset)
+                    if (item.p_waveLength == wave && item.p_scale == Scale && item.p_offset == Offset)
                     {
                         return false;
                     }
@@ -5094,7 +5564,7 @@ namespace Root_CAMELLIA
                     }
                     nRWLCount++;
                 }
-            }   
+            }
             else
             {
                 int nTWLCount = 0;
@@ -5123,7 +5593,7 @@ namespace Root_CAMELLIA
                 {
                     if (IsReflectanceCheck)
                     {
-                        if(ReflectanceSelectedIndex == -1)
+                        if (ReflectanceSelectedIndex == -1)
                         {
                             return;
                         }
@@ -5150,7 +5620,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     bool res = dataManager.recipeDM.AddMaterial();
-                    if(res)
+                    if (res)
                     {
                         MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.SaveModelData.MaterialList.ToArray());
                     }
@@ -5167,7 +5637,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     //MaterialListItem.Clear();
-                    if(CheckMaterialUse() == false)
+                    if (CheckMaterialUse() == false)
                     {
                         UpdateLayerModel();
                         dataManager.recipeDM.DeleteMaterial(MaterialSelectIndex);
@@ -5187,18 +5657,18 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                  
-                    if(dataManager.recipeDM.OpenModel() == true)
+
+                    if (dataManager.recipeDM.OpenModel() == true)
                     {
                         GridLayerData.Clear();
                         MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.SaveModelData.MaterialList.ToArray());
                         ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
 
                         InitLayerGrid();
-                        
+
                         DeleteGridCombo();
                         UpdateGridCombo();
-                        
+
                         UpdateLayerGrid();
                     }
                 });
@@ -5220,9 +5690,9 @@ namespace Root_CAMELLIA
                     }
                     if (dataManager.recipeDM.SaveModel())
                     {
-                        if(dataManager.recipeDM.SaveRecipeRD.ModelRecipePath != dataManager.recipeDM.TeachingRD.ModelRecipePath)
+                        if (dataManager.recipeDM.SaveRecipeRD.ModelRecipePath != dataManager.recipeDM.TeachingRD.ModelRecipePath)
                         {
-                            if(CustomMessageBox.Show("Caution!", "Model Path has been Changed! Change the Model Path?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Warning) == MessageBoxResult.OK)
+                            if (CustomMessageBox.Show("Caution!", "Model Path has been Changed! Change the Model Path?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Warning) == MessageBoxResult.OK)
                             {
                                 ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
                                 isModelPathChange = true;
@@ -5245,7 +5715,7 @@ namespace Root_CAMELLIA
                         CustomMessageBox.Show("Error", "Select Layer row", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
                         return;
                     }
-                    if(GridLayerData.Count == 12)
+                    if (GridLayerData.Count == 12)
                     {
                         CustomMessageBox.Show("Error", "Cannot add any more.", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
                         return;

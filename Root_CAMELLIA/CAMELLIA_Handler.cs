@@ -14,16 +14,31 @@ using System.Windows.Media;
 using Root_CAMELLIA.ManualJob;
 using RootTools.OHTNew;
 using Root_CAMELLIA.UI_UserControl;
+using System.Windows;
+using System;
 
 namespace Root_CAMELLIA
 {
     public class CAMELLIA_Handler : NotifyProperty, IHandler
     {
+        public delegate void EventHandler();
+        public event EventHandler OnRnRDone;
+        void DoneEvent()
+        {
+            if (OnRnRDone != null)
+                OnRnRDone();
+        }
+
+        public event EventHandler OnListUpdate;
+        public void UpdateEvent()
+        {
+            if (OnListUpdate != null)
+                OnListUpdate();
+        }
         public ModuleList p_moduleList
         {
             get; set;
         }
-
         #region List InfoWafer
         //public string AddInfoWafer(InfoWafer infoWafer)
         //{
@@ -60,7 +75,7 @@ namespace Root_CAMELLIA
         public ModuleList m_moduleList;
         public CAMELLIA_Recipe m_recipe;
         //public CAMELLIA_Process m_process;
-        public EFEM_Process m_process;
+        public CAMELLIA_Process p_process { get; set; }
         public Module_Camellia m_camellia;
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
         public Module_FDC m_FDC;
@@ -71,7 +86,6 @@ namespace Root_CAMELLIA
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
-
             InitWTR();
             InitLoadport();
             InitRFID();
@@ -97,7 +111,7 @@ namespace Root_CAMELLIA
             InitModule(m_FFU);
             m_recipe = new CAMELLIA_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
+            p_process = new CAMELLIA_Process("Process", m_engineer, iWTR, m_aLoadport);
         }
 
         void InitModule(ModuleBase module)
@@ -109,49 +123,38 @@ namespace Root_CAMELLIA
 
         public bool IsEnableRecovery()
         {
+            if (EQ.p_eState != EQ.eState.Ready)
+                return false;
             IWTR iWTR = (IWTR)m_wtr;
-            foreach (IWTRChild child in iWTR.p_aChild)
-            {
-                if (child.p_infoWafer != null)
-                {
-                    if (!child.p_id.Contains("Loadport"))
-                    {
-                        if (child.IsWaferExist(0) == false) return false;
-                        if (child.IsWaferExist(0) == true) return true;
-                    }
-                    else
-                    {
-                        //if (!child.IsWaferExist(0))
-                        //{
-                        //    child.SetAlarm();
-                        //    return false;
-                        //}
-                    }
-                }
-                else if (child.p_infoWafer == null)
-                {
-                    if (!child.p_id.Contains("Loadport"))
-                    {
-                        if (child.IsWaferExist(0) == true)
-                        {
-                            child.SetAlarm();
-                            return false;
-                        }
-                    }
-                }
-                else if(child.p_infoWafer != null)
-                {
-                    //if (!child.p_id.Contains("Loadport"))
-                    //{
-                    //    if (!child.IsWaferExist(0))
-                    //    {
-                    //        child.SetAlarm();
-                    //        return false;
-                    //    }
-                    //}
-                }
-            }
-            return iWTR.IsEnableRecovery();
+            //foreach (IWTRChild child in iWTR.p_aChild)
+            //{
+            //    if (child.p_infoWafer != null)
+            //    {
+            //        if (!child.p_id.Contains("Loadport"))
+            //        {
+            //            if (child.IsWaferExist(0) == false) return false;
+            //            if (child.IsWaferExist(0) == true) return true;
+            //        }
+            //    }
+            //    else if (child.p_infoWafer == null)
+            //    {
+            //        if (!child.p_id.Contains("Loadport"))
+            //        {
+            //            if (child.IsWaferExist(0) == true)
+            //            {
+            //                child.SetAlarm();
+            //                return false;
+            //            }
+            //        }
+            //    }
+            //}
+            //bool isRecovery = m_bIsPossible_Recovery;
+            //if (m_IsCheckWTR)
+            //{
+            //    isRecovery = iWTR.IsEnableRecovery();
+            //}
+
+            return m_bIsPossible_Recovery;
         }
         #endregion
 
@@ -288,6 +291,7 @@ namespace Root_CAMELLIA
 
         #region StateHome
         public bool m_bIsPossible_Recovery = false;
+        public bool m_IsCheckWTR = false;
         public string StateHome()
         {
             m_HomeProgress.Reset();
@@ -306,7 +310,11 @@ namespace Root_CAMELLIA
                 m_gem.DeleteAllJobInfo();
             }
 
+            //m_bIsPossible_Recovery = false;
             IWTR iWTR = (IWTR)m_wtr;
+            //m_bIsPossible_Recovery = iWTR.IsEnableRecovery();
+
+            bool needRecovery = false;
             foreach (IWTRChild child in iWTR.p_aChild)
             {
                 if (child.p_infoWafer != null)
@@ -316,7 +324,12 @@ namespace Root_CAMELLIA
                         if (child.IsWaferExist(0) == false)
                         {
                             child.SetAlarm();
+                            m_bIsPossible_Recovery = false;
                             return "Wafer Check Error";
+                        }
+                        else
+                        {
+                            needRecovery = true;
                         }
                     }
                 }
@@ -327,12 +340,20 @@ namespace Root_CAMELLIA
                         if (child.IsWaferExist(0) == true)
                         {
                             child.SetAlarm();
+                            m_bIsPossible_Recovery = false;
                             return "Wafer Check Error";
                         }
                     }
                 }
             }
 
+
+            bool wtrRecovery = false;
+            if (!needRecovery)
+                wtrRecovery = iWTR.IsEnableRecovery();
+
+            m_bIsPossible_Recovery = needRecovery || wtrRecovery;
+            //m_bIsPossible_Recovery = ExistWaferInfoRecovery && NotExistWaferInfoRecovery;
             return sInfo;
         }
 
@@ -402,35 +423,42 @@ namespace Root_CAMELLIA
         {
             //m_process.AddInfoWafer(infoSlot);
             m_infoRnRSlot = infoSlot;
-            m_process.p_sInfo = m_process.AddInfoWafer(infoSlot);
+            p_process.p_sInfo = p_process.AddInfoWafer(infoSlot);
             return "OK";
         }
 
         public void CalcSequence()
         {
-            m_process.ReCalcSequence();
+            p_process.ReCalcSequence();
             CalcDockingUndocking();
         }
 
         public void CalcRecover()
         {
-            m_process.CalcRecover();
-            CalcDockingUndocking();
+            p_process.CalcRecover();
+            CalcDockingUndocking(true);
         }
 
-        void CalcDockingUndocking()
+        void CalcDockingUndocking(bool isRecovery = false)
         {
-            List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
-            while (m_process.p_qSequence.Count > 0) aSequence.Add(m_process.p_qSequence.Dequeue());
+            List<CAMELLIA_Process.Sequence> aSequence = new List<CAMELLIA_Process.Sequence>();
+            while (p_process.p_qSequence.Count > 0) aSequence.Add(p_process.p_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
             {
-                if (CalcDocking(loadport, aSequence)) aDock.Add(loadport);
+                if (CalcDocking(loadport, aSequence))
+                {
+                    aDock.Add(loadport);
+                    //if (!isRecovery)
+                    //{
+                    //    CalcInitCal(loadport, aSequence);
+                    //}
+                }
             }
             while (aSequence.Count > 0)
             {
-                EFEM_Process.Sequence sequence = aSequence[0];
-                m_process.p_qSequence.Enqueue(sequence);
+                CAMELLIA_Process.Sequence sequence = aSequence[0];
+                p_process.p_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
                 //for (int n = m_process.m_qSequence.Count - 1; n >= 0; n--)
@@ -438,35 +466,51 @@ namespace Root_CAMELLIA
                     if (CalcUnload(aDock[n], aSequence))
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
-                        EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
-                        m_process.p_qSequence.Enqueue(sequenceUndock);
+                        CAMELLIA_Process.Sequence sequenceUndock = new CAMELLIA_Process.Sequence(runUndocking, sequence.m_infoWafer);
+                        p_process.p_qSequence.Enqueue(sequenceUndock);
                         aDock.RemoveAt(n);
                     }
                 }
             }
-            m_process.RunTree(Tree.eMode.Init);
+            p_process.RunTree(Tree.eMode.Init);
         }
 
-        bool CalcDocking(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcInitCal(ILoadport loadport, List<CAMELLIA_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (CAMELLIA_Process.Sequence sequence in aSequence)
             {
                 //if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) //return true;
                 {
-                    if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
-                    ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
-                    m_process.p_qSequence.Enqueue(sequenceDock);
+                    ModuleRunBase runInitCal = (Run_InitCalibration)m_camellia.CloneModuleRun("InitCalibration");
+                    CAMELLIA_Process.Sequence sequenceDock = new CAMELLIA_Process.Sequence(runInitCal, sequence.m_infoWafer);
+                    p_process.p_qSequence.Enqueue(sequenceDock);
                     return true;
                 }
             }
             return false;
         }
 
-        bool CalcUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcDocking(ILoadport loadport, List<CAMELLIA_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (CAMELLIA_Process.Sequence sequence in aSequence)
+            {
+                //if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) //return true;
+                {
+                    if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
+                    ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
+                    CAMELLIA_Process.Sequence sequenceDock = new CAMELLIA_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    p_process.p_qSequence.Enqueue(sequenceDock);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool CalcUnload(ILoadport loadport, List<CAMELLIA_Process.Sequence> aSequence)
+        {
+            foreach (CAMELLIA_Process.Sequence sequence in aSequence)
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false;
             }
@@ -479,7 +523,7 @@ namespace Root_CAMELLIA
         {
             if (m_gem.p_cjRun == null)
                 return;
-            if (m_process.p_qSequence.Count > 0)
+            if (p_process.p_qSequence.Count > 0)
                 return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
@@ -521,7 +565,8 @@ namespace Root_CAMELLIA
             m_thread = new Thread(new ThreadStart(RunThread));
             m_thread.Start();
         }
-        
+
+        public bool bLoad = false;
         void RunThread()
         {
             p_bThread = true;
@@ -537,23 +582,34 @@ namespace Root_CAMELLIA
                     case EQ.eState.Run:
                         if (m_moduleList.m_qModuleRun.Count == 0)
                         {
-                            //CheckLoad();
-                            m_process.p_sInfo = m_process.RunNextSequence();
-                            //CheckUnload();
-                            //if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
-                            if ((EQ.p_nRnR > 1) && (m_process.p_qSequence.Count == 0))
+                            p_process.p_sInfo = p_process.RunNextSequence();
+
+                            if ((EQ.p_nRnR > 1) && (p_process.p_qSequence.Count == 0))
                             {
-                                while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
-                                Thread.Sleep(1000);
-                                m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
-                                CalcSequence();
-                                //m_nRnR--;
+                                p_process.CopyRNRSeq();
+                                //SetGemSlotRnR();
+                                DoneEvent();
                                 EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
+                                
+                            }
+                            else if ((EQ.p_nRnR == 1) && (p_process.p_qSequence.Count == 1))
+                            {
+                                MarsLogManager.Instance.WriteLEH(EQ.p_nRunLP, m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_sLocID, SSLNet.LEH_EVENTID.PROCESS_JOB_END,
+                                    EQ.p_nRunLP == 0 ? MarsLogManager.Instance.m_flowDataA : MarsLogManager.Instance.m_flowDataB,
+                                    EQ.p_nRunLP == 0 ? MarsLogManager.Instance.m_dataFormatterA : MarsLogManager.Instance.m_dataFormatterB);
+                            }
+                            else if ((EQ.p_nRnR == 1) && (p_process.p_qSequence.Count == 0))
+                            {
+                                DoneEvent();
+                                EQ.p_nRnR--;
+                                m_RnRData.ClearData();
                             }
                         }
                         break;
                 }
+                //CheckFinish();
+                //CheckFinish();
             }
         }
         /*
@@ -628,6 +684,12 @@ namespace Root_CAMELLIA
                     module.ThreadStop();
             }
            
+        }
+
+        RnRData m_RnRData = new RnRData();
+        public RnRData GetRnRData()
+        {
+            return m_RnRData;
         }
     }
 }

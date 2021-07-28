@@ -7,57 +7,67 @@
              mc:Ignorable="d" 
              xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              d:DesignHeight="836" d:DesignWidth="1912" 
-             Background="{StaticResource PanelBackGround}">
+             Background="{StaticResource MainBackGroundColor}">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <GroupBox Header="Viewer" Grid.Column="0">
-            <TabControl Grid.Column="1">
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.13*"/>
+                <RowDefinition Height="0.1*"/>
+                <RowDefinition Height="5*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Teach ROI" Style="{StaticResource HeaderTextBlock}"/>
+            <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+            <TabControl Grid.Row="2" Style="{StaticResource ImageViewerTabControlStyle}" SelectedIndex="{Binding SelectedTab}">
                 <TabItem Header="EIP Cover Bottom"
-                                 Width="120">
-                    <Tools:RootViewer DataContext="{Binding EIPCoverBottom}"/>
+                                 Width="140" Style="{StaticResource ImageViewerTabItemStyle}">
+                    <Tools:RootViewer DataContext="{Binding EIPCoverBottom_TDI}"/>
                 </TabItem>
                 <TabItem Header="EIP Base Top"
-                                 Width="120">
-                    <Tools:RootViewer DataContext="{Binding EIPBasePlateTop}"/>
+                                 Width="120" Style="{StaticResource ImageViewerTabItemStyle}">
+                    <Tools:RootViewer DataContext="{Binding EIPBasePlateTop_TDI}"/>
                 </TabItem>
             </TabControl>
-        </GroupBox>
+        </Grid>
+
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
+                <RowDefinition Height="0.13*"/>
+                <RowDefinition Height="0.1*"/>
+                <RowDefinition Height="5*"/>
             </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Header="Sample Image">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0" Header="EIP Cover Bottom">
-                        <Tools:RootViewer DataContext="{Binding EIPCoverBottom_Teach}"/>
-                    </GroupBox>
-                    <GroupBox Grid.Column="1" Header="EIP BasePlate Top">
-                        <Tools:RootViewer DataContext="{Binding EIPBasePlateTop_Teach}"/>
-                    </GroupBox>
-                </Grid>
-            </GroupBox>
-            <GroupBox Grid.Row="1" Header="Step Image">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0" Header="EIP Cover Bottom">
-                        <local:screwUI DataContext="{Binding EIPCoverBottom_Step}"/>
-                    </GroupBox>
-                    <GroupBox Grid.Column="1" Header="EIP BasePlate Top">
-                        <local:screwUI DataContext="{Binding EIPBasePlate_Step}"/>
-                    </GroupBox>
-                </Grid>
-            </GroupBox>
+            <TextBlock Grid.Row="0" Text="Sample Image" Style="{StaticResource HeaderTextBlock}"/>
+            <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+            <TabControl Grid.Row="2" Style="{StaticResource ImageViewerTabControlStyle}" SelectedIndex="{Binding SelectedTab}">
+                <TabItem Header="EIP Cover Bottom"
+                                 Width="140" Style="{StaticResource ImageViewerTabItemStyle}">
+                    <Tools:RootViewer DataContext="{Binding EIPCoverBottom_Stacking}"/>
+                </TabItem>
+                <TabItem Header="EIP Base Top"
+                                 Width="120" Style="{StaticResource ImageViewerTabItemStyle}">
+                    <TabControl>
+                        <TabItem Header="ROI 1" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <Tools:RootViewer DataContext="{Binding BasePlateROI1}"/>
+                        </TabItem>
+                        <TabItem Header="ROI 2" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <Tools:RootViewer DataContext="{Binding BasePlateROI2}"/>
+                        </TabItem>
+                    </TabControl>
+                </TabItem>
+            </TabControl>
         </Grid>
     </Grid>
 

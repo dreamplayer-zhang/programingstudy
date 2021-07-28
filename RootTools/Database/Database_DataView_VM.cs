@@ -31,7 +31,8 @@ namespace RootTools
         public DataTable pDataTable 
         { 
             get => _dataTable; 
-            set => SetProperty(ref _dataTable, value); }
+            set => SetProperty(ref _dataTable, value); 
+        }
 
         //DataGrid _dataGrid;
         //public DataGrid pDataGrid { get => _dataGrid; set => SetProperty(ref _dataGrid, value); }
@@ -41,7 +42,6 @@ namespace RootTools
             get => selectedItem;
             set
             {
-
                 SetProperty(ref selectedItem, value);
             }
         }

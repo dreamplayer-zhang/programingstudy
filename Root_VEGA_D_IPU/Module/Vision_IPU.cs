@@ -28,6 +28,9 @@ namespace Root_VEGA_D_IPU.Module
         TCPIPComm_VEGA_D m_tcpipCommClient;
 
         public bool m_bImgInspectCompleted = true;
+        
+        Registry m_regTCPIP;
+
         #region [Getter Setter]
         public MemoryPool MemoryPool { get => m_memoryPool; private set => m_memoryPool = value; }
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
@@ -132,7 +135,7 @@ namespace Root_VEGA_D_IPU.Module
             }
 
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
-            m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
+            m_memoryMain = m_memoryGroup.CreateMemory("OtherPC", 3, 1, 40000, 40000);
         }
         #endregion
 
@@ -152,16 +155,16 @@ namespace Root_VEGA_D_IPU.Module
             {
                 m_sInfoWafer = (value == null) ? "" : value.p_id;
                 _infoWafer = value;
-                if (m_reg != null) m_reg.Write("sInfoWafer", m_sInfoWafer);
+                if (m_regInfoWafer != null) m_regInfoWafer.Write("sInfoWafer", m_sInfoWafer);
                 OnPropertyChanged();
             }
         }
 
-        Registry m_reg = null;
+        Registry m_regInfoWafer = null;
         public void ReadInfoWafer_Registry()
         {
-            m_reg = new Registry(p_id + ".InfoWafer");
-            m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
+            m_regInfoWafer = new Registry(p_id + ".InfoWafer");
+            m_sInfoWafer = m_regInfoWafer.Read("sInfoWafer", m_sInfoWafer);
             p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
         }
         #endregion
@@ -210,6 +213,8 @@ namespace Root_VEGA_D_IPU.Module
             m_tcpipCommClient = new TCPIPComm_VEGA_D(client);
             m_tcpipCommClient.EventReceiveData += EventReceiveData;
             m_tcpipCommClient.EventConnect += EventConnect;
+
+            m_regTCPIP = new Registry(p_id + ".TCPIP");
         }
 
         private void Vision_IPU_OnChangeState(eState eState)
@@ -369,11 +374,10 @@ namespace Root_VEGA_D_IPU.Module
 
 
                             // 작업 중인 이미지 그랩 데이터 저장
-                            Registry reg = new Registry(p_id + ".TCPIP");
-                            reg.Write(REGSUBKEYNAME_GRABLINESCANSTATE, cmd.ToString());
-                            reg.Write(REGSUBKEYNAME_TOTALSCANLINE, nScanLineNum);
-                            reg.Write(REGSUBKEYNAME_CURRENTSCANLINE, nScanLine);
-                            reg.Write(REGSUBKEYNAME_STARTSCANLINE, nStartScanLine);
+                            m_regTCPIP.Write(REGSUBKEYNAME_GRABLINESCANSTATE, cmd.ToString());
+                            m_regTCPIP.Write(REGSUBKEYNAME_TOTALSCANLINE, nScanLineNum);
+                            m_regTCPIP.Write(REGSUBKEYNAME_CURRENTSCANLINE, nScanLine);
+                            m_regTCPIP.Write(REGSUBKEYNAME_STARTSCANLINE, nStartScanLine);
                         }
                         break;
                     case TCPIPComm_VEGA_D.Command.LineEnd:
@@ -383,9 +387,8 @@ namespace Root_VEGA_D_IPU.Module
                             m_CamMain.StopGrab();
 
                             // 작업 중인 이미지 그랩 데이터 얻어오기
-                            Registry reg = new Registry(p_id + ".TCPIP");
-                            int totalScanLine = reg.Read(REGSUBKEYNAME_TOTALSCANLINE, -1);
-                            int curScanLine = reg.Read(REGSUBKEYNAME_CURRENTSCANLINE, -1);
+                            int totalScanLine = m_regTCPIP.Read(REGSUBKEYNAME_TOTALSCANLINE, -1);
+                            int curScanLine = m_regTCPIP.Read(REGSUBKEYNAME_CURRENTSCANLINE, -1);
                             string grabLineScanState = cmd.ToString();
 
                             if (totalScanLine != -1 && curScanLine != -1)
@@ -398,7 +401,7 @@ namespace Root_VEGA_D_IPU.Module
                             }
 
                             // 작업 중인 이미지 그랩 데이터 저장
-                            reg.Write(REGSUBKEYNAME_GRABLINESCANSTATE, grabLineScanState);
+                            m_regTCPIP.Write(REGSUBKEYNAME_GRABLINESCANSTATE, grabLineScanState);
 
                             // 이미지 검사 시작
                             // (임시처리 - 검사 거치지 않고 마지막 라인일경우 바로 Result 메세지 전달)
@@ -421,13 +424,12 @@ namespace Root_VEGA_D_IPU.Module
         private void EventConnect(Socket socket)
         {
             // 이전에 작업하던 이미지 그랩 데이터 확인
-            Registry reg = new Registry(p_id + ".TCPIP");
-            string strState = reg.Read(REGSUBKEYNAME_GRABLINESCANSTATE, "");
+            string strState = m_regTCPIP.Read(REGSUBKEYNAME_GRABLINESCANSTATE, "");
             if(strState != "")
             {
-                int totalScanLine = reg.Read(REGSUBKEYNAME_TOTALSCANLINE, -1);
-                int curScanLine = reg.Read(REGSUBKEYNAME_CURRENTSCANLINE, -1);
-                int startScanLine = reg.Read(REGSUBKEYNAME_STARTSCANLINE, -1);
+                int totalScanLine = m_regTCPIP.Read(REGSUBKEYNAME_TOTALSCANLINE, -1);
+                int curScanLine = m_regTCPIP.Read(REGSUBKEYNAME_CURRENTSCANLINE, -1);
+                int startScanLine = m_regTCPIP.Read(REGSUBKEYNAME_STARTSCANLINE, -1);
                 if(totalScanLine != -1 && curScanLine != -1 && startScanLine != -1)
                 {
                     Dictionary<string, string> mapParam = new Dictionary<string, string>();

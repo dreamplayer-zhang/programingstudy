@@ -16,9 +16,21 @@ namespace Root_CAMELLIA
             // SolidColorBrush brush = new SolidColorBrush();
             try
             {
-                double from = (double)values[0];
-                double to = (double)values[1];
-                double val = (double)values[2];
+                double from, to, val;
+                if(!double.TryParse(values[0].ToString(), out from))
+                {
+                    return Brushes.Black;
+                }
+                if(!double.TryParse(values[1].ToString(), out to))
+                {
+                    return Brushes.Black;
+                }
+                if(!double.TryParse(values[2].ToString(), out val))
+                {
+                    return Brushes.Black;
+                }
+                //double to = (double)values[1];
+                //double val = (double)values[2];
                 if ((double)values[0] > (double)values[2])
                 {
                     return Brushes.Gold;

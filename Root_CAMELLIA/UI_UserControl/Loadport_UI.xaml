@@ -119,6 +119,7 @@
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Background" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}, ConverterParameter=Background}"/>
+                                            <Setter Property="ToolTip" Value="{Binding p_recipeID}"/>
                                             <Setter Property="TextAlignment" Value="Center"/>
                                             <Setter Property="VerticalAlignment" Value="Stretch"/>
                                             <Setter Property="Foreground" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}}"/>
@@ -152,6 +153,22 @@
                     <Grid Grid.Row="2" Margin="5,0,5,3">
                         <ProgressBar Style="{StaticResource CustomProgress}" Value="{Binding p_progressValue, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Text="{Binding p_progressValue, StringFormat={}{0:0.#}％}" VerticalAlignment="Center" Margin="10,0"/>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0" FontWeight="Bold" FontSize="15" Foreground="DarkBlue">
+                            <Run Text="RNR "/>
+                            <Run Text="{Binding p_currentRNR, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Run Text=" / "/>
+                            <Run Text="{Binding p_totalRNR}"/>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding p_isRNR}" Value="true">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                         <TextBlock VerticalAlignment="Center" Margin="10,0" HorizontalAlignment="Right">
                             <Run Text="{Binding p_totalDone}"/>
                             <Run Text=" / "/>
@@ -180,11 +197,11 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Carrier ID"  VerticalAlignment="Center" Margin="10,0"/>
                             <Border  Grid.Row="0" Grid.Column="1" Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
-                                <TextBlock Text="{Binding p_infoCarrier.p_sCarrierID}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding p_loadport.p_infoCarrier.p_sCarrierID}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
                             <TextBlock  Grid.Row="1" Grid.Column="0" Text="Lot ID" VerticalAlignment="Center" Margin="10,0"/>
                             <Border Grid.Row="1" Grid.Column="1" Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
-                                <TextBlock Text="{Binding p_infoCarrier.p_sLotID}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding p_CurrentLotID, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Recipe ID" VerticalAlignment="Center" Margin="10,0"/>
                             <Border Grid.Row="2" Grid.Column="1" Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
@@ -192,7 +209,7 @@
                             </Border>
                             <TextBlock Grid.Row="3" Grid.Column="0" Text="Loadport State" VerticalAlignment="Center" Margin="10,0"/>
                             <Border Grid.Row="3" Grid.Column="1" Background="#eeeeee" BorderThickness="1" CornerRadius="5" Margin="1">
-                                <TextBlock Text="{Binding p_infoCarrier.p_eState, Converter={StaticResource EnumConverter}}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding p_loadport.p_infoCarrier.p_eState, Converter={StaticResource EnumConverter}}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
                         </Grid>
                     </GroupBox>
@@ -204,10 +221,10 @@
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding p_loadport.m_OHTsemi.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Auto">
+                                                <DataTrigger Binding="{Binding p_loadport.p_infoCarrier.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Auto">
                                                     <Setter Property="Background" Value="Transparent"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding p_loadport.m_OHTsemi.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Manual">
+                                                <DataTrigger Binding="{Binding p_loadport.p_infoCarrier.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Manual">
                                                     <Setter Property="Background" Value="#86ff11"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -219,10 +236,10 @@
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding p_loadport.m_OHTsemi.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Auto">
+                                                <DataTrigger Binding="{Binding p_loadport.p_infoCarrier.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Auto">
                                                     <Setter Property="Background" Value="#86ff11"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding p_loadport.m_OHTsemi.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Manual">
+                                                <DataTrigger Binding="{Binding p_loadport.p_infoCarrier.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Manual">
                                                     <Setter Property="Background" Value="Transparent"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -306,7 +323,7 @@
                         <Border Margin="5" VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Loadport State : " TextAlignment="Center"/>
-                                <TextBlock Text="{Binding p_loadport.m_OHTsemi.m_carrier.p_eTransfer}" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding p_loadport.p_infoCarrier.p_eTransfer, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"/>
                             </StackPanel>
                         </Border>
                     </Grid>

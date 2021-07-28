@@ -25,6 +25,8 @@ namespace Root_WindII
             public const string ImageRootPath = @"D:\Images\";
 
             public const string RootSetupPath = Root + @"Setup\";
+            public const string RootSetupRACPath = RootSetupPath + @"RAC\";
+            public const string RootSetupRACAlignKeyPath = RootSetupRACPath + @"AlignKey\";
         }
 
         public static class FilePath

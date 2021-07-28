@@ -14,6 +14,7 @@ namespace Root_VEGA_P_Vision
         public ImageViewerBase_Panel Main;
         private UserControl m_CurrentPanel;
         Visibility inspbtnvisible;
+
         public Visibility InspBtnVisibility
         {
             get => inspbtnvisible;

@@ -188,6 +188,20 @@ namespace Root_CAMELLIA
                 m_reg.Write(BaseDefine.RegNanoViewUseThickness, value);
             }
         }
+        private bool m_CalDCOLTransmittance = false;
+        public bool p_CalDCOLTransmittance
+        {
+            get
+            {
+                return m_CalDCOLTransmittance;
+            }
+            set
+            {
+                SetProperty(ref m_CalDCOLTransmittance, value);
+                m_reg.Write(BaseDefine.RegNanoViewCalDCOLTransmittance, value);
+                App.m_nanoView.isCalDCOLTransmittance = value;
+            }
+        }
         #endregion
 
 
@@ -229,6 +243,7 @@ namespace Root_CAMELLIA
         {
             p_ExceptNIR = m_reg.Read(BaseDefine.RegNanoViewExceptNIR, m_ExceptNIR);
             p_UseThickness = m_reg.Read(BaseDefine.RegNanoViewUseThickness, m_UseThickness);
+            p_CalDCOLTransmittance = m_reg.Read(BaseDefine.RegNanoViewCalDCOLTransmittance, m_CalDCOLTransmittance);
         }
 
         public void LoadConfig()

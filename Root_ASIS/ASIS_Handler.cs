@@ -196,6 +196,9 @@ namespace Root_ASIS
             //            }
             return null;
         }
+
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         #region Thread

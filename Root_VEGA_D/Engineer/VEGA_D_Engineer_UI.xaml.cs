@@ -24,6 +24,7 @@ namespace Root_VEGA_D.Engineer
             toolBoxUI.Init(engineer.ClassToolBox());
             handlerUI.Init(engineer.m_handler);
             engineer.RunTree(Tree.eMode.Init);
+            PMUI.Init(engineer.m_handler.m_vision);
         }
     }
 }

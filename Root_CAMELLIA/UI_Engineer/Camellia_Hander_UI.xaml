@@ -26,7 +26,7 @@
                         <local:Camellia_Recipe_UI x:Name="recipeUI"/>
                     </TabItem>
                     <TabItem Header="Process" Background="{Binding p_brushHandler}">
-                        <efem:EFEM_Process_UI x:Name="processUI"/>
+                        <local:CAMELLIA_Process_UI x:Name="processUI"/>
                     </TabItem>
                     <TabItem Header="GAF" Background="{Binding p_brushHandler}">
                         <gaf:GAF_UI x:Name="gafUI"/>

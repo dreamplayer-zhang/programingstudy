@@ -84,6 +84,7 @@ namespace Root_VEGA_D.Module
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryMain;
         MemoryData m_memoryLayer;
+        MemoryData m_memoryOtherPC;
         LightSet m_lightSet;
 
         Camera_Dalsa m_CamMain;
@@ -107,6 +108,7 @@ namespace Root_VEGA_D.Module
         public MemoryGroup MemoryGroup { get => m_memoryGroup; private set => m_memoryGroup = value; }
         public MemoryData MemoryMain { get => m_memoryMain; private set => m_memoryMain = value; }
         public MemoryData MemoryLayer { get => m_memoryLayer; private set => m_memoryLayer = value; }
+        public MemoryData MemoryOtherPC { get => m_memoryOtherPC; private set => m_memoryOtherPC = value; }
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
@@ -156,6 +158,7 @@ namespace Root_VEGA_D.Module
             m_alidReticleLocateInfoError = m_gaf.GetALID(this, "Reticle Locate Info is not Correct", "Reticle Locate Info is not Correct");
             m_alidPMCoaxialError = m_gaf.GetALID(this, "PM Coaxial Check Error", "Coaxial Light PM Test is failed");
             m_alidPMTransmittedError = m_gaf.GetALID(this, "PM Transmitted Check Error", "Transmitted Light PM Test is failed");
+            m_alidPMFail = m_gaf.GetALID(this, "PM Fail", "PM is Fail, Pod is not load");
         }
         #endregion
 
@@ -274,6 +277,9 @@ namespace Root_VEGA_D.Module
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
             //m_memoryGroup2 = m_memoryPool2.GetGroup("group");
             //m_memoryGroup2.CreateMemory("ROI", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+
+            m_memoryOtherPC = m_memoryGroup.CreateMemory("OtherPC", 1, 3, 40000, 40000);
+            //ImageData(string sPool, string sGroup, string sMem, MemoryTool tool, int nPlane, int nByte)
         }
         #endregion
 
@@ -690,7 +696,7 @@ namespace Root_VEGA_D.Module
             }
             string strTempFile = "D:\\AlignMarkTemplateImage\\TempAreaImage.bmp";
             ImageData tempImgData = new ImageData(mem);
-            tempImgData.FileSaveGrayBMP(strTempFile, crtROI, 1);
+            tempImgData.FileSaveGrayBMP(strTempFile, crtROI, 1, ImageData.eRgbChannel.None, 4);
 
             return new Image<Gray, byte>(strTempFile);
             //ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
@@ -771,6 +777,9 @@ namespace Root_VEGA_D.Module
             camMain.p_CamParam.SetRotaryEncoderMultiplier(nEncoderMul);
             camMain.p_CamParam.SetRotaryEncoderDivider(nEncoderDiv);
 
+            // GrabMode의 StartGrab() 초기에 Userset 변경으로 인한 불필요한 이미지 그랩 방지위해서
+            grabmode.m_GD.nUserSet = (int)camMain.p_CamParam.p_eUserSetCurrent;
+
             // 트리거 설정
             AxisXY.p_axisY.SetTrigger(startTriggerY, endTriggerY, grabmode.m_dTrigger, 0.001, true);
 
@@ -796,8 +805,6 @@ namespace Root_VEGA_D.Module
         {
             if (CamRADS == null) return "RADS Cam is null";
 
-            RADSControl.m_timer.Start();
-            RADSControl.p_IsRun = true;
             RADSControl.StartRADS();
 
             StopWatch sw = new StopWatch();
@@ -826,8 +833,6 @@ namespace Root_VEGA_D.Module
         {
             if (CamRADS == null) return "RADS Cam is null";
 
-            RADSControl.m_timer.Stop();
-            RADSControl.p_IsRun = false;
             RADSControl.StopRADS();
             if (CamRADS.p_CamInfo._IsGrabbing == true) CamRADS.StopGrab();
 
@@ -852,6 +857,20 @@ namespace Root_VEGA_D.Module
 
             // IPU와 통신 중단 시 처리 위한 타이머
             m_timerWaitReconnect.Tick += new EventHandler(WaitReconnectTimerTick);
+
+            // GrabLineScan 이벤트 설정
+            foreach (ModuleRunBase moduleRunBase in m_aModuleRun)
+            {
+                Run_GrabLineScan moduleRun = moduleRunBase as Run_GrabLineScan;
+                if (moduleRun != null)
+                {
+                    moduleRun.LineScanInit += ModuleRun_LineScanInit;
+                    moduleRun.AlignCompleted += Run_GrabLineScan_AlignCompleted;
+                    moduleRun.LineScanStarting += Run_GrabLineScan_LineScanStarting;
+                    moduleRun.LineScanCompleted += Run_GrabLineScan_LineScanCompleted;
+                    moduleRun.LineScanEnd += ModuleRun_LineScanEnd;
+                }
+            }
         }
 
         private void Vision_OnChangeState(eState eState)
@@ -977,6 +996,19 @@ namespace Root_VEGA_D.Module
                                         // IPU에서 이미지 검사 완료되었기 때문에 해당 상태변수 true로 변경
                                         runGrabLineScan.m_bIPUCompleted = true;
                                     }
+                                }
+                            }
+                            break;
+                        case TCPIPComm_VEGA_D.Command.InspStatus:
+                            {
+                                Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+                                if (runGrabLineScan != null)
+                                {
+                                    int nEndLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_INSPENDLINE]);
+                                    
+                                    // Call Line Inspection End Event Function
+                                    if (LineScanStatusChanged != null)
+                                        LineScanStatusChanged(this, runGrabLineScan, LineScanStatus.LineInspCompleted, new int[2] { runGrabLineScan.m_grabMode.m_ScanLineNum, nEndLine });
                                 }
                             }
                             break;
@@ -1144,6 +1176,48 @@ namespace Root_VEGA_D.Module
             AddModuleRunList(new Run_PatternAlign(this), true, "Run Pattern Align");
             m_runPM = AddModuleRunList(new Run_PM(this,(VEGA_D_Handler)m_engineer.ClassHandler()), true, "Run PM");
         }
+        #endregion
+
+        #region Event
+        public delegate void OnLineScanEvent(Vision vision, Run_GrabLineScan moduleRun, LineScanStatus status, object data);
+
+        public enum LineScanStatus
+        {
+            Init,
+            AlignCompleted,
+            LineScanStarting,
+            LineScanCompleted,
+            LineInspCompleted,
+            End,
+        }
+        public event OnLineScanEvent LineScanStatusChanged;
+
+        void Run_GrabLineScan_AlignCompleted(Run_GrabLineScan moduleRun, object data)
+        {
+            if (LineScanStatusChanged != null)
+                LineScanStatusChanged(this, moduleRun, LineScanStatus.AlignCompleted, data);
+        }
+        void Run_GrabLineScan_LineScanStarting(Run_GrabLineScan moduleRun, object data)
+        {
+            if (LineScanStatusChanged != null)
+                LineScanStatusChanged(this, moduleRun, LineScanStatus.LineScanStarting, data);
+        }
+        void Run_GrabLineScan_LineScanCompleted(Run_GrabLineScan moduleRun, object data)
+        {
+            if (LineScanStatusChanged != null)
+                LineScanStatusChanged(this, moduleRun, LineScanStatus.LineScanCompleted, data);
+        }
+        private void ModuleRun_LineScanInit(Run_GrabLineScan moduleRun, object data)
+        {
+            if (LineScanStatusChanged != null)
+                LineScanStatusChanged(this, moduleRun, LineScanStatus.Init, data);
+        }
+        private void ModuleRun_LineScanEnd(Run_GrabLineScan moduleRun, object data)
+        {
+            if (LineScanStatusChanged != null)
+                LineScanStatusChanged(this, moduleRun, LineScanStatus.End, data);
+        }
+
         #endregion
     }
 }

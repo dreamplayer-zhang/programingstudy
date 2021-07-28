@@ -19,6 +19,29 @@ namespace Root_WIND2.UI_User
 
     public delegate void BacksideSetupROIDoneEvent(CPoint centerPt, int radius);
 
+    #region [Center Data]
+    public class BacksideCircleData
+    {
+        public CPoint CenterPoint
+        {
+            get;
+            set;
+        }
+
+        public int Radius
+        {
+            get;
+            set;
+        }
+
+        public BacksideCircleData()
+        {
+            CenterPoint = new CPoint();
+            Radius = 0;
+        }
+    }
+    #endregion
+
     public class BacksideSetup_ImageViewer_ViewModel : RootViewer_ViewModel
     {
         #region [ColorDefines]
@@ -36,6 +59,9 @@ namespace Root_WIND2.UI_User
         }
 
         #endregion
+
+
+
 
         public event BacksideSetupROIDoneEvent ROIDone;
 
@@ -93,49 +119,33 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        private int circleCenterMemX;
-
-        public int CircleCenterMemX
+        public CPoint CircleCenterPoint
         {
             get
             {
-                //int width = this.circleEndMemoryPoint.X - this.circleStartMemoryPoint.X;
-                //int height = this.circleEndMemoryPoint.Y - this.circleStartMemoryPoint.Y;
-                //int radius = width > height ? width : height;
-                //radius = (int)((double)radius * 0.5);
-
-                return this.circleCenterMemX;
-            }
-
-            set
-            {
-                SetProperty(ref this.circleCenterMemX, value);
-            }
-        }
-
-
-        private int circleCenterMemY;
-        public int CircleCenterMemY
-        {
-            get
-            {
-                //int width = this.circleEndMemoryPoint.X - this.circleStartMemoryPoint.X;
-                //int height = this.circleEndMemoryPoint.Y - this.circleStartMemoryPoint.Y;
-                //int radius = width > height ? width : height;
-                //radius = (int)((double)radius * 0.5);
-
-                return this.circleCenterMemY;
+                return this.searchedCenterMemoryPoint;
             }
             set
             {
-                SetProperty(ref this.circleCenterMemY, value);
+                SetProperty(ref this.searchedCenterMemoryPoint, value);
             }
         }
+
+        
 
 
         public bool IsROI
         {
             get => this.p_UIElement.Contains(this.CircleUI);
+        }
+
+        public int InspectionCircleDiameter
+        {
+            get => this.inspectionCircleDiameter;
+            set
+            {
+                SetProperty(ref this.inspectionCircleDiameter, value);
+            }
         }
         #endregion
 
@@ -192,8 +202,16 @@ namespace Root_WIND2.UI_User
             Bottom
         }
 
+        private enum CIRCLE_CENTER_EDIT_STATE
+        {
+            None = 0,
+            Edit
+        }
+
         private CIRCLE_DRAW_STATE circleState = CIRCLE_DRAW_STATE.None;
         private CIRCLE_EDIT_STATE circleEditState = CIRCLE_EDIT_STATE.None;
+
+        private CIRCLE_CENTER_EDIT_STATE circleCenterEditState = CIRCLE_CENTER_EDIT_STATE.None;
 
         private Ellipse CircleUI;
         private Grid CircleEditUI;
@@ -206,7 +224,11 @@ namespace Root_WIND2.UI_User
         //
 
         private Grid SearchedCenterPointUI;
-        private Polygon SearchedCircleUI;
+        private Polygon SearchedCirclePointsUI;
+
+        private int inspectionCircleDiameter = 0;
+        private Ellipse InspectionCircleUI;
+
 
         private CPoint searchedCenterMemoryPoint = new CPoint();
         private List<CPoint> searchedCirclePoints = new List<CPoint>();
@@ -233,7 +255,9 @@ namespace Root_WIND2.UI_User
             CircleUI.Stroke = ColorDefines.Circle;
             CircleUI.StrokeThickness = 1;
             CircleUI.Opacity = 0.5;
-            
+
+            Canvas.SetZIndex(CircleUI, 1);
+
             CircleEditUI = new Grid();
 
             Ellipse CenterPoint = new Ellipse();
@@ -296,17 +320,21 @@ namespace Root_WIND2.UI_User
             BottomPoint.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
             BottomPoint.VerticalAlignment = System.Windows.VerticalAlignment.Bottom;
 
-            Canvas.SetZIndex(CenterPoint, 99);
-            Canvas.SetZIndex(LeftPoint, 99);
-            Canvas.SetZIndex(TopPoint, 99);
-            Canvas.SetZIndex(RightPoint, 99);
-            Canvas.SetZIndex(BottomPoint, 99);
+            //Canvas.SetZIndex(CenterPoint, 97);
+            //Canvas.SetZIndex(LeftPoint, 97);
+            //Canvas.SetZIndex(TopPoint, 97);
+            //Canvas.SetZIndex(RightPoint, 97);
+            //Canvas.SetZIndex(BottomPoint, 97);
+
+            
 
             CircleEditUI.Children.Add(CenterPoint);
             CircleEditUI.Children.Add(LeftPoint);
             CircleEditUI.Children.Add(TopPoint);
             CircleEditUI.Children.Add(RightPoint);
             CircleEditUI.Children.Add(BottomPoint);
+
+            Canvas.SetZIndex(CircleEditUI, 2);
 
             #endregion
 
@@ -331,15 +359,40 @@ namespace Root_WIND2.UI_User
             line2.Stroke = ColorDefines.SearchCenterPoint;
             line2.StrokeThickness = 3;
 
-            Canvas.SetZIndex(line1, 98);
-            Canvas.SetZIndex(line2, 98);
+            //Canvas.SetZIndex(line1, 99);
+            //Canvas.SetZIndex(line2, 99);
+
+            Ellipse circleCenterEditPoint = new Ellipse();
+            circleCenterEditPoint.Width = EditPointSize;
+            circleCenterEditPoint.Height = EditPointSize;
+            circleCenterEditPoint.Fill = Brushes.White;
+            circleCenterEditPoint.Stroke = Brushes.Gray;
+            circleCenterEditPoint.StrokeThickness = 1;
+            circleCenterEditPoint.Cursor = Cursors.SizeAll;
+            circleCenterEditPoint.MouseLeftButtonDown += MouseLeftButtonDown_CircleCenterEditUI_Bottom;
+            circleCenterEditPoint.MouseLeftButtonUp += MouseLeftButtonUp_CircleCenterEditUI_Bottom;
+            circleCenterEditPoint.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            circleCenterEditPoint.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+            //Canvas.SetZIndex(circleCenterEditPoint, 99);
 
             SearchedCenterPointUI.Children.Add(line1);
             SearchedCenterPointUI.Children.Add(line2);
+            SearchedCenterPointUI.Children.Add(circleCenterEditPoint);
 
-            SearchedCircleUI = new Polygon();
-            SearchedCircleUI.Stroke = ColorDefines.SearchCircle;
-            SearchedCircleUI.StrokeThickness = 2;
+            Canvas.SetZIndex(SearchedCenterPointUI, 3);
+
+            SearchedCirclePointsUI = new Polygon();
+            SearchedCirclePointsUI.Stroke = ColorDefines.SearchCircle;
+            SearchedCirclePointsUI.StrokeThickness = 2;
+
+            Canvas.SetZIndex(SearchedCirclePointsUI, 3);
+
+            InspectionCircleUI = new Ellipse();
+            InspectionCircleUI.Stroke = ColorDefines.SearchCenterPoint;
+            InspectionCircleUI.StrokeThickness = 2;
+
+            Canvas.SetZIndex(InspectionCircleUI, 3);
+
             #endregion
 
 
@@ -398,6 +451,17 @@ namespace Root_WIND2.UI_User
         {
             this.circleEditState = CIRCLE_EDIT_STATE.None;
         }
+
+        private void MouseLeftButtonDown_CircleCenterEditUI_Bottom(object sender, MouseEventArgs e)
+        {
+            this.circleCenterEditState = CIRCLE_CENTER_EDIT_STATE.Edit;
+        }
+
+        private void MouseLeftButtonUp_CircleCenterEditUI_Bottom(object sender, MouseEventArgs e)
+        {
+            this.circleCenterEditState = CIRCLE_CENTER_EDIT_STATE.None;
+        }
+
         #endregion
 
         private void DrawCircle()
@@ -458,7 +522,20 @@ namespace Root_WIND2.UI_User
 
         public void DrawSearchedCircle()
         {
-            if(this.p_UIElement.Contains(SearchedCenterPointUI))
+            if(this.p_UIElement.Contains(SearchedCirclePointsUI))
+            {
+                this.SearchedCirclePointsUI.Points.Clear();
+                foreach (CPoint pt in this.searchedCirclePoints)
+                {
+                    CPoint canvasPt = GetCanvasPoint(pt);
+                    this.SearchedCirclePointsUI.Points.Add(new Point(canvasPt.X, canvasPt.Y));
+                }
+            }
+        }
+
+        private void DrawInspectionROI()
+        {
+            if (this.p_UIElement.Contains(SearchedCenterPointUI))
             {
                 CPoint canvasPt = GetCanvasPoint(this.searchedCenterMemoryPoint);
 
@@ -466,14 +543,28 @@ namespace Root_WIND2.UI_User
                 Canvas.SetTop(SearchedCenterPointUI, canvasPt.Y - 15);
             }
 
-            if(this.p_UIElement.Contains(SearchedCircleUI))
+            if (this.p_UIElement.Contains(InspectionCircleUI))
             {
-                this.SearchedCircleUI.Points.Clear();
-                foreach (CPoint pt in this.searchedCirclePoints)
-                {
-                    CPoint canvasPt = GetCanvasPoint(pt);
-                    this.SearchedCircleUI.Points.Add(new Point(canvasPt.X, canvasPt.Y));
-                }
+                CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_BackSideVision.GetGrabMode(GlobalObjects.Instance.Get<RecipeBack>().CameraInfoIndex));
+
+                int diameter = (int)(this.inspectionCircleDiameter * 1000 / camInfo.RealResX);
+                int radius = diameter / 2;
+
+                CPoint canvasCircleStart = GetCanvasPoint(new CPoint(
+                    (int)this.searchedCenterMemoryPoint.X - radius,
+                    (int)this.searchedCenterMemoryPoint.Y - radius));
+
+                CPoint canvasCircleEnd = GetCanvasPoint(new CPoint(
+                    (int)this.searchedCenterMemoryPoint.X + radius,
+                    (int)this.searchedCenterMemoryPoint.Y + radius));
+
+                int canvasDiameter = (int)(canvasCircleEnd.X - canvasCircleStart.X);
+
+                InspectionCircleUI.Width = canvasDiameter;
+                InspectionCircleUI.Height = canvasDiameter;
+
+                Canvas.SetLeft(InspectionCircleUI, canvasCircleStart.X);
+                Canvas.SetTop(InspectionCircleUI, canvasCircleStart.Y);
             }
         }
 
@@ -579,6 +670,7 @@ namespace Root_WIND2.UI_User
                 tRect.MemoryRect.Right = rt.Right;
                 tRect.MemoryRect.Bottom = rt.Bottom;
 
+                Canvas.SetZIndex(rtUI, 2);
                 mapRectList.Add(tRect);
                 p_DrawElement.Add(rtUI);
             }
@@ -654,24 +746,28 @@ namespace Root_WIND2.UI_User
         public void SetSearchedCenter(CPoint memPt)
         {
             this.searchedCenterMemoryPoint = memPt;
-            if (this.p_UIElement.Contains(SearchedCenterPointUI))
-                this.p_UIElement.Remove(SearchedCenterPointUI);
+            if (!this.p_UIElement.Contains(SearchedCenterPointUI))
+            {
+                this.p_UIElement.Add(SearchedCenterPointUI);
+            }
 
-            //Canvas.SetZIndex(this.SearchedCenterPointUI, 99);
-            this.p_UIElement.Add(SearchedCenterPointUI);
+            if (!this.p_UIElement.Contains(InspectionCircleUI))
+            {
+                this.p_UIElement.Add(InspectionCircleUI);
 
+            }
 
-
-            DrawSearchedCircle();
+            DrawInspectionROI();
         }
 
         public void SetSearchedCirclePoints(List<CPoint> points)
         {
             this.searchedCirclePoints = points;
-            if (this.p_UIElement.Contains(SearchedCircleUI))
-                this.p_UIElement.Remove(SearchedCircleUI);
+            if (this.p_UIElement.Contains(SearchedCirclePointsUI))
+                this.p_UIElement.Remove(SearchedCirclePointsUI);
 
-            this.p_UIElement.Add(SearchedCircleUI);
+
+            this.p_UIElement.Add(SearchedCirclePointsUI);
 
             DrawSearchedCircle();
         }
@@ -683,6 +779,8 @@ namespace Root_WIND2.UI_User
             DrawCircle();
             DrawCircleEdit();
             DrawSearchedCircle();
+
+            DrawInspectionROI();
 
             // Polygon
             DrawExclusivePolygon();
@@ -711,6 +809,15 @@ namespace Root_WIND2.UI_User
             if (this.IsPolyChecked == true)
             {
                 AddExclusivePolygonPoint(memPt);
+            }
+
+
+            if(this.circleCenterEditState == CIRCLE_CENTER_EDIT_STATE.Edit)
+            {
+                searchedCenterMemoryPoint.X = memPt.X;
+                searchedCenterMemoryPoint.Y = memPt.Y;
+
+                DrawInspectionROI();
             }
 
             if(this.circleEditState == CIRCLE_EDIT_STATE.None)
@@ -788,6 +895,14 @@ namespace Root_WIND2.UI_User
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
+                if(this.circleCenterEditState == CIRCLE_CENTER_EDIT_STATE.Edit)
+                {
+                    searchedCenterMemoryPoint.X = memPt.X;
+                    searchedCenterMemoryPoint.Y = memPt.Y;
+
+                    DrawInspectionROI();
+                }
+
                 switch (circleEditState)
                 {
                     case CIRCLE_EDIT_STATE.None:
@@ -964,11 +1079,18 @@ namespace Root_WIND2.UI_User
                     this.p_UIElement.Remove(this.CircleEditUI);
                 }
 
-                if(this.p_UIElement.Contains(this.SearchedCircleUI))
+                if(this.p_UIElement.Contains(this.SearchedCirclePointsUI))
                 {
-                    this.p_UIElement.Remove(this.SearchedCircleUI);
+                    this.p_UIElement.Remove(this.SearchedCirclePointsUI);
                 }
             });
+        }
+
+        public void ClearMapRectList()
+        {
+            this.mapRectList.Clear();
+            this.mapOutterRectList.Clear();
+            this.p_DrawElement.Clear();
         }
 
 
@@ -998,309 +1120,62 @@ namespace Root_WIND2.UI_User
             unsafe
             {
                 int DownSample = 20;
+                int samplingW = memW / DownSample;
+                int samplingH = memH / DownSample;
 
-                fixed (byte* pImg = new byte[(long)(memW / DownSample) * (long)(memH / DownSample)]) // 원본 이미지 너무 커서 안열림
+                fixed (byte* pDst = new byte[(long)(samplingW) * (long)(samplingH)]) // 원본 이미지 너무 커서 안열림
                 {
-                    CLR_IP.Cpp_SubSampling((byte*)mainImage, pImg, memW, memH, 0, 0, memW, memH, DownSample);
+                    CLR_IP.Cpp_SubSampling((byte*)mainImage, pDst, memW, memH, 0, 0, memW, memH, DownSample);
+
+                    byte[] pThreshold = new byte[(long)(samplingW) * (long)(samplingH)];
+
+                    CLR_IP.Cpp_Threshold(pDst, pThreshold, samplingW, samplingH, 0, 0, samplingW, samplingH, false, 80);
 
                     // Param Down Scale
                     centerX /= DownSample; centerY /= DownSample;
                     roiR /= DownSample;
                     memW /= DownSample; memH /= DownSample;
 
-                    circlePoints = CLR_IP.Cpp_FindWaferEdge(pImg,
+                    fixed(byte* ptrThread = pThreshold)
+                    {
+                        circlePoints = CLR_IP.Cpp_FindWaferEdge(ptrThread,
                         &centerX, &centerY,
                         &roiR,
                         memW, memH,
                         1
                         );
+                    }
                 }
 
 
                 // Param Up Scale
-               centerX *= DownSample;
-               centerY *= DownSample;
+                centerX *= DownSample;
+                centerY *= DownSample;
 
                 double outRadius = roiR * DownSample;
-
 
                 PathGeometry geometry = PolygonController.CreatePolygonGeometry(this.ExclusivePolyMemPointsList);
 
                 List<CPoint> points = new List<CPoint>();
-
-                //centerX = 300000 / 4 / 2;
-                //centerY = 300000 / 4 / 2 + 2000;
-
-                int threshold = (int)centerX  + 2000;
-
                 for (int i = 0; i < circlePoints.Length; i++)
                 {
                     CPoint pt = new CPoint(circlePoints[i].x * DownSample, circlePoints[i].y * DownSample);
                     if (!PolygonController.HitTest(geometry, new Point(pt.X, pt.Y)))
                     {
                         double radius = Math.Sqrt(Math.Pow(pt.X - centerX, 2) + Math.Pow(pt.Y - centerY, 2));
-                        if( radius < threshold)
-                        points.Add(pt);
+                        if( radius < outRadius)
+                            points.Add(pt);
                     }
                 }
-
-
 
                 Point centerPt = Tools.FindCircleCenterByPoints(DataConverter.CPointListToPointList(points), (int)centerX, (int)centerY, 100);
 
                 this.SetSearchedCenter(new CPoint((int)centerPt.X, (int)centerPt.Y));
                 this.SetSearchedCirclePoints(points);
 
-                //List<CRect> rectOutterList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, true);
 
-                List<CRect> rectList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, false);
-
-                this.SetMapRectList(rectList, new List<CRect>());
             }
         }
-
-        public List<CRect> CalcDiePosition(int centerX, int centerY)
-        {
-            CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_BackSideVision.GetGrabMode(GlobalObjects.Instance.Get<RecipeBack>().CameraInfoIndex));
-
-            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
-            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
-            int[] mapData = waferMap.Data;
-
-            int MasterDieX = waferMap.MasterDieX;
-            int MasterDieY = waferMap.MasterDieY;
-
-            int originDieX = waferMap.OriginDieX;
-            int originDieY = waferMap.OriginDieY;
-
-            int mapSizeX = waferMap.MapSizeX;
-            int mapSizeY = waferMap.MapSizeY;
-            double diePitchX = waferMap.DiePitchX / camInfo.RealResX;
-            double diePitchY = waferMap.DiePitchY / camInfo.RealResY;
-            double sampleCenterX = waferMap.SampleCenterLocationX;
-            double sampleCenterY = waferMap.SampleCenterLocationY;
-
-            List<CRect> rectList = new List<CRect>();
-
-            int originX = (int)(centerX + sampleCenterX);
-            int originY = (int)(centerY - sampleCenterY);
-
-            for (int x = 0; x < mapSizeX; x++)
-            {
-                for (int y = 0; y < mapSizeY; y++)
-                {
-                    if (mapData[y * mapSizeX + x] == 1)
-                    {
-                        int left = (int)(originX - (originDieX - x) * diePitchX);
-                        int right = (int)(originX - (originDieX - x - 1) * diePitchX);
-                        int top = (int)(originY - (originDieY - y) * diePitchY);
-                        int bottom = (int)(originY - (originDieY - y - 1) * diePitchY);
-
-                        rectList.Add(new CRect(left, top, right, bottom));
-
-                        if (x == MasterDieX && y == MasterDieY)
-                        {
-                            originRecipe.OriginX = left;
-                            originRecipe.OriginY = bottom;
-                        }
-                    }
-                }
-            }
-
-
-            BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
-
-            backsideRecipe.CenterX = centerX;
-            backsideRecipe.CenterY = centerY;
-
-            return rectList;
-        }
-
-        public List<CRect> CalcDiePosition(int centerX, int centerY, bool isPartialDie)
-        {
-            CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_BackSideVision.GetGrabMode(GlobalObjects.Instance.Get<RecipeBack>().CameraInfoIndex));
-
-            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
-            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
-            int[] mapData = waferMap.Data;
-
-            int MasterDieX = waferMap.MasterDieX;
-            int MasterDieY = waferMap.MasterDieY;
-
-            int originDieX = waferMap.OriginDieX;
-            int originDieY = waferMap.OriginDieY;
-
-            double diePitchX = waferMap.DiePitchX / camInfo.RealResX;
-            double diePitchY = waferMap.DiePitchY / camInfo.RealResY;
-
-            originRecipe.DiePitchX = (int)diePitchX;
-            originRecipe.DiePitchY = (int)diePitchY;
-
-            double sampleCenterX = waferMap.SampleCenterLocationX;
-            double sampleCenterY = waferMap.SampleCenterLocationY;
-
-            int mapSizeX = waferMap.MapSizeX;
-            int mapSizeY = waferMap.MapSizeY;
-
-            double radius = 150000 / camInfo.RealResX;
-            double radius_2 = radius * radius;
-
-
-            List<CRect> rectList = new List<CRect>();
-
-            int originX = (int)(centerX + sampleCenterX);
-            int originY = (int)(centerY - sampleCenterY);
-
-            if(isPartialDie)
-            {
-                double left_remain_X = (centerX - sampleCenterX) - (originDieX * diePitchX);
-                double top_remain_y = (centerY - sampleCenterY) - (originDieY * diePitchY);
-
-                double right_remain_X = (centerX - sampleCenterX) - ((mapSizeX - originDieX) * diePitchX);
-                double bottom_remain_y = (centerY - sampleCenterY) - ((mapSizeY - originDieY) * diePitchY);
-
-
-                int dieLeftCount = 0, dieRightCount = 0, dieTopCount = 0, dieBottomCount = 0;
-                if (left_remain_X > 0)
-                {
-                    dieLeftCount = (int)Math.Ceiling(left_remain_X / diePitchX);
-                }
-
-                if (top_remain_y > 0)
-                {
-                    dieTopCount = (int)Math.Ceiling(top_remain_y / diePitchY);
-                }
-
-                if (right_remain_X > 0)
-                {
-                    dieRightCount = (int)Math.Ceiling(right_remain_X / diePitchX);
-                }
-
-                if (bottom_remain_y > 0)
-                {
-                    dieBottomCount = (int)Math.Ceiling(bottom_remain_y / diePitchY);
-                }
-
-
-                int originMapSizeX = mapSizeX;
-                int originMapSizeY = mapSizeY;
-                mapSizeX += (dieLeftCount + dieRightCount);
-                mapSizeY += (dieTopCount + dieBottomCount);
-
-                originDieX += dieLeftCount;
-                originDieY += dieTopCount;
-
-                for (int x = 0; x < mapSizeX; x++)
-                {
-                    for (int y = 0; y < mapSizeY; y++)
-                    {
-                        int rel_x = (x - originDieX); // 원점 중심좌표로 Right/Top방향이 +
-                        int rel_y = (originDieY - y);
-
-                        int left = (int)(originX + rel_x * diePitchX);
-                        int right = (int)(originX + (rel_x + 1) * diePitchX);
-                        int top = (int)(originY - (rel_y) * diePitchY);
-                        int bottom = (int)(originY - (rel_y - 1) * diePitchY);
-
-
-                        int map_x = x - dieLeftCount;
-                        int map_y = y - dieTopCount;
-                        if(map_x >= 0 && map_y >= 0 && 
-                            map_x < originMapSizeX && map_y < originMapSizeY)
-                        {
-                            if (mapData[map_y * originMapSizeX + map_x] == 1)
-                                continue;
-                        }
-
-                        if (rel_x >= 0 && rel_y >= 0) // 제 1사분면
-                        {
-                            // 다이의 좌하단이 포함
-                            if( Math.Pow(left - centerX, 2) + Math.Pow(bottom - centerY, 2) < radius_2)
-                            {
-                                rectList.Add(new CRect(left, top, right, bottom));
-                            }
-
-                        }
-                        else if(rel_x < 0 && rel_y >= 0) // 제 2사분면
-                        {
-                            // 다이의 우하단이 포함
-                            if (Math.Pow(right - centerX, 2) + Math.Pow(bottom - centerY, 2) < radius_2)
-                            {
-                                rectList.Add(new CRect(left, top, right, bottom));
-                            }
-                        }
-                        else if(rel_x < 0 && rel_y < 0) // 제 3사분면
-                        {
-                            // 다이의 우상단이 포함
-                            if (Math.Pow(right - centerX, 2) + Math.Pow(top - centerY, 2) < radius_2)
-                            {
-                                rectList.Add(new CRect(left, top, right, bottom));
-                            }
-                        }
-                        else //제 4사분면
-                        {
-                            // 다이의 좌상단이 포함
-                            if (Math.Pow(left - centerX, 2) + Math.Pow(top - centerY, 2) < radius_2)
-                            {
-                                rectList.Add(new CRect(left, top, right, bottom));
-                            }
-                        }
-
-
-                        //int map_x = x - dieLeftCount;
-                        //int map_y = y - dieTopCount;
-
-
-                        //if (mapData[y * mapSizeX + x] == 1)
-                        //{
-
-
-                        //    rectList.Add(new CRect(left, top, right, bottom));
-
-                        //    if (x == MasterDieX && y == MasterDieY)
-                        //    {
-                        //        originRecipe.OriginX = left;
-                        //        originRecipe.OriginY = bottom;
-                        //    }
-                        //}
-                    }
-                }
-
-            }
-            else
-            {
-                // Normal
-                for (int x = 0; x < mapSizeX; x++)
-                {
-                    for (int y = 0; y < mapSizeY; y++)
-                    {
-                        if (mapData[y * mapSizeX + x] == 1)
-                        {
-                            int left = (int)(originX - (originDieX - x) * diePitchX);
-                            int right = (int)(originX - (originDieX - x - 1) * diePitchX);
-                            int top = (int)(originY - (originDieY - y) * diePitchY);
-                            int bottom = (int)(originY - (originDieY - y - 1) * diePitchY);
-
-                            rectList.Add(new CRect(left, top, right, bottom));
-
-                            if (x == MasterDieX && y == MasterDieY)
-                            {
-                                originRecipe.OriginX = left;
-                                originRecipe.OriginY = bottom;
-                            }
-                        }
-                    }
-                }
-            }
-
-            BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
-
-            backsideRecipe.CenterX = centerX;
-            backsideRecipe.CenterY = centerY;
-
-            return rectList;
-        }
-
 
 
         public RelayCommand btnSavePolyCommand
@@ -1372,9 +1247,12 @@ namespace Root_WIND2.UI_User
 
                     using (StreamWriter wr = new StreamWriter(Constants.FilePath.BacksideCenterPointFilePath))
                     {
-                       
-                        XmlSerializer xs = new XmlSerializer(typeof(CPoint));
-                        xs.Serialize(wr, this.searchedCenterMemoryPoint);
+                        BacksideCircleData data = new BacksideCircleData();
+                        data.CenterPoint = this.searchedCenterMemoryPoint;
+                        data.Radius = this.inspectionCircleDiameter;
+
+                        XmlSerializer xs = new XmlSerializer(typeof(BacksideCircleData));
+                        xs.Serialize(wr, data);
                     }
                 }
             }
@@ -1392,8 +1270,11 @@ namespace Root_WIND2.UI_User
                 {        
                     using (var sr = new StreamReader(Constants.FilePath.BacksideCenterPointFilePath))
                     {
-                        XmlSerializer xs = new XmlSerializer(typeof(CPoint));
-                        CPoint centerPt = (CPoint)xs.Deserialize(sr);
+                        
+                        XmlSerializer xs = new XmlSerializer(typeof(BacksideCircleData));
+                        BacksideCircleData data = (BacksideCircleData)xs.Deserialize(sr);
+                        CPoint centerPt = data.CenterPoint;
+                        this.InspectionCircleDiameter = data.Radius;
 
                         SetSearchedCenter(centerPt);
                     }

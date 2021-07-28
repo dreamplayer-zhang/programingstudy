@@ -53,7 +53,10 @@ namespace RootTools.Comm
             set
             {
                 if ((m_sp != null) == value) return;
-                m_log.Info(p_id + " Connect -> " + value.ToString());
+
+                if(m_log != null)
+                    m_log.Info(p_id + " Connect -> " + value.ToString());
+                
                 if (value)
                 {
                     _sInfo = Connect();

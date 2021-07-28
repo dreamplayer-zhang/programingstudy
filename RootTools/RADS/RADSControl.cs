@@ -1,15 +1,17 @@
-﻿using RootTools.Trees;
+﻿using RootTools.Comm;
+using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Timers;
 using System.Windows.Controls;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace RootTools.RADS
 {
-	public class RADSControl : ObservableObject, ITool
+    public class RADSControl : ObservableObject, ITool
 	{
 		public string p_id { get; set; }
 		Log m_log;
@@ -25,9 +27,16 @@ namespace RootTools.RADS
 			//if (bUseRADS == true)
 			//{
 			//	p_treeRoot = p_connect.p_CurrentController.p_TreeRoot;
+
+			m_tickTime = DateTime.Now;
+
 			m_timer = new Timer(100);
 			m_timer.Elapsed += Timer_Elapsed;
+			m_timer.Start();
 			//}
+
+			InitRS232();
+			m_rs232.p_bConnect = true;
 		}
 
 		#region Tree
@@ -46,9 +55,16 @@ namespace RootTools.RADS
 			{
 				RADSControl_UI ui = new RADSControl_UI();
 				ui.Init(this);
+				
+				if(ui.m_voltPoints != null)
+					m_voltPoints = ui.m_voltPoints;
+
 				return (UserControl)ui;
 			}
 		}
+
+		DataPointCollection m_voltPoints = null;
+
 		#endregion
 
 		#region EventHandler
@@ -122,6 +138,31 @@ namespace RootTools.RADS
 		}
 		#endregion
 
+		#region RS232
+		public RS232byte m_rs232;
+		void InitRS232()
+		{
+			m_rs232 = new RS232byte(p_id, m_log);
+			m_rs232.OnReceive += M_rs232_OnReceive;
+		}
+
+		private void M_rs232_OnReceive(byte[] aRead, int nRead)
+		{
+			if (nRead > 0)
+			{
+				if (aRead[0] == 165)
+				{
+					byte b1 = aRead[1];
+					byte b2 = aRead[2];
+					int nVal = b1 << 8 | b2;
+
+					int nVoltage = 150 * nVal / 0x7600;
+					p_nVoltage = nVoltage;
+				}
+			}
+		}
+		#endregion
+
 		public Timer m_timer { get; set; }
 
 		RADSConnectControl m_connect;
@@ -153,12 +194,28 @@ namespace RootTools.RADS
 				SetProperty(ref m_nAdsData, value);
             }
         }
-		
+
+		int m_nVoltage = 0;
+		public int p_nVoltage
+		{
+			get { return m_nVoltage; }
+			set
+			{
+				SetProperty(ref m_nVoltage, value);
+			}
+		}
+
 		private void OnSearchComplete()
 		{
 			if (this.SearchComplete != null)
 				this.SearchComplete();
 		}
+
+		List<int> m_lstVoltageLog = new List<int>();
+
+		DateTime m_tickTime;
+		double m_dVoltageSum = 0;
+		double m_dElapsedTime = 0;
 
 		private void Timer_Elapsed(object sender, ElapsedEventArgs e)
 		{
@@ -182,14 +239,59 @@ namespace RootTools.RADS
 				{
 					p_IsRun = true;
                     p_nAdsData = p_connect.p_CurrentController.p_ADS_data;
-                    //Console.WriteLine("AdsData : {0}", p_nAdsData);
+					//Console.WriteLine("AdsData : {0}", p_nAdsData);
 				}
-
 			}
 			else
 			{
 				//Console.WriteLine("You're not ready!");
 			}
+
+			if(m_rs232.p_bConnect)
+            {
+				// 분당 평균 Voltage 로그 작성
+				TimeSpan diffTime = e.SignalTime - m_tickTime;
+				m_dElapsedTime += diffTime.TotalMilliseconds;
+				m_dVoltageSum += p_nVoltage * diffTime.TotalMilliseconds;
+
+				if (m_dElapsedTime > 10 * 1000)
+				{
+					double dAvr = m_dVoltageSum / m_dElapsedTime;
+					m_log.Info(string.Format("Average Voltage: {0}", dAvr.ToString(".00")));
+
+					m_dVoltageSum = 0;
+					m_dElapsedTime = 0;
+				}
+
+				m_tickTime = e.SignalTime;
+
+				// 100개의 Voltage 데이터가 모일 때마다 별도 파일로 로그 작성
+				m_lstVoltageLog.Add(p_nVoltage);
+				if(m_lstVoltageLog.Count >= 100)
+                {
+					WriteVoltageLog();
+
+					m_lstVoltageLog.Clear();
+                }
+			}
+		}
+
+		void WriteVoltageLog()
+		{
+			DateTime dt = DateTime.Now;
+			string sPath = LogView._logView.p_sPath;
+
+			if(!Directory.Exists(sPath + "\\RADS_Voltage"))
+				Directory.CreateDirectory(sPath + "\\RADS_Voltage");
+
+			string strFile = sPath + "\\RADS_Voltage" + "\\" + dt.ToShortDateString() + ".txt";
+			string strTime = dt.Hour.ToString("00") + '.' + dt.Minute.ToString("00") + '.' + dt.Second.ToString("00") + '.' + dt.Millisecond.ToString("000");
+
+			using (StreamWriter writer = new StreamWriter(strFile, true, Encoding.Default))
+            {
+				string strValues = string.Join(", ", m_lstVoltageLog.ToArray());
+				writer.WriteLine(strTime + "\t" + strValues);
+            }
 		}
 
 		public void Dispose()
@@ -213,6 +315,11 @@ namespace RootTools.RADS
 
 		public void StartRADS()
 		{
+			m_tickTime = DateTime.Now;
+
+			m_timer.Start();
+			p_IsRun = true;
+
 			if (p_connect.Start())
 			{
 				p_connect.ChangeViewStatus(true);
@@ -223,6 +330,15 @@ namespace RootTools.RADS
 
 		public void StopRADS()
 		{
+			m_dVoltageSum = 0;
+			m_dElapsedTime = 0;
+
+			WriteVoltageLog();
+			m_lstVoltageLog.Clear();
+
+			m_timer.Stop();
+			p_IsRun = false;
+
 			if (p_connect.Stop())
 			{
 				p_connect.ChangeViewStatus(false);

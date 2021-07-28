@@ -1,0 +1,516 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.Operating_Panel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             mc:Ignorable="d" Background="{StaticResource MainBackGroundColor}" 
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+           
+             d:DesignHeight="1000" d:DesignWidth="2000">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2.5*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+
+            </Grid.RowDefinitions>
+            <Border Background="{StaticResource MainThema}" CornerRadius="10" Margin="5" Padding="15,10,15,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.5*"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="2*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Progress" Style="{StaticResource HeaderTextBlock}" Margin="0" Foreground="White"/>
+                        <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Center"
+                      X2="1"/>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.1*"/>
+                            <RowDefinition Height="0.1*"/>
+                            <RowDefinition Height="0.1*"/>
+                            <RowDefinition Height="0.1*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Total Progress" Style="{StaticResource HeaderTextBlock}" Margin="0" Foreground="White"/>
+                        <ProgressBar Grid.Row="1"/>
+                        <UniformGrid Grid.Row="2" Rows="1">
+                            <TextBlock Text="Need"  HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                            <TextBlock Text="00:00:00" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                        </UniformGrid>
+                        <UniformGrid Grid.Row="3" Rows="1">
+                            <TextBlock Text="Run" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+                            <TextBlock Text="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+
+                        </UniformGrid>
+                    </Grid>
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Particle Counter" Style="{StaticResource HeaderTextBlock}" Margin="0" Foreground="White"/>
+                            <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Center"
+                      X2="1"/>
+                        </Grid>
+                        <TextBlock Grid.Row="1" Text="Total Progress" Foreground="White" VerticalAlignment="Center"/>
+                        <ProgressBar Grid.Row="2"/>
+                        <TextBlock Grid.Row="3" Text="Sub Progress" Foreground="White" VerticalAlignment="Center"/>
+                        <ProgressBar Grid.Row="4"/>
+
+                    </Grid>
+                    <Grid Grid.Row="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Vision" Style="{StaticResource HeaderTextBlock}" Margin="10,0,0,0" Foreground="White"/>
+                            <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Center"
+                      X2="1"/>
+                        </Grid>
+                        <TextBlock Grid.Row="1" Text="Total Progress" Foreground="White" VerticalAlignment="Center"/>
+                        <ProgressBar Grid.Row="2"/>
+                        <TextBlock Grid.Row="3" Text="Sub Progress" Foreground="White" VerticalAlignment="Center"/>
+                        <ProgressBar Grid.Row="4"/>
+                    </Grid>
+
+                </Grid>
+            </Border>
+            <Border Grid.Row="1" Background="{StaticResource MainThema}" CornerRadius="10" Margin="5" Padding="15,10,15,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1.8*"/>
+                        <RowDefinition Height="5*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="ID Reading" Style="{StaticResource HeaderTextBlock}" Margin="0" Foreground="White"/>
+                        <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Center"
+                      X2="1"/>
+                    </Grid>
+                    <UniformGrid Grid.Row="1" Rows="5">
+                        <TextBlock Text="RFID" Foreground="White"/>
+                        <TextBlock Text="-" Foreground="White"/>
+                        <TextBlock Text="Dome Upside" Foreground="White"/>
+                        <TextBlock Text="-" Foreground="White"/>
+                        <TextBlock Text="Dome Side" Foreground="White"/>
+                        <TextBlock Text="-" Foreground="White"/>
+                        <TextBlock Text="EIP Cover BCD" Foreground="White"/>
+                        <TextBlock Text="-" Foreground="White"/>
+                        <TextBlock Text="EIP BasePlate BCD" Foreground="White"/>
+                        <TextBlock Text="-" Foreground="White"/>
+                    </UniformGrid>
+                </Grid>
+            </Border>
+            <Border Grid.Row="2" Background="{StaticResource MainThema}" CornerRadius="10" Margin="5" Padding="15,10,15,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="5*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="FDC" Style="{StaticResource HeaderTextBlock}" Margin="0" Foreground="White"/>
+                        <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Center"
+                      X2="1"/>
+                    </Grid>
+                    <UniformGrid Grid.Row="1" Rows="1">
+                        <UniformGrid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="4*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="CDA" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Foreground="White"/>
+                                <UniformGrid Grid.Row="2" Rows="1">
+                                    <TextBlock/>
+                                    <TextBlock Text="MPa" VerticalAlignment="Center" Foreground="White"/>
+                                </UniformGrid>
+                            </Grid>
+                        </UniformGrid>
+                        <UniformGrid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="4*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="VAC" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Foreground="White"/>
+                                <UniformGrid Grid.Row="2" Rows="1">
+                                    <TextBlock/>
+                                    <TextBlock Text="kPa" VerticalAlignment="Center" Foreground="White"/>
+                                </UniformGrid>
+                            </Grid>
+                        </UniformGrid>
+                        <UniformGrid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="4*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Static" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Foreground="White"/>
+                                <UniformGrid Grid.Row="2" Rows="1">
+                                    <TextBlock/>
+                                    <TextBlock Text="V" VerticalAlignment="Center" Foreground="White"/>
+                                </UniformGrid>
+                            </Grid>
+                        </UniformGrid>
+                        <UniformGrid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="4*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Temp" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Foreground="White"/>
+                                <UniformGrid Grid.Row="2" Rows="1">
+                                    <TextBlock/>
+                                    <TextBlock Text="&#186;C" VerticalAlignment="Center" Foreground="White"/>
+                                </UniformGrid>
+                            </Grid>
+                        </UniformGrid>
+                    </UniformGrid>
+                </Grid>
+            </Border>
+            <Border Grid.Row="3" Background="{StaticResource MainThema}" CornerRadius="10" Margin="5" Padding="15,10,15,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="5*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="FFU" Style="{StaticResource HeaderTextBlock}" Margin="0" Foreground="White"/>
+                        <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Center"
+                      X2="1"/>
+                    </Grid>
+                    <UniformGrid Grid.Row="1" Rows="1">
+                        <UniformGrid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="4*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="EOP 1" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Foreground="White"/>
+                                <UniformGrid Grid.Row="2" Rows="1">
+                                    <TextBlock/>
+                                    <TextBlock Text="RPM" VerticalAlignment="Center" Foreground="White"/>
+                                </UniformGrid>
+                            </Grid>
+                        </UniformGrid>
+                        <UniformGrid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="4*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="EOP 2" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Foreground="White"/>
+                                <UniformGrid Grid.Row="2" Rows="1">
+                                    <TextBlock/>
+                                    <TextBlock Text="RPM" VerticalAlignment="Center" Foreground="White"/>
+                                </UniformGrid>
+                            </Grid>
+                        </UniformGrid>
+                        <UniformGrid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="4*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Static" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Foreground="White"/>
+                                <UniformGrid Grid.Row="2" Rows="1">
+                                    <TextBlock/>
+                                    <TextBlock Text="V" VerticalAlignment="Center" Foreground="White"/>
+                                </UniformGrid>
+                            </Grid>
+                        </UniformGrid>
+                        <UniformGrid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="4*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Temp" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Foreground="White"/>
+                                <UniformGrid Grid.Row="2" Rows="1">
+                                    <TextBlock/>
+                                    <TextBlock Text="&#186;C" VerticalAlignment="Center" Foreground="White"/>
+                                </UniformGrid>
+                            </Grid>
+                        </UniformGrid>
+                    </UniformGrid>
+                </Grid>
+            </Border>
+
+        </Grid>
+        <Grid Grid.Column="1">
+            <TabControl Style="{StaticResource ImageViewerTabControlStyle}" SelectedIndex="{Binding SelectedTab}">
+                <TabItem Header="Particle Counter" Style="{StaticResource ImageViewerTabItemStyle}">
+                    <TabControl Style="{StaticResource ImageViewerTabControlStyle}">
+                        <TabItem Header="EIP Cover" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <local:NozzleState DataContext="{Binding CoverFrontNozzle}" Grid.Column="0"/>
+                                <local:NozzleState DataContext="{Binding CoverBackNozzle}" Grid.Column="1"/>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="EIP BasePlate" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <local:NozzleState DataContext="{Binding PlateFrontNozzle}" Grid.Column="0"/>
+                                <local:NozzleState DataContext="{Binding PlateBackNozzle}" Grid.Column="1"/>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="EOP" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <local:NozzleState DataContext="{Binding EOPDomeNozzle}" Grid.Column="0"/>
+                                <local:NozzleState DataContext="{Binding EOPDoorNozzle}" Grid.Column="1"/>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </TabItem>
+                <TabItem Header="EIP Cover Front" Style="{StaticResource ImageViewerTabItemStyle}">
+                    <TabControl Style="{StaticResource ImageViewerTabControlStyle}">
+                        <TabItem Header="Particle" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <tools:RootViewer DataContext="{Binding CoverFrontParticle}"/>
+                        </TabItem>
+                        <TabItem Header="Stain" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <tools:RootViewer DataContext="{Binding CoverFrontStain}"/>
+                        </TabItem>
+                        <TabItem Header="Side" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <local:RecipeSideImageViewers_Panel DataContext="{Binding EIPCoverViewers}"/>
+                        </TabItem>
+                    </TabControl>
+                </TabItem>
+                <TabItem Header="EIP Cover Back" Style="{StaticResource ImageViewerTabItemStyle}">
+                    <TabControl Style="{StaticResource ImageViewerTabControlStyle}">
+                        <TabItem Header="Particle" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <tools:RootViewer DataContext="{Binding CoverBackParticle}"/>
+                        </TabItem>
+                        <TabItem Header="High Res" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <tools:RootViewer DataContext="{Binding CoverBackHighRes}"/>
+                        </TabItem>
+                        <TabItem Header="Stain" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <tools:RootViewer DataContext="{Binding CoverBackStain}"/>
+                        </TabItem>
+                    </TabControl>
+                </TabItem>
+                <TabItem Header="EIP BasePlate Front" Style="{StaticResource ImageViewerTabItemStyle}">
+                    <TabControl Style="{StaticResource ImageViewerTabControlStyle}">
+                        <TabItem Header="Particle" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <tools:RootViewer DataContext="{Binding PlateFrontParticle}"/>
+                        </TabItem>
+                        <TabItem Header="High Res" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <tools:RootViewer DataContext="{Binding PlateFrontHighRes}"/>
+                        </TabItem>
+                        <TabItem Header="Stain" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <tools:RootViewer DataContext="{Binding PlateFrontStain}"/>
+                        </TabItem>
+                        <TabItem Header="Side" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <local:RecipeSideImageViewers_Panel DataContext="{Binding EIPPlateViewers}"/>
+                        </TabItem>
+                    </TabControl>
+                </TabItem>
+                <TabItem Header="EIP BasePlate Back" Style="{StaticResource ImageViewerTabItemStyle}">
+                    <TabControl Style="{StaticResource ImageViewerTabControlStyle}">
+                        <TabItem Header="Particle" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <tools:RootViewer DataContext="{Binding PlateBackParticle}"/>
+                        </TabItem>
+                        <TabItem Header="Stain" Style="{StaticResource ImageViewerTabItemStyle}">
+                            <tools:RootViewer DataContext="{Binding PlateBackStain}"/>
+                        </TabItem>
+                    </TabControl>
+                </TabItem>
+            </TabControl>
+        </Grid>
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="{StaticResource MainThema}" CornerRadius="10" Margin="5" Padding="15,10,15,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="13*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Module State" Style="{StaticResource HeaderTextBlock}" Margin="0" Foreground="White"/>
+                        <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Center"
+                      X2="1"/>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="EQ" Foreground="White" VerticalAlignment="Center"/>
+                            <Border Grid.Row="1" Background="{StaticResource MainBackGroundColor}" CornerRadius="10">
+                                <UniformGrid Rows="1">
+                                    <TextBlock Text="Error" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Initial" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </UniformGrid>
+                            </Border>
+                            <TextBlock Grid.Row="2" Text="RTR" VerticalAlignment="Center" Foreground="White"/>
+                            <Border Grid.Row="3" BorderBrush="{StaticResource MainBackGroundColor}" BorderThickness="2" CornerRadius="10">
+                                <TextBlock Text="Init" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource MainBackGroundColor}"/>
+                            </Border>
+                            <TextBlock Grid.Row="4" Text="EOP" VerticalAlignment="Center" Foreground="White"/>
+                            <Border Grid.Row="5" BorderBrush="{StaticResource MainBackGroundColor}" BorderThickness="2" CornerRadius="10">
+                                <TextBlock Text="Init" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource MainBackGroundColor}"/>
+                            </Border>
+                            <UniformGrid Grid.Row="6" Rows="2">
+                                <TextBlock Text="EIP Plate" VerticalAlignment="Center" Foreground="White"/>
+                                <TextBlock Text="EIP Cover" VerticalAlignment="Center" Foreground="White"/>
+                                <Border BorderBrush="{StaticResource MainBackGroundColor}" BorderThickness="2" CornerRadius="10" Margin="0,0,5,0">
+                                    <TextBlock Text="Init" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource MainBackGroundColor}"/>
+                                </Border>
+                                <Border BorderBrush="{StaticResource MainBackGroundColor}" BorderThickness="2" CornerRadius="10" Margin="5,0,0,0">
+                                    <TextBlock Text="Init" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource MainBackGroundColor}"/>
+                                </Border>
+
+                            </UniformGrid>
+                            <UniformGrid Grid.Row="7" Rows="2">
+                                <TextBlock Text="Vision" VerticalAlignment="Center" Foreground="White"/>
+                                <TextBlock Text="Holder" VerticalAlignment="Center" Foreground="White"/>
+                                <Border BorderBrush="{StaticResource MainBackGroundColor}" BorderThickness="2" CornerRadius="10" Margin="0,0,5,0">
+                                    <TextBlock Text="Init" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource MainBackGroundColor}"/>
+                                </Border>
+                                <Border BorderBrush="{StaticResource MainBackGroundColor}" BorderThickness="2" CornerRadius="10" Margin="5,0,0,0">
+                                    <TextBlock Text="Init" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource MainBackGroundColor}"/>
+                                </Border>
+
+                            </UniformGrid>
+                    </Grid>
+                </Grid>
+            </Border>
+            <Border Grid.Row="1" Background="{StaticResource MainThema}" CornerRadius="10" Margin="5" Padding="15,10,15,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="10*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Task Queue" Style="{StaticResource HeaderTextBlock}" Margin="0" Foreground="White"/>
+                        <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Center"
+                      X2="1"/>
+                    </Grid>
+                    <ListBox IsEnabled="true" Grid.Row="1" Background="Transparent" HorizontalContentAlignment="Stretch" ItemsSource="{Binding TaskQ}">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="IsEnabled" Value="False"/>
+                                <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Height" Value="50"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

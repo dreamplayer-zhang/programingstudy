@@ -55,221 +55,66 @@
     <Grid Background="{StaticResource main_view_background}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="800"/>
-            <ColumnDefinition Width="800"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <GroupBox Header="VRS Camera Viewer" 
                   Margin="4"
                   Style="{StaticResource main_view_groupbox}">
-            <tools:RootViewer DataContext="{Binding p_RootViewer}"></tools:RootViewer>
+            <tools:RootViewer DataContext="{Binding ImageViewerVM}"></tools:RootViewer>
         </GroupBox>
-        <GroupBox Grid.Column="1" Header="Motion Control" Margin="4" Style="{StaticResource main_view_groupbox}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                </Grid.RowDefinitions>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="260"/>
+                <RowDefinition Height="*"/>
+                <!--<RowDefinition Height="*"/>-->
+            </Grid.RowDefinitions>
+            
+            <local:MotionController Grid.Row="0" DataContext="{Binding MotionControllerVM}"/>
+
+            <GroupBox Grid.Row="1" 
+                      Header="Defect Viewer"
+                      Margin="4,0,4,4"
+                      Style="{StaticResource main_view_groupbox}" >
                 <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="32"/>
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.5*"/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="80"/>
                     </Grid.ColumnDefinitions>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="0.2*"/>
-                            <RowDefinition Height="1.2*"/>
-                            <RowDefinition Height="2*"/>
-                        </Grid.RowDefinitions>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Grid>
-                                <RadioButton HorizontalAlignment="Center" VerticalAlignment="Center" GroupName="MoveSpeed" IsChecked="{Binding p_IsSlowCheck}">
-                                    <RadioButton.Content>
-                                        <TextBlock Foreground="{StaticResource groupbox_button_text}" Text="Slow"/>
-                                    </RadioButton.Content>
-                                </RadioButton>
-                            </Grid>
-                            <Grid Grid.Column="1">
-                                <RadioButton HorizontalAlignment="Center" VerticalAlignment="Center" GroupName="MoveSpeed">
-                                    <RadioButton.Content>
-                                        <TextBlock Foreground="{StaticResource groupbox_button_text}" Text="Fast"/>
-                                    </RadioButton.Content>
-                                </RadioButton>
-                            </Grid>
-                        </Grid>
-                        <Grid Grid.Row="1">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="0.3*"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="0.5*"/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="XY" Style="{StaticResource group_box_item_name_text}"></TextBlock>
-                                <Border Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="3" BorderBrush="White" BorderThickness="1"/>
-                                <TextBlock Text="Z" Grid.Column="4" Style="{StaticResource group_box_item_name_text}"></TextBlock>
-                                <Border Grid.Row="1" Grid.Column="4" Grid.RowSpan="2" BorderBrush="White" BorderThickness="1"/>
-                                <Button Grid.Row="1" Grid.Column="1" Margin="3" Style="{StaticResource button_selectmode}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                            <i:InvokeCommandAction Command="{Binding CmdAxisYMoveUp}" />
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                            <i:InvokeCommandAction Command="{Binding CmdYStop}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Button>
-                                <Button Grid.Row="2" Grid.Column="0" Margin="3" Style="{StaticResource button_selectmode}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                            <i:InvokeCommandAction Command="{Binding CmdAxisXMoveLeft}" />
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                            <i:InvokeCommandAction Command="{Binding CmdXStop}"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Button>
-                                <Button Grid.Row="2" Grid.Column="1" Margin="3" Style="{StaticResource button_selectmode}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                            <i:InvokeCommandAction Command="{Binding CmdAxisYMoveDown}" />
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                            <i:InvokeCommandAction Command="{Binding CmdYStop}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Button>
-                                <Button Grid.Row="2" Grid.Column="2" Margin="3" Style="{StaticResource button_selectmode}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                            <i:InvokeCommandAction Command="{Binding CmdAxisXMoveRight}" />
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                            <i:InvokeCommandAction Command="{Binding CmdXStop}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Button>
-                                <Button Grid.Row="1" Grid.Column="4" Margin="3" Style="{StaticResource button_selectmode}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                            <i:InvokeCommandAction Command="{Binding CmdAxisZMoveUp}" />
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                            <i:InvokeCommandAction Command="{Binding CmdZStop}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Button>
-                                <Button Grid.Row="2" Grid.Column="4" Margin="3" Style="{StaticResource button_selectmode}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                            <i:InvokeCommandAction Command="{Binding CmdAxisZMoveDown}" />
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                            <i:InvokeCommandAction Command="{Binding CmdZStop}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Button>
-                            </Grid>
-                        </Grid>
-                        <!--<UniformGrid Grid.Row="1" Rows="2" Columns="3">
-                            <Button Content="Axis Home" Margin="3" Style="{StaticResource button_selectmode}"/>
-                            <Button Content="Set Pos" Margin="3" Style="{StaticResource button_selectmode}"/>
-                            <Button Content="Repeat" Margin="3" Style="{StaticResource button_selectmode}"/>
-                        </UniformGrid>-->
-                        <Grid Grid.Row="2">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="0.1*"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="Light" Style="{StaticResource group_box_item_name_text}"/>
-                            <Border Grid.Row="1" BorderBrush="White" BorderThickness="1"></Border>
-                            <Grid Grid.Row="1">
-                        
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                    <Grid Grid.Column="1">
-                      
-                        <!--<local:MotionControlViewer/>-->
-                    </Grid>
+                    <TextBlock Grid.Row="0"
+                               Text="Inspection ID"  
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Center"/>
+                    <TextBox Margin="4,4,4,0"
+                             Grid.Row="0"
+                             Grid.Column="1"
+                             VerticalContentAlignment="Center"
+                             Text="{Binding InspectionID, Mode=TwoWay}"/>
+                    <Button Margin="4,4,4,0"
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            Content="Search"
+                            Command="{Binding btnInspectionIDSearchCommand}"
+                            Style="{StaticResource groupbox_griditem_button}"/>
+                    <tools:Database_DataView Grid.Row="1"
+                                             Grid.ColumnSpan="3"
+                                             DataContext="{Binding p_DataViewer_VM}" Margin="4">
+                    </tools:Database_DataView>
+                    <Button Content ="Load Current Inspection"
+                            Grid.Row="2"
+                            Grid.ColumnSpan ="3"
+                            Command="{Binding btnLoadCurrentInspectionCommand}"
+                            Style="{StaticResource groupbox_griditem_button}"/>
                 </Grid>
-            </Grid>
-        </GroupBox>
-        <!--<Grid Grid.Column="1">
-            <local:MotionControlViewer/>
-            <Grid Grid.Row="1">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1.5*"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition Height="2.5*"/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid>
-                            
-                        </Grid>
-                        <UniformGrid Grid.Row="1" Rows="2" Columns="3">
-                            <Button Content="All Home" Margin="3" Style="{StaticResource button_selectmode}"/>
-                            <Button Content="Move Pos" Margin="3" Style="{StaticResource button_selectmode}"/>
-                            <Button Content="Stop" Margin="3" Style="{StaticResource button_selectmode}"/>
-                            <Button Content="Axis Home" Margin="3" Style="{StaticResource button_selectmode}"/>
-                            <Button Content="Set Pos" Margin="3" Style="{StaticResource button_selectmode}"/>
-                            <Button Content="Repeat" Margin="3" Style="{StaticResource button_selectmode}"/>
-                        </UniformGrid>
-                        --><!--<Button Content="LeftTurn" Margin="3" Style="{StaticResource button_selectmode}"/>
-                        <Button Grid.Column="2" Content="RightTurn" Margin="3" Style="{StaticResource button_selectmode}"/>
-                        <Button Grid.Row="1" Grid.Column="1" Content="Up" Margin="3" Style="{StaticResource button_selectmode}"/>
-                        <Button Grid.Row="2" Grid.Column="0" Content="Left" Margin="3" Style="{StaticResource button_selectmode}"/>
-                        <Button Grid.Row="2" Grid.Column="1" Content="Home" Foreground="{StaticResource groupbox_button_text}" FontWeight="Bold">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Grid>
-                                        <Ellipse x:Name="EllipseBtn" Fill="DarkRed" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"></Ellipse>
-                                        <ContentPresenter x:Name="EllipseContentPresenter" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Grid>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="EllipseBtn" Property="Fill" Value="{StaticResource groupbox_button_mouseover}"/>
-                                        </Trigger>
-                                        <Trigger Property="IsPressed" Value="True">
-                                            <Setter TargetName="EllipseBtn" Property="Fill" Value="{StaticResource groupbox_button_press}"/>
-                                            <Setter TargetName="EllipseContentPresenter" Property="TextBlock.Foreground" Value="{StaticResource groupbox_button_press_text}"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-                        <Button Grid.Row="2" Grid.Column="2" Content="Right" Margin="3" Style="{StaticResource button_selectmode}"/>
-                        <Button Grid.Row="3" Grid.Column="1" Content="Down" Margin="3" Style="{StaticResource button_selectmode}"/>
-                        <Button Grid.Row="1" Grid.Column="3" Content="Z Up" Margin="3" Style="{StaticResource button_selectmode}"/>
-                        <Button Grid.Row="2" Grid.Column="3" Content="Z Home" Foreground="{StaticResource groupbox_button_text}" FontWeight="Bold">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Grid>
-                                        <Ellipse Width="60" Height="60" Fill="DarkRed"></Ellipse>
-                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Grid>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-                        <Button Grid.Row="3" Grid.Column="3" Content="Z Down" Margin="3" Style="{StaticResource button_selectmode}"/>--><!--
-                    </Grid>
-                </Grid>
-            </Grid>
-        </Grid>-->
+            </GroupBox>
+        </Grid>
+
     </Grid>
 </UserControl>

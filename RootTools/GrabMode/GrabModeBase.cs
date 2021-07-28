@@ -117,7 +117,7 @@ namespace RootTools
 
         #region Light
         public LightSet m_lightSet;
-        protected List<double> m_aLightPower = new List<double>();
+        public List<double> m_aLightPower = new List<double>(); 
 
         protected void RunTreeLight(Tree tree, bool bVisible, bool bReadOnly)
         {

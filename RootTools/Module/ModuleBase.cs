@@ -242,7 +242,10 @@ namespace RootTools.Module
                 Thread.Sleep(10);
                 RunThread();
             }
+            RunThreadStop(); 
         }
+
+        protected virtual void RunThreadStop() { }
 
         protected virtual void RunThread()
         {
@@ -453,6 +456,11 @@ namespace RootTools.Module
             return false;
         }
 
+        public virtual bool IsDocked()
+        {
+            return false;
+        }
+
         StopWatch m_swRun = new StopWatch(); 
         protected string StateRun()
         {
@@ -496,7 +504,7 @@ namespace RootTools.Module
             }
         }
 
-        public class Remote
+        public class Remote : NotifyProperty
         {
             MemoryStream m_memoryStream = new MemoryStream();
 
@@ -578,7 +586,7 @@ namespace RootTools.Module
             #endregion
 
             #region List Send
-            List<Protocol> m_aProtocol = new List<Protocol>(); 
+            public List<Protocol> m_aProtocol = new List<Protocol>(); 
             void Send(Protocol protocol)
             {
                 m_aProtocol.Add(protocol); 
@@ -605,7 +613,19 @@ namespace RootTools.Module
             #endregion
 
             #region Client
-            TCPIPClient m_client;
+            bool _bEnable = true;
+            public bool p_bEnable
+            {
+                get { return _bEnable; }
+                set
+                {
+                    if (_bEnable == value) return;
+                    _bEnable = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            public TCPIPClient m_client;
             void InitClient(bool bInit)
             {
                 m_module.p_sInfo = m_module.m_toolBox.GetComm(ref m_client, m_module, "TCPIP");
@@ -614,6 +634,7 @@ namespace RootTools.Module
 
             public string RemoteSend(ModuleRunBase run)
             {
+                if (p_bEnable == false) return "OK";
                 m_memoryStream = new MemoryStream();
                 m_treeRoot.m_job = new Job(m_memoryStream, true, m_log);
                 m_treeRoot.p_eMode = Tree.eMode.JobSave;
@@ -645,7 +666,7 @@ namespace RootTools.Module
             #endregion
 
             #region Server
-            TCPIPServer m_server;
+            public TCPIPServer m_server;
             void InitServer(bool bInit)
             {
                 m_module.p_sInfo = m_module.m_toolBox.GetComm(ref m_server, m_module, "TCPIP");
@@ -668,7 +689,7 @@ namespace RootTools.Module
                 if (run == null)
                 {
                     protocol.p_sRun = "Unknown Cmd";
-                    Send(protocol);
+                    //Send(protocol);
                     return; 
                 }
                 m_memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(protocol.p_sRun));
@@ -818,14 +839,21 @@ namespace RootTools.Module
 
         void RunTreeQueue(Tree tree)
         {
-            int n = 0; 
-            ModuleRunBase[] aModuleRemote = m_qModuleRemote.ToArray();
-            foreach (ModuleRunBase run in aModuleRemote) run.RunTree(tree.GetTree(n++, run.p_id), true);
-            ModuleRunBase[] aModuleRun = m_qModuleRun.ToArray();
-            foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(n++, run.p_id), true);
+            try
+            {
+                char c = (char)0;
+                ModuleRunBase[] aModuleRemote = m_qModuleRemote.ToArray();
+                foreach (ModuleRunBase run in aModuleRemote) run.RunTree(tree.GetTree(c++, run.m_sModuleRun), true);
+                ModuleRunBase[] aModuleRun = m_qModuleRun.ToArray();
+                foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(c++, run.m_sModuleRun), true);
+            }
+            catch (Exception e)
+            {
+                int n = 0;
+            }
         }
         #endregion
-
+        
         string _id = "";
         public string p_id
         {

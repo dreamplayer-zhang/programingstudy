@@ -24,5 +24,12 @@ namespace Root_WIND2.UI_User
         {
             InitializeComponent();
         }
+
+        private void PackIconMaterial_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            RootTools.D2DSequenceViewer D2DInfo = new RootTools.D2DSequenceViewer();
+            D2DInfo.Show();
+            D2DInfo.Topmost = true;
+        }
     }
 }

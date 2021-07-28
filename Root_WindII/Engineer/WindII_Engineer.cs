@@ -1,5 +1,4 @@
-﻿using Root_WindII.Module;
-using RootTools;
+﻿using RootTools;
 using RootTools.Control;
 using RootTools.Control.ACS;
 using RootTools.Control.Ajin;

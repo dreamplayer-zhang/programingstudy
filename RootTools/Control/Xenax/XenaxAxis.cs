@@ -82,6 +82,7 @@ namespace RootTools.Control.Xenax
                     m_comm = rs232;
                     p_commUI = rs232.p_ui;
                     rs232.OnReceive += Rs232_OnReceive;
+                    rs232.p_bConnect = true;
                     break;
                 case eComm.TCPIP:
                     TCPIPClient tcpip = new TCPIPClient(p_id + ".TCPIP", p_log);
@@ -238,7 +239,7 @@ namespace RootTools.Control.Xenax
                 {
                     case eCmd.GetPos: OnRecieveGetPos(ConvInt(sData)); break;
                     case eCmd.GetErrorCode: m_sErrorCode = sData; break;
-                    case eCmd.GetErrorString: p_sInfo = "Xenax Error : " + sData + " (" + m_sErrorCode + ")"; break; 
+                    case eCmd.GetErrorString: p_sInfo = "Xenax Error : " + sData + " (" + m_sErrorCode + ")"; break;
                 }
                 m_protocolSend = null;
             }
@@ -268,7 +269,7 @@ namespace RootTools.Control.Xenax
                     p_sensorInPos = false; 
                     break;
                 case eEvent.HomeDone:
-                    if (p_eState == eState.Home) p_eState = eState.Ready;
+                    /*if (p_eState == eState.Home) */p_eState = eState.Ready;
                     break;
                 case eEvent.Error:
                     p_eState = eState.Error;
@@ -331,9 +332,9 @@ namespace RootTools.Control.Xenax
         public override string StartMove(double fPos, string sSpeed = null)
         {
             if (IsInterlock()) return p_id + m_sCheckInterlock;
-            p_sInfo = base.StartMove(fPos, sSpeed);
-            if (p_sInfo != "OK") return p_sInfo;
-            AddSpeed(m_speedNow.m_v * p_pulsepUnit);
+            //p_sInfo = base.StartMove(fPos, sSpeed);
+            //if (p_sInfo != "OK") return p_sInfo;
+            //AddSpeed(m_speedNow.m_v * p_pulsepUnit);
             m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.Move], (int)(fPos * p_pulsepUnit)));
             p_eState = eState.Move; 
             Thread.Sleep(10);
@@ -526,8 +527,9 @@ namespace RootTools.Control.Xenax
             while (m_bThread)
             {
                 Thread.Sleep(20);
-                if (m_qProtocol.Count == 0) AddGetPos();
-                else if (m_protocolSend == null)
+                //if (m_qProtocol.Count == 0) AddGetPos();
+                //else 
+                if (m_protocolSend == null && m_qProtocol.Count != 0)
                 {
                     m_protocolSend = m_qProtocol.Dequeue();
                     if (m_comm != null) m_comm.Send(m_protocolSend.m_sSend);
@@ -578,6 +580,7 @@ namespace RootTools.Control.Xenax
         public void Init(XenaxListAxis listAxis, string id, Log log)
         {
             m_listAxis = listAxis;
+            p_eComm = eComm.RS232;
             InitCmd();
             InitEvent(); 
             InitBase(id, log);

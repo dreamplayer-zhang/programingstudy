@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RootTools
 {
@@ -28,13 +29,29 @@ namespace RootTools
 
         public bool m_useLog = false;
         SSLoggerNet m_sSLoggerNet { get; set; } = null;
-
+        public FlowData m_flowDataA;
+        public FlowData m_flowDataB;
+        public DataFormatter m_dataFormatterA;
+        public DataFormatter m_dataFormatterB;
         MarsLogManager()
         {
-            m_sSLoggerNet = new SSLoggerNet();
+            try
+            {
+                m_sSLoggerNet = new SSLoggerNet();
+                m_flowDataA = new FlowData();
+                m_flowDataB = new FlowData();
+                m_dataFormatterA = new DataFormatter();
+                m_dataFormatterB = new DataFormatter();
+            }
+            catch (Exception e)
+            {
+                //string ess = e.ToString();
+            }
         }
         public void ChangeMaterial(int port, int slot, string lot, string foup, string recipe)
         {
+            if (!m_useLog)
+                return;
             m_sSLoggerNet.ChangeMaterial(port, slot, lot, foup, recipe);
         }
 
@@ -43,65 +60,53 @@ namespace RootTools
             m_sSLoggerNet.ChangeMaterialSlot(port, slot);
         }
 
-        public void WritePRC(int port, string device, PRC_EVENTID eventID, STATUS status, string stepName, int stepNum, DataFormatter dataFormatter = null, string materialID = null)
+        public void WritePRC(int port, string device, PRC_EVENTID eventID, STATUS status, MATERIAL_TYPE materialType, string stepName = "", int stepNum = -1, int stageNum = -1, DataFormatter dataFormatter = null)
         {
             if (!m_useLog)
                 return;
 
-            bool isExist = false;
-            if (materialID != null)
-                isExist = true;
-
             bool isDataExist = CheckDataExist(dataFormatter);
 
+            bool isExist = false;
+            if (stageNum != -1)
+                isExist = true;
+
             if (isDataExist && isExist)
-                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum, dataFormatter);
+                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, materialType, stepName, stepNum, stageNum, dataFormatter);
             else if (isDataExist && !isExist)
-                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum, dataFormatter, materialID);
+                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, materialType, stepName, stepNum, dataFormatter);
             else if (!isDataExist && isExist)
-                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum, materialID);
+                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, materialType, stepName, stepNum, stageNum);
+            else if (!isDataExist && !isExist && stepName != "" && stepNum != -1)
+                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, materialType, stepName, stepNum);
             else
-                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum);
+                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, materialType);
         }
 
-        public void WriteFNC(int port, string device, string eventID, STATUS status, DataFormatter dataFormatter = null, MATERIAL_TYPE? type = null)
-        {
-            if (!m_useLog)
-                return;
-
-            bool isExist = false;
-            if (type != null)
-                isExist = true;
-
-            bool isDataExist = CheckDataExist(dataFormatter);
-
-            if (isDataExist && isExist)
-                m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, dataFormatter, (MATERIAL_TYPE)type);
-            else if (isDataExist && !isExist)
-                m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, dataFormatter);
-            else if (isDataExist && isExist)
-                m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, (MATERIAL_TYPE)type);
-            else
-                m_sSLoggerNet.WriteFNCLog(port, device, eventID, status);
-        }
-
-        public void WriteXFR(string device, XFR_EVENTID eventID, STATUS stauts, FlowData fromDevice, FlowData fromSlot, FlowData toDevice, FlowData toSlot, DataFormatter dataFormatter = null, MaterialFormatter materialFormatter = null)
+        public void WriteFNC(int port, string device, string eventID, STATUS status, MATERIAL_TYPE type = MATERIAL_TYPE.WAFER, DataFormatter dataFormatter = null)
         {
             if (!m_useLog)
                 return;
 
             bool isDataExist = CheckDataExist(dataFormatter);
 
-            bool isMaterialDataExist = CheckMaterialDataExist(materialFormatter);
-
-            if (isDataExist && isMaterialDataExist)
-                m_sSLoggerNet.WriteXFRLog(device, eventID, stauts, fromDevice, fromSlot, toDevice, toSlot, dataFormatter, materialFormatter);
-            else if (isDataExist && !isMaterialDataExist)
-                m_sSLoggerNet.WriteXFRLog(device, eventID, stauts, fromDevice, fromSlot, toDevice, toSlot, dataFormatter);
-            else if (!isDataExist && isMaterialDataExist)
-                m_sSLoggerNet.WriteXFRLog(device, eventID, stauts, fromDevice, fromSlot, toDevice, toSlot, materialFormatter);
+            if (isDataExist)
+                m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, type, dataFormatter);
             else
-                m_sSLoggerNet.WriteXFRLog(device, eventID, stauts, fromDevice, fromSlot, toDevice, toSlot);
+                m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, type);
+        }
+
+        public void WriteXFR(int port, string device, XFR_EVENTID eventID, STATUS stauts, FlowData fromDevice, FlowData fromSlot, FlowData toDevice, FlowData toSlot, MaterialFormatter materialFormatter, DataFormatter dataFormatter = null)
+        {
+            if (!m_useLog)
+                return;
+
+            bool isDataExist = CheckDataExist(dataFormatter);
+
+            if (isDataExist)
+                m_sSLoggerNet.WriteXFRLog(port, device, eventID, stauts, fromDevice, fromSlot, toDevice, toSlot, materialFormatter, dataFormatter);
+            else
+                m_sSLoggerNet.WriteXFRLog(port, device, eventID, stauts, fromDevice, fromSlot, toDevice, toSlot, materialFormatter);
         }
 
         public void WriteLEH(int port, string device, LEH_EVENTID eventID, FlowData flowInfo, DataFormatter dataFormatter = null)
@@ -127,17 +132,32 @@ namespace RootTools
             return materialData == null ? false : true;
         }
 
-        public void WriteCFG(string device, string eventID, DataFormatter dataFormatter = null)
+        public void WriteCFG(string device, string categoryID, string cfgID, dynamic value, DataFormatter dataFormatter = null, string unit = "", string ecid = "")
         {
             if (!m_useLog)
                 return;
 
             bool isDataExist = CheckDataExist(dataFormatter);
 
-            if (isDataExist)
-                m_sSLoggerNet.WriteCFGLog(device, eventID, dataFormatter);
-            else
-                m_sSLoggerNet.WriteCFGLog(device, eventID);
+            if(isDataExist && (unit == "" || ecid == ""))
+            {
+                MessageBox.Show("dataFormatter가 존재 할 시 unit, ecid는 공백이면 안됩니다.");
+                return;
+            }
+            try
+            {
+                if (isDataExist)
+                    m_sSLoggerNet.WriteCFGLog(device, categoryID, cfgID, value, dataFormatter, unit, ecid);
+                else if (!isDataExist && unit != "" && ecid != "")
+                    m_sSLoggerNet.WriteCFGLog(device, categoryID, cfgID, value, unit, ecid);
+                else
+                    m_sSLoggerNet.WriteCFGLog(device, categoryID, cfgID, value);
+            }
+            catch (Exception e)
+            {
+
+            }
+
         }
 
         //public DataFormatter GetDataFormatter()

@@ -38,17 +38,20 @@ namespace Root_VEGA_P_Vision
         private SelectMode modeWindow;
         private Setup setupWindow;
         private Review_Panel reviewPanel;
+        private Operating_Panel operatingPanel;
         #endregion
 
         #region [ViewModel]
         private Setup_ViewModel setupViewModel;
         private Review_ViewModel reviewViewModel;
+        private Operating_ViewModel operatingViewModel;
         #endregion
         public bool Initialize()
         {
             InitModeSelect();
             InitSetupMode();
             InitReviewMode();
+            InitOperationMode();
             return true;
         }
         void InitModeSelect()
@@ -69,6 +72,9 @@ namespace Root_VEGA_P_Vision
         }
         void InitOperationMode()
         {
+            operatingPanel = new Operating_Panel();
+            operatingViewModel = new Operating_ViewModel();
+            operatingPanel.DataContext = operatingViewModel;
         }
         public void ChangeMainUI(UIElement window)
         {
@@ -95,7 +101,7 @@ namespace Root_VEGA_P_Vision
 
         public void ChangeUIRun()
         {
-
+            ChangeMainUI(operatingPanel);
         }
     }
 }

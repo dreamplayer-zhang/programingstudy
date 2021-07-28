@@ -16,18 +16,22 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" Background="AliceBlue" Margin="3">
                 <TextBlock Text="{Binding p_sLED}" HorizontalAlignment="Center"/>
             </Grid>
-            <Grid Grid.Row="1" Background="Beige" Margin="3">
+            <Grid Grid.Row="1" x:Name="gridUp" Background="Beige" Margin="3" PreviewMouseLeftButtonDown="gridUp_PreviewMouseLeftButtonDown">
                 <TextBlock x:Name="textBlockUp" HorizontalAlignment="Center"/>
             </Grid>
-            <Grid Grid.Row="2" Background="Beige" Margin="3">
+            <Grid Grid.Row="2" x:Name="gridDown" Background="Beige" Margin="3" PreviewMouseLeftButtonDown="gridDown_PreviewMouseLeftButtonDown">
                 <TextBlock x:Name="textBlockDown" HorizontalAlignment="Center"/>
             </Grid>
-            <tree:TreeUI Grid.Row="3" x:Name="treeRootUI" IsEnabled="False"/>
+            <Grid Grid.Row="3" x:Name="gridInfo" Margin="3" Background="White" PreviewMouseLeftButtonDown="gridInfo_PreviewMouseLeftButtonDown">
+                <TextBlock x:Name="textBlockInfo" Text="{Binding p_sInfo}"/>
+            </Grid>
+            <tree:TreeUI Grid.Row="4" x:Name="treeRootUI" IsEnabled="False"/>
         </Grid>
     </GroupBox>
 </UserControl>

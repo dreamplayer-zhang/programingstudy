@@ -11,25 +11,25 @@
                         d:DesignHeight="818"
              d:DesignWidth="1912">
     <Grid>
-        <TabControl x:Name="MainTab">
+        <TabControl x:Name="MainTab" Style="{StaticResource ImageViewerTabControlStyle}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding TabChanged}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-            <TabItem Header="2D TDI">
+            <TabItem Header="2D TDI" Style="{StaticResource ImageViewerTabItemStyle}">
                 <Tools:RootViewer DataContext="{Binding p_2DOriginViewer}"/>
             </TabItem>
-            <TabItem Header="Stain">
+            <TabItem Header="Stain" Style="{StaticResource ImageViewerTabItemStyle}">
                 <Tools:RootViewer DataContext="{Binding p_StainOriginViewer}"/>
             </TabItem>
-            <TabItem Header="Side">
-                <TabControl x:Name="SideTab">
-                    <TabItem Header="Side Top Bottom">
+            <TabItem Header="Side" Style="{StaticResource ImageViewerTabItemStyle}">
+                <TabControl x:Name="SideTab" Background="Transparent">
+                    <TabItem Header="Side Top Bottom" Style="{StaticResource ImageViewerTabItemStyle}">
                         <Tools:RootViewer DataContext="{Binding p_SideOriginTopBtmViewer}"/>
 
                     </TabItem>
-                    <TabItem Header="Side Left Right">
+                    <TabItem Header="Side Left Right" Style="{StaticResource ImageViewerTabItemStyle}">
                         <Tools:RootViewer DataContext="{Binding p_SideOriginLeftRightViewer}"/>
 
                     </TabItem>

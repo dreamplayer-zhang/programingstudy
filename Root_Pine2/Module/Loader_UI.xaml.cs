@@ -1,6 +1,7 @@
 ﻿using RootTools.Module;
 using RootTools.Trees;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Root_Pine2.Module
@@ -34,7 +35,9 @@ namespace Root_Pine2.Module
                 case ModuleBase.eState.Run: Background = Brushes.Yellow; break;
                 case ModuleBase.eState.Error: Background = Brushes.OrangeRed; break;
             }
-            textBlockStrip.Text = (m_loader.p_infoStrip != null) ? m_loader.p_infoStrip.p_id : ""; 
+            textBlockStrip.Text = (m_loader.p_infoStrip != null) ? m_loader.p_infoStrip.p_id : "";
+            bool bInspect = (m_loader.p_infoStrip != null) ? m_loader.p_infoStrip.p_bInspect : false;
+            gridID.Background = bInspect ? Brushes.Orange : Brushes.Beige;
             OnRunTree();
         }
 
@@ -45,6 +48,20 @@ namespace Root_Pine2.Module
             m_nQueue[0] = m_loader.m_qModuleRun.Count;
             m_nQueue[1] = m_loader.m_qModuleRemote.Count;
             m_loader.RunTreeQueue(Tree.eMode.Init);
+        }
+
+        private void gridID_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            m_loader.StartUnloadStrip(); 
+        }
+
+        private void gridInfo_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            switch (m_loader.p_eState)
+            {
+                case ModuleBase.eState.Init: m_loader.p_eState = ModuleBase.eState.Home; break;
+                case ModuleBase.eState.Error: m_loader.Reset(); break;
+            }
         }
     }
 }

@@ -66,14 +66,14 @@ namespace Root_CAMELLIA.Data
             }
             ptAvgRB = new Point(sumX / m_ptRB.Count, sumY / m_ptRB.Count);
 
-            double LTX = ptLTPulse.X + ((ptAvgLT.X - (ptROI.X / 2)) * resolutionX * 10);
-            double LTY = ptLTPulse.Y - ((ptAvgLT.Y - (ptROI.Y / 2)) * resolutionX * 10);
+            double LTX = ptLTPulse.X + ((ptROI.X / 2) - ptAvgLT.X) * resolutionX * 10;
+            double LTY = ptLTPulse.Y - ((ptROI.Y / 2) - ptAvgLT.Y) * resolutionX * 10;
 
-            double RTX = ptRTPulse.X + ((ptAvgRT.X - (ptROI.X / 2)) * resolutionX * 10);
-            double RTY = ptRTPulse.Y - ((ptAvgRT.Y - (ptROI.Y / 2)) * resolutionX * 10);
+            double RTX = ptRTPulse.X + ((ptROI.X / 2) - ptAvgRT.X) * resolutionX * 10;
+            double RTY = ptRTPulse.Y - ((ptROI.Y / 2) - ptAvgRT.Y) * resolutionX * 10;
 
-            double RBX = ptRBPulse.X + ((ptAvgRB.X - (ptROI.X / 2)) * resolutionX * 10);
-            double RBY = ptRBPulse.Y - ((ptAvgRB.Y - (ptROI.Y / 2)) * resolutionX * 10);
+            double RBX = ptRBPulse.X + ((ptROI.X / 2) - ptAvgRB.X) * resolutionX * 10;
+            double RBY = ptRBPulse.Y - ((ptROI.Y / 2) - ptAvgRB.Y) * resolutionX * 10;
 
             PointF ptLT = new PointF((float)LTX, (float)LTY);
             PointF ptRT = new PointF((float)RTX, (float)RTY);
@@ -235,7 +235,7 @@ namespace Root_CAMELLIA.Data
                 {
                     CvInvoke.Circle(matTest, tempList[i], 20, new MCvScalar(0, 0, 255),4);
                 }
-                //matTest.Save(@"C:\Users\cgkim\Desktop\CenteringTest\" + DateTime.Now.ToString("yyMMddhhmmssff") + test + ".bmp");
+                matTest.Save(@"C:\Users\ATI\Desktop\CenteringTest\Image\" + DateTime.Now.ToString("yyMMddhhmmssff") + test + ".bmp");
             }
             catch(Exception ex)
             {

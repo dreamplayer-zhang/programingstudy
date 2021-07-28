@@ -14,12 +14,16 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Background="Beige" Margin="3">
+            <Grid Grid.Row="0" x:Name="gridID" Background="Beige" Margin="3" PreviewMouseLeftButtonDown="gridID_PreviewMouseLeftButtonDown">
                 <TextBlock x:Name="textBlockStrip" Text="{Binding p_id}" HorizontalAlignment="Center"/>
             </Grid>
-            <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" IsEnabled="False"/>
+            <Grid Grid.Row="1" x:Name="gridInfo" Margin="3" Background="White" PreviewMouseLeftButtonDown="gridInfo_PreviewMouseLeftButtonDown">
+                <TextBlock x:Name="textBlockInfo" Text="{Binding p_sInfo}"/>
+            </Grid>
+            <tree:TreeUI Grid.Row="2" x:Name="treeRootUI" IsEnabled="False" Margin="3,0,3,0"/>
         </Grid>
     </GroupBox>
 </UserControl>

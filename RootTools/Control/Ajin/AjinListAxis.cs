@@ -98,6 +98,7 @@ namespace RootTools.Control.Ajin
         {
             m_bThread = true; 
             LoadMotFile();
+            Thread.Sleep(5000);
             while (m_bThread)
             {
                 Thread.Sleep(10); 

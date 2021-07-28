@@ -1,6 +1,7 @@
 ﻿using RootTools.Module;
 using RootTools.Trees;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Root_Pine2.Module
@@ -36,6 +37,8 @@ namespace Root_Pine2.Module
             }
             textBlockA.Text = (m_transfer.m_gripper.p_infoStrip != null) ? m_transfer.m_gripper.p_infoStrip.p_id : "";
             textBlockB.Text = (m_transfer.m_pusher.p_infoStrip != null) ? m_transfer.m_pusher.p_infoStrip.p_id : "";
+            bool bInspect = (m_transfer.m_pusher.p_infoStrip != null) ? m_transfer.m_pusher.p_infoStrip.p_bInspect : false;
+            gridPusher.Background = bInspect ? Brushes.Orange : Brushes.Beige;
             OnRunTree();
         }
 
@@ -46,6 +49,15 @@ namespace Root_Pine2.Module
             m_nQueue[0] = m_transfer.m_qModuleRun.Count;
             m_nQueue[1] = m_transfer.m_qModuleRemote.Count;
             m_transfer.RunTreeQueue(Tree.eMode.Init);
+        }
+
+        private void gridInfo_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            switch (m_transfer.p_eState)
+            {
+                case ModuleBase.eState.Init: m_transfer.p_eState = ModuleBase.eState.Home; break;
+                case ModuleBase.eState.Error: m_transfer.Reset(); break;
+            }
         }
     }
 }

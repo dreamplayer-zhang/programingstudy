@@ -47,6 +47,12 @@ namespace RootTools.Module
             RunTree(Tree.eMode.Init);
         }
 
+        public void Undo()
+        {
+            p_aModuleRun.RemoveAt(p_aModuleRun.Count - 1);
+            RunTree(Tree.eMode.Init);
+        }
+
         public List<string> GetModuleRunNames(string sModule)
         {
             ModuleBase module = GetModule(sModule);

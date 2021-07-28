@@ -8,8 +8,22 @@
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
-        Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
-    <Grid>
-        <engineer:Pine2_Engineer_UI x:Name="engineerUI"/>
-    </Grid>
+        Title="Pine2" Height="900" Width="1920" WindowState="Maximized">
+    <Window.Resources>
+        <DataTemplate x:Key="TabItemHeaderTemplate">
+            <ContentPresenter Content="{TemplateBinding Content}" RenderTransformOrigin="0.5,0.5">
+                <ContentPresenter.LayoutTransform>
+                    <RotateTransform Angle="-90"/>
+                </ContentPresenter.LayoutTransform>
+            </ContentPresenter>
+        </DataTemplate>
+    </Window.Resources>
+    <TabControl TabStripPlacement="Left">
+        <TabItem Header=" Main " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
+            <engineer:Pine2_Main_UI x:Name="mainUI"/>
+        </TabItem>
+        <TabItem Header=" Engineer " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
+            <engineer:Pine2_Engineer_UI x:Name="engineerUI"/>
+        </TabItem>
+    </TabControl>
 </Window>

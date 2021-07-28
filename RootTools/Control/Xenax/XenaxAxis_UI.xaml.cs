@@ -135,7 +135,7 @@ namespace RootTools.Control.Xenax
         private void buttonMove_Click(object sender, RoutedEventArgs e)
         {
             if (m_bRepeat) return;
-            if (m_axis.p_eState != Axis.eState.Ready) return;
+//            if (m_axis.p_eState != Axis.eState.Ready) return;
             m_axis.StartMove(comboMovePos.Text, 0, comboSpeedMove.Text);
         }
 

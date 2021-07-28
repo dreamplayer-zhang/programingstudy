@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Media;
@@ -290,6 +291,7 @@ namespace RootTools.Gem.XGem
 
         string LogSend(long nError, string sCmd, params object[] objs)
         {
+            if (m_log == null) return "";
             string sLog = sCmd;
             foreach (object obj in objs) sLog += ", " + obj.ToString();
             m_log.Info(" --> " + sLog);
@@ -301,6 +303,7 @@ namespace RootTools.Gem.XGem
 
         void LogRcv(string sCmd, params object[] objs)
         {
+            if (m_log == null) return ;
             string sLog = sCmd;
             foreach (object obj in objs) sLog += ", " + obj.ToString();
             m_log.Info(" <-- " + sLog);
@@ -441,6 +444,17 @@ namespace RootTools.Gem.XGem
         {
             if (p_bEnable == false) return -1;
             m_svID[0] = sv.p_nID;
+            m_svValue[0] = value.ToString();
+            long nError = p_bEnable ? m_xGem.GEMSetVariable(1, m_svID, m_svValue) : 0;
+            LogSend(nError, "GEMSetVariable", m_svID[0], m_svValue[0]);
+            //p_sInfo = "SetSV " + sv.p_sModule + "." + sv.p_id + " : " + sv.p_value.ToString() + " -> " + value.ToString(); 
+            return nError;
+        }
+
+        public long SetSV(long svid, dynamic value)
+        {
+            if (p_bEnable == false) return -1;
+            m_svID[0] = svid;
             m_svValue[0] = value.ToString();
             long nError = p_bEnable ? m_xGem.GEMSetVariable(1, m_svID, m_svValue) : 0;
             LogSend(nError, "GEMSetVariable", m_svID[0], m_svValue[0]);
@@ -668,6 +682,7 @@ namespace RootTools.Gem.XGem
         {
             LogRcv("OnCMSCarrierVerifySucceeded", nVerifyType, sLocID, sCarrierID, sSlotMap, nCount, psLotID[0], psSubstrateID[0], sUsage);
             GemCarrierBase carrier = GetGemCarrier(sLocID);
+            carrier.p_sLotID = psLotID[0];
             if (carrier == null) return;
             switch (nVerifyType)
             {
@@ -680,6 +695,8 @@ namespace RootTools.Gem.XGem
                     {
                         char ch = sSlotMap[n];
                         GemSlotBase.eState state = (GemSlotBase.eState)(ch - '0');
+                        if (carrier.p_sLotID == "")
+                            carrier.p_sLotID = psLotID[n];
                         p_sLastError = carrier.SetSlotInfo(n, state, psLotID[n], psSubstrateID[n]);
                     }
                     break;
@@ -774,8 +791,9 @@ namespace RootTools.Gem.XGem
             {
                 if (carrier.p_sCarrierID == sCarrierID)
                 {
-                    p_sInfo = "eReqTransfer : " + carrier.p_eReqTransfer.ToString() + " -> " + GemCarrierBase.eTransfer.ReadyToLoad.ToString();
-                    carrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                    carrier.p_sCarrierID = "";
+                    //p_sInfo = "eReqTransfer : " + carrier.p_eReqTransfer.ToString() + " -> " + GemCarrierBase.eTransfer.ReadyToLoad.ToString();
+                    //carrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                 }
             }
         }
@@ -893,6 +911,12 @@ namespace RootTools.Gem.XGem
             GemPJ pj = new GemPJ(sPJobID, (GemPJ.eAutoStart)nAutoStart, sRcpID, m_log, m_sRecipeExt);
             m_aPJ.Add(pj);
 
+            SSLNet.DataFormatter dataFormatter;
+            SSLNet.FlowData flowData;
+
+            bool isFirst = true;
+            int nLP = 0;
+            string sLocID = "";
             for (int n = 0; n < nMtrlCount; n++)
             {
                 GemCarrierBase carrier = GetGemCarrier(GetGemLocID(psMtrlID[n]));
@@ -900,13 +924,64 @@ namespace RootTools.Gem.XGem
                 {
                     for (int i = 0; i < psSlotInfo[n].Length; i++)
                     {
-                        if (psSlotInfo[n][i] == '3') pj.SetSlotExist(carrier, i);
+                        if (psSlotInfo[n][i] == '3')
+                        {
+                            pj.SetSlotExist(carrier, i);
+                            if (isFirst)
+                            {
+                                sLocID = GetGemLocID(psMtrlID[n]);
+                                if (GetGemLocID(psMtrlID[n]) == "LP2")
+                                    nLP = 1;      
+                                MarsLogManager.Instance.ChangeMaterial(nLP, i + 1, carrier.p_sLotID, carrier.p_sCarrierID, sRcpID);
+                                isFirst = false;
+                            }
+                        }
                     }
                 }
             }
 
+            if(nLP == 0)
+            {
+                dataFormatter = MarsLogManager.Instance.m_dataFormatterA;
+                flowData = MarsLogManager.Instance.m_flowDataA;
+            }
+            else
+            {
+                dataFormatter = MarsLogManager.Instance.m_dataFormatterB;
+                flowData = MarsLogManager.Instance.m_flowDataB;
+            }
+            MakeFlowData(nLP);
+            dataFormatter.ClearData();
+            dataFormatter.AddData("RecipeID", sRcpID);
+            
+
+            MarsLogManager.Instance.WriteLEH(nLP, sLocID, SSLNet.LEH_EVENTID.CARRIER_LOAD, flowData, dataFormatter);
+
             long nError = m_xGem.PJSetState(sPJobID, (long)GemPJ.eState.Queued);
             LogSend(nError, "PJSetState", sPJobID, GemPJ.eState.Queued);
+        }
+
+        private void MakeFlowData(int nLP)
+        {
+            SSLNet.FlowData flowData;
+            if (nLP == 0)
+            {
+                flowData = MarsLogManager.Instance.m_flowDataA;
+                flowData.ClearData();
+                flowData.AddData("LP1");
+                flowData.AddData("Aligner");
+                flowData.AddData("Vision");
+                flowData.AddData("LP1");
+            }
+            else
+            {
+                flowData = MarsLogManager.Instance.m_flowDataB;
+                flowData.ClearData();
+                flowData.AddData("LP2");
+                flowData.AddData("Aligner");
+                flowData.AddData("Vision");
+                flowData.AddData("LP2");
+            }
         }
 
         private void M_xGem_OnPJDeleted(string sPJobID)
@@ -979,7 +1054,8 @@ namespace RootTools.Gem.XGem
 
         void RunTreeProcessJob(Tree tree)
         {
-            foreach (GemPJ pj in m_aPJ) pj.RunTree(tree.GetTree(pj.m_sPJobID));
+            if (m_aPJ.Count == 0) return;
+            foreach (GemPJ pj in m_aPJ.ToArray()) pj.RunTree(tree.GetTree(pj.m_sPJobID));
         }
 
         #endregion
@@ -1014,6 +1090,15 @@ namespace RootTools.Gem.XGem
             m_xGem.OnCJDeleted += M_xGem_OnCJDeleted;
             m_xGem.OnCJStateChanged += M_xGem_OnCJStateChanged;
             m_xGem.OnCJRspSelect += M_xGem_OnCJRspSelect;
+            m_xGem.OnGEMReqPPList += M_xGem_OnGEMReqPPList;
+        }
+
+        private void M_xGem_OnGEMReqPPList(long nMsgId)
+        {
+            string[] files = Directory.GetFiles(@"C:\Recipe", "*." + m_sRecipeExt);
+            var query = from file in files select Path.GetFileNameWithoutExtension(file);
+            string[] recipe = query.Take(files.Length).ToArray();
+            m_xGem.GEMRspPPList(nMsgId, files.Length, recipe);
         }
 
         private void M_xGem_OnCJCreated(string sCJobID, long nStartMethod, long nCountPRJob, string[] psPRJobID)
@@ -1083,7 +1168,8 @@ namespace RootTools.Gem.XGem
 
         void RunTreeControlJob(Tree tree)
         {
-            foreach (GemCJ cj in m_qCJ) cj.RunTree(tree.GetTree(cj.m_sCJobID));
+            if (m_qCJ.Count == 0) return;
+            foreach (GemCJ cj in m_qCJ.ToArray()) cj.RunTree(tree.GetTree(cj.m_sCJobID));
         }
         #endregion
 
@@ -1399,5 +1485,34 @@ namespace RootTools.Gem.XGem
             }
         }
 
+        public void MakeObject(ref long nObject)
+        {
+            m_xGem.MakeObject(ref nObject);
+        }
+
+        public void SetListItem(long nObject, int listCnt)
+        {
+            m_xGem.SetListItem(nObject, listCnt);
+        }
+
+        public void SetStringItem(long nObject, string strItem)
+        {
+            m_xGem.SetStringItem(nObject, strItem);
+        }
+
+        public void SetInt4Item(long nObject, int nitem)
+        {
+            m_xGem.SetInt4Item(nObject, nitem);
+        }
+
+        public void SetFloat4Item(long nObject, float fItem)
+        {
+            m_xGem.SetFloat4Item(nObject, fItem);
+        }
+
+        public void GEMSetVariables(long nObject, long nVid)
+        {
+            m_xGem.GEMSetVariables(nObject, nVid);
+        }
     }
 }

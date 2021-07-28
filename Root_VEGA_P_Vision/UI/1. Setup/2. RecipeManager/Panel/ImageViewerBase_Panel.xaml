@@ -7,10 +7,10 @@
              mc:Ignorable="d" 
                           d:DesignHeight="818"
              d:DesignWidth="1912"
-             Background="{StaticResource PanelBackGround}">
+             Background="{StaticResource MainBackGroundColor}">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.7*"/>
+            <RowDefinition Height="0.5*"/>
             <RowDefinition Height="9*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
@@ -20,6 +20,10 @@
             <Button Content="Clear" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_SubViewer.DataContext.ImageClear}"/>
             <Button Content="Snap" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_SubViewer.DataContext.btnSnap}"/>
             <Button Content="Insp" Visibility="{Binding InspBtnVisibility}" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_SubViewer.DataContext.btnInsp}"/>
+            <StackPanel Orientation="Horizontal" Visibility="{Binding p_SubViewer.DataContext.SelectedViewerVisibility,Converter={StaticResource BooleanToVisiblity}}">
+                <TextBlock Text="Select Image" Style="{StaticResource ImageText}"/>
+                <ComboBox Style="{StaticResource ComboBoxStyle}" Width="50" Margin="0,8,0,8" ItemsSource="{Binding p_SubViewer.DataContext.MemNumList}" SelectedIndex="{Binding p_SubViewer.DataContext.SelectedIdx}"/>
+            </StackPanel>
         </StackPanel>
         <Grid Grid.Row="1">
             <ContentControl Content="{Binding p_SubViewer}"/>

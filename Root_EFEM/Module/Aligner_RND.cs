@@ -626,6 +626,7 @@ namespace Root_EFEM.Module
         {
             ////m_bgwWaferExist.RunWorkerAsync(true);
             //m_bgwWaferExist.RunWorkerAsync(false);
+            
             return SendCmd(eCmd.ResetPos);
         }
 
@@ -633,7 +634,15 @@ namespace Root_EFEM.Module
         {
             //string sPut = SendCmd(eCmd.VacuumOn);
             //m_bgwWaferExist.RunWorkerAsync(true);
-            return "OK"; 
+            MarsLogManager marsLogManager = MarsLogManager.Instance;
+            marsLogManager.ChangeMaterialSlot(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1);
+            if (!m_diWaferExist.p_bIn)
+            {
+                m_alid_WaferExist.Run(true, "Aligner Wafer Exist Fail");
+                return "ExistFail";
+            }
+            else
+                return "OK"; 
         }
 
         enum eCheckWafer
@@ -720,9 +729,9 @@ namespace Root_EFEM.Module
 
         public override void Reset()
         {
-            SendCmd(eCmd.SlowStop);
-            SendCmd(eCmd.ClearError);
-            SendCmd(eCmd.ResetPos);
+            //Run(SendCmd(eCmd.SlowStop));
+            //Run(SendCmd(eCmd.ClearError));
+            //Run(SendCmd(eCmd.ResetPos));
             base.Reset();
         }
         #endregion

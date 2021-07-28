@@ -9,6 +9,7 @@ using RootTools.ToolBoxs;
 using RootTools.Module;
 using RootTools.Control;
 using RootTools.Trees;
+using System.Collections.Generic;
 
 namespace Root_CAMELLIA
 {
@@ -28,6 +29,7 @@ namespace Root_CAMELLIA
             m_handler.m_towerlamp.BuzzerOff();
             return "OK";
         }
+
         public string Recovery()
         {
             
@@ -122,13 +124,13 @@ namespace Root_CAMELLIA
                 OnPropertyChanged();
             }
         }
-        XGem m_xGem = null;
-        XGem_UI m_xGemUI = new XGem_UI();
+        XGem_New m_xGem = null;
+        XGem_New_UI m_xGemUI = new XGem_New_UI();
         void InitXGem()
         {
             //if (m_bUseXGem == false) return;
             if (p_bUseXGem == false) return;
-            m_xGem = new XGem();
+            m_xGem = new XGem_New();
             m_xGem.Init("XGem", this);
             m_xGemUI.Init(m_xGem);
             m_toolBox.AddToolSet(m_xGem, m_xGemUI);

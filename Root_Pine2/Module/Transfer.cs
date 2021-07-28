@@ -1,9 +1,12 @@
-﻿using RootTools;
+﻿using Root_Pine2.Engineer;
+using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_Pine2.Module
@@ -17,7 +20,17 @@ namespace Root_Pine2.Module
             m_buffer.GetTools(m_toolBox, this, bInit);
             m_gripper.GetTools(m_toolBox, this, bInit);
             m_pusher.GetTools(m_toolBox, this, bInit);
+            if (bInit) InitALID(); 
         }
+
+        ALID m_alidGripper;
+        ALID m_alidPusher;
+        void InitALID()
+        {
+            m_alidGripper = m_gaf.GetALID(this, "Gripper", "Home Error : Gripper has Strip");
+            m_alidPusher = m_gaf.GetALID(this, "Pusher", "Home Error : Pusher has Strip");
+        }
+
         #endregion
 
         #region Loader Pusher
@@ -59,6 +72,7 @@ namespace Root_Pine2.Module
 
             public string RunMoveReady(bool bWait = true)
             {
+                if ((m_axis[0].p_posCommand == m_axis[0].GetPosValue(c_sReady)) && (m_axis[1].p_posCommand == m_axis[1].GetPosValue(c_sReady))) return "OK";
                 m_axis[0].StartMove(c_sReady);
                 m_axis[1].StartMove(c_sReady);
                 if (bWait == false) return "OK";
@@ -89,6 +103,7 @@ namespace Root_Pine2.Module
                 DIO_I diOverload = m_diOverload[GetAxisID(eMagazine)];
                 try
                 {
+                    m_magazineSet.m_aEV[eMagazine].m_elevator.m_bPusherSafe = false;
                     dioPusher.Write(true);
                     StopWatch sw = new StopWatch();
                     int msTimeout = (int)(1000 * dioPusher.m_secTimeout);
@@ -103,11 +118,21 @@ namespace Root_Pine2.Module
                     dioPusher.Write(false);
                     return dioPusher.WaitDone(); 
                 }
-                finally { dioPusher.Write(false); }
+                finally 
+                { 
+                    dioPusher.Write(false);
+                    m_magazineSet.m_aEV[eMagazine].m_elevator.m_bPusherSafe = true; 
+                }
             }
             #endregion
+
+            MagazineEVSet m_magazineSet; 
+            public LoaderPusher(MagazineEVSet magazineSet)
+            {
+                m_magazineSet = magazineSet; 
+            }
         }
-        LoaderPusher m_loaderPusher = new LoaderPusher();
+        LoaderPusher m_loaderPusher;
         #endregion
 
         #region Buffer
@@ -129,13 +154,20 @@ namespace Root_Pine2.Module
                 m_axisWidth.AddPos(Enum.GetNames(typeof(eWidth)));
                 
             }
+
+            public double GetXScale(InfoStrip.eMagazine eMagazine)
+            {
+                double p0 = m_axis.GetPosValue(InfoStrip.eMagazine.Magazine0);
+                double p7 = m_axis.GetPosValue(InfoStrip.eMagazine.Magazine7); 
+                return (m_axis.GetPosValue(eMagazine) - p0)  / (p7 - p0); 
+            }
             #endregion
 
             #region Axis
             double m_dxPulse = 0;
-            public double m_dZ = 0;
             public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0;
-            public string RunMove(InfoStrip.eMagazine ePos, bool bPushPos, bool bWait = true)
+            public double m_xOffset = 0; 
+            public string RunMove(InfoStrip.eMagazine ePos, double xOffset, bool bPushPos, bool bWait = true)
             {
                 if (m_transfer.m_pusher.p_bLock) return "Lock by Sorter Picker";
                 if (m_transfer.m_gripper.p_bLock) return "Lock by Loader Picker";
@@ -143,7 +175,10 @@ namespace Root_Pine2.Module
                 m_transfer.m_gripper.p_bEnable = false; 
                 m_ePosDst = ePos;
                 double dPos = 1000 * (m_transfer.m_pine2.m_widthDefaultStrip - m_transfer.m_pine2.p_widthStrip) / 2;
-                m_axis.StartMove(ePos, (bPushPos ? 0 : m_dxPulse) + dPos); 
+                m_xOffset = (bPushPos ? m_dxPulse : 0) + dPos + xOffset;
+                foreach (MagazineEV magazineEV in m_transfer.m_magazineEV.m_aEV.Values) magazineEV.m_conveyor.m_bInv = false;
+                m_transfer.m_magazineEV.m_aEV[ePos].m_conveyor.m_bInv = true; 
+                m_axis.StartMove(ePos, m_xOffset); 
                 return bWait ? m_axis.WaitReady() : "OK";
             }
             #endregion
@@ -154,13 +189,21 @@ namespace Root_Pine2.Module
                 mm75,
                 mm95,
             }
+            double m_dPos = 0; 
             public string RunWidth(double fWidth, bool bWait = true)
             {
                 double f75 = m_axisWidth.GetPosValue(eWidth.mm75);
                 double f95 = m_axisWidth.GetPosValue(eWidth.mm95);
                 double dPos = (f95 - f75) * (fWidth - 75) / 20 + f75;
+                m_dPos = dPos; 
                 m_axisWidth.StartMove(dPos);
                 return bWait ? m_axisWidth.WaitReady() : "OK";
+            }
+
+            public string RunAlign(bool bAlign)
+            {
+                m_axisWidth.StartMove(m_dPos + (bAlign ? 1000 : 0));
+                return "OK";
             }
             #endregion
 
@@ -172,7 +215,6 @@ namespace Root_Pine2.Module
             public void RunTree(Tree tree)
             {
                 m_dxPulse = tree.Set(m_dxPulse, m_dxPulse, "dPulse", "Distance between Buffer (pulse)");
-                m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Distance between Buffer (pulse)");
             }
 
             Transfer m_transfer; 
@@ -204,26 +246,26 @@ namespace Root_Pine2.Module
                 Ungrip,
                 Grip
             }
-            public string RunMoveGripper(eGripper eGripper, bool bWait = true)
+            public string RunMoveGripper(eGripper eGripper, double fOffset, bool bWait = true)
             {
-                m_axis.StartMove(eGripper);
+                m_axis.StartMove(eGripper, fOffset);
                 return bWait ? m_axis.WaitReady() : "OK";
             }
 
             public string RunGripperReady(eGripper eGripper)
             {
                 m_dioGripper.Write(false);
-                return RunMoveGripper(eGripper, false);
+                return RunMoveGripper(eGripper, 0, false);
             }
 
             public string RunGripper()
             {
                 if (Run(RunGripper(false))) return m_sRun;
-                if (Run(RunMoveGripper(eGripper.Grip))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Grip, 5000))) return m_sRun;
                 if (Run(RunGripper(true))) return m_sRun;
-                if (Run(RunMoveGripper(eGripper.Ungrip))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Ungrip, 0))) return m_sRun;
                 if (Run(RunGripper(false))) return m_sRun;
-                if (Run(RunMoveGripper(eGripper.Ready))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Ready, 0))) return m_sRun;
                 return "OK";
             }
 
@@ -243,6 +285,16 @@ namespace Root_Pine2.Module
             public bool IsExist()
             {
                 return m_diCheck.ReadDI(0) || m_diCheck.ReadDI(1);
+            }
+
+            public bool IsGripped()
+            {
+                return m_diCheck.ReadDI(0) && m_diCheck.ReadDI(1);
+            }
+
+            public bool IsPushed()
+            {
+                return m_diCheck.ReadDI(0);
             }
 
             public InfoStrip p_infoStrip { get; set; }
@@ -299,7 +351,7 @@ namespace Root_Pine2.Module
         #region Pusher
         public class Pusher : NotifyProperty
         {
-            DIO_I2O m_dioPusher;
+            public DIO_I2O m_dioPusher;
             DIO_I m_diOverload;
             DIO_Is m_diCheck;
             public void GetTools(ToolBox toolBox, Transfer module, bool bInit)
@@ -333,6 +385,11 @@ namespace Root_Pine2.Module
             public bool IsExist()
             {
                 return m_diCheck.ReadDI(0) || m_diCheck.ReadDI(1);
+            }
+
+            public bool IsPlaced()
+            {
+                return m_diCheck.ReadDI(0) && m_diCheck.ReadDI(1);
             }
 
             public InfoStrip p_infoStrip { get; set; }
@@ -402,24 +459,27 @@ namespace Root_Pine2.Module
                 Thread.Sleep(2000);
                 return m_pusher.WaitUnlock();
             }
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, false))) return p_sInfo;
-            if (Run(m_magazineEV.RunMove(infoStrip, 0))) return p_sInfo;
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, true))) return p_sInfo;
+            double xOffset = m_magazineEV.CalcXOffset(infoStrip);
+            if (Run(m_loaderPusher.RunMove(infoStrip.p_eMagazine, false))) return p_sInfo;
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, false))) return p_sInfo;
+            if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, true))) return p_sInfo;
             m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
-            try
+            if (Run(m_gripper.RunGripperReady(Gripper.eGripper.Grip))) return p_sInfo;
+            if (Run(m_loaderPusher.RunPusher(infoStrip.p_eMagazine))) return p_sInfo;
+            if (m_gripper.IsPushed())
             {
-                if (Run(m_gripper.RunGripperReady(Gripper.eGripper.Grip))) return p_sInfo;
-                if (Run(m_loaderPusher.RunPusher(infoStrip.p_eMagazine))) return p_sInfo;
                 if (Run(m_gripper.RunGripper())) return p_sInfo;
                 infoStrip = m_magazineEV.GetInfoStrip(false);
-                if (m_gripper.IsExist()) m_gripper.p_infoStrip = infoStrip;
-                else infoStrip.Dispose();
-                return m_pusher.WaitUnlock();
+                if (m_gripper.IsGripped()) m_gripper.p_infoStrip = infoStrip;
+                else return "Check Strip in Gripper";
             }
-            finally
+            else
             {
-                m_gripper.RunGripperReady(Gripper.eGripper.Ready); 
+                m_magazineEV.GetInfoStrip(false);
+                infoStrip.Dispose();
             }
+            return m_pusher.WaitUnlock();
         }
         #endregion
 
@@ -450,14 +510,20 @@ namespace Root_Pine2.Module
         {
             InfoStrip infoStrip = m_pusher.p_infoStrip; 
             if (infoStrip == null) return "OK";
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, false))) return p_sInfo;
-            if (Run(m_magazineEV.RunMove(infoStrip, m_buffer.m_dZ))) return p_sInfo;
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, true))) return p_sInfo;
+            if (m_pusher.IsPlaced() == false) return "Check Strip in Pusher"; 
+            double xOffset = m_magazineEV.CalcXOffset(infoStrip);
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, true, false))) return p_sInfo;
+            if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, true, true))) return p_sInfo;
             m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
             if (Run(m_pusher.RunPusher())) return p_sInfo;
+            if (m_pusher.IsExist()) return "Strip Exist in Pusher after Push";
+            ((Pine2_Handler)m_engineer.ClassHandler()).SendSortInfo(infoStrip);
             m_magazineEV.PutInfoStrip(infoStrip);
-            m_pusher.p_infoStrip = null; 
-            return m_gripper.WaitUnlock(); 
+            m_pusher.p_infoStrip = null;
+            if (Run(m_gripper.WaitUnlock())) return p_sInfo; 
+            m_engineer.ClassHandler().CheckFinish();
+            return "OK"; 
         }
         #endregion
 
@@ -471,6 +537,7 @@ namespace Root_Pine2.Module
                     m_loaderPusher.RunMoveReady(); 
                     break;
                 case Pine2.eRunMode.Magazine:
+                    if (m_pusher.p_bLock || m_gripper.p_bLock) return "OK";
                     if (m_pusher.p_infoStrip != null) return StartUnload();
                     if (m_gripper.p_infoStrip == null) return StartLoad();
                     return StartWaitLoader();
@@ -485,8 +552,17 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            if (m_gripper.IsExist() || m_pusher.IsExist())
+            {
+                m_alidGripper.p_bSet = m_gripper.IsExist();
+                m_alidPusher.p_bSet = m_pusher.IsExist(); 
+                p_eState = eState.Init;
+                return "Check Strip Sensor";
+            }
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            m_loaderPusher.Reset();
+            m_buffer.Reset(m_pine2);
             return p_sInfo;
         }
 
@@ -514,7 +590,8 @@ namespace Root_Pine2.Module
         {
             m_pine2 = pine2;
             m_magazineEV = magazineEV;
-            m_buffer = new Buffer(this); 
+            m_buffer = new Buffer(this);
+            m_loaderPusher = new LoaderPusher(magazineEV);
             InitBase(id, engineer); 
         }
 
@@ -532,6 +609,7 @@ namespace Root_Pine2.Module
         {
             AddModuleRunList(new Run_ChangeWidth(this), false, "Run Change Width");
             AddModuleRunList(new Run_LoaderPusher(this), false, "Run Load Pusher");
+            AddModuleRunList(new Run_MoveTranfer(this), false, "Run MoveTray");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip Strip");
             AddModuleRunList(new Run_Pusher(this), false, "Run Push Strip");
             m_runLoad = AddModuleRunList(new Run_RunLoad(this), false, "Run Load to Transfer");
@@ -596,6 +674,38 @@ namespace Root_Pine2.Module
             {
                 if (m_bPush) return m_module.m_loaderPusher.RunPusher(m_eMagazine);
                 else return m_module.m_loaderPusher.RunMove(m_eMagazine); 
+            }
+        }
+
+        public class Run_MoveTranfer : ModuleRunBase
+        {
+            Transfer m_module;
+            public Run_MoveTranfer(Transfer module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            InfoStrip.eMagazine m_eMagazine = InfoStrip.eMagazine.Magazine0;
+            bool m_bPushPos = false;
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveTranfer run = new Run_MoveTranfer(m_module);
+                run.m_eMagazine = m_eMagazine;
+                run.m_bPushPos = m_bPushPos;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eMagazine = (InfoStrip.eMagazine)tree.Set(m_eMagazine, m_eMagazine, "MagazineEV", "MagazineEV", bVisible);
+                m_bPushPos = tree.Set(m_bPushPos, m_bPushPos, "Pusher Pos", "Pusher Position", bVisible);
+            }
+
+            public override string Run()
+            {
+                double xOffset = m_module.m_magazineEV.m_aEV[m_eMagazine].CalcXOffset(); 
+                return m_module.m_buffer.RunMove(m_eMagazine, xOffset, m_bPushPos);
             }
         }
 

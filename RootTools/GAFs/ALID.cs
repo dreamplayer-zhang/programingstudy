@@ -68,7 +68,7 @@ namespace RootTools.GAFs
 			}
 		}
 
-		bool _bEQError = false;
+		bool _bEQError = true;
         public bool p_bEQError
         {
             get { return _bEQError; }
@@ -111,6 +111,18 @@ namespace RootTools.GAFs
             {
                 _dateTime = value;
                 OnPropertyChanged();
+                p_sTime = value.ToString("HH:mm:ss"); 
+            }
+        }
+
+        string _sTime = "";
+        public string p_sTime
+        {
+            get { return _sTime; }
+            set
+            {
+                _sTime = value;
+                OnPropertyChanged(); 
             }
         }
 

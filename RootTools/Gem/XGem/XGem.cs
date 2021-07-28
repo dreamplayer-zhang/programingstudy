@@ -1232,48 +1232,53 @@ namespace RootTools.Gem.XGem
             eThreadStep step = eThreadStep.Ready; 
             while (m_bThread)
             {
-                Thread.Sleep(20);
-                switch (step)
+                try
                 {
-                    case eThreadStep.Ready:
-                        if ((p_cjRun == null) && (m_qCJ.Count > 0))
-                        {
-                            //p_cjRun = m_qCJ.Dequeue();
-                            p_cjRun = m_qCJ.Peek();
-                            SendCJReqSelect(p_cjRun);
-                            step = eThreadStep.CheckPJ;
-                        }
-                        break;
-                    case eThreadStep.CheckPJ:
-                        if (IsPJProcessing()) step = eThreadStep.InAccessing;
-                        break;
-                    case eThreadStep.InAccessing:
-                        foreach (GemPJ pj in p_cjRun.m_aPJ)
-                        {
-                            foreach (GemCarrierBase carrier in pj.m_aCarrier)
+
+                    Thread.Sleep(20);
+                    switch (step)
+                    {
+                        case eThreadStep.Ready:
+                            if ((p_cjRun == null) && (m_qCJ.Count > 0))
                             {
-                                carrier.p_eReqAccess = GemCarrierBase.eAccess.InAccessed;
+                                //p_cjRun = m_qCJ.Dequeue();
+                                p_cjRun = m_qCJ.Peek();
+                                SendCJReqSelect(p_cjRun);
+                                step = eThreadStep.CheckPJ;
                             }
-                        }
-                        if(!EQ.p_bSimulate) m_engineer.ClassHandler().CalcSequence();
-                        step = eThreadStep.Processing;
-                        break;
-                    case eThreadStep.Processing:
-                        if (p_cjRun == null) 
-                            step = eThreadStep.Complete;
-                        break;
-                    case eThreadStep.Complete:
-                        GemCJ cj = m_aCJFinish[m_aCJFinish.Count - 1]; 
-                        foreach (GemPJ pj in cj.m_aPJ)
-                        {
-                            foreach (GemCarrierBase carrier in pj.m_aCarrier)
+                            break;
+                        case eThreadStep.CheckPJ:
+                            if (IsPJProcessing()) step = eThreadStep.InAccessing;
+                            break;
+                        case eThreadStep.InAccessing:
+                            foreach (GemPJ pj in p_cjRun.m_aPJ)
                             {
-                                carrier.p_eReqAccess = GemCarrierBase.eAccess.CarrierCompleted;
+                                foreach (GemCarrierBase carrier in pj.m_aCarrier)
+                                {
+                                    carrier.p_eReqAccess = GemCarrierBase.eAccess.InAccessed;
+                                }
                             }
-                        }
-                        step = eThreadStep.Ready;
-                        break; 
+                            if (!EQ.p_bSimulate) m_engineer.ClassHandler().CalcSequence();
+                            step = eThreadStep.Processing;
+                            break;
+                        case eThreadStep.Processing:
+                            if (p_cjRun == null)
+                                step = eThreadStep.Complete;
+                            break;
+                        case eThreadStep.Complete:
+                            GemCJ cj = m_aCJFinish[m_aCJFinish.Count - 1];
+                            foreach (GemPJ pj in cj.m_aPJ)
+                            {
+                                foreach (GemCarrierBase carrier in pj.m_aCarrier)
+                                {
+                                    carrier.p_eReqAccess = GemCarrierBase.eAccess.CarrierCompleted;
+                                }
+                            }
+                            step = eThreadStep.Ready;
+                            break;
+                    }
                 }
+                catch (Exception ex) { string a = ex.ToString(); }
             }
         }
 
@@ -1361,5 +1366,34 @@ namespace RootTools.Gem.XGem
             }
         }
 
+        public void MakeObject(ref long nObject)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetListItem(long nObject, int listCnt)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetStringItem(long nObject, string strItem)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetInt4Item(long nObject, int nitem)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetFloat4Item(long nObject, float fItem)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GEMSetVariables(long nObject, long nVid)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

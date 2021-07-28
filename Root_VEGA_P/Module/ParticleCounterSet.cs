@@ -106,6 +106,7 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region Result
+        [Serializable]
         public class Result
         {
             public DateTime m_dateTime = DateTime.Now;
@@ -120,6 +121,12 @@ namespace Root_VEGA_P.Module
                 m_fFlow = fFlow;
                 foreach (string sSize in lasairIII.m_asParticleSize) m_asSize.Add(sSize);
                 foreach (int nCount in lasairIII.m_aCount) m_aCount.Add(nCount); 
+            }
+            public bool Save()
+            {
+                return true;
+                //bool res = true;
+                //string PodInfoPath = App.RecipeRootPath
             }
         }
         public List<Result> m_aResult = new List<Result>(); 
@@ -142,12 +149,12 @@ namespace Root_VEGA_P.Module
                         {
                             Thread.Sleep(100);
                             if (EQ.IsStop()) return "EQ Stop";
-                            //bBackFlow |= m_regulator.IsBackFlow(); //forget
-                            //if (Run(ReadFlowSensor())) return m_sInfo;
+                            bBackFlow |= m_regulator.IsBackFlow(); //forget
+                            if (Run(ReadFlowSensor())) return m_sInfo;
                         }
                         Thread.Sleep((int)(1000 * m_vegaP.m_secPumpDelay));
-                        //Result result = new Result(bBackFlow, m_fFlow, m_particleCounter);
-                        //m_aResult.Add(result);
+                        Result result = new Result(bBackFlow, m_fFlow, m_particleCounter);
+                        m_aResult.Add(result);
                         if (Run(m_regulator.RunPump(0))) return m_sInfo;
                         Thread.Sleep((int)(1000 * m_vegaP.m_secPumpDelay));
                     }

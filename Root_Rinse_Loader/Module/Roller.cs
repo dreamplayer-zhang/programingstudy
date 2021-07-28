@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -31,6 +32,14 @@ namespace Root_Rinse_Loader.Module
         {
             m_axisRotate[0].AddSpeed(Enum.GetNames(typeof(eSpeed)));
             m_axisRotate[1].AddSpeed(Enum.GetNames(typeof(eSpeed)));
+        }
+        #endregion
+
+        #region GAF
+        ALID m_alidAxis;
+        void InitALID()
+        {
+            m_alidAxis = m_gaf.GetALID(this, "Rotate Axis Alarm", "Rotate Axis Alarm");
         }
         #endregion
 
@@ -75,6 +84,7 @@ namespace Root_Rinse_Loader.Module
 
         public string RunRotate(bool bRotate)
         {
+            m_alidAxis.p_bSet = m_axisRotate[0].p_sensorAlarm || m_axisRotate[1].p_sensorAlarm; 
             if (bRotate)
             {
                 eSpeed eSpeed = (m_rinse.p_eMode == RinseL.eRunMode.Stack) ? eSpeed.Stack : eSpeed.Magazine; 
@@ -123,6 +133,7 @@ namespace Root_Rinse_Loader.Module
         {
             p_id = id;
             m_rinse = rinse;
+            InitALID(); 
             InitILines();
             InitBase(id, engineer);
         }

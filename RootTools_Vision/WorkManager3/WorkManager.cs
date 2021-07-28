@@ -26,8 +26,11 @@ namespace RootTools_Vision.WorkManager3
         private WorkPipeLine pipeLine;
 
         private int threadNum;
+        private bool useCopyBuffer;
 
         private ConcurrentQueue<Workplace> currentWorkplaceQueue;
+
+        private bool isRunning = false;
         #endregion
 
 
@@ -35,6 +38,11 @@ namespace RootTools_Vision.WorkManager3
         public SharedBufferInfo SharedBuffer
         {
             get => this.sharedBuffer;
+        }
+
+        public bool IsRunning
+        {
+            get => this.isRunning;
         }
         #endregion
 
@@ -102,6 +110,7 @@ namespace RootTools_Vision.WorkManager3
         public WorkManager()
         {
             pipeLine = new WorkPipeLine(1);
+            pipeLine.WorkPipeLineDone += WorkPipeLineDone_Callback;
 
             this.threadNum = 1;
             WorkEventManager.PositionDone += PositionDone_Callback;
@@ -123,6 +132,7 @@ namespace RootTools_Vision.WorkManager3
         { 
             bool bCopyBuffer = false;
             pipeLine = new WorkPipeLine(inspectionThreadNum, bCopyBuffer);
+            pipeLine.WorkPipeLineDone += WorkPipeLineDone_Callback;
 
             this.threadNum = inspectionThreadNum;
 
@@ -144,8 +154,10 @@ namespace RootTools_Vision.WorkManager3
         public WorkManager(int inspectionThreadNum, bool bCopyBuffer)
         {
             pipeLine = new WorkPipeLine(inspectionThreadNum, bCopyBuffer);
+            pipeLine.WorkPipeLineDone += WorkPipeLineDone_Callback;
 
             this.threadNum = inspectionThreadNum;
+            this.useCopyBuffer = bCopyBuffer;
 
             WorkEventManager.PositionDone += PositionDone_Callback;
 
@@ -160,6 +172,11 @@ namespace RootTools_Vision.WorkManager3
             WorkEventManager.ProcessMeasurementDone += ProcessMeasurementDone_Callback;
 
             WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+        }
+
+        private void WorkPipeLineDone_Callback()
+        {
+            this.isRunning = false;
         }
 
 
@@ -202,58 +219,76 @@ namespace RootTools_Vision.WorkManager3
 
         public async void Start(bool inspOnly = true, Lotinfo lotInfo = null)
         {
-            if (block) return;
-
-            block = true;
-
-            if (this.sharedBuffer.PtrR_GRAY == IntPtr.Zero)
+            try
             {
-                throw new ArgumentException("SharedBuffer가 초기화되지 않았습니다.");
-            }
+                if (block) return;
+                this.block = true;
+                this.isRunning = true;
 
-            WorkBundle works = new WorkBundle();
-            // 레시피 기반으로 work/workplace 생성
-            if(inspOnly == false)
+                if (this.sharedBuffer.PtrR_GRAY == IntPtr.Zero)
+                {
+                    throw new ArgumentException("SharedBuffer가 초기화되지 않았습니다.");
+                }
+
+                WorkBundle works = new WorkBundle();
+                // 레시피 기반으로 work/workplace 생성
+                if (inspOnly == false)
+                {
+                    works.Add(new Snap());
+
+                }
+                WorkBundle temp = RecipeToWorkConverter.Convert(this.recipe);
+                foreach (WorkBase work in temp)
+                {
+                    works.Add(work);
+                }
+
+                this.currentWorkplaceQueue =
+                    RecipeToWorkplaceConverter.ConvertToQueue(this.recipe, this.sharedBuffer, this.cameraInfo);
+
+                //if (pipeLine.Stop() == false)
+                //{
+                //    this.pipeLine = new WorkPipeLine(threadNum, useCopyBuffer);
+                //    this.pipeLine.Reset();
+                //    TempLogger.Write("Worker", "PipeLine Initialize");
+                //}
+                //else
+                //{
+
+                //}
+
+                this.pipeLine.Stop();
+
+                this.pipeLine = new WorkPipeLine(threadNum, useCopyBuffer);
+                this.pipeLine.WorkPipeLineDone += WorkPipeLineDone_Callback;
+
+                if (lotInfo == null)
+                    DatabaseManager.Instance.SetLotinfo(DateTime.Now, DateTime.Now, Path.GetFileName(this.recipe.RecipePath));
+                else
+                    DatabaseManager.Instance.SetLotinfo(lotInfo);
+
+                currentWorkplaceBundle = this.currentWorkplaceQueue.First().ParentBundle;
+
+                pipeLine.Start(
+                    this.currentWorkplaceQueue,
+                    works
+                    );
+
+                WorkEventManager.OnInspectionStart(new object(), new InspectionStartArgs());
+
+                await Task.Delay(1000);
+
+                this.block = false;
+            }
+            catch
             {
-                works.Add(new Snap());
-                
+
+                this.isRunning = false;
             }
-            WorkBundle temp = RecipeToWorkConverter.Convert(this.recipe);
-            foreach(WorkBase work in temp)
+            finally
             {
-                works.Add(work);
+                this.block = false;
             }
-
-            this.currentWorkplaceQueue = 
-                RecipeToWorkplaceConverter.ConvertToQueue(this.recipe, this.sharedBuffer, this.cameraInfo);
-
-            if(pipeLine.Stop() == false)
-            {
-                this.pipeLine.Reset();
-                TempLogger.Write("Worker", "PipeLine Initialize");
-            }
-            else
-            {
-
-            }
-
-            if (lotInfo == null)
-                DatabaseManager.Instance.SetLotinfo(DateTime.Now, DateTime.Now, Path.GetFileName(this.recipe.RecipePath));
-            else
-                DatabaseManager.Instance.SetLotinfo(lotInfo);
-
-            currentWorkplaceBundle = this.currentWorkplaceQueue.First().ParentBundle;
-
-            pipeLine.Start(
-                this.currentWorkplaceQueue,
-                works
-                );
-
-            WorkEventManager.OnInspectionStart(new object(), new InspectionStartArgs());
-
-            await Task.Delay(1000);
-
-            block = false;
         }
 
 
@@ -274,7 +309,13 @@ namespace RootTools_Vision.WorkManager3
 
         public void Stop()
         {
-            pipeLine.Stop();
+            if(pipeLine != null)
+                pipeLine.Stop();
+
+            this.isRunning = false;
+            //pipeLine = null;
+
+            this.currentWorkplaceBundle = null;
 
             GC.Collect();
         }

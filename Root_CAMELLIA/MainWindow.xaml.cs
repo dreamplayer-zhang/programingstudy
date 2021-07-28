@@ -88,12 +88,11 @@ namespace Root_CAMELLIA
             m_handler = m_engineer.m_handler;
             //loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             //loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
-            marsLogManager = MarsLogManager.Instance;
+            //marsLogManager = MarsLogManager.Instance;
             int nLPNum = m_handler.m_aLoadport.Count;
             //for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTsemi);
             dlgOHT = new OHTs_UI();
             dlgOHT.Init((CAMELLIA_Handler)m_engineer.ClassHandler());
-
 
             SplashScreenHelper.ShowText("Handler Initialize Done");
 
@@ -106,16 +105,21 @@ namespace Root_CAMELLIA
 
             SplashScreenHelper.ShowText("Camellia2 Initialize Done");
 
-
             //SSLoggerNet sSLoggerNet = new SSLoggerNet();
             //DataFormatter data = new DataFormatter();
             //sSLoggerNet.WriteFNCLog(1, "1", "1", STATUS.START);
             //data.AddData("test", 1);
             //data.Serialize();
-            MarsLogManager instance = MarsLogManager.Instance;
-            instance.m_useLog = true;
+            //MarsLogManager instance = MarsLogManager.Instance;
+            //instance.m_useLog = true;
             //instance.m_sSLoggerNet.WriteFNCLog(EQ.p_nRunLP, m_handler.m_loadport[0].p_id, "Test", STATUS.START);
             //instance.m_sSLoggerNet.WriteFNCLog(EQ.p_nRunLP, m_handler.m_loadport[0].p_id, "Test", STATUS.END,  MATERIAL_TYPE.FOUP);
+
+            //StreamWriter sw = new StreamWriter, true); // append
+
+            //sw.WriteLine("asdf");
+
+
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -131,18 +135,16 @@ namespace Root_CAMELLIA
         private void M_timer_Tick(object sender, EventArgs e)
         {
             tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            if(DateTime.Now.Minute == 0 && DateTime.Now.Second == 0 && !isCFGWrite)
+
+            if (DateTime.Now.Minute == 0 && DateTime.Now.Second == 0 && !isCFGWrite)
             {
-                DataFormatter data = new DataFormatter();
-                data.AddData("Version", BaseDefine.Configuration.Version3);
-                marsLogManager.WriteCFG("Vision", "Version", data);
-                data.ClearData();
+                MarsLogManager.Instance.WriteCFG("Vision", BaseDefine.Category.EQUIPMENT.ToString(), "Version", BaseDefine.Configuration.Version3);
                 isCFGWrite = true;
             }
 
             if (DateTime.Now.Second == 1)
                 isCFGWrite = false;
-
+            //int a = 10;
             TimerUI();
             TimerLamp();
 
@@ -153,7 +155,7 @@ namespace Root_CAMELLIA
 
             if (EQ.p_eState == EQ.eState.Ready && m_handler.m_camellia.p_isClearInfoWafer)
             {
-                m_handler.m_process.ClearInfoWafer();
+                m_handler.p_process.ClearInfoWafer();
                 m_handler.m_camellia.p_isClearInfoWafer = false;
             }
         }
@@ -193,7 +195,7 @@ namespace Root_CAMELLIA
         bool IsEnable_Resume()
         {
             if (EQ.p_eState != EQ.eState.Ready) return false;
-            if (m_handler.m_process.p_qSequence.Count <= 0) return false;
+            if (m_handler.p_process.p_qSequence.Count <= 0) return false;
             return true;
         }
 
@@ -273,6 +275,8 @@ namespace Root_CAMELLIA
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Run; //? Run으로 되어있었음.
             EQ.p_bRecovery = true;
+            m_handler.m_bIsPossible_Recovery = false;
+            m_handler.m_IsCheckWTR = false;
         }
 
         bool IsEnable_Pause()
@@ -322,132 +326,7 @@ namespace Root_CAMELLIA
 
         #region Lamp Check Parameter
 
-        private void LampPMCheck(double dLeftLampTime)
-        {
-            //if (dLeftLampTime >= 0)
-            //{
-            //    string sLeftLampTime = dLeftLampTime.ToString();
-            //    p_LampTimeError = sLeftLampTime + " Hours Left until PM !";
-
-            //}
-            //else
-            //{
-            //    p_LampTimeError = "Please, Do Lamp PM";
-            //}
-        }
-
-        //private void UpdateLampTime(bool Initialize)
-        //{
-        //    double LampUseTime = UpdateLampData(Initialize, "t");
-
-        //    //p_LampTimeCount = LampUseTime;
-
-        //    // App.m_nanoView.m_PMDatas.
-        //    if (LampUseTime > 9500)
-        //    {
-        //        LampPMCheck(10000 - LampUseTime);
-        //    }
-        //}
-
-        //public SerialPort sp = new SerialPort();
-
-        //public double UpdateLampData(bool initialize, string CheckWord)
-        //{
-
-        //    if (initialize)
-        //    {
-        //        sp.PortName = "COM2";
-        //        sp.BaudRate = 9600;
-        //        sp.DataBits = 8;
-        //        sp.StopBits = StopBits.One;
-        //        sp.Parity = Parity.None;
-        //        //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
-        //        sp.Open();
-        //        sp.Write("c");
-
-        //    }
-
-        //    sp.Write(CheckWord);
-        //    string OutputData = sp.ReadExisting();
-        //    string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
-        //    string[] arr = OutputData.Split(':');
-        //    string[] strarr = arr[1].Split(',');
-        //    double LampUseTime = 0.0;
-        //    double value = 0.0;
-        //    int Hr, Min, Sec;
-        //    int m_Hr_Org, m_Min_Org, m_Sec_Org;
-        //    int m_Hr, m_Min, m_Sec;
-        //    string filepath;
-        //    foreach (string str in strtext)
-        //    {
-        //        if (OutputData.Contains(str))
-        //        {
-        //            if (OutputData.Contains("Time:"))
-        //            {
-        //                filepath = Application.StartupPath + "\\Timedata.txt";
-
-        //                FileInfo fi = new FileInfo(filepath);
-
-        //                m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
-        //                m_Hr = m_Min = m_Sec = 0;
-
-        //                if (fi.Exists)
-        //                {
-        //                    timedata = File.ReadAllText(@filepath);
-        //                    char sp = ':';
-        //                    string[] spstring = timedata.Split(sp);
-
-        //                    m_Hr_Org = Convert.ToInt32(spstring[0]);
-        //                    m_Min_Org = Convert.ToInt32(spstring[1]);
-        //                    m_Sec_Org = Convert.ToInt32(spstring[2]);
-
-
-        //                    Sec = Convert.ToInt32(arr[1]);
-
-        //                    m_Sec = Sec + m_Sec_Org;
-
-        //                    if (m_Sec >= 60)
-        //                    {
-        //                        m_Min = (m_Sec / 60) + m_Min_Org;
-
-        //                        m_Sec = m_Sec % 60;
-        //                    }
-        //                    else
-        //                    {
-        //                        m_Min = m_Min_Org;
-        //                    }
-
-        //                    if (m_Min >= 60)
-        //                    {
-        //                        m_Hr = (m_Min / 60) + m_Hr_Org;
-
-        //                        m_Min = m_Min % 60;
-        //                    }
-        //                    else
-        //                    {
-        //                        m_Hr = m_Hr_Org;
-        //                    }
-
-        //                    // strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
-
-
-        //                    value = m_Hr;
-
-        //                }
-        //                else
-        //                {
-        //                    decimal number1 = 0;
-        //                    bool canConvert = decimal.TryParse(arr[1], out number1);
-        //                    if (canConvert == true)
-        //                        value = Convert.ToDouble(number1);
-        //                }
-        //            }
-        //        }
-        //        return value;
-
-        //    }
-
-        //}
+      
 
         #endregion
     }

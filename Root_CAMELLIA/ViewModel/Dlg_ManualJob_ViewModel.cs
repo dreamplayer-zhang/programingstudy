@@ -272,6 +272,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    p_checkRnR = false;
                     CloseRequested(this, new DialogCloseRequestedEventArgs(false));
                 });
             }
@@ -304,6 +305,31 @@ namespace Root_CAMELLIA
             string recipePath = p_selectRecipe.Replace(Path.GetExtension(p_selectRecipe), "") + "\\" + p_selectRecipe;
             string sequenceRecipePath = BaseDefine.Dir_SequenceInitialPath + p_selectRecipe;
             bool isVisionRecipeOpen = false;
+
+            int firstIdx = -1;
+            int lastIdx = -1;
+            List<string> moduleRunList = new List<string>();
+
+            SSLNet.FlowData flowData;
+            SSLNet.DataFormatter dataFormatter;
+            if(EQ.p_nRunLP == 0)
+            {
+                flowData = MarsLogManager.Instance.m_flowDataA;
+                dataFormatter = MarsLogManager.Instance.m_dataFormatterA;
+            }
+            else
+            {
+                flowData = MarsLogManager.Instance.m_flowDataB;
+                dataFormatter = MarsLogManager.Instance.m_dataFormatterB;
+
+            }
+            flowData.ClearData();
+            RnRData rnrData = App.m_engineer.ClassHandler().GetRnRData();
+            rnrData.ClearData();
+            moduleRunList.Add(App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_sLocID);
+            rnrData.CarrierID = p_carrierID;
+            rnrData.LotID = p_lotID;
+
             for (int i = 0; i < nSlot; i++)
             {
                 m_infoCarrier.m_aGemSlot[i].p_sRecipe = "";
@@ -316,8 +342,10 @@ namespace Root_CAMELLIA
                     infoWafer.p_sWaferID = p_data[nSlot - 1 - i].p_waferID;
                     infoWafer.p_sLotID = p_lotID;
                     infoWafer.p_sCarrierID = p_carrierID;
+
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {
+                        rnrData.SelectSlot.Add(i);
                         infoWafer.RecipeOpen(sequenceRecipePath);
                         string visionPath = recipePath.Replace(Path.GetExtension(recipePath), ".aco");
                         m_infoCarrier.m_aGemSlot[i].p_sRecipe = infoWafer.p_sRecipe;
@@ -328,12 +356,63 @@ namespace Root_CAMELLIA
                             return;
                         }
                         isVisionRecipeOpen = true;
+
+                        if (firstIdx == -1)
+                        {
+                            firstIdx = i;
+                            for (int a = 0; a < infoWafer.m_moduleRunList.p_aModuleRun.Count; a++)
+                            {
+                                bool bFind = false;
+                                string module = infoWafer.m_moduleRunList.p_aModuleRun[a].m_moduleBase.p_id;
+                                foreach (string str in moduleRunList)
+                                {
+                                    if(module == str)
+                                    {
+                                        bFind = true;
+                                        break;
+                                    }
+                                }
+                                if (!bFind)
+                                    moduleRunList.Add(module);
+                            }
+                            moduleRunList.Add(App.m_engineer.m_handler.m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_sLocID);
+
+                            foreach(string str in moduleRunList)
+                            {
+                                string module = str;
+                                if(module == EQ.m_sModel)
+                                {
+                                    module = "Vision";
+                                }
+                                flowData.AddData(module);
+                            }
+                            MarsLogManager.Instance.WriteLEH(EQ.p_nRunLP, moduleRunList[0], SSLNet.LEH_EVENTID.CARRIER_LOAD, flowData);
+                            MarsLogManager.Instance.ChangeMaterial(EQ.p_nRunLP, firstIdx + 1, infoWafer.p_sLotID, m_infoCarrier.p_sCarrierID, Path.GetFileNameWithoutExtension(m_infoCarrier.m_aInfoWafer[firstIdx].p_sRecipe));
+                        }
+
                         m_infoCarrier.StartProcess(infoWafer.p_id);
+ 
+                        lastIdx = i;
                     }
                 }
             }
+            //foreach (CAMELLIA_Process.Sequence prc in App.m_engineer.m_handler.p_process.p_qSequence)
+            //{
+            //    string s = prc.p_moduleRun.p_id;
+            //}
+            if (firstIdx == lastIdx)
+                m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstLastWafer;
+            else
+            {
+                m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstWafer;
+                m_infoCarrier.m_aInfoWafer[lastIdx].p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
+            }
+
+            dataFormatter.ClearData();
+            dataFormatter.AddData("RecipeID", Path.GetFileNameWithoutExtension(m_infoCarrier.m_aInfoWafer[firstIdx].p_sRecipe));
             m_infoCarrier.SetSelectMapData(m_infoCarrier);
-            EQ.p_nRnR = p_checkRnR ? p_RnR : 0;
+            
+            EQ.p_nRnR = p_checkRnR ? p_RnR : 1;
 
             CloseRequested(this, new DialogCloseRequestedEventArgs(true));
         }

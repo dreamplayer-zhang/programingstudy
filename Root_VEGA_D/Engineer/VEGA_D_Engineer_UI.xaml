@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vegad="clr-namespace:Root_VEGA_D"
              xmlns:local="clr-namespace:Root_VEGA_D.Engineer"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:toolBox="clr-namespace:RootTools.ToolBoxs;assembly=RootTools"
@@ -29,6 +30,9 @@
             </TabItem>
             <TabItem Header="Setup" Background="DarkBlue">
                 <tree:TreeUI x:Name="treeRootUI"/>
+            </TabItem>
+            <TabItem Header="PM" Background="AliceBlue">
+                <vegad:PM_UI x:Name="PMUI"/>
             </TabItem>
         </TabControl>
     </Grid>

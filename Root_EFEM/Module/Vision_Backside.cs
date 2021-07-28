@@ -27,10 +27,15 @@ namespace Root_EFEM.Module
         #region ToolBox
         Axis axisZ;
         AxisXY axisXY;
-        DIO_O doVac;
+        public DIO_O doVac;
         DIO_O doBlow;
-        DIO_I diWaferExist;
+        public DIO_I diWaferExist;
         DIO_I diWaferExistVac;
+        DIO_I di_test1;
+        DIO_I di_test2;
+        DIO_I di_test3;
+        DIO_I di_test4;
+
         MemoryPool memoryPool;
         MemoryGroup memoryGroup;
         MemoryData memoryMain;
@@ -40,7 +45,7 @@ namespace Root_EFEM.Module
         Camera_Silicon camLADS;
         List<List<double>> ladsinfos;
 
-        ALID alid_WaferExist;
+        public ALID alid_WaferExist;
 
         #region Getter/Setter
         public Axis AxisZ { get => axisZ; private set => axisZ = value; }
@@ -59,6 +64,10 @@ namespace Root_EFEM.Module
                 p_sInfo = m_toolBox.GetDIO(ref doBlow, this, "Stage Blow");
                 p_sInfo = m_toolBox.GetDIO(ref diWaferExist, this, "Wafer Exist");
                 p_sInfo = m_toolBox.GetDIO(ref diWaferExistVac, this, "Wafer Exist Vac Check");
+                p_sInfo = m_toolBox.GetDIO(ref di_test1, this, "ESide Elec Panel Top door");
+                p_sInfo = m_toolBox.GetDIO(ref di_test2, this, "ESide Elec Panel Bottom door");
+                p_sInfo = m_toolBox.GetDIO(ref di_test3, this, "Eside PC Door Sensor");
+                p_sInfo = m_toolBox.GetDIO(ref di_test4, this, "Eside Top Loof Door Sensor");
 
                 p_sInfo = m_toolBox.Get(ref lightSet, this);
                 p_sInfo = m_toolBox.GetCamera(ref camMain, this, "MainCam");
@@ -91,6 +100,15 @@ namespace Root_EFEM.Module
             foreach (GrabModeBack grabMode in m_aGrabMode)
             {
                 if (sGrabMode == grabMode.p_sName) return grabMode;
+            }
+            return null;
+        }
+
+        public GrabModeBack GetGrabMode(int index)
+        {
+            if (m_aGrabMode?.Count > 0)
+            {
+                return m_aGrabMode[index];
             }
             return null;
         }
@@ -248,7 +266,7 @@ namespace Root_EFEM.Module
                 return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
             else
             {
-                return "FALSE";
+                return "OK";
                 //if (p_infoWafer == null) return m_id + " BeforeGet : InfoWafer = null";
                 //return CheckGetPut();
             }
@@ -268,14 +286,37 @@ namespace Root_EFEM.Module
 
         public string AfterGet(int nID)
         {
-            return "OK";
+            
+                doVac.Write(false);
+                Thread.Sleep(500);
+                if (!diWaferExist.p_bIn)
+                {
+                    return "OK";
+                }
+                else
+                {
+                    alid_WaferExist.Run(true, "Back Side Wafer Exist Error");
+                    return "OK";
+                }
+                return "OK";
         }
 
         public string AfterPut(int nID)
         {
+            doVac.Write(true);
+            Thread.Sleep(500);
+            if (diWaferExist.p_bIn && diWaferExistVac.p_bIn)
+            {
+                return "OK";
+            }
+            else
+            {
+                alid_WaferExist.Run(true, "Back Side Wafer Exist Error");
+                return "OK";
+            }
             //if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
             //    alid_WaferExist.Run(true, "Wafer Check Error");
-            return "OK";
+           // return "OK";
         }
 
         enum eCheckWafer
@@ -385,7 +426,29 @@ namespace Root_EFEM.Module
             ladsinfos = new List<List<double>>();
             OnChangeState += Backside_OnChangeState;
             InitMemorys();
+            testthread = new Thread(new ThreadStart(RunTest));
+            testthread.Start();
         }
+
+        public void RunTest()
+        {
+            //while(true)
+            //{
+            //    Thread.Sleep(500);
+            //    if (!di_test1.p_bIn)
+            //        GeneralFunction.WriteINIFile("1","2",di_test1.m_id + "Door Open Detected", @"D:\Share\1.ini");
+            //    else if (!di_test2.p_bIn)
+            //        GeneralFunction.WriteINIFile("1", "2", di_test2.m_id + "Door Open Detected", @"D:\Share\1.ini");
+            //    else if (!di_test3.p_bIn)
+            //        GeneralFunction.WriteINIFile("1", "2", di_test3.m_id + "Door Open Detected", @"D:\Share\1.ini");
+            //    else if (!di_test4.p_bIn)
+            //        GeneralFunction.WriteINIFile("1", "2", di_test4.m_id + "Door Open Detected", @"D:\Share\1.ini");
+            //    else
+            //        GeneralFunction.WriteINIFile("1", "2", "", @"D:\Share\1.ini");
+            //}
+        }
+
+        Thread testthread;
 
         private void Backside_OnChangeState(eState eState)
         {

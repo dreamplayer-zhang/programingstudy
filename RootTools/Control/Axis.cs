@@ -204,7 +204,7 @@ namespace RootTools.Control
         #endregion
 
         #region SW Limit
-        bool[] m_bSWLimit = new bool[2] { false, false };
+        protected bool[] m_bSWLimit = new bool[2] { false, false };
         protected bool m_bSWBoardLimit = false;
 
         protected string CheckSWLimit(ref double fPosDst)
@@ -215,7 +215,11 @@ namespace RootTools.Control
             if (m_bSWLimit[0])
             {
                 if (fPosDst >= fPosMinusLimit) return "OK";
-                if (fPosNow < fPosMinusLimit) return "SW Minus Limit Error : " + fPosDst.ToString();
+                if (fPosNow < fPosMinusLimit)
+                {
+                    EQ.p_bStop = true;
+                    return "SW Minus Limit Error : " + fPosDst.ToString();
+                }
                 fPosDst = fPosMinusLimit;
                 return "OK";
             }
@@ -223,7 +227,11 @@ namespace RootTools.Control
             if (m_bSWLimit[1])
             {
                 if (fPosDst <= fPosPlusLimit) return "OK";
-                if (fPosNow > fPosPlusLimit) return "SW Plus Limit Error : " + fPosDst.ToString();
+                if (fPosNow > fPosPlusLimit)
+                {
+                    EQ.p_bStop = true;
+                    return "SW Plus Limit Error : " + fPosDst.ToString();
+                }
                 fPosDst = fPosPlusLimit;
                 return "OK";
             }
@@ -234,8 +242,16 @@ namespace RootTools.Control
         {
             if (vJog == 0) return "OK";
             double fPosNow = p_posCommand;
-            if (m_bSWLimit[0] && (vJog < 0) && (fPosNow <= m_aPos[p_asPos[0]])) return "SW Minus Limit Error";
-            if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[p_asPos[1]])) return "SW Plus Limit Error";
+            if (m_bSWLimit[0] && (vJog < 0) && (fPosNow <= m_aPos[p_asPos[0]]))
+            {
+                EQ.p_bStop = true;
+                return "SW Minus Limit Error";
+            }
+            if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[p_asPos[1]]))
+            {
+                EQ.p_bStop = true;
+                return "SW Plus Limit Error";
+            }
             return "OK";
         }
 
@@ -404,7 +420,7 @@ namespace RootTools.Control
             if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
             //if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
-            return CheckSWLimit (fScale * m_speedNow.m_v);
+            return CheckSWLimit(fScale * m_speedNow.m_v);
         }
 
         public virtual void StopAxis(bool bSlowStop = true) { }
@@ -422,6 +438,7 @@ namespace RootTools.Control
             return StartMove(fPos, sSpeed);
         }
 
+        public bool m_bCheckStop = true; 
         public double m_posDst = 0;
         int m_msMoveTime = 0;
         public virtual string StartMove(double fPos, string sSpeed = null)
@@ -429,7 +446,7 @@ namespace RootTools.Control
             m_posDst = fPos;
             m_speedNow = (sSpeed != null) ? GetSpeedValue(sSpeed) : GetSpeedValue(EQ.p_bDoorOpen ? eSpeed.Move_DoorOpen : eSpeed.Move);
             m_swMove.Start();
-            if (EQ.IsStop()) return p_id + " EQ Stop";
+            if (m_bCheckStop && EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
             if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
             double dPos = fPos - p_posCommand;
@@ -561,7 +578,7 @@ namespace RootTools.Control
             string sStartHome = ResetAlarm();
             ServoOn(true);
             Thread.Sleep(10); 
-            if (p_bServoOn == false) return p_id + " ServoOn Error";
+            //if (p_bServoOn == false) return p_id + " ServoOn Error";
             return "OK";
         }
 
@@ -699,12 +716,14 @@ namespace RootTools.Control
         {
             m_trigger.Set(fPos0, fPos1, dPos, bCmd, -1);
             RunTrigger(true, m_trigger);
+            p_log.Info("SetTrigger : " + dPos.ToString() + ", " + fPos0.ToString() + " ~ " + fPos1.ToString()); 
         }
 
         public void SetTrigger(double fPos0, double fPos1, double dPos, double dUptime, bool bCmd)
         {
             m_trigger.Set(fPos0, fPos1, dPos, bCmd, dUptime);
             RunTrigger(true, m_trigger);
+            p_log.Info("SetTrigger : " + dPos.ToString() + ", " + fPos0.ToString() + " ~ " + fPos1.ToString());
         }
 
         public virtual void RunTrigger(bool bOn, Trigger trigger = null) { }
@@ -735,7 +754,9 @@ namespace RootTools.Control
         {
             m_treeRootSetting = new TreeRoot(p_id + ".Setting", p_log);
             m_treeRootSetting.UpdateTree += M_treeRootSetting_UpdateTree;
+            
             RunTreeSetting(Tree.eMode.RegRead);
+            RunTreeSetting(Tree.eMode.Update);
         }
 
         private void M_treeRootSetting_UpdateTree()

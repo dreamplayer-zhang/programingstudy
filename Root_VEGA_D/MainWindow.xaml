@@ -30,35 +30,6 @@
             <Setter Property="HorizontalAlignment"
                     Value="Left" />
         </Style>
-        <Style TargetType="{x:Type ToggleButton}" x:Key="IO_indicator">
-            <Setter Property="BorderThickness" Value="0"></Setter>
-            <Setter Property="Background" Value="{PriorityBinding}"></Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid Background="Transparent" Name="grd" Grid.Column="1"
-                                    Margin="{TemplateBinding Padding}" VerticalAlignment="Center"
-                                  Height="20"
-                                    Width="20">
-                                <Ellipse x:Name="ellipse" Stroke="{TemplateBinding BorderBrush}"
-                                        StrokeThickness="2" Stretch="Uniform"
-                                        Fill="{TemplateBinding  Background}"></Ellipse>
-                            </Grid>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="ellipse" Property="Fill" Value="#FFBBBBBB" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
 
     <Grid>
@@ -78,14 +49,16 @@
             <Viewbox Margin="3">
                 <icon:AtiLogo/>
             </Viewbox>
-            <TextBlock Text="ADI"
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal">
+                <TextBlock Text="VEGA-D"
                        FontFamily="Arial"
                        Foreground="White"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       FontSize="15"
-                       Margin="10,0,0,0"
-                       Grid.Column="1" />
+                       FontSize="15" FontWeight="Bold"
+                       Margin="10,0,0,0"/>
+                <TextBlock x:Name="VersionInfo" Margin="10,0,0,0" Foreground="White"  FontFamily="Arial" FontSize="15" VerticalAlignment="Center" FontWeight="Bold"></TextBlock>
+            </StackPanel>
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
                         Orientation="Horizontal"
                         Grid.Column="2">
@@ -175,7 +148,6 @@
                       Grid.Row="0">
                     <Grid.RowDefinitions>
                         <RowDefinition />
-                        <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
@@ -183,13 +155,15 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="1"
                           Grid.Row="0">
-                        <TextBlock Text="VEGA-D" FontSize="20"
-                                   FontWeight="Bold" />
+                        <!--<TextBlock Text="VEGA-D" FontSize="20"
+                                   FontWeight="Bold" />-->
                     </Grid>
                     <Grid Grid.Column="1"
                           Grid.Row="1">
-                        <TextBlock x:Name="VersionInfo" FontSize="20"
-                                   FontWeight="Bold" />
+                        <TextBlock x:Name="NowTime"
+                                       HorizontalAlignment="Center"
+                                   FontSize="15"
+                                       FontWeight="Bold" />
                     </Grid>
                     <Grid Grid.Column="0"
                           Grid.RowSpan="2">
@@ -220,10 +194,7 @@
                             <ColumnDefinition Width="3*" />
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0">
-                            <TextBlock x:Name="NowTime"
-                                       HorizontalAlignment="Left"
-                                       Margin="30,0,0,0"
-                                       FontWeight="Bold" />
+                         
                         </Grid>
                         <Grid Grid.Column="1">
 
@@ -339,7 +310,28 @@
                     </Grid>
                     <Grid Grid.Column="4">
                         <Viewbox Margin="5">
-                            <control:LoadingControl />
+                            <control:LoadingControl/>
+                            <Viewbox.Style>
+                                <Style TargetType="Viewbox">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=p_eState, Source={x:Static tools:EQ.m_EQ}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Value="Error">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=p_eState, Source={x:Static tools:EQ.m_EQ}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Value="Ready">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=p_eState, Source={x:Static tools:EQ.m_EQ},  UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Value="Init">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=p_eState, Source={x:Static tools:EQ.m_EQ},  UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Value="ModuleRunList">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=p_eState, Source={x:Static tools:EQ.m_EQ},  UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Value="Run">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Viewbox.Style>
                         </Viewbox>
                     </Grid>
                     <Border Grid.Column="6"
@@ -371,6 +363,7 @@
                         <ColumnDefinition />
                         <ColumnDefinition />
                         <ColumnDefinition />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0"
                           Margin="5">
@@ -396,6 +389,14 @@
                                 Margin="0"
                                 Style="{StaticResource SetupPanelBtn}"
                                 Click="btnLogin_Click"/>
+                    </Grid>
+                    <Grid Grid.Column="3"
+                          Margin="5">
+                        <Button
+                                Content="Review"
+                                Margin="0"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Command="{Binding CmdReview}"/>
                     </Grid>
                 </Grid>
                 <!--Left Panel-->
@@ -449,46 +450,513 @@
                                    HorizontalAlignment="Center"
                                    FontWeight="Bold" />
                     </Grid>
-                    <TabControl Style="{StaticResource ResourceKey=WizardTabControl}" Grid.Row="1">
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.09*"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <StackPanel>
+                                <RadioButton Style="{StaticResource TabRadio}" Command="{Binding CmdInfo}" Content="Information"/>
+                                <RadioButton x:Name="RunTab" Style="{StaticResource TabRadio}" Command="{Binding CmdRun}" Content="Run"/>
+                                <RadioButton x:Name="engineerTab" Style="{StaticResource TabRadio}" Command="{Binding CmdEngineer}" Content="Engineer"/>
+                                <RadioButton x:Name="RecipeTab" Style="{StaticResource TabRadio}" Command="{Binding CmdRecipe}" Content="Recipe"/>
+                            </StackPanel>
+                            <Grid Grid.Row="1">
+                                <StackPanel VerticalAlignment="Bottom">
+                                    <Button Grid.Column="0"
+                                    x:Name="buttonResume" Height="40"
+                                    Content="Resume"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonResume_Click"/>
+                                    <Button Grid.Column="1"
+                                    x:Name="buttonPause" Height="40"
+                                    Content="Pause"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonPause_Click"/>
+                                    <Button Grid.Column="2" Height="40"
+                                    x:Name="buttonInitialize"
+                                    Content="Initialize"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonInitialize_Click"/>
+                                    <Button Grid.Column="0" Height="40"
+                                    x:Name="buttonRecovery"
+                                    Content="Recovery"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonRecovery_Click"/>
+                                    <Button Grid.Column="2"
+                                    x:Name="buttonBuzzOff" Height="40"
+                                    Content="Buzzer Off"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonBuzzOff_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                        <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="2,0,0,0">
+                            <Grid>
+                                <ContentControl Content="{Binding p_CurrentPanel}"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <!--<TabControl Style="{StaticResource ResourceKey=WizardTabControl}" Grid.Row="1">
                         <TabItem Header="Information"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
-                            <ScrollViewer Background="AliceBlue" FontSize="17">
-                                <StackPanel>
-                                    <Grid Grid.Column="0"
-                                          Background="AliceBlue"
-                                          Height="840">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="3*" />
-                                            <RowDefinition Height="10*" />
-                                            <RowDefinition Height="10*" />
-                                            <RowDefinition Height="15*" />
-                                            <RowDefinition Height="15*" />
-                                            <RowDefinition Height="15*" />
-                                            <RowDefinition Height="8*" />
-
-                                        </Grid.RowDefinitions>
-                                        <GroupBox Header="Product Info"
-                                                  Grid.Column="0"
-                                                  Grid.Row="1" DataContext="">
-                                            <UniformGrid Margin="5,2">
-
-                                                <TextBlock Text="Reticle ID"
+                            <ScrollViewer Background="Transparent" FontSize="17">
+                                <Grid Grid.Column="0"
+                                          Background="Transparent"
+                                          Height="856">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="0.15*"/>
+                                    </Grid.RowDefinitions>
+                                    <GroupBox Header="Recipe Info">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="11*" />
+                                                <RowDefinition Height="10*" />
+                                                <RowDefinition Height="15*" />
+                                                <RowDefinition Height="15*" />
+                                                <RowDefinition Height="8*" />
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Column="0" Grid.Row="0" DataContext="">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <GroupBox Header="Product Info" DataContext="">
+                                                    <UniformGrid Margin="5,2">
+                                                        <TextBlock Text="Reticle ID"
                                                            HorizontalAlignment="Left" />
-                                                <TextBlock Text="{Binding p_sSlotID}" x:Name="TextBlockRetID"
+                                                        <TextBlock Text="{Binding p_sSlotID}" x:Name="TextBlockRetID"
                                                            HorizontalAlignment="Left" />
-                                                <TextBlock Text="Reticle Type"
+                                                        <TextBlock Text="Reticle Type"
                                                            HorizontalAlignment="Left" />
-                                                <TextBlock Text="EUV"
+                                                        <TextBlock Text="EUV"
                                                            HorizontalAlignment="Left" />
-                                            </UniformGrid>
-                                        </GroupBox>
-                                        <GroupBox Header="Reticle Location"
+                                                    </UniformGrid>
+                                                </GroupBox>
+                                                <GroupBox Header="Illumination Info"
                                                   Grid.Column="1"
                                                   Grid.Row="1">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <GroupBox Header="Illum">
+                                                            <UniformGrid Margin="5,2"
+                                                         Columns="2">
+                                                                <TextBlock Text="Red" Foreground="Red"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="Green" Foreground="Green"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="Blue" Foreground="Blue"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="White" Foreground="LightSlateGray"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                                            </UniformGrid>
+                                                        </GroupBox>
+                                                        <GroupBox Header="Align Illum" Grid.Column="1">
+                                                            <UniformGrid Margin="5,2"
+                                                         Columns="2">
+                                                                <TextBlock Text="Red" Foreground="Red"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="Green" Foreground="Green"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="Blue" Foreground="Blue"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="White" Foreground="LightSlateGray"
+                                                           HorizontalAlignment="Left" />
+                                                                <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                                            </UniformGrid>
+                                                        </GroupBox>
+                                                    </Grid>
+                                                </GroupBox>
+                                            </Grid>
+                                            <GroupBox Header="Coordinate Info" Grid.Row="1">
+                                                <Grid Margin="5,2">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition />
+                                                    </Grid.RowDefinitions>
+                                                    <UniformGrid Columns="2"
+                                                             Grid.Row="0">
+                                                        <TextBlock Text="File"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="D:\DieInfoFile.xml"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="Die Size"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="17972, 50504"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="Scribe Lane Size"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="280, 280"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="Shot Size"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="127484, 101288"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="Shot"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="64.18, 180.37"
+                                                               HorizontalAlignment="Left" />
+                                                    </UniformGrid>
+                                                </Grid>
+                                            </GroupBox>
+                                            <Grid Grid.Column="0" Grid.Row="2" Grid.RowSpan="3">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="450"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="450"/>
+                                                    </Grid.RowDefinitions>
+                                                    <GroupBox Header="Key">
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition/>
+                                                                <RowDefinition/>
+                                                            </Grid.RowDefinitions>
+                                                            <Border Background="Black" Margin="3">
+                                                                <Image x:Name="imageLeftTopAlignKey" Source="{Binding p_bmpLeftTopAlignKeySrc}"/>
+                                                            </Border>
+                                                            <Border Background="Black" Grid.Row="1" Margin="3">
+                                                                <Image x:Name="imageLeftBottomAlignKey" Source="{Binding p_bmpLeftBottomAlignKeySrc}"/>
+                                                            </Border>
+                                                        </Grid>
+                                                    </GroupBox>
+                                                    <GroupBox Header="Inspection Area"
+                                                  Grid.Column="1"
+                                                  Grid.Row="3"
+                                                  Grid.RowSpan="3">
+
+                                                        <Viewbox Grid.Column="1">
+                                                            <Canvas Width="1000" Background="Black"
+                                                            Height="1000">
+                                                                <TextBlock Text="Pattern Area"
+                                                                   Canvas.Left="230"
+                                                                   Canvas.Top="70"
+                                                                   FontSize="15"
+                                                                   FontWeight="Bold"
+                                                                   Panel.ZIndex="5"
+                                                                   Height="20" />
+                                                                <TextBlock Text="NonPattern Area"
+                                                                   Canvas.Left="160"
+                                                                   Canvas.Top="20"
+                                                                   FontSize="15"
+                                                                   FontWeight="Bold"
+                                                                   Panel.ZIndex="5"
+                                                                   Height="20" />
+                                                                <Rectangle Stroke="Coral"
+                                                                   Fill="Coral"
+                                                                   StrokeThickness="4"
+                                                                   Opacity="0.3"
+                                                                   Panel.ZIndex="2"
+                                                                   Width="558"
+                                                                   Height="856"
+                                                                   Canvas.Left="225"
+                                                                   Canvas.Top="70" />
+                                                                <Rectangle Stroke="SteelBlue"
+                                                                   Fill="SteelBlue"
+                                                                   StrokeThickness="4"
+                                                                   Opacity="0.3"
+                                                                   Width="708"
+                                                                   Height="956"
+                                                                   Canvas.Left="155"
+                                                                   Canvas.Top="20" />
+
+                                                            </Canvas>
+                                                        </Viewbox>
+                                                    </GroupBox>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                    <Grid Grid.Row="6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="2*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <GroupBox Header="FDC"
+                                                  Grid.Column="0">
+                                            <Grid Margin="5,2">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="2*"/>
+                                                    <ColumnDefinition Width="0.65*"/>
+                                                    <ColumnDefinition Width="1*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="CDA 1" FontSize="12"
+                                                           HorizontalAlignment="Left"/>
+                                                <TextBlock Grid.Column="1" 
+                                                           HorizontalAlignment="Left"
+                                                           x:Name="FDC_CDA1" FontSize="12"
+                                                           Text="{Binding p_CDA1_Value}"/>
+                                                <TextBlock Grid.Column="2" Text="MPa" FontSize="12"
+                                                           HorizontalAlignment="Left"/>
+                                                <TextBlock  Grid.Row="1"  Grid.Column="0" Text="INSPECT CDA" FontSize="12"
+                                                           HorizontalAlignment="Left"/>
+                                                <TextBlock  Grid.Row="1"  Grid.Column="1"
+                                                           x:Name="FDC_CDA2" FontSize="12"
+                                                           Text="{Binding p_CDA2_Value}"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock  Grid.Row="1"  Grid.Column="2" Text="MPa" FontSize="12"
+                                                           HorizontalAlignment="Left"/>
+                                            </Grid>
+                                        </GroupBox>
+                                        <GroupBox Header="FFU" Grid.Column="1">
+                                            <Grid Margin="5,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <module:FFU_Fan_UI Grid.Row="0" x:Name="FanUI0"/>
+                                                <module:FFU_Fan_UI Grid.Column="1" x:Name="FanUI1"/>
+                                                <module:FFU_Fan_UI Grid.Column="2" x:Name="FanUI2"/>
+                                                <module:FFU_Fan_UI Grid.Column="3" x:Name="FanUI3"/>
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
+                                    <Grid Grid.Column="1">
+                                        <GroupBox Header="Inspection Info">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="11*" />
+                                                    <RowDefinition Height="10*" />
+                                                    <RowDefinition Height="15*" />
+                                                    <RowDefinition Height="8*" />
+                                                </Grid.RowDefinitions>
+                                                <GroupBox Header="Reticle Location"
+                                                  Grid.Column="1"
+                                                  Grid.Row="0">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Border Grid.Column="0" Grid.Row="0">
+                                                            <TextBlock Text="LoadportA"
+                                           FontWeight="SemiBold"/>
+                                                        </Border>
+                                                        <Border Grid.Column="1" Grid.Row="0">
+                                                            <TextBlock Text="LoadportB"
+                                           FontWeight="SemiBold"/>
+                                                        </Border>
+                                                        <Border Grid.Column="2" Grid.Row="0">
+                                                            <TextBlock Text="Robot"
+                                           FontWeight="SemiBold"/>
+                                                        </Border>
+                                                        <Border Grid.Column="3" Grid.Row="0">
+                                                            <TextBlock Text="Vision"        
+                               FontWeight="SemiBold"/>
+                                                        </Border>
+                                                        <Border Grid.Column="0" Grid.Row="1" x:Name="LoadportABack">
+                                                            <TextBlock x:Name="LoadportAState" Text="{Binding p_eState}"
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                                        </Border>
+                                                        <Border Grid.Column="1" Grid.Row="1" x:Name="LoadportBBack">
+                                                            <TextBlock x:Name="LoadportBState" Text="{Binding p_eState}"
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                                        </Border>
+                                                        <Border Grid.Column="2" Grid.Row="1" x:Name="RobotBack">
+                                                            <TextBlock x:Name="RobotState" Text="{Binding p_eState}"
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                                        </Border>
+                                                        <Border Grid.Column="3" Grid.Row="1" x:Name="VisionBack">
+                                                            <TextBlock x:Name="VisionState" Text="{Binding p_eState}"
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </GroupBox>
+                                                <GroupBox  Header="Inspection Info"
+                                                       Grid.Row="1">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="1.5*" />
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition Width="2*" />
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition Width="2*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+                                                        <TextBlock Text="Pattern"
+                                                               Grid.Column="0"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="True"
+                                                               Foreground="Green"
+                                                               Grid.Column="1"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Center" />
+                                                        <TextBlock Text="X, Y"
+                                                               Grid.Column="2"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Center" />
+                                                        <TextBlock Text="12315, 465547"
+                                                               Grid.Column="3"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="Size"
+                                                               Grid.Column="4"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Center" />
+                                                        <TextBlock Text="34555, 273433"
+                                                               Grid.Column="5"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="NonPattern"
+                                                               Grid.Column="0"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="True"
+                                                               Foreground="Green"
+                                                               Grid.Column="1"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Center" />
+                                                        <TextBlock Text="X, Y"
+                                                               Grid.Column="2"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Center" />
+                                                        <TextBlock Text="2315, 765547"
+                                                               Grid.Column="3"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Left" />
+                                                        <TextBlock Text="Size"
+                                                               Grid.Column="4"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Center" />
+                                                        <TextBlock Text="74555, 573433"
+                                                               Grid.Column="5"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Left" />
+                                                    </Grid>
+                                                </GroupBox>
+                                                <Grid Grid.Row="2" Grid.RowSpan="2">
+                                                    <GroupBox Header="Inspection Summary">
+                                                        <DataGrid>
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="No." Width="40"/>
+                                                                <DataGridTextColumn Header="Inspection Recipe" Width="auto"/>
+                                                                <DataGridTextColumn Header="Pod ID" Width="auto"/>
+                                                                <DataGridTextColumn Header="Lot ID" Width="auto"/>
+                                                                <DataGridTextColumn Header="Inspection Time" Width="auto"/>
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
+                                                    </GroupBox>
+                                                </Grid>
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
+                                    <Grid Grid.Row="1" Grid.Column="1">
+                                        <GroupBox Header="Isolator IO"
+                                                  Grid.Column="1"
+                                                  Grid.Row="6" Grid.ColumnSpan="1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="1*"/>
+                                                    <RowDefinition Height="2*"/>
+                                                    <RowDefinition Height="0.4*"/>
+                                                    <RowDefinition Height="1*"/>
+                                                    <RowDefinition Height="2*"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="FP Isolator" Grid.Column="0" Grid.Row="0" 
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                                                <ToggleButton  x:Name="btnFP_Isolator" Width ="{PriorityBinding}" Background="Green" Grid.Column="0" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Isolator V" Grid.Column="1" Grid.Row="0"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                                                <ToggleButton x:Name="btnIsolator_V" Width ="{PriorityBinding}" Background="Green" Grid.Column="1" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Factory Air Pad" Grid.Column="2" Grid.Row="0"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                                                <ToggleButton x:Name="btn_Factory_Air_Pad" Width ="{PriorityBinding}" Background="Green" Grid.Column="2" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Air Tank" Grid.Column="3" Grid.Row="0"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                                                <ToggleButton x:Name="btn_Air_Tank" Width ="{PriorityBinding}" Background="Green" Grid.Column="3" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="X Bottom" Grid.Column="4" Grid.Row="0"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                                                <ToggleButton x:Name="btn_X_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="4" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="X Side Master" Grid.Column="0" Grid.Row="3"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                                                <ToggleButton x:Name="btn_X_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="0" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="X Side Slave" Grid.Column="1" Grid.Row="3"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                                                <ToggleButton x:Name="btn_X_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="1" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Y Bottom" Grid.Column="2" Grid.Row="3"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                                                <ToggleButton x:Name="btn_Y_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="2" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Y Side Master" Grid.Column="3" Grid.Row="3"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                                                <ToggleButton x:Name="btn_Y_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="3" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Y Side Slave" Grid.Column="4" Grid.Row="3"
+                                                           HorizontalAlignment="Center" FontSize="12"/>
+                                                <ToggleButton x:Name="btn_Y_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="4" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
+                                </Grid>
+                                --><!--<GroupBox Header="Reticle Location"
+                                                  Grid.Column="1"
+                                                  Grid.Row="0">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition/>
@@ -532,26 +1000,21 @@
                                                     <TextBlock x:Name="VisionState" Text="{Binding p_eState}"
                                FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
                                                 </Border>
-                                                    <!--<TextBlock Text="Recipe Name"
+                                                    --><!--<TextBlock Text="Recipe Name"
                                                            HorizontalAlignment="Left" />
                                                 <TextBlock Text="200811ADI.rcp"
                                                            HorizontalAlignment="Left" />
                                                 <TextBlock Text="Last Write Time"
                                                            HorizontalAlignment="Left" />
                                                 <TextBlock Text="2020-08-11 11:20"
-                                                           HorizontalAlignment="Left" />-->
+                                                           HorizontalAlignment="Left" />--><!--
                                             </Grid>
                                         </GroupBox>
                                         <GroupBox Header="Isolator IO"
-                                                  Grid.Column="0"
-                                                  Grid.Row="6" Grid.ColumnSpan="2">
+                                                  Grid.Column="1"
+                                                  Grid.Row="6" Grid.ColumnSpan="1">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
                                                     <ColumnDefinition/>
                                                     <ColumnDefinition/>
                                                     <ColumnDefinition/>
@@ -561,75 +1024,58 @@
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="1*"/>
                                                     <RowDefinition Height="2*"/>
+                                                    <RowDefinition Height="0.4*"/>
+                                                    <RowDefinition Height="1*"/>
+                                                    <RowDefinition Height="2*"/>
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Text="FP Isolator" Grid.Column="0" Grid.Row="0" 
                                                            HorizontalAlignment="Center" FontSize="12"/>
                                                 <ToggleButton  x:Name="btnFP_Isolator" Width ="{PriorityBinding}" Background="Green" Grid.Column="0" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
                                                 <TextBlock Text="Isolator V" Grid.Column="1" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
                                                 <ToggleButton x:Name="btnIsolator_V" Width ="{PriorityBinding}" Background="Green" Grid.Column="1" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
                                                 <TextBlock Text="Factory Air Pad" Grid.Column="2" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
                                                 <ToggleButton x:Name="btn_Factory_Air_Pad" Width ="{PriorityBinding}" Background="Green" Grid.Column="2" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
                                                 <TextBlock Text="Air Tank" Grid.Column="3" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
                                                 <ToggleButton x:Name="btn_Air_Tank" Width ="{PriorityBinding}" Background="Green" Grid.Column="3" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
                                                 <TextBlock Text="X Bottom" Grid.Column="4" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
                                                 <ToggleButton x:Name="btn_X_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="4" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="X Side Master" Grid.Column="5" Grid.Row="0"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="X Side Master" Grid.Column="0" Grid.Row="3"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_X_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="5" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="X Side Slave" Grid.Column="6" Grid.Row="0"
+                                                <ToggleButton x:Name="btn_X_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="0" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="X Side Slave" Grid.Column="1" Grid.Row="3"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_X_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="6" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Y Bottom" Grid.Column="7" Grid.Row="0"
+                                                <ToggleButton x:Name="btn_X_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="1" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Y Bottom" Grid.Column="2" Grid.Row="3"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="7" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Y Side Master" Grid.Column="8" Grid.Row="0"
+                                                <ToggleButton x:Name="btn_Y_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="2" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Y Side Master" Grid.Column="3" Grid.Row="3"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="8" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Y Side Slave" Grid.Column="9" Grid.Row="0"
+                                                <ToggleButton x:Name="btn_Y_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="3" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Y Side Slave" Grid.Column="4" Grid.Row="3"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="9" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton x:Name="btn_Y_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="4" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
                                             </Grid>
                                         </GroupBox>
-                                        <GroupBox Header="Illumination Info"
-                                                  Grid.Column="0"
-                                                  Grid.Row="2">
-                                            <UniformGrid Margin="5,2"
-                                                         Columns="2">
-                                                <TextBlock Text="Red"
-                                                           HorizontalAlignment="Left" />
-                                                <TextBlock Text="0"
-                                                           HorizontalAlignment="Left" />
-                                                <TextBlock Text="Green"
-                                                           HorizontalAlignment="Left" />
-                                                <TextBlock Text="0"
-                                                           HorizontalAlignment="Left" />
-                                                <TextBlock Text="Red"
-                                                           HorizontalAlignment="Left" />
-                                                <TextBlock Text="0"
-                                                           HorizontalAlignment="Left" />
-                                            </UniformGrid>
-                                        </GroupBox>
                                         <GroupBox Header="Coordinate Info"
-                                                  Grid.Column="0"
-                                                  Grid.Row="3">
+                                                  Grid.Column="0" Grid.RowSpan="1"
+                                                  Grid.Row="1">
                                             <Grid Margin="5,2">
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition />
-                                                    <RowDefinition Height="1.5*" />
                                                 </Grid.RowDefinitions>
                                                 <UniformGrid Columns="2"
                                                              Grid.Row="0">
@@ -654,7 +1100,7 @@
                                                     <TextBlock Text="64.18, 180.37"
                                                                HorizontalAlignment="Left" />
                                                 </UniformGrid>
-                                                <DataGrid IsReadOnly="True"
+                                                --><!--<DataGrid IsReadOnly="True"
                                                           Margin="0,2"
                                                           Grid.Row="1">
                                                     <DataGrid.Resources>
@@ -680,58 +1126,62 @@
                                                                             Width="*" />
                                                     </DataGrid.Columns>
 
-                                                </DataGrid>
-                                            </Grid>
-
-                                        </GroupBox>
-                                        <GroupBox Header="FFU"
-                                                  Grid.Row="4"
-                                                  Grid.Column="0">
-                                            <Grid Margin="5,2">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                </Grid.ColumnDefinitions>
-                                                <module:FFU_Fan_UI Grid.Row="0" x:Name="FanUI0"/>
-                                                <module:FFU_Fan_UI Grid.Column="1" x:Name="FanUI1"/>
-                                                <module:FFU_Fan_UI Grid.Column="2" x:Name="FanUI2"/>
-                                                <module:FFU_Fan_UI Grid.Column="3" x:Name="FanUI3"/>
+                                                </DataGrid>--><!--
                                             </Grid>
                                         </GroupBox>
-                                        <GroupBox Header="FDC"
-                                                  Grid.Row="5"
+                                        <Grid Grid.Row="6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <GroupBox Header="FDC"
                                                   Grid.Column="0">
-                                            <Grid Margin="5,2">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="2*"/>
-                                                    <ColumnDefinition Width="0.65*"/>
-                                                    <ColumnDefinition Width="1*"/>
-                                                    <ColumnDefinition Width="2*"/>
-                                                    <ColumnDefinition Width="0.65*"/>
-                                                    <ColumnDefinition Width="1*"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="CDA 1"
+                                                <Grid Margin="5,2">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="2*"/>
+                                                        <ColumnDefinition Width="0.65*"/>
+                                                        <ColumnDefinition Width="1*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="CDA 1" FontSize="12"
                                                            HorizontalAlignment="Left"/>
-                                                <TextBlock Grid.Column="1"
+                                                    <TextBlock Grid.Column="1" 
                                                            HorizontalAlignment="Left"
-                                                           x:Name="FDC_CDA1"
+                                                           x:Name="FDC_CDA1" FontSize="12"
                                                            Text="{Binding p_CDA1_Value}"/>
-                                                <TextBlock Grid.Column="2" Text="MPa"
+                                                    <TextBlock Grid.Column="2" Text="MPa" FontSize="12"
                                                            HorizontalAlignment="Left"/>
-                                                <TextBlock Grid.Column="3" Text="INSPECT CDA"
-                                                           HorizontalAlignment="Center"/>
-                                                <TextBlock Grid.Column="4"
-                                                           x:Name="FDC_CDA2"
+                                                    <TextBlock  Grid.Row="1"  Grid.Column="0" Text="INSPECT CDA" FontSize="12"
+                                                           HorizontalAlignment="Left"/>
+                                                    <TextBlock  Grid.Row="1"  Grid.Column="1"
+                                                           x:Name="FDC_CDA2" FontSize="12"
                                                            Text="{Binding p_CDA2_Value}"
                                                            HorizontalAlignment="Left" />
-                                                <TextBlock Grid.Column="5" Text="MPa"
+                                                    <TextBlock  Grid.Row="1"  Grid.Column="2" Text="MPa" FontSize="12"
                                                            HorizontalAlignment="Left"/>
-                                            </Grid>
-                                        </GroupBox>
+                                                </Grid>
+                                            </GroupBox>
+                                            <GroupBox Header="FFU" Grid.Column="1">
+                                                <Grid Margin="5,2">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <module:FFU_Fan_UI Grid.Row="0" x:Name="FanUI0"/>
+                                                    <module:FFU_Fan_UI Grid.Column="1" x:Name="FanUI1"/>
+                                                    <module:FFU_Fan_UI Grid.Column="2" x:Name="FanUI2"/>
+                                                    <module:FFU_Fan_UI Grid.Column="3" x:Name="FanUI3"/>
+                                                </Grid>
+                                            </GroupBox>
+                                        </Grid>
+                                    
                                         <Grid Grid.Column="1"
-                                              Grid.Row="2">
+                                              Grid.Row="1">
                                             <GroupBox  Header="Inspection Info"
                                                        Grid.Row="0">
                                                 <Grid>
@@ -800,33 +1250,55 @@
                                                 </Grid>
                                             </GroupBox>
                                         </Grid>
-                                        <GroupBox Header="Inspection Area"
+                                        <Grid Grid.Column="0" Grid.Row="2" Grid.RowSpan="3">
+                                            <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="450"/>
+                                                    </Grid.ColumnDefinitions> 
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="450"/>
+                                                    </Grid.RowDefinitions>
+                                                    --><!--<Image Source="Resource/ReticleMap2.PNG"
+                                                       Stretch="Fill"
+                                                       Margin="10" />--><!--
+                                                <GroupBox Header="Key">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Border Background="Black" Margin="3">
+                                                            <Image x:Name="imageLeftTopAlignKey" Source="{Binding p_bmpLeftTopAlignKeySrc}"/>
+                                                        </Border>
+                                                        <Border Background="Black" Grid.Row="1" Margin="3">
+                                                            <Image x:Name="imageLeftBottomAlignKey" Source="{Binding p_bmpLeftBottomAlignKeySrc}"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </GroupBox>
+                                                <GroupBox Header="Inspection Area"
                                                   Grid.Column="1"
                                                   Grid.Row="3"
                                                   Grid.RowSpan="3">
 
-                                            <Grid Background="Black">
-                                                <!--<Image Source="Resource/ReticleMap2.PNG"
-                                                       Stretch="Fill"
-                                                       Margin="10" />-->
-                                                <Viewbox>
-                                                    <Canvas Width="1000"
+                                                    <Viewbox Grid.Column="1">
+                                                        <Canvas Width="1000" Background="Black"
                                                             Height="1000">
-                                                        <TextBlock Text="Pattern Area"
+                                                            <TextBlock Text="Pattern Area"
                                                                    Canvas.Left="230"
                                                                    Canvas.Top="70"
                                                                    FontSize="15"
                                                                    FontWeight="Bold"
                                                                    Panel.ZIndex="5"
                                                                    Height="20" />
-                                                        <TextBlock Text="NonPattern Area"
+                                                            <TextBlock Text="NonPattern Area"
                                                                    Canvas.Left="160"
                                                                    Canvas.Top="20"
                                                                    FontSize="15"
                                                                    FontWeight="Bold"
                                                                    Panel.ZIndex="5"
                                                                    Height="20" />
-                                                        <Rectangle Stroke="Coral"
+                                                            <Rectangle Stroke="Coral"
                                                                    Fill="Coral"
                                                                    StrokeThickness="4"
                                                                    Opacity="0.3"
@@ -835,7 +1307,7 @@
                                                                    Height="856"
                                                                    Canvas.Left="225"
                                                                    Canvas.Top="70" />
-                                                        <Rectangle Stroke="SteelBlue"
+                                                            <Rectangle Stroke="SteelBlue"
                                                                    Fill="SteelBlue"
                                                                    StrokeThickness="4"
                                                                    Opacity="0.3"
@@ -844,13 +1316,14 @@
                                                                    Canvas.Left="155"
                                                                    Canvas.Top="20" />
 
-                                                    </Canvas>
-                                                </Viewbox>
-                                            </Grid>
-                                        </GroupBox>
-                                    </Grid>
-                                </StackPanel>
+                                                        </Canvas>
+                                                    </Viewbox>
+                                            </GroupBox>
+                                                </Grid>
+                                        </Grid>
+                                    </Grid>--><!-- 
                             </ScrollViewer>
+                            --><!--</StackPanel>--><!--
                         </TabItem>
 
                         <TabItem Header="Run" x:Name="RunTab"
@@ -887,27 +1360,31 @@
                                                     </UniformGrid>
                                                     <StackPanel Grid.Row="1"
                                                                 VerticalAlignment="Center">
-                                                        <TextBlock Text="Main Progress"
+                                                        <TextBlock Text="Snap Progress"
                                                                    FontWeight="Bold"
                                                                    HorizontalAlignment="Left" />
                                                         <Grid>
-                                                            <ProgressBar Height="30"
-                                                                         Value="7" />
-                                                            <TextBlock Text="7%"
+                                                            <ProgressBar x:Name="pbSnap"
+                                                                         Height="30"
+                                                                         Value="{Binding p_SnapProgressValue}" />
+                                                            <TextBlock x:Name="tbSnap"
+                                                                       Text="{Binding p_SnapDispText}"
                                                                        Foreground="Black"
                                                                        FontWeight="Bold" />
                                                         </Grid>
                                                     </StackPanel>
                                                     <StackPanel Grid.Row="2"
                                                                 VerticalAlignment="Center">
-                                                        <TextBlock Text="Sub Progress"
+                                                        <TextBlock Text="Inspection Progress"
                                                                    FontWeight="Bold"
                                                                    HorizontalAlignment="Left" />
                                                         <Grid>
-                                                            <ProgressBar Height="20"
-                                                                         Value="80"
+                                                            <ProgressBar x:Name="pbInsp"
+                                                                         Height="30"
+                                                                         Value="{Binding p_InspProgressValue}"
                                                                          Grid.ColumnSpan="2" />
-                                                            <TextBlock Text="Sub Process Name"
+                                                            <TextBlock x:Name="tbInsp"
+                                                                       Text="{Binding p_InspDispText}"
                                                                        Foreground="Black" />
                                                         </Grid>
                                                     </StackPanel>
@@ -917,9 +1394,9 @@
                                         <Grid Grid.Column="1"
                                               Grid.Row="0">
                                             <GroupBox Header="Histogram">
-                                                <!--<Image Margin="10"
+                                                --><!--<Image Margin="10"
                                                        Stretch="Fill"
-                                                       Source="Resource/Histogram.PNG" />-->
+                                                       Source="Resource/Histogram.PNG" />--><!--
                                             </GroupBox>
                                         </Grid>
                                         <Grid Grid.Column="0"
@@ -986,20 +1463,33 @@
                                         </Grid>
                                         <Grid Grid.Column="1"
                                               Grid.Row="1">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="1*" />
-                                                <RowDefinition Height="1*" />
-                                            </Grid.RowDefinitions>
-
-                                            <GroupBox Header="Defect Image"
-                                                      Grid.Row="0">
-                                                <Grid Background="Black">
-                                                    <TextBlock Text="Defect Image"
+                                            <GroupBox Header="Defect Image">
+                                                <GroupBox>
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Grid Background="Black" Margin="3">
+                                                            <TextBlock Text="Defect Image 1"
                                                                Foreground="White" />
-                                                </Grid>
+                                                        </Grid>
+                                                        <Grid Background="Black" Grid.Row="1" Margin="3">
+                                                            <TextBlock Text="Defect Image 2"
+                                                               Foreground="White" />
+                                                        </Grid>
+                                                        <Grid Background="Black" Grid.Row="2" Margin="3">
+                                                            <TextBlock Text="Defect Image 3"
+                                                               Foreground="White" />
+                                                        </Grid>
+
+
+                                                    </Grid>
+                                                </GroupBox>
                                             </GroupBox>
 
-                                            <GroupBox Header="Module State"
+                                            --><!--<GroupBox Header="Module State"
                                                       Grid.Row="1">
                                                 <Grid>
                                                     <Grid.RowDefinitions>
@@ -1090,22 +1580,18 @@
                                                     </Grid>
 
                                                 </Grid>
-                                            </GroupBox>
+                                            </GroupBox>--><!--
 
                                         </Grid>
                                     </Grid>
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
-                        <TabItem Header="Review" x:Name="ReviewTab"
-                                 Style="{StaticResource ResourceKey=WizardTabItem}">
-                            <Button Content="test"/>
-                        </TabItem>
                         <TabItem Header="Engineer" x:Name="engineerTab"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <engineer:VEGA_D_Engineer_UI x:Name="engineerUI"/>
                         </TabItem>
-                        <TabItem Header="Viewer" x:Name="ViewerTab"
+                        --><!--<TabItem Header="Viewer" x:Name="ViewerTab"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <Grid Grid.Column="0" Grid.Row="2">
                                 <Grid.RowDefinitions>
@@ -1126,9 +1612,9 @@
                                 <Grid Grid.Column="1">
                                     <GroupBox Header="Map">
                                         <Grid Background="Black">
-                                            <!--<Image Source="Resource/ReticleMap2.PNG"
+                                            --><!--<Image Source="Resource/ReticleMap2.PNG"
                                        Margin="20,10"
-                                       Stretch="Fill" />-->
+                                       Stretch="Fill" />--><!--
                                         </Grid>
                                     </GroupBox>
                                 </Grid>
@@ -1526,12 +2012,12 @@
                                     </GroupBox>
                                 </Grid>
                             </Grid>
-                        </TabItem>
-                        <TabItem Header="Recipe Manager"
-                                 Style="{StaticResource ResourceKey=WizardTabItem}" Visibility="Collapsed">
-                            <local:RecipeManager_UI />
+                        </TabItem>--><!--
+                        <TabItem Header="Recipe Manager" x:Name="RecipeManagerTab"
+                                 Style="{StaticResource ResourceKey=WizardTabItem}" Visibility="Visible">
+                            <local:RecipeManager_UI x:Name="recipeManagerUI" DataContext="{Binding p_recipeManager_ViewModel}" />
 
-                            <!--<ScrollViewer Background="White">
+                            --><!--<ScrollViewer Background="White">
                                 <StackPanel>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -2232,12 +2718,12 @@
                                         </Grid>
                                     </Grid>
                                 </StackPanel>
-                            </ScrollViewer>-->
+                            </ScrollViewer>--><!--
                         </TabItem>
-                        <TabItem Header="Recipe Wizard"
-                                 Style="{StaticResource WizardTabItem}" Visibility="Collapsed">
-                            <local:RecipeWizard_UI x:Name="RecipeWizard_UI" />
-                        </TabItem>
+                        --><!--<TabItem Header="Recipe Wizard" x:Name="RecipeWizardTab"
+                                 Style="{StaticResource WizardTabItem}" Visibility="Visible">
+                            <local:RecipeWizard_UI DataContext="{Binding p_recipeWizard_ViewModel}" />
+                        </TabItem>-->
                         <!--<TabItem Header="Run"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <ScrollViewer Background="AliceBlue">
@@ -2620,8 +3106,8 @@
                                 </Grid>
 
                             </Grid>
-                        </TabItem>-->
-                    </TabControl>
+                        </TabItem>--><!--
+                    </TabControl>-->
                     <GridSplitter Grid.Row="2"
                                   HorizontalAlignment="Stretch"
                                   VerticalAlignment="Stretch"
@@ -2646,150 +3132,13 @@
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="70*" />
                         <RowDefinition Height="auto" />
-                        <RowDefinition Height="30*" />
-                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
-                    <!--<GroupBox Grid.Row="0"
-                              Header="Mask Location">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition Height="3*" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0">
-                                <TextBlock Text="Loading..."
-                                           VerticalAlignment="Bottom" />
-                            </Grid>
-                            <Grid Grid.Column="1">
-
-                            </Grid>
-                            <Grid Grid.Column="2">
-
-                            </Grid>
-                            <Grid x:Name="Is_InLP"
-                                  Grid.Column="0"
-                                  Grid.Row="1"
-                                  Margin="5">
-                                <TextBlock Text="LoadPort" />
-                            </Grid>
-                            <Grid x:Name="Is_InRTR"
-                                  Grid.Column="1"
-                                  Grid.Row="1"
-                                  Opacity="0.6"
-                                  Margin="5">
-                                <TextBlock Text="Robot" />
-                            </Grid>
-                            <Grid x:Name="Is_InVS"
-                                  Grid.Column="2"
-                                  Grid.Row="1"
-                                  Opacity="0.6"
-                                  Margin="5">
-                                <TextBlock Text="Vision" />
-                            </Grid>
-                        </Grid>
-                    </GroupBox>-->
                     <Grid Grid.Row="0">
                         <local:Loadport_UI x:Name="loadportA"/>
                     </Grid>
                     <Grid Grid.Row="2">
                         <local:Loadport_UI x:Name="loadportB"/>
                     </Grid>
-                    <!--<Button Grid.Row="6"
-                            FontSize="15"
-                            Content="Start"
-                            Margin="10" />
-                    <Button Grid.Row="8"
-                            FontSize="15"
-                            Content="Stop"
-                            Margin="10" />-->
-                    <Grid Grid.Row="4" Margin="10,0,10,0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0"
-                                    x:Name="buttonResume"
-                                    Content="Resume"
-                                    Margin="5"
-                                    Style="{StaticResource SetupPanelBtn}"
-                                    Click="buttonResume_Click"/>
-                            <Button Grid.Column="1"
-                                    x:Name="buttonPause"
-                                    Content="Pause"
-                                    Margin="5"
-                                    Style="{StaticResource SetupPanelBtn}"
-                                    Click="buttonPause_Click"/>
-                            <Button Grid.Column="2"
-                                    x:Name="buttonInitialize"
-                                    Content="Initialize"
-                                    Margin="5"
-                                    Style="{StaticResource SetupPanelBtn}"
-                                    Click="buttonInitialize_Click"/>
-                        </Grid>
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0"
-                                    x:Name="buttonRecovery"
-                                    Content="Recovery"
-                                    Margin="5"
-                                    Style="{StaticResource SetupPanelBtn}"
-                                    Click="buttonRecovery_Click"/>
-                            <!--Button Grid.Column="1"
-                                    x:Name="buttonResetRADS"
-                                    Content="Reset RADS"
-                                    Margin="5"
-                                    Style="{StaticResource SetupPanelBtn}"
-                                    Click="buttonResetRADS_Click"/>-->
-                            <Button Grid.Column="2"
-                                    x:Name="buttonBuzzOff"
-                                    Content="Buzzer Off"
-                                    Margin="5"
-                                    Style="{StaticResource SetupPanelBtn}"
-                                    Click="buttonBuzzOff_Click"/>
-                        </Grid>
-                        <Grid Grid.Row="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <!--<Button Grid.Column="0"
-                                    x:Name="buttonGetDeviceInfo"
-                                    Content="Get Device Info"
-                                    Margin="5"
-                                    Style="{StaticResource SetupPanelBtn}"
-                                    Click="buttonGetDeviceInfo_Click"/>-->
-                            <!--<Button Grid.Column="1"
-                                    x:Name="buttonStartRADS"
-                                    Content="Start RADS"
-                                    Margin="5"
-                                    Style="{StaticResource SetupPanelBtn}"
-                                    Click="buttonStartRADS_Click"/>
-                            <Button Grid.Column="2"
-                                    x:Name="buttonStopRADS"
-                                    Content="Stop RADS"
-                                    Margin="5"
-                                    Style="{StaticResource SetupPanelBtn}"
-                                    Click="buttonStopRADS_Click"/>-->
-                        </Grid>
-                    </Grid>
-
                 </Grid>
             </Grid>
         </Border>

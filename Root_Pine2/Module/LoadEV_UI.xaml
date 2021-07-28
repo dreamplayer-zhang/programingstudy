@@ -14,12 +14,25 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Background="Beige" Margin="3">
-                <TextBlock x:Name="textBlockDone" HorizontalAlignment="Center"/>
+            <Grid Grid.Row="0" x:Name="gridLoad" Background="Beige" Margin="3" PreviewMouseLeftButtonDown="gridLoad_PreviewMouseLeftButtonDown">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" x:Name="textBlockDone" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" x:Name="textBlockStrip" Text="{Binding p_iStrip}" HorizontalAlignment="Center"/>
+                </Grid>
             </Grid>
-            <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" IsEnabled="False"/>
+            <CheckBox Grid.Row="1" x:Name="checkBoxCycleStop" Content="Cycle Stop" IsChecked="{Binding p_bCycleStop}" Margin="3"/>
+            <Grid Grid.Row="2" x:Name="gridInfo" Margin="3" Background="White" PreviewMouseLeftButtonDown="gridInfo_PreviewMouseLeftButtonDown">
+                <TextBlock x:Name="textBlockInfo" Text="{Binding p_sInfo}"/>
+            </Grid>
+            <tree:TreeUI Grid.Row="3" x:Name="treeRootUI" IsEnabled="False" Margin="3,0,3,0"/>
         </Grid>
     </GroupBox>
 </UserControl>

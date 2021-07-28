@@ -64,9 +64,11 @@ namespace Root_WIND2.UI_User
 
                 motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
 
-                this.ImageViewerVM.SetImageData(visionModule.p_CamVRS.p_ImageViewer.p_ImageData);
-
-                this.visionModule.p_CamVRS.Grabed += this.ImageViewerVM.OnUpdateImage;
+                if(visionModule.p_CamVRS != null)
+                {
+                    this.ImageViewerVM.SetImageData(visionModule.p_CamVRS.p_ImageViewer.p_ImageData);
+                    this.visionModule.p_CamVRS.Grabed += this.ImageViewerVM.OnUpdateImage;
+                }
             }
 
             m_DataViewer_VM = new Database_DataView_VM();
@@ -148,7 +150,7 @@ namespace Root_WIND2.UI_User
                 m_DataViewer_VM.pDataTable = DatabaseManager.Instance.SelectTablewithInspectionID("defect", this.inspectionID);
             });
         }
-
+         
         public RelayCommand btnLoadCurrentInspectionCommand
         {
             get => new RelayCommand(() =>

@@ -327,26 +327,51 @@ namespace RootTools
 
             else if (nByte == 3)
             {
-                if (imgData.m_MemData == null)
+                if (imgData.m_eMode == eMode.ImageBuffer)
                 {
-                    System.Windows.MessageBox.Show("ImageData SetData() 실패\nMemoryData == null");
-                    return;
-                }
-                    
-                byte* Rptr = (byte*)imgData.m_MemData.GetPtr(0).ToPointer();
-                byte* Gptr = (byte*)imgData.m_MemData.GetPtr(1).ToPointer();
-                byte* Bptr = (byte*)imgData.m_MemData.GetPtr(2).ToPointer();
-
-                int idx = 0;
-                long xOffset;
-                for (int r = rect.Top; r < rect.Top + rect.Height; r++)
-                {
-                    for (int c = rect.Left; c < rect.Left + rect.Width; c++, idx++)
+                    if (imgData.m_aBuf == null)
                     {
-                        xOffset = c + (long)r * stride;
-                        m_aBuf[nByte * idx + 0] = *(Rptr + xOffset);
-                        m_aBuf[nByte * idx + 1] = *(Gptr + xOffset);
-                        m_aBuf[nByte * idx + 2] = *(Bptr + xOffset);
+                        System.Windows.MessageBox.Show("ImageData SetData() 실패\nm_aBuf == null");
+                        return;
+                    }
+
+                    int idx = 0;
+                    long xOffset;
+                    for (int r = rect.Top; r < rect.Top + rect.Height; r++)
+                    {
+                        for (int c = rect.Left; c < rect.Left + rect.Width; c++, idx++)
+                        {
+                            xOffset = c + (long)r * stride;
+                            m_aBuf[nByte * idx + 0] = imgData.m_aBuf[3 * (r * imgData.m_Size.X + c) + 2];
+                            m_aBuf[nByte * idx + 1] = imgData.m_aBuf[3 * (r * imgData.m_Size.X + c) + 1];
+                            m_aBuf[nByte * idx + 2] = imgData.m_aBuf[3 * (r * imgData.m_Size.X + c) + 0];
+                        }
+                    }
+                }
+
+                else if (imgData.m_eMode == eMode.MemoryRead || imgData.m_eMode == eMode.OtherPCMem)
+                {
+                    if (imgData.m_MemData == null)
+                    {
+                        System.Windows.MessageBox.Show("ImageData SetData() 실패\nMemoryData == null");
+                        return;
+                    }
+
+                    byte* Rptr = (byte*)imgData.m_MemData.GetPtr(0).ToPointer();
+                    byte* Gptr = (byte*)imgData.m_MemData.GetPtr(1).ToPointer();
+                    byte* Bptr = (byte*)imgData.m_MemData.GetPtr(2).ToPointer();
+
+                    int idx = 0;
+                    long xOffset;
+                    for (int r = rect.Top; r < rect.Top + rect.Height; r++)
+                    {
+                        for (int c = rect.Left; c < rect.Left + rect.Width; c++, idx++)
+                        {
+                            xOffset = c + (long)r * stride;
+                            m_aBuf[nByte * idx + 0] = *(Rptr + xOffset);
+                            m_aBuf[nByte * idx + 1] = *(Gptr + xOffset);
+                            m_aBuf[nByte * idx + 2] = *(Bptr + xOffset);
+                        }
                     }
                 }
             }
@@ -395,8 +420,10 @@ namespace RootTools
         {
             OnUpdateImage();
         }
+
         public Bitmap GetBitmapToArray(int width, int height, byte[] imageData)
         {
+            // need to edit (same with GetByteToBitmap)
             var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
             bmp.Palette = mono;
             using (var stream = new MemoryStream(imageData))
@@ -412,24 +439,20 @@ namespace RootTools
             }
             return bmp;
         }
+
         public Bitmap GetByteToBitmap(int width, int height, byte[] imageData)
         {
             var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
-
             bmp.Palette = mono;
-
             using (var stream = new MemoryStream(imageData))
             {
-
                 System.Drawing.Imaging.BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0,
                                                                 bmp.Width,
                                                                 bmp.Height),
                                                   System.Drawing.Imaging.ImageLockMode.WriteOnly,
                                                   bmp.PixelFormat);
-
                 IntPtr pNative = bmpData.Scan0;
                 Marshal.Copy(imageData, 0, pNative, imageData.Length);
-
                 bmp.UnlockBits(bmpData);
             }
             return bmp;
@@ -542,7 +565,7 @@ namespace RootTools
                 Marshal.Copy((IntPtr)((long)GetPtr() + rect.Left + ((long)i + (long)rect.Top) * p_Size.X), aBuf, position, rect.Width);
                 position += rect.Width;
             }
-            return GetBitmapToArray(rect.Width, rect.Height, aBuf);
+            return GetByteToBitmap(rect.Width, rect.Height, aBuf);
         }
 
         public unsafe BitmapSource GetBitMapSource(int nByteCnt = 1)
@@ -845,7 +868,7 @@ namespace RootTools
         {
             None, R, G, B
         }
-        public unsafe void FileSaveGrayBMP(string sFile, CRect rect, int nByte, eRgbChannel channel = eRgbChannel.None)
+        public unsafe void FileSaveGrayBMP(string sFile, CRect rect, int nByte, eRgbChannel channel = eRgbChannel.None, int nBitShiftOffset = 0)
         {
             FileStream fs = null;
             try
@@ -931,12 +954,25 @@ namespace RootTools
 
                                 if (nByte == 1) // 2byte -> 1byte
                                 {
-                                    byte val1 = arrByte[idx + i * p_nByte + 0];
-                                    byte val2 = arrByte[idx + i * p_nByte + 1];
-                                    //byte[] arrb1b2 = new byte[2] { val1, val2 };
+                                    //byte val1 = arrByte[idx + i * p_nByte + 0];
+                                    //byte val2 = arrByte[idx + i * p_nByte + 1];
+                                    ////byte[] arrb1b2 = new byte[2] { val1, val2 };
 
-                                    //aBuf[i] = (byte)(BitConverter.ToUInt16(arrb1b2, 0) / (Math.Pow(2, 8 * p_nByte) - 1));
-                                    aBuf[i] = val2;
+                                    ////aBuf[i] = (byte)(BitConverter.ToUInt16(arrb1b2, 0) / (Math.Pow(2, 8 * p_nByte) - 1));
+                                    //aBuf[i] = val2;
+
+
+                                    byte[] arrVal = new byte[sizeof(long)];
+                                    for (int tempIdx = 0; tempIdx < p_nByte; tempIdx++)
+                                    {
+                                        arrVal[tempIdx] = arrByte[idx + i * p_nByte + tempIdx];
+                                    }
+
+                                    ulong nVal = BitConverter.ToUInt64(arrVal, 0);
+                                    nVal = nVal << nBitShiftOffset;
+
+                                    aBuf[i] = (byte)((nVal >> (8 * (p_nByte - nByte))) & 0xFF);
+
                                 }
                                 else /*if(nByte == 2)*/ // 1byte -> 2byte
                                 {

@@ -216,7 +216,8 @@
     <Reference Include="QRCoder, Version=1.3.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\QRCoder.1.3.6\lib\net40\QRCoder.dll</HintPath>
     </Reference>
-    <Reference Include="SSLNet">
+    <Reference Include="SSLNet, Version=1.0.7845.34598, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\MarsLog\SSLNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -235,6 +236,8 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Windows.Forms.DataVisualization.Design" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -247,6 +250,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
     <Reference Include="XGem300Pro_Net40_01_64">
       <HintPath>Gem\XGem\DLL\XGem300Pro_Net40_01_64.dll</HintPath>
     </Reference>
@@ -287,6 +291,8 @@
       <DependentUpon>TCPSyncServer_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\Axis3D.cs" />
+    <Compile Include="Control\DIO_I4O.cs" />
+    <Compile Include="Control\DIO_I8O2.cs" />
     <Compile Include="Control\Xenax\Xenax.cs" />
     <Compile Include="Control\Xenax\XenaxAxis.cs" />
     <Compile Include="Control\Xenax\XenaxAxis_UI.xaml.cs">
@@ -307,6 +313,7 @@
     <Compile Include="Database\Table\DatabaseManager.cs" />
     <Compile Include="Database\Table\Database_ConnectSession.cs" />
     <Compile Include="Database\Table\Defect\Defect.cs" />
+    <Compile Include="Database\Table\Defect\DefectEIP.cs" />
     <Compile Include="Database\Table\Defect\DefectManager.cs" />
     <Compile Include="Database\Table\Lotinfo.cs" />
     <Compile Include="Database\Table\Measurement\Measurement.cs" />
@@ -427,6 +434,7 @@
     </Compile>
     <Compile Include="Control\IControl.cs" />
     <Compile Include="ImageProcess\FocusStacking_new.cs" />
+    <Compile Include="ImageProcess\VignetteFilter.cs" />
     <Compile Include="Image\C3Point.cs" />
     <Compile Include="Image\CustomCanvas.cs" />
     <Compile Include="Image\MiniViewer.xaml.cs">
@@ -485,6 +493,7 @@
     <Compile Include="ParticleCounter\ParticleCounterBase_UI.xaml.cs">
       <DependentUpon>ParticleCounterBase_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Printer\BXLAPI.cs" />
     <Compile Include="Printer\SRP350.cs" />
     <Compile Include="Printer\SRP350_UI.xaml.cs">
       <DependentUpon>SRP350_UI.xaml</DependentUpon>
@@ -505,7 +514,11 @@
     <Compile Include="RFIDs\RFID_UI.xaml.cs">
       <DependentUpon>RFID_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RnRData\RnRData.cs" />
     <Compile Include="Trees\TreeItem_FolderName.cs" />
+    <Compile Include="Viewer\CustomViewer\D2DSequenceViewer.xaml.cs">
+      <DependentUpon>D2DSequenceViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Viewer\CustomViewer\DrawableRootViewer.xaml.cs">
       <DependentUpon>DrawableRootViewer.xaml</DependentUpon>
     </Compile>
@@ -1193,6 +1206,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Viewer\CustomViewer\D2DSequenceViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Viewer\CustomViewer\DrawableRootViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1277,6 +1294,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\OutPod.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\D2D_SEQ.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

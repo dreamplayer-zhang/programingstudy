@@ -73,7 +73,6 @@ namespace Root_Rinse_Loader.Engineer
             Thread.Sleep(100);
             string sInfo = StateHome(p_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
-            m_rinse.m_doRinseEmg.Write(true);
             m_loader.RunVacuum(false);
             return sInfo;
         }
@@ -147,13 +146,14 @@ namespace Root_Rinse_Loader.Engineer
 
         public string AddSequence(dynamic infoSlot)
         {
-            throw new NotImplementedException();
+            return "OK";
         }
 
         public void CalcSequence()
         {
-            throw new NotImplementedException();
         }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         #region Thread

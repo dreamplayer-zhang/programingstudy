@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using RootTools.Database;
 using RootTools_Vision;
 
 namespace Root_WIND2
@@ -22,6 +23,9 @@ namespace Root_WIND2
     public partial class DefectView : UserControl
     {
         RecipeBase recipe;
+
+        List<Defect> defectList;
+
         public DefectView()
         {
             InitializeComponent();
@@ -33,6 +37,11 @@ namespace Root_WIND2
         public void SetRecipe(RecipeBase _recipe)
         {
             this.recipe = _recipe;
+        }
+
+        public void SetDefectList(List<Defect> defectList)
+        {
+            this.defectList = defectList;
         }
 
         private void DefectCheckBox_Checked(object sender, RoutedEventArgs e)

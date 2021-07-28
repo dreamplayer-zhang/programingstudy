@@ -25,12 +25,18 @@ namespace RootTools_Vision
         MedianAverage,
         Median,
     }
+    public enum CreateDiffMethod
+    {
+        Absolute = 0,
+        Bright,
+        Dark,
+    }
     public enum RefImageUpdateFreq
     {
         Chip = 0,
         Chip_Trigger,
         Line,
-        BeforeInsp,
+        PreCreate,
     }
     public class D2DParameter : ParameterBase, IMaskInspection, IColorInspection, IDisplaySpecSummary, IFrontsideInspection
     {
@@ -45,7 +51,8 @@ namespace RootTools_Vision
         #region [Parameters]
         private int intensity = 0;
         private int size = 0;
-        private bool isBright = false;
+        private int sizeLimit = 0;
+        private CreateDiffMethod createDiffMethod = CreateDiffMethod.Absolute;
         private bool scaleMap = false;
         private bool histWeightMap = false;
         private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
@@ -73,13 +80,23 @@ namespace RootTools_Vision
                 SetProperty<int>(ref this.size, value);
             }
         }
-        [Category("Option")]
-        public bool IsBright
+        [Category("Parameter")]
+        [DisplayName("Size Limit")]
+        public int SizeLimit
         {
-            get => this.isBright;
+            get => this.sizeLimit;
             set
             {
-                SetProperty<bool>(ref this.isBright, value);
+                SetProperty<int>(ref this.sizeLimit, value);
+            }
+        }
+        [Category("Option")]
+        public CreateDiffMethod CreateDiffMethod
+        {
+            get => this.createDiffMethod;
+            set
+            {
+                SetProperty<CreateDiffMethod>(ref this.createDiffMethod, value);
             }
         }
         [Category("Option")]

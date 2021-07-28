@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="Root_VEGA_P.NozzleRecipeInfo_Panel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="450" Background="{StaticResource MainBackGroundColor}">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.045*"/>
+            <RowDefinition Height="0.01*"/>
+            <RowDefinition Height="0.37*"/>
+            <RowDefinition Height="0.04*"/>
+            <RowDefinition Height="0.6*"/>
+            <RowDefinition Height="0.08*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" VerticalAlignment="Bottom" Text="{Binding Header}" Style="{StaticResource HeaderTextBlock}"/>
+            <CheckBox Grid.Column="1" VerticalAlignment="Bottom" VerticalContentAlignment="Center">Enable</CheckBox>
+        </Grid>
+        <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+        <Image Grid.Row="2" Source="{Binding ImgSrc}"/>
+        <Grid Grid.Row="3" Background="{StaticResource MainThema}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0.8*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Enable" Style="{StaticResource NozzleHeaderText}" />
+            <TextBlock Grid.Column="1" Text="Nozzle No." HorizontalAlignment="Center" Style="{StaticResource NozzleHeaderText}"/>
+            <TextBlock Grid.Column="2" Text="Pressure" HorizontalAlignment="Center" Style="{StaticResource NozzleHeaderText}"/>
+            <TextBlock Grid.Column="3" Text="Sec" Style="{StaticResource NozzleHeaderText}"/>
+        </Grid>
+        <ListBox Grid.Row="4" Background="Transparent" HorizontalContentAlignment="Stretch" ItemsSource="{Binding NozzleList}" SelectedIndex="{Binding NozzleListIdx}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+        <UniformGrid Rows="1" Grid.Row="5" Margin="0,10,0,10">
+            <Button Content="Open" Command="{Binding btnOpen}" Style="{StaticResource ImageBaseBtn}"/>
+            <Button Content="Save" Command="{Binding btnSave}" Style="{StaticResource ImageBaseBtn}"/>
+        </UniformGrid>
+        
+    </Grid>
+</UserControl>

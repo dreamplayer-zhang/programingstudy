@@ -6,6 +6,7 @@ using RootTools.Module;
 using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -99,8 +100,8 @@ namespace Root_EFEM
             RND,
             Cymechs,
         }
-        List<eLoadport> m_aLoadportType = new List<eLoadport>();
-        List<ILoadport> m_aLoadport = new List<ILoadport>(); 
+        ObservableCollection<eLoadport> m_aLoadportType = new ObservableCollection<eLoadport>();
+        ObservableCollection<ILoadport> m_aLoadport = new ObservableCollection<ILoadport>(); 
         int m_lLoadport = 2; 
         void InitLoadport()
         {
@@ -488,6 +489,16 @@ namespace Root_EFEM
             }
             p_moduleList.ThreadStop();
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
+        }
+
+        public void UpdateEvent()
+        {
+            return;
+        }
+
+        public RnRData GetRnRData()
+        {
+            return new RnRData();
         }
     }
 }

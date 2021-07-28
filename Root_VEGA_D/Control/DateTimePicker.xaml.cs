@@ -261,7 +261,7 @@ namespace Root_VEGA_D.Control
 		}
 		void DateDisplay_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			DateTime? date = ParseDateText(true);
+			 DateTime? date = ParseDateText(true);
 			if (date != null)
 				SelectedDate = date.Value;
 		}

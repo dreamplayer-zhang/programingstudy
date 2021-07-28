@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -28,12 +29,6 @@ namespace RootTools_Vision.WorkManager3
             get => this.tasks.FixedSize;
         }
 
-        private int completeCount;
-        public int CompleteCount
-        {
-            get=> this.completeCount;
-        }
-            
         public bool IsAvailableTask
         {
             get => (TaskCount < this.MaxTaskCount);
@@ -46,22 +41,6 @@ namespace RootTools_Vision.WorkManager3
             tasks = new FixedSizeList<Task<TResult>>(size);
             // 여기서 쓰레드 실행 종료 관리
         }
-
-        //private object countLockObj = new object();
-        //public void IncreaseCount()
-        //{
-        //    lock (countLockObj) this.completeCount++;
-        //}
-
-        //public void DecreaseCount()
-        //{
-        //    lock (countLockObj) this.completeCount--;
-
-        //    if (this.completeCount < 0)
-        //    {
-        //        MessageBox.Show("Bug");
-        //    }
-        //}
 
         public bool Invoke(Task<TResult> task)
         {
@@ -97,19 +76,23 @@ namespace RootTools_Vision.WorkManager3
 
         private void Remove(Task<TResult> task)
         {
-            if (TaskCompleted != null)
+            try
             {
-                TaskCompleted(task.Result);
-            }
-                
+                if (TaskCompleted != null)
+                {
+                    TaskCompleted(task.Result);
+                }
 
-            //lock(lockObj)
-            {
+
                 if (!this.tasks.Remove(task))
                 {
                     //if(this.tasks.Count != 0)
                     //    throw new ArgumentException("삭제 시 false 반환되면 안됨");
                 }
+            }
+            catch(Exception)
+            {
+                
             }
         }
 

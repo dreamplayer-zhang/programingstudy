@@ -93,9 +93,9 @@
             <Border
                 Background="{StaticResource sidetap_child_background}">
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
-                    <RadioButton Content="Product"  IsChecked="True" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <RadioButton Content="Setup" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <RadioButton Content="Align Key" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Product" Command="{Binding btnRACProduct}"  IsChecked="True" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Setup" Command="{Binding btnRACSetup}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Align Key" Command="{Binding btnRACAlignKey}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Create" Style="{StaticResource sidetap_child_radiobutton}"/>
                 </StackPanel>
             </Border>

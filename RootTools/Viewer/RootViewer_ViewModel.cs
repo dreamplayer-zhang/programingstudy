@@ -45,7 +45,7 @@ namespace RootTools
             }
             InitCrossLine();
         }
-        private IDialogService m_DialogService;
+        protected IDialogService m_DialogService;
 
         StopWatch m_swMouse = new StopWatch();
         CPoint m_ptViewBuffer = new CPoint();
@@ -303,7 +303,7 @@ namespace RootTools
                 SetProperty(ref m_View_Rect, value);
             }
         }
-        private int m_CanvasWidth = 100;
+        protected int m_CanvasWidth = 100;
         public int p_CanvasWidth
         {
             get
@@ -451,8 +451,8 @@ namespace RootTools
                 SetProperty(ref m_Cursor, value);
             }
         }
-        private int m_MouseX = 0;
-        public int p_MouseX
+        protected int m_MouseX = 0;
+        public virtual int p_MouseX
         {
             get
             {
@@ -726,7 +726,7 @@ namespace RootTools
         }
 
         bool isUpdate = false;
-        public unsafe void SetImageSource()
+        public virtual unsafe void SetImageSource()
         {
 			try
 			{
@@ -753,6 +753,15 @@ namespace RootTools
 								p_ImgSource = ImageHelper.ToBitmapSource(view);
 							}
 						}
+                        else if(p_ImageData.GetBytePerPixel() == 2)
+                        {
+                            if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
+                            {
+                                Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+                                byte[,,] viewptr = view.Data;
+                                byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+                            }
+                        }
 						else if (p_ImageData.GetBytePerPixel() == 3)
 						{
 							if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
@@ -911,25 +920,34 @@ namespace RootTools
 										return;
 									if (imageptrB == null)
 										return;
-									Parallel.For(0, p_CanvasHeight, (yy) =>
-									{
-										{
-											long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-											for (int xx = 0; xx < p_CanvasWidth; xx++)
-											{
-												long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-												if (pix_x + (long)pix_y * sizeX >= 0)
-												{
-													viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[(long)pix_x + (long)pix_y * sizeX]);
-													viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[(long)pix_x + (long)pix_y * sizeX]);
-													viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[(long)pix_x + (long)pix_y * sizeX]);
-												}
-											}
-										}
-									});
+                                    StopWatch sw = new StopWatch();
 
-									p_ImgSource = ImageHelper.ToBitmapSource(view);
+                                    sw.Start();
+                                    Parallel.For(0, p_CanvasHeight, (yy) =>
+                                    {
+                                        {
+                                            //unsafe
+                                            {
+                                                long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                                                for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                                {
+                                                    long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+
+                                                    if (pix_x + (long)pix_y * sizeX >= 0)
+                                                    {
+                                                        viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[(long)pix_x + (long)pix_y * sizeX]);
+                                                        viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[(long)pix_x + (long)pix_y * sizeX]);
+                                                        viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[(long)pix_x + (long)pix_y * sizeX]);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+                                    sw.Stop();
+                                    System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
+
+                                    p_ImgSource = ImageHelper.ToBitmapSource(view);
 
 									p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
 									if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y) == 0)
@@ -1257,7 +1275,7 @@ namespace RootTools
 
         public void ClearDrawElement()
         {
-            this.p_UIElement.Clear();
+            this.p_DrawElement.Clear();
         }
 
         public void InitRoiRect(int nWidth, int nHeight)
@@ -1879,7 +1897,7 @@ namespace RootTools
             if (p_ImageData != null)
                 p_ImageData.ClearImage();
         }
-        void _CancelCopy()
+        protected void _CancelCopy()
         {
             if (p_ImageData.Worker_MemoryCopy.IsBusy)
             {

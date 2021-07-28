@@ -727,8 +727,9 @@ namespace Root_EFEM.Module
         public string p_swLotTime = "";
         private void M_timer_Tick(object sender, EventArgs e)
         {
+            if (EQ.m_EQ.p_bPause) return;
             p_swLotTime = String.Format("{0:00}:{1:00}:{2:00}", m_swLotTime.Elapsed.Hours, m_swLotTime.Elapsed.Minutes, m_swLotTime.Elapsed.Seconds);
-            if (!EQ.IsStop())
+            if (!EQ.m_EQ.p_bStop)
             {
                 if (p_infoCarrier.p_eReqAccessLP == GemCarrierBase.eAccessLP.Manual)
                 {
@@ -1336,7 +1337,9 @@ namespace Root_EFEM.Module
                 for (int i = 0; i < m_infoCarrier.m_aGemSlot.Count; i++)
                 {
                     if (m_infoCarrier.m_aGemSlot[i].p_eState == GemSlotBase.eState.Select)
+                    {
                         m_infoCarrier.StartProcess(m_infoCarrier.m_aGemSlot[i].p_id);
+                    }
                 }
 
                 return sResult;

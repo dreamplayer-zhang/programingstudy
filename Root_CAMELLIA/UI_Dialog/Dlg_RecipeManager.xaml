@@ -336,22 +336,30 @@
                                 <TextBox Grid.Row="1" Grid.Column="2" TextAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" Margin="75,2,2,2" Grid.ColumnSpan="2" Text="{Binding ModelPath}" IsEnabled="{Binding p_UseThickness}"/>
                             </Grid>
                         </Grid>
-                        <UniformGrid Columns="2" Grid.Row="3">
-                            <Grid Margin="5" Background="Gainsboro">
+                        <UniformGrid Columns="3" Grid.Row="3">
+                            <Grid Margin="3" Background="Gainsboro">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="18*"/>
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Integration Time (VIS)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding VISIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                <TextBlock Text="Integration Time (VIS)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0" TextAlignment="Center" TextWrapping="WrapWithOverflow"/>
+                                <TextBox Grid.Column="1" Margin="5" Text="{Binding VISIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                             </Grid>
-                            <Grid Margin="5" Background="Gainsboro">
+                            <Grid Margin="3" Background="Gainsboro">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="18*"/>
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Integration Time (NIR)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="{Binding p_SettingViewModel.p_ExceptNIR, Converter={StaticResource BoolConverter}}" />
+                                <TextBlock Text="Integration Time (NIR)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0" TextAlignment="Center" TextWrapping="WrapWithOverflow"/>
+                                <TextBox Grid.Column="1" Margin="5" Text="{Binding NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="{Binding p_SettingViewModel.p_ExceptNIR, Converter={StaticResource BoolConverter}}" />
+                            </Grid>
+                            <Grid Margin="3" Background="Gainsboro">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="18*"/>
+                                    <ColumnDefinition Width="12*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Measure Repeat Count" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0" TextAlignment="Center" TextWrapping="WrapWithOverflow"/>
+                                <TextBox Grid.Column="1" Margin="5" Text="{Binding MeasureRepeatCount, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" VerticalContentAlignment="Center" />
                             </Grid>
                         </UniformGrid>
                     </Grid>
@@ -675,7 +683,6 @@
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </Viewbox>
-
                             <Viewbox Margin="10" Width="auto" Grid.Row="0">
                                 <ItemsControl ItemsSource="{Binding p_DrawSelectElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
@@ -683,6 +690,18 @@
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Viewbox>
+                            <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                                <ItemsControl ItemsSource="{Binding p_DrawGuideElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                            </Canvas>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
@@ -943,7 +962,7 @@
                                         <TextBox Grid.Column="1" Margin="3" TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding p_circleSize, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                     </Grid>
                                     <TabControl Grid.Row="1">
-                                        <TabItem Header="Point">
+                                        <TabItem Header="Point" Style="{StaticResource customTabitem}">
                                             <Grid>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="40"/>
@@ -975,8 +994,60 @@
                                                 </Grid>
                                             </Grid>
                                         </TabItem>
-                                        <TabItem Header="Line">
+                                        <TabItem Header="Line" Style="{StaticResource customTabitem}">
                                             
+                                        </TabItem>
+                                        <TabItem Header="Circle" Style="{StaticResource customTabitem}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="40"/>
+                                                    <RowDefinition Height="40"/>
+                                                    <RowDefinition Height="40"/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <Grid Background="Gainsboro" Margin="2">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock  Text="R Range (mm)" Margin="3" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                        <Grid Grid.Column="1">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="0.1*"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBox Grid.Column="0" Margin="3" TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding p_SettingRRangeMin, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                            <TextBlock Grid.Column="1" VerticalAlignment="Center">~</TextBlock>
+                                                            <TextBox Grid.Column="2" Margin="3" TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding p_SettingRRangeMax, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Background="Gainsboro" Grid.Row="1" Margin="2">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock  Text="R Step (mm)" Margin="3" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" Margin="3" TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding p_SettingRStep, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Background="Gainsboro" Grid.Row="2" Margin="2">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock  Text="∠ Step ( °)" Margin="3" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" Margin="3" TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding p_SettingAngle, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Background="Gainsboro" Grid.Row="3" Margin="2">
+                                                    <Button Margin="3" Content="Set" Command="{Binding CmdSetCandidateCircle}" Style="{StaticResource customButton}"/>
+                                                </Grid>
+                                            </Grid>
                                         </TabItem>
                                     </TabControl>
                                 </Grid>

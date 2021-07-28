@@ -183,7 +183,8 @@ namespace RootTools_CLR
 		for (int i = 0; i < startPoint->Length; i++)
 		{
 			vtStartPoint.push_back(Point(startPoint[i]->x, startPoint[i]->y));
-			vtLength.push_back((int)length[i]);
+			int nLen = length[i];
+			vtLength.push_back(nLen);
 		}
 		IP::Masking(pSrc, pDst, vtStartPoint, vtLength, nMemW, nMemH);
 
@@ -207,6 +208,24 @@ namespace RootTools_CLR
 
 		return score;
 	}
+
+	float CLR_IP::Cpp_TemplateMatching(array<byte>^ pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pTemp = &pTempImg[0];
+		Point Pos;
+
+		float score = IP::TemplateMatching_VRS(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod, nByteCnt);
+
+		outPosX = Pos.x;
+		outPosY = Pos.y;
+
+		pSrc = nullptr;
+		pTemp = nullptr;
+
+		return score;
+	}
+
 	float CLR_IP::Cpp_TemplateMatching(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt, int nChIdx)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
@@ -214,6 +233,40 @@ namespace RootTools_CLR
 		Point Pos;
 
 		float score = IP::TemplateMatching(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod, nByteCnt, nChIdx);
+
+		outPosX = Pos.x;
+		outPosY = Pos.y;
+
+		pSrc = nullptr;
+		pTemp = nullptr;
+
+		return score;
+	}
+
+	float CLR_IP::Cpp_TemplateMatching_LargeTrigger(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt, int nChIdx)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pTemp = &pTempImg[0];
+		Point Pos;
+
+		float score = IP::TemplateMatching_LargeTrigger(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod, nByteCnt, nChIdx);
+
+		outPosX = Pos.x;
+		outPosY = Pos.y;
+
+		pSrc = nullptr;
+		pTemp = nullptr;
+
+		return score;
+	}
+
+	float CLR_IP::Cpp_TemplateMatching_LargeTrigger(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt, int nChIdx)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pTemp = &pTempImg[0];
+		Point Pos;
+
+		float score = IP::TemplateMatching_LargeTrigger(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod, nByteCnt, nChIdx);
 
 		outPosX = Pos.x;
 		outPosY = Pos.y;
@@ -237,6 +290,18 @@ namespace RootTools_CLR
 		pSrc2 = nullptr;
 		pDst = nullptr;
 	}
+	void CLR_IP::Cpp_Subtract(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<byte> pSrc2 = &pSrcImg2[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Subtract(pSrc1, pSrc2, pDst, nMemW, nMemH);
+
+		pSrc1 = nullptr;
+		pSrc2 = nullptr;
+		pDst = nullptr;
+	}
 	void CLR_IP::Cpp_FindMinDiffLoc(array<byte>^ pSrcImg, array<byte>^ pInOutTarget, int nTransX, int nTransY, int nTargetW, int nTargetH, int nTrigger)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
@@ -248,7 +313,7 @@ namespace RootTools_CLR
 		pSrc = nullptr;
 		pTarget = nullptr;
 	}
-	void CLR_IP::Cpp_SelectMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH)
+	void CLR_IP::Cpp_SelectAbsMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pDst = &pDstImg[0];
@@ -258,122 +323,28 @@ namespace RootTools_CLR
 		for (int i = 0; i < RefROILT->Count; i++)
 			vtPoint.push_back(Point(RefROILT[i]->x, RefROILT[i]->y));
 
-		IP::SelectMinDiffinArea(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, Point(CurROILT->x, CurROILT->y), stride, nROIW, nROIH);
+		IP::SelectAbsMinDiffinArea(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, Point(CurROILT->x, CurROILT->y), stride, nROIW, nROIH);
 
 		pSrc = nullptr;
 		pDst = nullptr;
 	}
 
-	// Create Golden Image
-	// pSrcImg가 3개 미만인 경우 Avg Method로 동작함
-	void CLR_IP::Cpp_CreateGoldenImage_Avg(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH)
+	void CLR_IP::Cpp_SelectMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH, bool isDark)
 	{
-		using System::Runtime::InteropServices::GCHandle;
-		using System::Runtime::InteropServices::GCHandleType;
-
+		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pDst = &pDstImg[0];
-		// pin each contained array<int>^
-		array<GCHandle>^ pins = gcnew array<GCHandle>(pSrcImg->Count);
-		for (int i = 0, i_max = pins->Length; i != i_max; ++i)
-			pins[i] = GCHandle::Alloc(pSrcImg[i], GCHandleType::Pinned);
 
-		try
-		{
-			// get int*s for each contained pinned array<int>^
-			array<byte*>^ arrays = gcnew array<byte*>(pins->Length);
-			for (int i = 0, i_max = arrays->Length; i != i_max; ++i)
-				arrays[i] = static_cast<byte*>(pins[i].AddrOfPinnedObject().ToPointer());
+		std::vector<Point> vtPoint;
 
-			// pin outer array<int*>^
-			pin_ptr<byte*> pin = &arrays[0];
+		for (int i = 0; i < RefROILT->Count; i++)
+			vtPoint.push_back(Point(RefROILT[i]->x, RefROILT[i]->y));
 
-			// pass outer pinned array<int*> to UNumeric::ChangeArray as an int**
-			// (note that no casts are necessary in correct code)
-			IP::CreateGoldenImage_Avg(pin, pDst, imgNum, nMemW, nMemH);
-		}
-		finally
-		{
-			// unpin each contained array<int>^
-			for each (GCHandle pin in pins)
-				pin.Free();
-			pDst = nullptr;
-		}
+		IP::SelectMinDiffinArea(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, Point(CurROILT->x, CurROILT->y), stride, nROIW, nROIH, isDark);
+
+		pSrc = nullptr;
+		pDst = nullptr;
+
 	}
-	void CLR_IP::Cpp_CreateGoldenImage_MedianAvg(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH)
-	{
-		using System::Runtime::InteropServices::GCHandle;
-		using System::Runtime::InteropServices::GCHandleType;
-
-		pin_ptr<byte> pDst = &pDstImg[0];
-		// pin each contained array<int>^
-		array<GCHandle>^ pins = gcnew array<GCHandle>(pSrcImg->Count);
-		for (int i = 0, i_max = pins->Length; i != i_max; ++i)
-			pins[i] = GCHandle::Alloc(pSrcImg[i], GCHandleType::Pinned);
-
-		try
-		{
-			// get int*s for each contained pinned array<int>^
-			array<byte*>^ arrays = gcnew array<byte*>(pins->Length);
-			for (int i = 0, i_max = arrays->Length; i != i_max; ++i)
-				arrays[i] = static_cast<byte*>(pins[i].AddrOfPinnedObject().ToPointer());
-
-			// pin outer array<int*>^
-			pin_ptr<byte*> pin = &arrays[0];
-
-			// pass outer pinned array<int*> to UNumeric::ChangeArray as an int**
-			// (note that no casts are necessary in correct code)
-			if(imgNum < 3)
-				IP::CreateGoldenImage_Avg(pin, pDst, imgNum, nMemW, nMemH);
-			else
-				IP::CreateGoldenImage_MedianAvg(pin, pDst, imgNum, nMemW, nMemH);
-		}
-		finally
-		{
-			// unpin each contained array<int>^
-			for each (GCHandle pin in pins)
-				pin.Free();
-			pDst = nullptr;
-		}
-	}
-	void CLR_IP::Cpp_CreateGoldenImage_Median(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH)
-	{
-		{
-			using System::Runtime::InteropServices::GCHandle;
-			using System::Runtime::InteropServices::GCHandleType;
-
-			pin_ptr<byte> pDst = &pDstImg[0];
-			// pin each contained array<int>^
-			array<GCHandle>^ pins = gcnew array<GCHandle>(pSrcImg->Count);
-			for (int i = 0, i_max = pins->Length; i != i_max; ++i)
-				pins[i] = GCHandle::Alloc(pSrcImg[i], GCHandleType::Pinned);
-
-			try
-			{
-				// get int*s for each contained pinned array<int>^
-				array<byte*>^ arrays = gcnew array<byte*>(pins->Length);
-				for (int i = 0, i_max = arrays->Length; i != i_max; ++i)
-					arrays[i] = static_cast<byte*>(pins[i].AddrOfPinnedObject().ToPointer());
-
-				// pin outer array<int*>^
-				pin_ptr<byte*> pin = &arrays[0];
-
-				// pass outer pinned array<int*> to UNumeric::ChangeArray as an int**
-				// (note that no casts are necessary in correct code)
-				if (imgNum < 3)
-					IP::CreateGoldenImage_Avg(pin, pDst, imgNum, nMemW, nMemH);
-				else
-					IP::CreateGoldenImage_Median(pin, pDst, imgNum, nMemW, nMemH);
-			}
-			finally
-			{
-				// unpin each contained array<int>^
-				for each (GCHandle pin in pins)
-					pin.Free();
-				pDst = nullptr;
-			}
-		}
-	}
-
 	void CLR_IP::Cpp_CreateGoldenImage_Avg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
@@ -465,14 +436,64 @@ namespace RootTools_CLR
 	// Elementwise Operation
 	void CLR_IP::Cpp_Multiply(array<byte>^ pSrcImg1, array<float>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
 	{
-		pin_ptr<byte> pSrc = &pSrcImg1[0];
-		pin_ptr<float> pGolden = &pSrcImg2[0];
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<float> pSrc2 = &pSrcImg2[0];
 		pin_ptr<byte> pDst = &pDstImg[0];
 
-		IP::Multiply(pSrc, pGolden, pDst, nMemW, nMemH);
+		IP::Multiply(pSrc1, pSrc2, pDst, nMemW, nMemH);
+
+		pSrc1 = nullptr;
+		pSrc2 = nullptr;
+		pDst = nullptr;
+	}
+
+	void CLR_IP::Cpp_Multiply(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<byte> pSrc2 = &pSrcImg2[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Multiply(pSrc1, pSrc2, pDst, nMemW, nMemH);
+
+		pSrc1 = nullptr;
+		pSrc2 = nullptr;
+		pDst = nullptr;
+	}
+
+	void CLR_IP::Cpp_Bitwise_NOT(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Bitwise_NOT(pSrc, pDst, nMemW, nMemH);
 
 		pSrc = nullptr;
-		pGolden = nullptr;
+		pDst = nullptr;
+	}
+
+	void CLR_IP::Cpp_Bitwise_AND(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<byte> pSrc2 = &pSrcImg2[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Bitwise_AND(pSrc1, pSrc2, pDst, nMemW, nMemH);
+
+		pSrc1 = nullptr;
+		pSrc2 = nullptr;
+		pDst = nullptr;
+	}
+
+	void CLR_IP::Cpp_Bitwise_OR(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<byte> pSrc2 = &pSrcImg2[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Bitwise_OR(pSrc1, pSrc2, pDst, nMemW, nMemH);
+
+		pSrc1 = nullptr;
+		pSrc2 = nullptr;
 		pDst = nullptr;
 	}
 
@@ -588,6 +609,19 @@ namespace RootTools_CLR
 			}
 		}
 		return local;
+	}
+	
+	int CLR_IP::Cpp_FindDominantIntensity(array<byte>^ pSrcImg, array<byte>^ pMaskImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pMask = &pMaskImg[0];
+	
+		int nThreshold = IP::FindDominantIntensity(pSrc, pMask, nMemW, nMemH);
+
+		pSrc = nullptr;
+		pMask = nullptr;
+
+		return nThreshold;
 	}
 
 	// Image(Feature/Defect Image) Load/Save

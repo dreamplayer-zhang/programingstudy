@@ -197,7 +197,7 @@ namespace RootTools.Light
                     if (EQ.IsStop()) return "EQ Stop";
                     if (m_lightTool.m_rs232.p_bConnect == false) return "RS232 Connection Lost !!";
                     if (m_nRead > 0) return "OK";
-                    if (sw.Elapsed.TotalSeconds > msWait) return "Timeover";
+                    if (sw.Elapsed.TotalMilliseconds > msWait) return "Timeover";
                     Thread.Sleep(10);
                 }
             }
@@ -270,21 +270,32 @@ namespace RootTools.Light
             protected override void GetPower()
             {
                 Protocol protocol = null;
-                switch (m_eChannel)
-                {
-                    case eChannel.Red: protocol = m_lightTool.AddProtocol(eCmd.GetRedPower, 0, this);     break;
-                    case eChannel.Green: protocol = m_lightTool.AddProtocol(eCmd.GetGreenPower, 0, this);   break;
-                    case eChannel.Blue: protocol = m_lightTool.AddProtocol(eCmd.GetBluePower, 0, this);    break;
-                    default:
-                        break;
-                }
 
-                if (protocol != null)
+                int nSendCount = 1;
+                do
                 {
-                    string sResult = protocol.WaitReply(m_msWaitReply);
-                    if (sResult == "Timeover")
-                        m_lightTool.m_protocolSend = null;
+                    switch (m_eChannel)
+                    {
+                        case eChannel.Red: protocol = m_lightTool.AddProtocol(eCmd.GetRedPower, 0, this); break;
+                        case eChannel.Green: protocol = m_lightTool.AddProtocol(eCmd.GetGreenPower, 0, this); break;
+                        case eChannel.Blue: protocol = m_lightTool.AddProtocol(eCmd.GetBluePower, 0, this); break;
+                        default:
+                            break;
+                    }
+
+                    if (protocol != null)
+                    {
+                        string sResult = protocol.WaitReply(m_msWaitReply);
+                        if (sResult != "OK")
+                        {
+                            m_lightTool.m_protocolSend = null;
+                            nSendCount++;
+                        }
+                        else
+                            break;
+                    }
                 }
+                while (nSendCount <= m_nResendCount);
             }
 
             public void SetGetPower(int nPower)
@@ -294,49 +305,73 @@ namespace RootTools.Light
             }
 
             const int c_maxPower = 4000;
-            const int m_msWaitReply = 2000;
+            const int m_msWaitReply = 1000;
+            int m_nResendCount = 3;
             public override void SetPower()
             {
                 Protocol protocol = null;
                 double fPower = p_bOn ? p_fSetPower : 0;
                 fPower *= p_fScalePower;
                 fPower = Math.Round(fPower);
-                switch (m_eChannel)
-                {
-                    case eChannel.Red: protocol = m_lightTool.AddProtocol(eCmd.SetRedPower, (int)fPower, this); break;
-                    case eChannel.Green: protocol = m_lightTool.AddProtocol(eCmd.SetGreenPower, (int)fPower, this); break;
-                    case eChannel.Blue: protocol = m_lightTool.AddProtocol(eCmd.SetBluePower, (int)fPower, this); break;
-                    default:
-                        break;
-                }
 
-                if (protocol != null)
+                int nSendCount = 1;
+                do
                 {
-                    string sResult = protocol.WaitReply(m_msWaitReply);
-                    if (sResult != "OK")
-                        m_lightTool.m_protocolSend = null;
+                    switch (m_eChannel)
+                    {
+                        case eChannel.Red: protocol = m_lightTool.AddProtocol(eCmd.SetRedPower, (int)fPower, this); break;
+                        case eChannel.Green: protocol = m_lightTool.AddProtocol(eCmd.SetGreenPower, (int)fPower, this); break;
+                        case eChannel.Blue: protocol = m_lightTool.AddProtocol(eCmd.SetBluePower, (int)fPower, this); break;
+                        default:
+                            break;
+                    }
+
+                    if (protocol != null)
+                    {
+                        string sResult = protocol.WaitReply(m_msWaitReply);
+                        if (sResult != "OK")
+                        {
+                            m_lightTool.m_protocolSend = null;
+                            nSendCount++;
+                        }
+                        else
+                            break;
+                    }
                 }
+                while (nSendCount <= m_nResendCount);
+                
             }
             protected override void GetOnOff() { }
             public override void SetOnOff()
             {
                 Protocol protocol = null;
                 int nVal = p_bOn ? 1 : 0;
-                switch (m_eChannel)
-                {
-                    case eChannel.Red: protocol = m_lightTool.AddProtocol(eCmd.SetRedOnOff, nVal, this); break;
-                    case eChannel.Green: protocol = m_lightTool.AddProtocol(eCmd.SetGreenOnOff, nVal, this); break;
-                    case eChannel.Blue: protocol = m_lightTool.AddProtocol(eCmd.SetBlueOnOff, nVal, this); break;
-                    default:
-                        break;
-                }
 
-                if (protocol != null)
+                int nSendCount = 1;
+                do
                 {
-                    string sResult = protocol.WaitReply(m_msWaitReply);
-                    if (sResult != "OK")
-                        m_lightTool.m_protocolSend = null;
+                    switch (m_eChannel)
+                    {
+                        case eChannel.Red: protocol = m_lightTool.AddProtocol(eCmd.SetRedOnOff, nVal, this); break;
+                        case eChannel.Green: protocol = m_lightTool.AddProtocol(eCmd.SetGreenOnOff, nVal, this); break;
+                        case eChannel.Blue: protocol = m_lightTool.AddProtocol(eCmd.SetBlueOnOff, nVal, this); break;
+                        default:
+                            break;
+                    }
+
+                    if (protocol != null)
+                    {
+                        string sResult = protocol.WaitReply(m_msWaitReply);
+                        if (sResult != "OK")
+                        {
+                            m_lightTool.m_protocolSend = null;
+                            nSendCount++;
+                        }
+                        else
+                            break;
+                    }
                 }
+                while (nSendCount <= m_nResendCount);
             }
 
             public int m_nCh = 0;
@@ -367,6 +402,8 @@ namespace RootTools.Light
             {
                 Light light = new Light(p_id, eChannel, this);
                 p_aLight.Add(light);
+
+                light.p_bOn = true;
             }
         }
 

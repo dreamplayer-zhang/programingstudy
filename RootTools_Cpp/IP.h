@@ -34,17 +34,16 @@ public:
 	static void Masking(BYTE* pSrc, BYTE* pDst, std::vector<Point> vtStartPoint, std::vector<int> vtLength, int nW, int nH);
 	// Method Âü°í : https://docs.opencv.org/2.4/doc/tutorials/imgproc/histograms/template_matching/template_matching.html
 	static float TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nSrcW, int nSrcH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt, int nChIdx);
-
+	static float TemplateMatching_VRS(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nSrcW, int nSrcH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt);
+	static float TemplateMatching_LargeTrigger(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt, int nChIdx);
 	// ********* D2D ******** //
 	static void SubtractAbs(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH);
-	static void SelectMinDiffinArea(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtRefROILT, Point vtCurROILT, int stride, int nChipW, int nChipH);
+	static void Subtract(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH);
+	static void SelectMinDiffinArea(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtRefROILT, Point vtCurROILT, int stride, int nChipW, int nChipH, bool isDark);
+	static void SelectAbsMinDiffinArea(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtRefROILT, Point vtCurROILT, int stride, int nChipW, int nChipH);
 	static Point FindMinDiffLoc(BYTE* pSrc, BYTE* pInOutTarget, int nTargetW, int nTargetH, int nTrigger);
 
 	// Create Golden Image
-	static void CreateGoldenImage_Avg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH);
-	static void CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH);
-	static void CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH);
-
 	static void CreateGoldenImage_Avg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH);
 	static void CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH);
 	static void CreateGoldenImage_Median(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH);
@@ -60,6 +59,10 @@ public:
 
 	// Elemetwise Operation
 	static void Multiply(BYTE* pSrc1, float* pSrc2, BYTE* pDst, int nW, int nH);
+	static void Multiply(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH);
+	static void Bitwise_NOT(BYTE* pSrc, BYTE* pDst, int nW, int nH);
+	static void Bitwise_AND(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH);
+	static void Bitwise_OR(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH);
 
 	// Filtering
 	static void GaussianBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nSig);
@@ -71,6 +74,7 @@ public:
 	static std::vector<Point> FindWaferEdge(BYTE* pSrc, float& inoutCenterX, float& inoutCenterY, float& inoutRadius, int nW, int nH, int downScale);
 	static std::vector<byte> GenerateMapData(std::vector<Point> vtContour, float& outOriginX, float& outOriginY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode);
 	static std::vector<byte> GenerateMapData(std::vector<Point> vtContour, float& outOriginX, float& outOriginY, float& outChipSzX, float& outChipSzY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode);
+	static int FindDominantIntensity(BYTE* pSrc, BYTE* pMask, int nW, int nH);
 
 	// Bitmap Save / Load
 	static void SaveBMP(String sFilePath, BYTE* pSrc, int nW, int nH, int nByteCnt);

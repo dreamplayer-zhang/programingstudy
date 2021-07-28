@@ -25,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,6 +35,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -45,6 +47,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <UseVSHostingProcess>true</UseVSHostingProcess>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -56,8 +59,16 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Emgu.CV.UI">
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
     </Reference>
@@ -241,16 +252,21 @@
     <Compile Include="Module\Aligner_RND.cs" />
     <Compile Include="Module\BacksideVision\Run_GrabBackside.cs" />
     <Compile Include="Module\BacksideVision\Run_InspectBackside.cs" />
+    <Compile Include="Module\BacksideVision\Run_LADS.cs" />
     <Compile Include="Module\EdgesideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgesideVision\Run_GrabEdge.cs" />
     <Compile Include="Module\EdgesideVision\Run_InspectEBR.cs" />
     <Compile Include="Module\EdgesideVision\Run_InspectEdge.cs" />
     <Compile Include="Module\EFEM_AOP.cs" />
+    <Compile Include="Module\FrontsideVision\Run_Centering.cs" />
     <Compile Include="Module\FrontsideVision\Run_GrabLineScan.cs" />
     <Compile Include="Module\FrontsideVision\Run_Inspect.cs" />
+    <Compile Include="Module\FrontsideVision\Run_VRSAlign.cs" />
+    <Compile Include="Module\FrontsideVision\Run_VisionAlign.cs" />
     <Compile Include="Module\Gem_XGem300Pro.cs" />
     <Compile Include="Module\IWTRRun.cs" />
     <Compile Include="Module\Loadport_Cymechs.cs" />
+    <Compile Include="Module\RecipeAlign.cs" />
     <Compile Include="Module\RFID_Brooks.cs" />
     <Compile Include="Module\RFID_Ceyon.cs" />
     <Compile Include="Module\Vision_Edgeside.cs" />
@@ -295,6 +311,10 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
+      <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
+      <Name>RootTools_CLR</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RootTools_Vision\RootTools_Vision.csproj">
       <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
       <Name>RootTools_Vision</Name>
@@ -302,4 +322,8 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(SolutionDir)Lib\MarsLog\SSL.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\SSL.dll"
+copy /Y "$(SolutionDir)Lib\MarsLog\SSLNet.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\SSLNet.dll"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

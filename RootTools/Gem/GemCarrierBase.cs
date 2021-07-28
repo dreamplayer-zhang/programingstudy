@@ -179,7 +179,7 @@ namespace RootTools.Gem
                 if (_eReqTransfer == value) return;
                 if ((m_gem == null) || m_gem.p_bOffline) return;
                 m_log.Info("p_eTransfer " + _eReqTransfer.ToString() + " -> " + value.ToString());
-                _eReqTransfer = value;
+                p_eReqTransfer = value;
                 if (EQ.p_bSimulate) p_eTransfer = value; 
                 switch (_eReqTransfer)
                 {
@@ -263,7 +263,7 @@ namespace RootTools.Gem
                 {
 
                     case eAccess.CarrierCompleted: 
-                        m_bReqUnload = true; 
+                        //m_bReqUnload = true; 
                         break; 
                 }
             }
@@ -301,6 +301,7 @@ namespace RootTools.Gem
                 _eAccessLP = value;
                 RunTree(Tree.eMode.Init);
                 OnPropertyChanged();
+                OnPropertyChanged("p_eAccessLP");
                 OnPropertyChanged("p_bAccessLP_Auto");
                 OnPropertyChanged("p_bAccessLP_Manual");
             }
@@ -325,7 +326,7 @@ namespace RootTools.Gem
             if (m_gem.p_eControl != eControl.ONLINEREMOTE)
             {
                 p_eStateCarrierID = eGemState.VerificationOK;
-                p_eTransfer = eTransfer.TransferBlocked;
+                p_eReqTransfer = eTransfer.TransferBlocked;
                 return;
             }
 
@@ -403,7 +404,7 @@ namespace RootTools.Gem
         #region Property
         public string p_sLocID { get; set; }
 
-        string _sLotID = "LotID";
+        string _sLotID = "";
         public string p_sLotID 
         {
             get { return _sLotID; }

@@ -17,6 +17,12 @@ namespace Root_CAMELLIA
             Measure
         }
 
+        public enum Category
+        {
+            EQUIPMENT = 1,
+            ETC
+        }
+
 
         public const int ViewSize = 310;
         public const int WFRadius = 300;
@@ -28,15 +34,16 @@ namespace Root_CAMELLIA
         public const string RegNanoViewConfig = "NanoViewConfigPath";
         public const string RegNanoViewPort = "NanoViewPort";
         public const string RegNanoViewExceptNIR = "ExceptNIR";
+        public const string RegNanoViewCalDCOLTransmittance = "CalDCOLTransmittance";
         public const string RegNanoViewUseThickness = "Use Thickness"; 
         public const string RegLightSourcePath = "LightSourcePath";
         public const string Dir_SequenceInitialPath = @"C:\Recipe\";
         public const string Dir_InitialPath = @"C:\Recipe\CAMELLIA2";
         public const string Dir_InitialLayerPath = @"C:\Recipe\LAYER\";
-        public const string Dir_Preset = @"C:\Camellia\Preset\";
-        public const string Dir_StageMap = @"C:\Camellia\StageMap\";
-        public const string Dir_Recipe = @"C:\Camellia\Recipe\PRD\15Line\"; // 변경해야함
-        public const string Dir_StageHole = @"C:\Camellia\StageCircleHole.txt"; //변경해야함
+        public const string Dir_Preset = @"C:\Camellia2\Preset\";
+        public const string Dir_StageMap = @"C:\Camellia2\StageMap\";
+        public const string Dir_Recipe = @"C:\Recipe\"; // 변경해야함
+        public const string Dir_StageHole = @"C:\Camellia2\StageCircleHole.txt"; //변경해야함
         public const string Dir_LockImg = "\\Resource\\locked.png";
         public const string Dir_MeasureSaveRootPath = @"D:\Camellia2\PRD\Data\";
         public const string Dir_HistorySaveRootPath = @"D:\Camellia2\History\";

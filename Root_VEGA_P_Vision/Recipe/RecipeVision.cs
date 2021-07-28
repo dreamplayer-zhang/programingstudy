@@ -2,15 +2,14 @@
 
 namespace Root_VEGA_P_Vision
 {
-    class RecipeVision:RecipeBase
+    public class RecipeVision:RecipeBase
     {
         public override void Initilize()
         {
-            RegisterRecipeItem<OriginRecipe>();
-            RegisterRecipeItem<PositionRecipe>();
+            RegisterRecipeItem<EUVOriginRecipe>();
+            RegisterRecipeItem<EUVPositionRecipe>();
             RegisterRecipeItem<MaskRecipe>();
             RegisterRecipeItem<EUVPodSurfaceRecipe>();
-
             RegisterParameterItem<EUVPodSurfaceParameter>();
 
             WaferMap.MapSizeX = 1;

@@ -6,6 +6,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Root_WIND2
 {
@@ -14,6 +17,8 @@ namespace Root_WIND2
         Normal,
         SelectChip,
         SelectRoi,
+        DrawMap,
+        EraseMap,
     }
 
     public delegate void EventViewerStateChagned();
@@ -74,6 +79,12 @@ namespace Root_WIND2
                     case DIALOG_MAP_CREATOR_VIEWER_STATE.SelectRoi:
                         selectRoiState = PROCESS_SELECT_ROI_STATE.SelectRoiLeftTop;
                         break;
+                    case DIALOG_MAP_CREATOR_VIEWER_STATE.DrawMap:
+                        drawMapState = PROCESS_DRAW_MAP_STATE.Draw;
+                        break;
+                    case DIALOG_MAP_CREATOR_VIEWER_STATE.EraseMap:
+                        eraseMapState = PROCESS_ERASE_MAP_STATE.Erase;
+                        break;
                 }
 
                 SetProperty<DIALOG_MAP_CREATOR_VIEWER_STATE>(ref this.viewerState, value);
@@ -95,6 +106,14 @@ namespace Root_WIND2
                 if (this.IsSelectRoiChecked == true)
                 {
                     this.IsSelectRoiChecked = false;
+                }
+                if (this.IsDrawChecked == true)
+                {
+                    this.IsDrawChecked = false;
+                }
+                if (this.IsEraseChecked == true)
+                {
+                    this.IsEraseChecked = false;
                 }
             }
         }
@@ -157,13 +176,23 @@ namespace Root_WIND2
             }
         }
 
-        private bool isWaferModeChecked = false;
-        public bool IsWaferModeChecked
+        private bool isDrawChecked = false;
+        public bool IsDrawChecked
         {
-            get => this.isWaferModeChecked;
+            get => this.isDrawChecked;
             set
             {
-                SetProperty<bool>(ref this.isWaferModeChecked, value);
+                SetProperty<bool>(ref this.isDrawChecked, value);
+            }
+        }
+
+        private bool isEraseChecked = false;
+        public bool IsEraseChecked
+        {
+            get => this.isEraseChecked;
+            set
+            {
+                SetProperty<bool>(ref this.isEraseChecked, value);
             }
         }
 
@@ -174,6 +203,46 @@ namespace Root_WIND2
             set
             {
                 SetProperty<string>(ref this.displayViewerState, value);
+            }
+        }
+
+        private bool isFindDone = false;
+        public bool IsFindDone
+        {
+            get => this.isFindDone;
+            set
+            {
+                SetProperty<bool>(ref this.isFindDone, value);
+            }
+        }
+
+        private int mapWidth = 0;
+        public int MapWidth
+        {
+            get => this.mapWidth;
+            set
+            {
+                SetProperty<int>(ref this.mapWidth, value);
+            }
+        }
+
+        private int mapHeight = 0;
+        public int MapHeight
+        {
+            get => this.mapHeight;
+            set
+            {
+                SetProperty<int>(ref this.mapHeight, value);
+            }
+        }
+
+        private int[] searchedWaferMap = null;
+        public int[] SearchedWaferMap
+        {
+            get => this.searchedWaferMap;
+            set
+            {
+                SetProperty<int[]>(ref this.searchedWaferMap, value);
             }
         }
         #endregion
@@ -250,13 +319,52 @@ namespace Root_WIND2
             }
         }
 
-        public ICommand btnWaferModeCommand
+        public ICommand btnModeDrawCommand
         {
             get
             {
                 return new RelayCommand(() =>
                 {
+                    if (this.IsFindDone == true)
+                    {
+                        if (this.IsDrawChecked == true)
+                        {
+                            this.IsEraseChecked = false;
+                            this.ViewerState = DIALOG_MAP_CREATOR_VIEWER_STATE.DrawMap;
+                            this.DisplayViewerState = this.ViewerState.ToString();
+                        }
+                        else
+                        {
+                            this.IsEraseChecked = true;
+                            this.ViewerState = DIALOG_MAP_CREATOR_VIEWER_STATE.EraseMap;
+                            this.DisplayViewerState = this.ViewerState.ToString();
+                        }
+                    }
+                });
+            }
+        }
 
+        public ICommand btnModeEraseCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.IsFindDone == true)
+                    {
+                        if (this.IsEraseChecked == true)
+                        {
+                            this.IsDrawChecked = false;
+                            this.ViewerState = DIALOG_MAP_CREATOR_VIEWER_STATE.EraseMap;
+                            this.DisplayViewerState = this.ViewerState.ToString();
+                        }
+                        else
+                        {
+                            this.IsDrawChecked = true;
+                            this.ViewerState = DIALOG_MAP_CREATOR_VIEWER_STATE.DrawMap;
+                            this.DisplayViewerState = this.ViewerState.ToString();
+                        }
+                    }
                 });
             }
         }
@@ -294,24 +402,20 @@ namespace Root_WIND2
             }
         }
 
-        public RelayCommand btnViewFullCommand
+        public RelayCommand btnDrawClearCommand
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    this.DisplayFull();
-                });
-            }
-        }
-
-        public RelayCommand btnViewBoxCommand
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    this.DisplayBox();
+                    this.IsFindDone = false;
+                    this.MapWidth = 0;
+                    this.MapHeight = 0;
+                    this.SearchedWaferMap = null;
+                    rectList.Clear();
+                    gridList.Clear();
+                    searchedChipPoint.Clear();
+                    ClearObjects();
                 });
             }
         }
@@ -334,6 +438,11 @@ namespace Root_WIND2
         public CPoint selectRoiLeftTop = new CPoint();
         public CPoint selectRoiRightBottom = new CPoint();
         public CRect selectRoiBox = new CRect();
+
+        public List<C3Point> searchedChipPoint = new List<C3Point>();
+        TShape CurrentShape;
+        List<TRect> rectList = new List<TRect>();
+        List<Grid> gridList = new List<Grid>();
 
         public void InitializeUIElement()
         {
@@ -424,6 +533,12 @@ namespace Root_WIND2
                     break;
                 case DIALOG_MAP_CREATOR_VIEWER_STATE.SelectRoi:
                     ProcessSelectRoi(e);
+                    break;
+                case DIALOG_MAP_CREATOR_VIEWER_STATE.DrawMap:
+                    ProcessDrawMap(e);
+                    break;
+                case DIALOG_MAP_CREATOR_VIEWER_STATE.EraseMap:
+                    ProcessEraseMap(e);
                     break;
             }
         }
@@ -520,12 +635,13 @@ namespace Root_WIND2
                     //ClearObjects();
                     this.p_UIElement.Remove(SelectChipBox_UI);
 
+                    if (this.SelectChipPointDone != null)
+                        this.SelectChipPointDone();
+
                     p_Cursor = Cursors.Arrow;
                     selectChipLeftTop = memPt;
                     DrawSelectChipLeftTopPoint(selectChipLeftTop);
-
-                    if (this.SelectChipPointDone != null)
-                        this.SelectChipPointDone();
+                    SetSelectChipPoint();
 
                     selectChipState = PROCESS_SELECT_CHIP_STATE.SelectChipRightBottom;
                     break;
@@ -582,12 +698,13 @@ namespace Root_WIND2
                     //ClearObjects();
                     this.p_UIElement.Remove(SelectRoiBox_UI);
 
+                    if (this.SelectRoiPointDone != null)
+                        this.SelectRoiPointDone();
+
                     p_Cursor = Cursors.Arrow;
                     selectRoiLeftTop = memPt;
                     DrawSelectRoiLeftTopPoint(selectRoiLeftTop);
-
-                    if (this.SelectRoiPointDone != null)
-                        this.SelectRoiPointDone();
+                    SetSelectRoiPoint();
 
                     selectRoiState = PROCESS_SELECT_ROI_STATE.SelectRoiRightBottom;
                     break;
@@ -616,6 +733,149 @@ namespace Root_WIND2
 
                     selectRoiState = PROCESS_SELECT_ROI_STATE.None;
                     ViewerState = DIALOG_MAP_CREATOR_VIEWER_STATE.Normal;
+                    break;
+            }
+        }
+        #endregion
+
+        #region [Process DrawMap]
+        private enum PROCESS_DRAW_MAP_STATE
+        {
+            None,
+            Draw,
+        }
+
+        PROCESS_DRAW_MAP_STATE drawMapState = PROCESS_DRAW_MAP_STATE.None;
+
+        public void ProcessDrawMap(MouseEventArgs e)
+        {
+            CPoint canvasPt = new CPoint(p_MouseX, p_MouseY);
+            CPoint memPt = GetMemPoint(canvasPt);
+
+            switch (drawMapState)
+            {
+                case PROCESS_DRAW_MAP_STATE.None:
+                    break;
+                case PROCESS_DRAW_MAP_STATE.Draw:
+                    foreach (var item in rectList)
+                    {
+                        if (memPt.X >= item.MemoryRect.Left && memPt.X <= item.MemoryRect.Right && memPt.Y >= item.MemoryRect.Top && memPt.Y <= item.MemoryRect.Bottom)
+                        {
+                            int idx = rectList.IndexOf(item);
+                            if (this.SearchedWaferMap[idx] == 0 && searchedChipPoint[idx].Z > 0)
+                            {
+                                this.SearchedWaferMap[idx] = 1;
+                                searchedChipPoint[idx].Z = searchedChipPoint[idx].Z - 100;
+                                DrawSearchedChipBox(searchedChipPoint[idx]);
+
+                                RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+                                Array.Copy(this.SearchedWaferMap, this.SearchedWaferMap, this.MapWidth * this.MapHeight);
+                                waferMap.CreateWaferMap(this.MapWidth, this.MapHeight, this.SearchedWaferMap);
+                            }
+                            break;
+                        }
+                    }
+                    break;
+            }
+        }
+        #endregion
+
+        #region [Process EraseMap]
+        private enum PROCESS_ERASE_MAP_STATE
+        {
+            None,
+            Erase,
+        }
+
+        PROCESS_ERASE_MAP_STATE eraseMapState = PROCESS_ERASE_MAP_STATE.None;
+
+        public void ProcessEraseMap(MouseEventArgs e)
+        {
+            CPoint canvasPt = new CPoint(p_MouseX, p_MouseY);
+            CPoint memPt = GetMemPoint(canvasPt);
+
+            switch (eraseMapState)
+            {
+                case PROCESS_ERASE_MAP_STATE.None:
+                    break;
+                case PROCESS_ERASE_MAP_STATE.Erase:
+                    foreach (var item in rectList)
+                    {
+                        if (memPt.X >= item.MemoryRect.Left && memPt.X <= item.MemoryRect.Right && memPt.Y >= item.MemoryRect.Top && memPt.Y <= item.MemoryRect.Bottom)
+                        {
+                            int idx = rectList.IndexOf(item);
+                            int sumRow = 0;
+                            int sumCol = 0;
+
+                            if (this.SearchedWaferMap[idx] == 1)
+                            {
+                                this.SearchedWaferMap[idx] = 0;
+                                searchedChipPoint[idx].Z = searchedChipPoint[idx].Z + 100;
+                                DrawSearchedChipBox(searchedChipPoint[idx]);
+
+                                // Check empty column
+                                for (int j = 0; j < this.MapWidth; j++)
+                                {
+                                    for (int i = 0; i < this.MapHeight; i++)
+                                    {
+                                        sumCol = sumCol + this.SearchedWaferMap[this.MapWidth * i + j];
+                                    }
+                                    if (sumCol == 0) // Clear column
+                                    {
+                                        for (int i = 0; i < this.MapHeight; i++)
+                                        {
+                                            int removeIdx = this.MapWidth * i + j - i;
+
+                                            this.SearchedWaferMap = this.SearchedWaferMap.Where((source, index) => index != removeIdx).ToArray();
+                                            this.searchedChipPoint.RemoveAt(removeIdx);
+                                            p_UIElement.Remove(rectList[removeIdx].CanvasRect);
+                                            p_UIElement.Remove(gridList[removeIdx]);
+                                            this.rectList.RemoveAt(removeIdx);
+                                            this.gridList.RemoveAt(removeIdx);
+                                        }
+                                        this.MapWidth = this.MapWidth - 1;
+                                    }
+                                    else
+                                    {
+                                        sumCol = 0;
+                                    }
+                                }
+
+                                // Check empty row
+                                for (int j = 0; j < this.MapHeight; j++)
+                                {
+                                    for (int i = 0; i < this.MapWidth; i++)
+                                    {
+                                        sumRow = sumRow + this.SearchedWaferMap[this.MapWidth * j + i];
+                                    }
+                                    if (sumRow == 0) // Clear row
+                                    {
+                                        for (int i = 0; i < this.MapWidth; i++)
+                                        {
+                                            int removeIdx = this.MapWidth * j;
+
+                                            this.SearchedWaferMap = this.SearchedWaferMap.Where((source, index) => index != removeIdx).ToArray();
+                                            this.searchedChipPoint.RemoveAt(removeIdx);
+                                            p_UIElement.Remove(rectList[removeIdx].CanvasRect);
+                                            p_UIElement.Remove(gridList[removeIdx]);
+                                            this.rectList.RemoveAt(removeIdx);
+                                            this.gridList.RemoveAt(removeIdx);
+                                        }
+                                        this.MapHeight = this.MapHeight - 1;
+                                    }
+                                    else
+                                    {
+                                        sumRow = 0;
+                                    }
+                                }
+
+                                RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+                                Array.Copy(this.SearchedWaferMap, this.SearchedWaferMap, this.MapWidth * this.MapHeight);
+                                waferMap.CreateWaferMap(this.MapWidth, this.MapHeight, this.SearchedWaferMap);
+                            }
+                            break;
+                        }
+                    }
                     break;
             }
         }
@@ -920,7 +1180,107 @@ namespace Root_WIND2
             }
         }
 
-        private void RedrawShapes()
+        public void DrawSearchedChipBox(C3Point chip)
+        {
+            if (chip.Z == 0 || chip.Z > 100) // Under similarity score or Erased
+            {
+                CurrentShape = new TRect(Brushes.Blue, 2, 0.5);
+            }
+            else
+            {
+                CurrentShape = new TRect(Brushes.Red, 2, 0.5);
+            }
+            TRect rect = CurrentShape as TRect;
+
+            rect.MemPointBuffer = new CPoint(chip.X, chip.Y);
+            rect.MemoryRect.Left = chip.X;
+            rect.MemoryRect.Top = chip.Y;
+            rect.MemoryRect.Right = rect.MemoryRect.Left + this.selectChipBox.Width;
+            rect.MemoryRect.Bottom = rect.MemoryRect.Top + this.selectChipBox.Height;
+            rect.MemoryRect.Width = this.selectChipBox.Width;
+            rect.MemoryRect.Height = this.selectChipBox.Height;
+
+            Grid grid = new Grid();
+            TextBlock tb = new TextBlock();
+            tb.FontWeight = FontWeights.UltraBold;
+            tb.TextAlignment = TextAlignment.Center;
+
+            if (chip.Z == 0) // Under similarity score
+            {
+                tb.Foreground = Brushes.Blue;
+                tb.Text = "";
+            }
+            else if (chip.Z > 100) // Erased
+            {
+                tb.Foreground = Brushes.Blue;
+                tb.Text = string.Format("{0}", chip.Z - 100);
+            }
+            else
+            {
+                tb.Foreground = Brushes.Red;
+                tb.Text = string.Format("{0}", chip.Z);
+            }
+
+            double pixSizeX = (double)p_CanvasWidth / (double)p_View_Rect.Width;
+            double pixSizeY = (double)p_CanvasHeight / (double)p_View_Rect.Height;
+
+            CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
+            CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
+
+            CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+            CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+            int width = Math.Abs(canvasRB.X - canvasLT.X);
+            int height = Math.Abs(canvasRB.Y - canvasLT.Y);
+            rect.CanvasRect.Width = width + pixSizeX;
+            rect.CanvasRect.Height = height + pixSizeY;
+
+            tb.Width = width + pixSizeX;
+            tb.Height = height + pixSizeY;
+            tb.FontSize = (int)(0.5 * Math.Min(tb.Width, tb.Height));
+            tb.Padding = new Thickness(0, (int)((tb.Height - tb.FontSize) / 2), 0, 0);
+
+            Canvas.SetLeft(rect.CanvasRect, canvasLT.X - pixSizeX / 2);
+            Canvas.SetTop(rect.CanvasRect, canvasLT.Y - pixSizeY / 2);
+            Canvas.SetRight(rect.CanvasRect, canvasRB.X);
+            Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
+
+            Canvas.SetLeft(grid, canvasLT.X - pixSizeX / 2);
+            Canvas.SetTop(grid, canvasLT.Y - pixSizeY / 2);
+
+            if (!p_UIElement.Contains(rect.CanvasRect))
+            {
+                p_UIElement.Add(rect.CanvasRect);
+            }
+
+            grid.Children.Add(tb);
+            if (!p_UIElement.Contains(grid))
+            {
+                p_UIElement.Add(grid);
+            }
+
+            bool isNew = true;
+            foreach (var item in rectList)
+            {
+                int idx = rectList.IndexOf(item);
+
+                if (item.MemPointBuffer == rect.MemPointBuffer)
+                {
+                    p_UIElement.Remove(rectList[idx].CanvasRect);
+                    p_UIElement.Remove(gridList[idx]);
+                    rectList[idx] = rect;
+                    gridList[idx] = grid;
+                    isNew = false;
+                    break;
+                }
+            }
+            if (isNew == true)
+            {
+                rectList.Add(rect);
+                gridList.Add(grid);
+            }
+        }
+
+        public void RedrawShapes()
         {
             if (p_UIElement.Contains(SelectChipLeftTop_UI))
             {
@@ -939,13 +1299,36 @@ namespace Root_WIND2
                 DrawSelectRoiRightBottomPoint(selectRoiRightBottom);
             }
 
-            if(p_UIElement.Contains(SelectChipBox_UI))
+            if (p_UIElement.Contains(SelectChipBox_UI))
             {
                 DrawSelectChipBox();
             }
             if (p_UIElement.Contains(SelectRoiBox_UI))
             {
                 DrawSelectRoiBox();
+            }
+
+            foreach (var item in rectList)
+            {
+                if (p_UIElement.Contains(item.CanvasRect))
+                {
+                    p_UIElement.Remove(item.CanvasRect);
+                }
+            }
+            rectList.Clear();
+
+            foreach (var item in gridList)
+            {
+                if (p_UIElement.Contains(item))
+                {
+                    p_UIElement.Remove(item);
+                }
+            }
+            gridList.Clear();
+
+            foreach (var item in searchedChipPoint)
+            {
+                DrawSearchedChipBox(item);
             }
         }
         #endregion
@@ -1017,6 +1400,8 @@ namespace Root_WIND2
 
             this.selectChipState = PROCESS_SELECT_CHIP_STATE.None;
             this.selectRoiState = PROCESS_SELECT_ROI_STATE.None;
+            this.drawMapState = PROCESS_DRAW_MAP_STATE.None;
+            this.eraseMapState = PROCESS_ERASE_MAP_STATE.None;
 
             if (this.SelectChipBoxReset != null && isFromParent == false)
                 this.SelectChipBoxReset();
@@ -1024,10 +1409,22 @@ namespace Root_WIND2
                 this.SelectRoiBoxReset();
         }
 
+        public void SetSelectChipPoint()
+        {
+            if (this.SelectChipPointDone != null)
+                this.SelectChipPointDone();
+        }
+
         public void SetSelectChip()
         {
             if (this.SelectChipBoxDone != null)
                 this.SelectChipBoxDone();
+        }
+
+        public void SetSelectRoiPoint()
+        {
+            if (this.SelectRoiPointDone != null)
+                this.SelectRoiPointDone();
         }
 
         public void SetSelectRoi()

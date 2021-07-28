@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -69,10 +70,19 @@ namespace Root_Rinse_Unloader.Module
         }
         #endregion
 
+        #region GAF
+        ALID m_alidAxis;
+        void InitALID()
+        {
+            m_alidAxis = m_gaf.GetALID(this, "Rotate Axis Alarm", "Rotate Axis Alarm");
+        }
+        #endregion
+
         #region Rotate
         Axis[] m_axisRotate = new Axis[2];
         public string RunRotate(bool bRotate)
         {
+            m_alidAxis.p_bSet = m_axisRotate[0].p_sensorAlarm || m_axisRotate[1].p_sensorAlarm;
             if (bRotate)
             {
                 eSpeed eSpeed = (m_rinse.p_eMode == RinseU.eRunMode.Stack) ? eSpeed.Stack : eSpeed.Magazine;
@@ -120,6 +130,13 @@ namespace Root_Rinse_Unloader.Module
         #region Stopper
         public string RunStopperUp(bool bUp)
         {
+            if (bUp)
+            {
+                foreach (Line line in m_aLine)
+                {
+                    if (line.m_diCheck[2].p_bIn) return "Stipper Up Error : Check Arrive Sensor";
+                }
+            }
             return m_dioStopperUp.RunSol(bUp); 
         }
         #endregion
@@ -447,9 +464,10 @@ namespace Root_Rinse_Unloader.Module
             p_id = id;
             m_rinse = rinse;
             m_rail = rail;
-            m_storage = storage; 
+            m_storage = storage;
             InitILines();
             InitBase(id, engineer);
+            InitALID();
 
             InitThreadCheck(); 
             EQ.m_EQ.OnChanged += M_EQ_OnChanged;

@@ -6,36 +6,19 @@
              mc:Ignorable="d"
       d:DesignHeight="400" d:DesignWidth="800">
 
-    <!--<UserControl.Resources>
-        <Style x:Key="use_checkbox_button" TargetType="CheckBox">
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="IsChecked" Value="{Binding IsChecked}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <Border x:Name="bd" CornerRadius="10">
-                            <TextBlock x:Name="tb" Text="USE" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{StaticResource groupbox_button_normal}"/>
-                                <Setter TargetName="tb" Property="Text" Value="On"/>
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="bd" Property="Background" Value="#222222"/>
-                                <Setter TargetName="tb" Property="Text" Value="Off"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+    <UserControl.Resources>
+        <local:StringConverter x:Key="StringConverter"/>
+        <local:ColorConverter x:Key="ColorConverter"/>
+        <local:IndexConverter x:Key="IndexConverter"/>
+        <Style TargetType="{x:Type DataGridCell}">
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="Foreground" Value="Black" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
-    </UserControl.Resources>-->
+    </UserControl.Resources>
 
     <Grid Background="{StaticResource main_view_background}">
         <Grid.ColumnDefinitions>
@@ -102,7 +85,7 @@
                     </Grid>
                 </StackPanel>
             </GroupBox>
-            
+
             <GroupBox Header="Inspect Spec" 
                       Grid.Row="1" 
                       Background="{StaticResource GroupBoxBackground}"
@@ -138,12 +121,15 @@
                                      ToolbarVisible="False"
                                      PropertySort="Categorized"/>
             </GroupBox>
+
+
         </Grid>
 
 
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="150"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <!--<RowDefinition Height="*"/>-->
             </Grid.RowDefinitions>
@@ -220,7 +206,93 @@
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
-        </Grid>
 
+            <GroupBox Header="Option Defect" 
+                      Grid.Row="3"
+                      Background="{StaticResource GroupBoxBackground}"
+                      Style="{StaticResource main_view_groupbox}"
+                      Margin="4">
+
+                <GroupBox.Resources>
+                    <local:PropertyConverter x:Key="PropertyConverter" />
+                </GroupBox.Resources>
+
+                <StackPanel Margin="4">
+                    <DataGrid ItemsSource="{Binding OptionDefectList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedItem="{Binding SelectedOptionDefect, Mode=TwoWay}"
+                                      SelectionMode="Single"
+                                      IsReadOnly="False"
+                                      AutoGenerateColumns="False">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                            <Style x:Key="TextInCellLeft" TargetType="{x:Type TextBlock}" >
+                                <Setter Property="TextAlignment" Value="Left"/>
+                                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                <Setter Property="FontSize" Value="12"/>
+                                <Setter Property="Height" Value="24"/>
+                                <Setter Property="Margin" Value="12,6,0,0"/>
+                            </Style>
+                            <Style x:Key="TextInCellCenter" TargetType="{x:Type TextBlock}" >
+                                <Setter Property="TextAlignment" Value="Center"/>
+                                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                <Setter Property="FontSize" Value="12"/>
+                                <Setter Property="Height" Value="24"/>
+                                <Setter Property="Margin" Value="0,6,0,0"/>
+                            </Style>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                                                             Color="Gainsboro"/>
+                        </DataGrid.Resources>
+
+                        <DataGrid.Columns>
+
+                            <!--<DataGridTextColumn Header="Angle" Width="200"
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding Angle, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="Defect Code" Width="*"
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding Code, UpdateSourceTrigger=PropertyChanged}"/>-->
+                            <DataGridTextColumn Header="Min Angle" Width="1*"
+                                                                        ElementStyle="{StaticResource TextInCellCenter}"
+                                                                        Binding="{Binding MinAngle, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Max Angle" Width="1*"
+                                                                        ElementStyle="{StaticResource TextInCellCenter}"
+                                                                        Binding="{Binding MaxAngle, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Defect Code" Width="1*"
+                                                                        ElementStyle="{StaticResource TextInCellCenter}"
+                                                                        Binding="{Binding Code, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Content="Add" Grid.Column="0"
+                            Margin="4" 
+                            Height="30"
+                            Command="{Binding btnAddOptionDefect}"
+                            Style="{StaticResource groupbox_button}"/>
+
+                        <Button Content="Delete" Grid.Column="1"
+                            Margin="4" 
+                            Height="30"
+                            Command="{Binding btnDeleteOptionDefect}"
+                            Style="{StaticResource groupbox_button}"/>
+
+                        <Button Content="Save" Grid.Column="2"
+                            Margin="4" 
+                            Height="30"
+                            Command="{Binding btnSaveOptionDefect}"
+                            Style="{StaticResource groupbox_button}"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
     </Grid>
 </UserControl>

@@ -25,14 +25,12 @@ namespace Root_VEGA_P_Vision
         public ScrewUI_ViewModel(string memstr)
         {
             screwUI = new screwUI();
+            screwUI.DataContext = this;
             ScrewUI_ImageViewerVM = new RootViewer_ViewModel();
             ScrewUI_ImageViewerVM.p_VisibleMenu = Visibility.Collapsed;
             ScrewUI_ImageViewerVM.p_VisibleSlider = Visibility.Collapsed;
-            ScrewUI_ImageViewerVM.init(new ImageData(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr)));
-            //p_VisibleMenu = Visibility.Collapsed;
-            //p_VisibleSlider = Visibility.Collapsed;
-            //init(new ImageData(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr)));
             ImageDatas = new List<ImageData>();
+            ScrewUI_ImageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>(memstr));
         }
 
         public ICommand btnPrev
@@ -47,7 +45,6 @@ namespace Root_VEGA_P_Vision
         void btnNextCommand()
         {
             if (idx >= ImageDatas.Count) return;
-            
             idx++;
             SetCurrentImage(idx);
         }

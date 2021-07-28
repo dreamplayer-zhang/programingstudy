@@ -321,6 +321,7 @@ namespace Root_WIND2.UI_User
                 {
                     var viewModel = new Dialog_MapCreator_ViewModel();
                     Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+                    DrawMap();
                 });
             }
         }

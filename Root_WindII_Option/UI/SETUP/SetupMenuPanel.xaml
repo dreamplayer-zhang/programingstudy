@@ -41,7 +41,9 @@
             <Border
                 Background="{StaticResource sidetap_child_background}">
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
+                    <RadioButton Content="Product" Command="{Binding btnBackProduct}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Setup" Command="{Binding btnBackSetup}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Spec" Command="{Binding btnBackSpec}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Inspect" Command="{Binding btnBackInspect}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <Button Content="NEW" Command="{Binding btnNewRecipeBack}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="SAVE" Command="{Binding btnSaveRecipeBack}" Style="{StaticResource sidetap_child_button}"/>
@@ -69,7 +71,7 @@
                 Background="{StaticResource sidetap_child_background}">
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
                     <RadioButton Content="Setup" Command="{Binding btnEBRSetup}" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <!--<RadioButton Content="Inspect" Command="{Binding btnEBRInspect}" Style="{StaticResource sidetap_child_radiobutton}"/>-->
+                    <RadioButton Content="Inspect" Command="{Binding btnEBRInspect}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <Button Content="NEW" Command="{Binding btnNewRecipeEBR}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="SAVE" Command="{Binding btnSaveRecipeEBR}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="LOAD" Command="{Binding btnLoadRecipeEBR}" Style="{StaticResource sidetap_child_button}"/>
@@ -98,11 +100,11 @@
         <Border Background="{StaticResource sidetap_parent_background}">
             <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Right">
                 <RadioButton x:Name="btnHome" Content="HOME" IsChecked="True" Command="{Binding btnHomeClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>
-                <RadioButton x:Name="btnFront" Content="FRONT"  Command="{Binding btnFrontClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>
+                <!--<RadioButton x:Name="btnFront" Content="FRONT"  Command="{Binding btnFrontClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>-->
                 <RadioButton x:Name="btnBack" Content="BACK"  Command="{Binding btnBackClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>
                 <RadioButton x:Name="btnEdge" Content="EDGE" Command="{Binding btnEdgeClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>
                 <RadioButton x:Name="btnEBR" Content="EBR"  Command="{Binding btnEBRClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>
-                <RadioButton x:Name="btnCamera" Content="Camera"  Command="{Binding btnCameraClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>
+                <!--<RadioButton x:Name="btnCamera" Content="Camera"  Command="{Binding btnCameraClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>-->
             </StackPanel>
         </Border>
         <ContentControl Grid.Column="1">

@@ -61,5 +61,17 @@ namespace RootTools.Gem
         eControl p_eControl { get; set; }
 
         eControl p_eReqControl { get; set; }
+
+        void MakeObject(ref long nObject);
+
+        void SetListItem(long nObject, int listCnt);
+
+        void SetStringItem(long nObject, string strItem);
+
+        void SetInt4Item(long nObject, int nitem);
+
+        void SetFloat4Item(long nObject, float fItem);
+
+        void GEMSetVariables(long nObject, long nVid);
     }
 }

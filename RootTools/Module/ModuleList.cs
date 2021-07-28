@@ -153,7 +153,7 @@ namespace RootTools.Module
                         }
                         if (m_qModuleRun.Count == 0) p_iRun = p_maxRun - m_qModuleRun.Count;
 
-                        if (m_qModuleRun.Count != m_moduleRunList.p_aModuleRun.Count && m_qModuleRun.Count % m_moduleRunList.p_aModuleRun.Count == 0)
+                        if (m_qModuleRun.Count % m_moduleRunList.p_aModuleRun.Count == 0)
                         {
                             if (p_nRnR > p_nTotalRnR)
                                 p_nTotalRnR++;

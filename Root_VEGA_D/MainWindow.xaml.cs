@@ -1,6 +1,7 @@
 ﻿using Root_EFEM.Module;
 using Root_VEGA_D.Engineer;
 using Root_VEGA_D.Module;
+using Root_VEGA_D.Module.Recipe;
 using RootTools;
 using RootTools.Module;
 using System;
@@ -11,6 +12,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace Root_VEGA_D
@@ -75,7 +77,7 @@ namespace Root_VEGA_D
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if (!Directory.Exists(@"C:\Recipe\VEGA_D")) Directory.CreateDirectory(@"C:\Recipe\VEGA_D");
-            Init();
+
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -85,45 +87,57 @@ namespace Root_VEGA_D
         #endregion
 
         VEGA_D_Handler m_handler;
-        VEGA_D_Engineer m_engineer = new VEGA_D_Engineer();
+        VEGA_D_Engineer m_engineer;
         Loadport_Cymechs[] m_loadport_Cymechs = new Loadport_Cymechs[2];
         Login_UI m_login;
         OHTs_UI m_ohts= new OHTs_UI();
         Login.eLevel m_level;
+        ADIRecipe m_recipe = new ADIRecipe();
+
+        MainWindow_ViewModel m_mainWindowViewModel;
+
         public MainWindow()
         {
             InitializeComponent();
+            
+            Init();
         }
+
         void Init()
         {
+            m_engineer = App.m_engineer;
+
             m_engineer.Init("VEGA_D");
-            engineerUI.Init(m_engineer);
+            //engineerUI.Init(m_engineer);
             m_handler = m_engineer.m_handler;
             loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
-            RecipeWizard_UI.init(m_engineer);
+            //RecipeWizard_UI.init(m_engineer);
             InitTimer();
             InitFFU();
             m_loadport_Cymechs[0] = (Loadport_Cymechs)m_handler.m_aLoadport[0];
             m_loadport_Cymechs[1] = (Loadport_Cymechs)m_handler.m_aLoadport[1];
             VersionInfo.Text = "Ver " + assemblyVersion.ToString();
             btnLogin.Content = "User";
-            LoadportAState.DataContext = m_handler.m_loadport[0];
-            LoadportBState.DataContext = m_handler.m_loadport[1];
-            RobotState.DataContext = m_handler.m_wtr;
-            VisionState.DataContext = m_handler.m_vision;
+            //LoadportAState.DataContext = m_handler.m_loadport[0];
+            //LoadportBState.DataContext = m_handler.m_loadport[1];
+            //RobotState.DataContext = m_handler.m_wtr;
+            //VisionState.DataContext = m_handler.m_vision;
             btnLogin.DataContext = m_engineer.m_login;
-            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
-            ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
-            RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            //engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Collapsed;
+            //ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            //RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            //RecipeManagerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed; ;
+            //RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
+
+            m_mainWindowViewModel = new MainWindow_ViewModel(this, m_recipe);
+            this.DataContext = m_mainWindowViewModel;
+
+            m_handler.m_vision.LineScanStatusChanged += m_mainWindowViewModel.M_vision_LineScanStatusChanged;
         }
 
         //bool m_blogin = false;
-
-
-
-
 
         void ThreadStop()
         {
@@ -155,12 +169,12 @@ namespace Root_VEGA_D
         }
         void InitFFU()
         {
-            FanUI0.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[0];
-            FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
-            FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
-            FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
-            FDC_CDA1.DataContext = m_handler.m_interlock;
-            FDC_CDA2.DataContext = m_handler.m_interlock;
+            //FanUI0.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[0];
+            //FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
+            //FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
+            //FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
+            //FDC_CDA1.DataContext = m_handler.m_interlock;
+            //FDC_CDA2.DataContext = m_handler.m_interlock;
         }
 
         bool IsRunModule(ModuleBase module)
@@ -247,11 +261,11 @@ namespace Root_VEGA_D
         {
             TimerUI();
             TimerLamp();
-            NowTime.Text = "Date : " + DateTime.Now.ToString("yyyy.MM.dd tt hh:mm:ss", CultureInfo.InvariantCulture);
-            LoadportABack.Background = m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[0] != null && m_handler.m_aLoadport[0].p_bPlaced && m_handler.m_aLoadport[0].p_bPresent ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
-            LoadportBBack.Background = m_handler.m_aLoadport[1].p_infoCarrier.m_aInfoWafer[0] != null && m_handler.m_aLoadport[1].p_bPlaced && m_handler.m_aLoadport[1].p_bPresent ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
-            RobotBack.Background = m_handler.m_wtr.m_dicArm[0].p_infoWafer != null ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
-            VisionBack.Background = m_handler.m_vision.p_infoWafer != null ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
+            NowTime.Text = DateTime.Now.ToString("yyyy.MM.dd tt hh:mm:ss", CultureInfo.InvariantCulture);
+            //LoadportABack.Background = m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[0] != null && m_handler.m_aLoadport[0].p_bPlaced && m_handler.m_aLoadport[0].p_bPresent ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
+            //LoadportBBack.Background = m_handler.m_aLoadport[1].p_infoCarrier.m_aInfoWafer[0] != null && m_handler.m_aLoadport[1].p_bPlaced && m_handler.m_aLoadport[1].p_bPresent ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
+           // RobotBack.Background = m_handler.m_wtr.m_dicArm[0].p_infoWafer != null ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
+           // VisionBack.Background = m_handler.m_vision.p_infoWafer != null ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
             buttonResume.IsEnabled = IsEnable_Resume();
             buttonPause.IsEnabled = IsEnable_Pause();
             buttonInitialize.IsEnabled = IsEnable_Initial();
@@ -261,16 +275,16 @@ namespace Root_VEGA_D
             else
                 InspectTime.Text = String.Format("{0:00}:{1:00}:{2:00}", m_loadport_Cymechs[1].m_swLotTime.Elapsed.Hours, m_loadport_Cymechs[1].m_swLotTime.Elapsed.Minutes, m_loadport_Cymechs[1].m_swLotTime.Elapsed.Seconds);
             RNRCount.Text = EQ.p_nRnR < 1 ? "0" : EQ.p_nRnR.ToString();
-            btnFP_Isolator.IsChecked = m_handler.m_interlock.m_diFP_Isolator.p_bIn;
-            btnIsolator_V.IsChecked = m_handler.m_interlock.m_diIsolator_VPre.p_bIn;
-            btn_Factory_Air_Pad.IsChecked = m_handler.m_interlock.m_diFactory_Air_PadPre.p_bIn;
-            btn_Air_Tank.IsChecked = m_handler.m_interlock.m_diAir_TankPre.p_bIn;
-            btn_X_Bottom.IsChecked = m_handler.m_interlock.m_diX_BottomPre.p_bIn;
-            btn_X_Side_Master.IsChecked = m_handler.m_interlock.m_diX_SideMasterPre.p_bIn;
-            btn_X_Side_Slave.IsChecked = m_handler.m_interlock.m_diX_SideSlavePre.p_bIn;
-            btn_Y_Bottom.IsChecked = m_handler.m_interlock.m_diY_BottomPre.p_bIn;
-            btn_Y_Side_Master.IsChecked = m_handler.m_interlock.m_diY_SideMasterPre.p_bIn;
-            btn_Y_Side_Slave.IsChecked = m_handler.m_interlock.m_diY_SideSlavePre.p_bIn;
+            //btnFP_Isolator.IsChecked = m_handler.m_interlock.m_diFP_Isolator.p_bIn;
+            //btnIsolator_V.IsChecked = m_handler.m_interlock.m_diIsolator_VPre.p_bIn;
+            //btn_Factory_Air_Pad.IsChecked = m_handler.m_interlock.m_diFactory_Air_PadPre.p_bIn;
+            //btn_Air_Tank.IsChecked = m_handler.m_interlock.m_diAir_TankPre.p_bIn;
+            //btn_X_Bottom.IsChecked = m_handler.m_interlock.m_diX_BottomPre.p_bIn;
+            //btn_X_Side_Master.IsChecked = m_handler.m_interlock.m_diX_SideMasterPre.p_bIn;
+            //btn_X_Side_Slave.IsChecked = m_handler.m_interlock.m_diX_SideSlavePre.p_bIn;
+            //btn_Y_Bottom.IsChecked = m_handler.m_interlock.m_diY_BottomPre.p_bIn;
+            //btn_Y_Side_Master.IsChecked = m_handler.m_interlock.m_diY_SideMasterPre.p_bIn;
+            //btn_Y_Side_Slave.IsChecked = m_handler.m_interlock.m_diY_SideSlavePre.p_bIn;
         }
         void TimerUI()
         {
@@ -293,9 +307,11 @@ namespace Root_VEGA_D
 		{
             m_login = new Login_UI(m_engineer);
             m_login.ShowDialog();
-            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
-            ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
-            RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            //engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Collapsed;
+            //ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            //RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            //RecipeManagerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            //RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
         }
 
 		private void btnOHT_Click(object sender, RoutedEventArgs e)
@@ -308,7 +324,7 @@ namespace Root_VEGA_D
             else m_ohts.Show();
 
         }
-	}
+    }
 	public class StateToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

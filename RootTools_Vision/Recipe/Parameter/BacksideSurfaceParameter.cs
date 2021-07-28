@@ -17,6 +17,8 @@ namespace RootTools_Vision
         private int intensity = 30;
         private int size = 10;
         private bool isBright = false;
+        private bool isAdaptiveIntensity = false;
+        private int adaptiveOffset = 10;
         private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
         #endregion
 
@@ -41,6 +43,18 @@ namespace RootTools_Vision
             }
         }
 
+        [Category("Parameter")]
+        //[DisplayName("Pattern Intensity <-> Param Intensity Offset")]
+        [DisplayName("Adaptive Intensity")]
+        public int AdaptiveOffset
+        {
+            get => this.adaptiveOffset;
+            set
+            {
+                SetProperty<int>(ref this.adaptiveOffset, value);
+            }
+        }
+
         [Category("Option")]
         public bool IsBright
         {
@@ -50,6 +64,18 @@ namespace RootTools_Vision
                 SetProperty<bool>(ref this.isBright, value);
             }
         }
+
+        [Category("Option")]
+        [DisplayName("Adaptive Intensity Mode")]
+        public bool IsAdaptiveIntensity
+        {
+            get => this.isAdaptiveIntensity;
+            set
+            {
+                SetProperty<bool>(ref this.isAdaptiveIntensity, value);
+            }
+        }
+
         [Category("Option")]
         [DisplayName("Diff Filter")]
         public DiffFilterMethod DiffFilter

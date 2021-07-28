@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,64 +16,164 @@ namespace Root_VEGA_P_Vision
 {
     public class Recipe1um_ViewModel : ObservableObject
     {
-        public RecipeMask_ViewModel recipeSetting;
+        public RecipeMask_ViewModel recipeMask;
         public Recipe1um_Panel Main;
 
-        RootViewer_ViewModel EIPcoverBottom, EIPcoverBottom_Teach, EIPbaseplateTop, EIPbaseplateTop_Teach;
-        ScrewUI_ViewModel EIPcoverBottom_Step, EIPbaseplate_step;
+        MaskRootViewer_ViewModel EIPcoverBottom_TDI, EIPbasePlateTop_TDI, EIPcoverBottom_Stacking, basePlateROI1, basePlateROI2, selectedViewer;
+        int selectedTab;
+        List<int> numList;
+        public List<int> MemNumList
+        {
+            get => numList;
+            set => SetProperty(ref numList, value);
+        }
+
         #region Property
-        public RootViewer_ViewModel EIPCoverBottom
+        bool selectedViewerVisibility;
+        public bool SelectedViewerVisibility
         {
-            get => EIPcoverBottom;
-            set => SetProperty(ref EIPcoverBottom, value);
+            get => selectedViewerVisibility;
+            set => SetProperty(ref selectedViewerVisibility,value);
         }
-        public RootViewer_ViewModel EIPCoverBottom_Teach
+        private ObservableCollection<UIElement> ROIlist = new ObservableCollection<UIElement>();
+        public ObservableCollection<UIElement> ROIList
         {
-            get => EIPcoverBottom_Teach;
-            set => SetProperty(ref EIPcoverBottom_Teach, value);
+            get => ROIlist;
+            set => SetProperty(ref ROIlist, value);
         }
-        public RootViewer_ViewModel EIPBasePlateTop
+        int ROIlistIdx = -1;
+        public int ROIListIdx
         {
-            get => EIPbaseplateTop;
-            set => SetProperty(ref EIPbaseplateTop, value);
+            get => ROIlistIdx;
+            set => SetProperty(ref ROIlistIdx, value);
         }
-        public RootViewer_ViewModel EIPBasePlateTop_Teach
+        public int SelectedTab
         {
-            get => EIPbaseplateTop_Teach;
-            set => SetProperty(ref EIPbaseplateTop_Teach, value);
+            get => selectedTab;
+            set
+            {
+                SetProperty(ref selectedTab, value);
+                if (value == 0)
+                    selectedViewer = EIPCoverBottom_TDI;
+                else
+                    selectedViewer = EIPBasePlateTop_TDI;
+
+                recipeMask.SurfaceParameterBase = selectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>().PodStacking;
+
+                selectedViewer.SetMask();
+            }
         }
-        public ScrewUI_ViewModel EIPCoverBottom_Step
+        public MaskRootViewer_ViewModel SelectedViewer
         {
-            get => EIPcoverBottom_Step;
-            set => SetProperty(ref EIPcoverBottom_Step, value);
+            get => selectedViewer;
+            set => SetProperty(ref selectedViewer, value);
         }
-        public ScrewUI_ViewModel EIPBasePlate_Step
+        public MaskRootViewer_ViewModel EIPCoverBottom_TDI
         {
-            get => EIPbaseplate_step;
-            set => SetProperty(ref EIPbaseplate_step, value);
+            get => EIPcoverBottom_TDI;
+            set => SetProperty(ref EIPcoverBottom_TDI, value);
+        }
+        public MaskRootViewer_ViewModel EIPBasePlateTop_TDI
+        {
+            get => EIPbasePlateTop_TDI;
+            set => SetProperty(ref EIPbasePlateTop_TDI, value);
+        }
+        public MaskRootViewer_ViewModel EIPCoverBottom_Stacking
+        {
+            get => EIPcoverBottom_Stacking;
+            set => SetProperty(ref EIPcoverBottom_Stacking, value);
+        }
+        public MaskRootViewer_ViewModel BasePlateROI1
+        {
+            get => basePlateROI1;
+            set => SetProperty(ref basePlateROI1, value);
+        }
+        public MaskRootViewer_ViewModel BasePlateROI2
+        {
+            get => basePlateROI2;
+            set => SetProperty(ref basePlateROI2, value);
         }
         #endregion
-        public Recipe1um_ViewModel(RecipeMask_ViewModel recipeSetting)
+        public Recipe1um_ViewModel(RecipeMask_ViewModel recipeMask)
         {
-            this.recipeSetting = recipeSetting;
+            this.recipeMask = recipeMask;
             Main = new Recipe1um_Panel();
             Main.DataContext = this;
-            EIPcoverBottom = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Front", recipeSetting);
-            EIPcoverBottom_Teach = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Bottom", recipeSetting);
-            EIPbaseplateTop = new MaskRootViewer_ViewModel("EIP_Plate.Stack.Front", recipeSetting);
-            EIPbaseplateTop_Teach = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Bottom", recipeSetting);
+            SelectedViewerVisibility = false;
+            RecipeCoverBack recipeCoverBack = GlobalObjects.Instance.Get<RecipeCoverBack>();
+            EIPcoverBottom_TDI = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeMask.MaskTools,
+                recipeCoverBack, recipeCoverBack.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
 
-            EIPcoverBottom_Step = new ScrewUI_ViewModel("EIP_Cover.Stack.Front");
-            EIPbaseplate_step = new ScrewUI_ViewModel("EIP_Plate.Stack.Front");
+            RecipePlateFront recipePlateFront = GlobalObjects.Instance.Get<RecipePlateFront>();
+            EIPbasePlateTop_TDI = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeMask.MaskTools,
+                recipePlateFront, recipePlateFront.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipePlateFront.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
+
+            EIPcoverBottom_Stacking = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Back", recipeMask.MaskTools,
+                recipeCoverBack,recipeCoverBack.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodStacking.MaskIndex);
+
+            basePlateROI1 = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Back", recipeMask.MaskTools,
+                recipeCoverBack, recipeCoverBack.GetItem<EUVOriginRecipe>().TDIOriginInfo, recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodStacking.MaskIndex);
+
+            basePlateROI2 = new MaskRootViewer_ViewModel("EIP_Plate.Stack.Front", recipeMask.MaskTools,
+                recipePlateFront, recipePlateFront.GetItem<EUVOriginRecipe>().TDIOriginInfo, recipePlateFront.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
+
+            SelectedViewer = EIPCoverBottom_TDI;
+            curROIListItem = new ROIListItem();
+
+            numList = new List<int>();
+            for (int i = 0; i < EIPcoverBottom_TDI.p_ImageData.p_nPlane; i++)
+                MemNumList.Add(i + 1);
+
+            selectedViewer.CapturedAreaDone += SelectedViewer_CapturedAreaDone;
+        }
+        public CRect memRect;
+        ROIListItem curROIListItem;
+        private void SelectedViewer_CapturedAreaDone(object e,string Parts)
+        {
+            memRect = ((TRect)e).MemoryRect;
+            curROIListItem.SetData(Parts, memRect.Left.ToString(), memRect.Top.ToString());
         }
 
+        public ICommand ImageOpen
+        {
+            get => new RelayCommand(() => selectedViewer._openImage());
+        }
+        public ICommand ImageSave
+        {
+            get => new RelayCommand(() => selectedViewer._saveImage());
+        }
+        public ICommand ImageClear
+        {
+            get => new RelayCommand(() => selectedViewer._clearImage());
+        }
         public ICommand btnSnap
         {
             get => new RelayCommand(() => Snap());
         }
-        public ICommand btnInsp
+        public ICommand btnDraw
         {
-            get => new RelayCommand(() => { });
+            get => new RelayCommand(() => 
+            selectedViewer.m_eCurMode = ViewerMode.CaptureROI);
+        }
+        public ICommand btnAdd
+        {
+            get => new RelayCommand(() =>
+              {
+                  ROIListItem item = new ROIListItem(curROIListItem);
+                  ROIList.Add(item);
+                  recipeMask.Main.btnAdd.IsChecked = false;
+              });
+        }
+        public ICommand btnDelete
+        {
+            get => new RelayCommand(() =>
+            {
+                ROIList.RemoveAt(ROIListIdx);
+                if (ROIList.Count == 0)
+                    ROIListIdx = -1;
+                recipeMask.Main.btnDelete.IsChecked = false;
+
+            });
         }
         void Snap()
         {

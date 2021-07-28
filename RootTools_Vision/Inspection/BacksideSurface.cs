@@ -48,6 +48,7 @@ namespace RootTools_Vision
                 return;
 			}
 
+
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterBackside.IndexChannel);
             byte[] workplaceBuffer = GetWorkplaceBufferByColorChannel(this.parameterBackside.IndexChannel);
 
@@ -55,12 +56,40 @@ namespace RootTools_Vision
             bool isDarkInsp = !parameterBackside.IsBright; // Option
             int nGrayLevel = parameterBackside.Intensity; // Option
             int nDefectSz = parameterBackside.Size; // Option     
-
+            bool bAdaptiveIntensity = parameterBackside.IsAdaptiveIntensity;
+            int nAdaptiveOffset = parameterBackside.AdaptiveOffset;
             int chipW = this.currentWorkplace.Width; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
             int chipH = this.currentWorkplace.Height;
 
-            byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
-            
+            byte[] arrBinImg = Enumerable.Repeat<byte>(255, chipH * chipW).ToArray<byte>(); // Threashold 결과 array
+            // Masking - 검사영역 255, 비검사 영역 0
+            OuterMasking(ref arrBinImg);
+
+            if(bAdaptiveIntensity)
+            { 
+                nGrayLevel = CLR_IP.Cpp_FindDominantIntensity(workplaceBuffer, arrBinImg, chipW, chipH);
+
+                if (isDarkInsp)
+                {  
+                    nGrayLevel = (nGrayLevel - nAdaptiveOffset <= 0) ? 1 : nGrayLevel - nAdaptiveOffset;
+                }
+                else
+                { 
+                    nGrayLevel = (nGrayLevel + nAdaptiveOffset >= 255) ? 254 : nGrayLevel + nAdaptiveOffset;
+                }
+            }
+
+            if (isDarkInsp)
+            {
+                // 비검사 영역을 255로 만들어 Threhosld에 걸리지 않게 해줌
+                CLR_IP.Cpp_Bitwise_NOT(arrBinImg, arrBinImg, chipW, chipH);
+                CLR_IP.Cpp_Bitwise_OR(workplaceBuffer, arrBinImg, workplaceBuffer, chipW, chipH);
+            }
+            else
+            {
+                // 비검사 영역을 0으로 만들어 Threshold에 걸리지 않게 해줌
+                CLR_IP.Cpp_Bitwise_AND(workplaceBuffer, arrBinImg, workplaceBuffer, chipW, chipH);
+            }
 
             // Dark
             CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
@@ -119,6 +148,65 @@ namespace RootTools_Vision
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
 
+
+        private void OuterMasking(ref byte[] imgArr)
+        {
+            // Outer Area Mask
+            double centerX = recipeBackside.CenterX;
+            double centerY = recipeBackside.CenterY;
+            double radius = recipeBackside.Radius;
+            double radius_2 = radius * radius;
+
+            double left = this.currentWorkplace.PositionX;
+            double top = this.currentWorkplace.PositionY;
+            double right = this.currentWorkplace.PositionX + this.currentWorkplace.Width;
+            double bottom = this.currentWorkplace.PositionY + this.currentWorkplace.Height;
+
+            int width = this.currentWorkplace.Width;
+            int height = this.currentWorkplace.Height;
+
+
+            // Mask 생성
+
+
+            // 포함이 안된 경우
+            long posX = (long)left, posY = (long)top;
+
+            if (((left - centerX) * (left - centerX) + (top - centerX) * (top - centerX) <= radius_2) &&
+                ((right - centerX) * (right - centerX) + (top - centerX) * (top - centerX) <= radius_2) &&
+                ((right - centerX) * (right - centerX) + (bottom - centerX) * (bottom - centerX) <= radius_2) &&
+                ((left - centerX) * (left - centerX) + (bottom - centerX) * (bottom - centerX) <= radius_2)
+                )
+            {
+                return;
+            }
+
+
+            // Masking
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    long index = x + y * width;
+
+                    long absX = (long)left + x - (long)centerX;
+                    long absY = (long)centerY - (long)(top + y);
+
+                    long absX_2 = (absX * absX);
+                    long absY_2 = (absY * absY);
+
+                    if (absX_2 + absY_2 > radius_2)
+                    {
+                        imgArr[(long)index] = 0;
+                    }
+                    else
+                    {
+                        imgArr[(long)index] = 255;
+                    }
+                }
+            }
+            
+        }
 
         public override WorkBase Clone()
         {

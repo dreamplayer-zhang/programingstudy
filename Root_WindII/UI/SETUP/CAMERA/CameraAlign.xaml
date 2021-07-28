@@ -58,7 +58,8 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="400"/>
-            <ColumnDefinition />
+            <ColumnDefinition Width="400"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <GroupBox Header="Align Camera Viewer" 
                   Margin="4"
@@ -86,59 +87,22 @@
               Width="400"
               HorizontalAlignment="Left">
             <Grid.RowDefinitions>
-                <RowDefinition  Height="160"/>
                 <RowDefinition  Height="300"/>
                 <RowDefinition  Height="260"/>
+                <RowDefinition  Height="160"/>
                 <RowDefinition  Height="*"/>
             </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0"
-                      Header="Align Information"
-                      Style="{StaticResource main_view_groupbox}" Margin="4">
-                <StackPanel Grid.Row="1"
-                                Margin="0, 15, 0, 0"
-                                Orientation="Vertical">
-                    <Grid Height="30">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="90"/>
-                            <ColumnDefinition Width="90"/>
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Current Axis Pos" IsEnabled="False" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                        <TextBox Grid.Column="1" Margin="4"/>
-                        <TextBox Grid.Column="2" Margin="4"/>
-
-                    </Grid>
-                    <Grid Height="30">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="180"/>
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="1st Axis Position" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                        <TextBox Grid.Column="1" Margin="4"/>
-                        <Button Grid.Column="2" Content="SET" Command="{Binding btnSetFirstAxisPositionCommond}" Style="{StaticResource groupbox_griditem_button}"/>
-                    </Grid>
-                    <Grid Height="30">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="180"/>
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="2nd Axis Position" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                        <TextBox Grid.Column="1" Margin="4"/>
-                        <Button Grid.Column="2" Content="SET" Command="{Binding btnSetSecondAxisPositionCommond}" Style="{StaticResource groupbox_griditem_button}"/>
-                    </Grid>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Grid.Row="1" 
+           
+            <!-- -->
+            <GroupBox Grid.Row="0" 
                       Margin="4" 
                       Header="Motion Control Viewer"
                       Style="{StaticResource main_view_groupbox}">
-                <local:MotionControlViewer />
+                <local:MotionViewer DataContext="{Binding MotionViewerVM}" />
             </GroupBox>
             
-            <local:MotionController Grid.Row="2" DataContext="{Binding MotionControllerVM}"/>
+            <!-- -->
+            <local:MotionController Grid.Row="1" DataContext="{Binding MotionControllerVM}"/>
             <!--<GroupBox Grid.Row="1"
                       Header="Motion Controller"
                       Style="{StaticResource main_view_groupbox}" Margin="4">
@@ -222,28 +186,83 @@
                 </Grid>
             </GroupBox>-->
         </Grid>
-        <GroupBox Header="Feature Item List"  Grid.Column="1" Style="{StaticResource main_view_groupbox}" Margin="4">
-            <Grid >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="80"/>
-                </Grid.RowDefinitions>
-                <ListBox Grid.Row="0" 
-                         ItemsSource="{Binding FeatureItemList}"
-                         SelectedIndex="{Binding SelectedFeatureItem}"
-                         Background="Transparent">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Vertical" HorizontalAlignment="Center"/>
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                </ListBox>
-                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <Button Content="Add" Command="{Binding btnFeatureAddCommand}" Width="120" Style="{StaticResource groupbox_button}"/>
-                    <Button Content="Set" Width="120" Style="{StaticResource groupbox_button}"/>
-                    <Button Content="Clear" Width="120" Style="{StaticResource groupbox_button}"/>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="170"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <!-- -->
+            <GroupBox Grid.Row="0"
+                      Header="Align Information"
+                      Style="{StaticResource main_view_groupbox}" Margin="4">
+                <StackPanel Grid.Row="1"
+                                Margin="0, 15, 0, 0"
+                                Orientation="Vertical">
+                    <Grid Height="60">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110"/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="1st Axis Position" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        <TextBlock Grid.Column="1" Text="X" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        <TextBox Grid.Column="2" Text="{Binding FirstAxisPositionX}" HorizontalContentAlignment="Right" Margin="4"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="Y" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding FirstAxisPositionY}" HorizontalContentAlignment="Right" Margin="4"/>
+                        <Button Grid.Column="3" Content="SET" Command="{Binding btnSetFirstAxisPositionCommond}" Style="{StaticResource groupbox_griditem_button}"/>
+                    </Grid>
+                    <Grid Height="60">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110"/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="2nd Axis Position" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        <TextBlock Grid.Column="1" Text="X" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        <TextBox Grid.Column="2" Text="{Binding SecondAxisPositionX}" HorizontalContentAlignment="Right" Margin="4"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="Y" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding SecondAxisPositionY}" HorizontalContentAlignment="Right" Margin="4"/>
+                        <Button Grid.Column="3" Content="SET" Command="{Binding btnSetSecondAxisPositionCommond}" Style="{StaticResource groupbox_griditem_button}"/>
+                    </Grid>
                 </StackPanel>
-            </Grid>
-        </GroupBox>
+            </GroupBox>
+
+            <!-- -->
+            <GroupBox Header="Feature Item List"  
+                      Grid.Row="1"
+                      Style="{StaticResource main_view_groupbox}" Margin="4">
+                <Grid >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="80"/>
+                    </Grid.RowDefinitions>
+                    <ListBox Grid.Row="0" 
+                         ItemsSource="{Binding FeatureItemList}"
+                         SelectedItem="{Binding SelectedFeatureItem}"
+                         Background="Transparent">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Vertical" HorizontalAlignment="Center"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <Button Content="Add" Command="{Binding btnFeatureAddCommand}" Width="120" Style="{StaticResource groupbox_button}"/>
+                        <Button Content="Delete" Command="{Binding btnFeatureDeleteCommand}" Width="120" Style="{StaticResource groupbox_button}"/>
+                        <Button Content="Clear" Command="{Binding btnFeatureClearCommand}" Width="120" Style="{StaticResource groupbox_button}"/>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+        </Grid>
     </Grid>
 </UserControl>

@@ -13,6 +13,7 @@ using System.Data;
 using RootTools_Vision.WorkManager3;
 using RootTools_Vision.Utility;
 using System.IO;
+using System.Windows.Input;
 
 namespace Root_WIND2.UI_User
 {
@@ -234,6 +235,9 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
 
+                DefectCodeManager defectCodeManager = new DefectCodeManager(Constants.FilePath.SettingFilePath);
+                defectCodeManager.ReadDefectCodes();
+
                 if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
                 {
                     GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").Start();                    
@@ -271,6 +275,27 @@ namespace Root_WIND2.UI_User
                     if (result.Value)
                     {
                         vision.StartRun(Grab);
+                    }
+                    else
+                    {
+
+                    }
+                }
+            });
+        }
+
+        public RelayCommand btnManualAlign
+        {
+            get => new RelayCommand(() =>
+            {
+                var viewModel = new ManualAlignViewer_ViewModel(this.imageViewerVM.p_ImageData);
+                Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+
+                if (result.HasValue)
+                {
+                    if (result.Value)
+                    {
+
                     }
                     else
                     {

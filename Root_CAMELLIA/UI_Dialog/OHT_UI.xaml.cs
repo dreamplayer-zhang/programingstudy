@@ -94,9 +94,9 @@ namespace Root_CAMELLIA
                 m_OHT.m_doReady.p_bOn = false;
                 m_OHT.m_doES.p_bOn = true;
                 m_OHT.m_bAuto = true;
-                if ((m_loadport.p_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+                if ((m_loadport.p_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
                 {
-                    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
+                    m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                 }
             }
         }
@@ -113,7 +113,7 @@ namespace Root_CAMELLIA
 
             if (m_OHT.p_eState == OHT_Semi.eState.All_Off && !m_OHT.m_bOHTErr && (!m_loadport.p_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn))
             {
-                m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
             }
             else if (m_loadport.p_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn)
             {
@@ -202,7 +202,7 @@ namespace Root_CAMELLIA
                 }
             }
 
-            if (m_loadport.p_infoCarrier.p_eReqAccessLP == GemCarrierBase.eAccessLP.Manual)
+            if (m_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual)
             {
                 //if (m_carrier.p_eTransfer != GemCarrierBase.eTransfer.TransferBlocked)
                 //{
@@ -212,7 +212,16 @@ namespace Root_CAMELLIA
                 //{
                 //    m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                 //}
-                blockTransferState.Text = "TransferBlocked";
+                if (App.m_engineer.ClassGem().p_bOffline)
+                {
+                    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                    m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                }
+                else
+                {
+                    m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                }
+                //blockTransferState.Text = "TransferBlocked";
             }
             bool bPodIn = p_bBlink ? !m_loadport.m_diPlaced.p_bIn : !m_loadport.p_diPresent.p_bIn;
             //imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
@@ -272,11 +281,11 @@ namespace Root_CAMELLIA
                     {
                         if ((!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
                         {
-                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                            m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                         }
                         else if ((m_loadport.m_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
                         {
-                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
+                            m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                         }
                         buttonRetry.IsEnabled = false;
                         grPioState.Background = null;
@@ -299,7 +308,7 @@ namespace Root_CAMELLIA
                     buttonRetry.IsEnabled = true;
                     m_OHT.m_doHoAvailable.p_bOn = false;
                     m_OHT.m_doES.p_bOn = false;
-                    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                    m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                     grPioState.Background = Brushes.Coral;
                     grErrState.Background = Brushes.Coral;
                 }
@@ -374,11 +383,11 @@ namespace Root_CAMELLIA
             grErrState.Background = null;
             if (!m_loadport.m_diPlaced.p_bIn && m_OHT.p_eState == OHT_Semi.eState.All_Off)
             {
-                m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
             }
             else if (m_loadport.m_diPlaced.p_bIn && m_OHT.p_eState == OHT_Semi.eState.All_Off)
             {
-                m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
+                m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
             }
 
             //else if(!m_loadport.m_bPlaced && m_OHT.p_eState == OHT_Semi.eState.All_Off)

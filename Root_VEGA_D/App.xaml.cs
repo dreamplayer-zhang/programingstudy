@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Root_VEGA_D.Engineer;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -16,7 +17,7 @@ namespace Root_VEGA_D
     public partial class App : Application
 	{
 		public static string MainFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-
+		public static VEGA_D_Engineer m_engineer = new VEGA_D_Engineer();
 		static App()
         {
             AppDomain.CurrentDomain.UnhandledException += (sender, arg) => ReportException(sender, arg.ExceptionObject as Exception);

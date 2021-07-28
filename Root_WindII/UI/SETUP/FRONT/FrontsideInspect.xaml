@@ -64,9 +64,10 @@
         <StackPanel Orientation="Horizontal">
             <Button Content="Start" Command="{Binding btnStart}"  Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Snap" Command="{Binding btnSnap}" Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Manual Align" Command="{Binding btnManualAlign}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Stop" Command="{Binding btnStop}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
-            <Button Content="Remote" Command="{Binding btnRemoteStart}" Style="{StaticResource inspection_menu_button}"/>
+            <!--<Button Content="Remote" Command="{Binding btnRemoteStart}" Style="{StaticResource inspection_menu_button}"/>-->
         </StackPanel>
         <Grid Grid.Row="1" Background="{StaticResource main_view_background}">
             <Grid.ColumnDefinitions>
@@ -93,6 +94,7 @@
                         <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         <CheckBox Content="Box" IsChecked="{Binding IsBoxChecked, Mode=TwoWay}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                         <CheckBox Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" IsEnabled="False" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                        <Button Content="Save" Command="{Binding btnToolSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                         <Button Content="Clear" Command="{Binding btnToolClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
 
 

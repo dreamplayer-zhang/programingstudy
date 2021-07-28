@@ -6,569 +6,631 @@
              xmlns:control="clr-namespace:Root_VEGA_D.Control"
              xmlns:local="clr-namespace:Root_VEGA_D"
              mc:Ignorable="d"
-             d:DesignHeight="849"
+             d:DesignHeight="1060"
              d:DesignWidth="1052">
     <Grid>
-        <ScrollViewer Background="White" Grid.Row="1">
-            <StackPanel>
-                <Grid Height="849">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="2*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2.5*" />
-                            <RowDefinition Height="7.5*" />
-                        </Grid.RowDefinitions>
-                        <GroupBox Header="Recipe List"
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="0.15*"/>
+        </Grid.RowDefinitions>
+        <TabControl>
+            <TabItem Header="Info">
+                <ScrollViewer Background="White" Grid.Row="1">
+                    <StackPanel>
+                        <Grid Height="729">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2.5*" />
+                                    <RowDefinition Height="7.5*" />
+                                </Grid.RowDefinitions>
+                                <GroupBox Header="Recipe List"
                                   Grid.Row="1">
-                            <DataGrid IsReadOnly="True"
+                                    <DataGrid IsReadOnly="True"
                                       Margin="5,2">
-                                <DataGrid.Resources>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalAlignment"
+                                        <DataGrid.Resources>
+                                            <Style TargetType="DataGridColumnHeader">
+                                                <Setter Property="HorizontalAlignment"
                                                 Value="Stretch" />
-                                        <Setter Property="HorizontalContentAlignment"
+                                                <Setter Property="HorizontalContentAlignment"
                                                 Value="Center" />
-                                    </Style>
-                                </DataGrid.Resources>
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="No."
+                                            </Style>
+                                        </DataGrid.Resources>
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="No."
                                                         Width="30"
                                                         Binding="{Binding no}" />
-                                    <DataGridTextColumn Header="Recipe Name"
+                                            <DataGridTextColumn Header="Recipe Name"
                                                         Width="*"
                                                         Binding="{Binding type}" />
-                                    <DataGridTextColumn Header="Mask ID"
+                                            <DataGridTextColumn Header="Mask ID"
                                                         Width="*"
                                                         Binding="{Binding x}" />
-                                    <DataGridTextColumn Header="Write Time"
+                                            <DataGridTextColumn Header="Write Time"
                                                         Width="1.5*"
                                                         Binding="{Binding y}" />
-                                </DataGrid.Columns>
+                                        </DataGrid.Columns>
 
-                            </DataGrid>
-                        </GroupBox>
-                        <GroupBox Header="Search Option"
+                                    </DataGrid>
+                                </GroupBox>
+                                <GroupBox Header="Search Option"
                                   Grid.Row="0">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <CheckBox Content="Start Date"
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <CheckBox Content="Start Date"
                                           VerticalAlignment="Center"
                                           Margin="0,5,0,0"
-                                          FontSize="12"
+                                          FontSize="12" IsChecked="{Binding p_isCheckStartDate}"
                                           x:Name="cbStart" />
-                                <control:DateTimePicker IsEnabled="{Binding ElementName=cbStart, Path=IsChecked}"
-                                                        DateFormat="yyyy-MM-dd"
+                                        <control:DateTimePicker IsEnabled="{Binding ElementName=cbStart, Path=IsChecked}"
+                                                        DateFormat="yyyy-MM-dd"  SelectedDate="{Binding p_selectedStartDate, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
                                                         Grid.Row="1" />
-                                <CheckBox Content="End Date"
+                                        <CheckBox Content="End Date"
                                           VerticalAlignment="Center"
                                           Margin="0,5,0,0"
                                           FontSize="12"
                                           x:Name="cbEnd"
-                                          Grid.Row="2" />
-                                <control:DateTimePicker IsEnabled="{Binding ElementName=cbEnd, Path=IsChecked}"
-                                                        DateFormat="yyyy-MM-dd"
+                                          Grid.Row="2" IsChecked="{Binding p_isCheckEndDate}" />
+                                        <control:DateTimePicker IsEnabled="{Binding ElementName=cbEnd, Path=IsChecked}"
+                                                        DateFormat="yyyy-MM-dd" SelectedDate="{Binding p_selectedEndData, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
                                                         Grid.Row="3" />
-                                <Grid Margin="0,7,0,0"
+                                        <Grid Margin="0,7,0,0"
                                       Grid.Row="4">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition />
-                                        <ColumnDefinition Width="1.5*" />
-                                    </Grid.ColumnDefinitions>
-                                    <CheckBox Content="Mask ID"
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.5*" />
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Content="Mask ID"
                                               VerticalAlignment="Center"
-                                              x:Name="cbWafer" />
-                                    <TextBox Grid.Column="1"
+                                              x:Name="cbWafer" IsChecked="{Binding p_isCheckMaskID}" />
+                                            <TextBox Grid.Column="1"
                                              IsEnabled="{Binding ElementName=cbWafer, Path=IsChecked}" />
-                                </Grid>
-                                <Grid Margin="0,7,0,0"
+                                        </Grid>
+                                        <Grid Margin="0,7,0,0"
                                       Grid.Row="5">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition />
-                                        <ColumnDefinition Width="1.5*" />
-                                    </Grid.ColumnDefinitions>
-                                    <CheckBox Content="Recipe Name"
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.5*" />
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Content="Recipe Name"
                                               VerticalAlignment="Center"
-                                              x:Name="cbRecipe" />
-                                    <TextBox Grid.Column="1"
+                                              x:Name="cbRecipe" IsChecked="{Binding p_isCheckRecipeName}" />
+                                            <TextBox Grid.Column="1"
                                              IsEnabled="{Binding ElementName=cbRecipe, Path=IsChecked}" />
-                                </Grid>
-                                <Button Content="Search"
-                                        Margin="0,9,0,0"
-                                        Grid.Row="6" />
-                            </Grid>
-                        </GroupBox>
-                        <Grid Margin="5,2"
-                              Opacity="0">
-                            <StackPanel>
+                                        </Grid>
+                                        <UniformGrid Columns="4" Grid.Row="6">
+                                            <Button Content="Search" Margin="3,9,3,0" Command="{Binding CmdSearchRecipe}"/>
+                                            <Button Content="New" Margin="3,9,3,0" Command="{Binding CmdNewRecipe}"/>
+                                            <Button Content="Save" Margin="3,9,3,0" Command="{Binding CmdSaveRecipe}"/>
+                                            <Button Content="Delete" Margin="3,9,3,0" Command="{Binding CmdDeleteRecipe}"/>
+                                        </UniformGrid>
 
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-                    <Grid Grid.Column="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="1.2*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Grid Grid.Column="0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="3*" />
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <GroupBox Header="Coordinate">
-                                <Grid Margin="5,2">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20" />
-                                        <RowDefinition Height="3*" />
-                                        <RowDefinition Height="20" />
-                                        <RowDefinition Height="7*" />
-                                    </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="0.5*" />
-                                            <ColumnDefinition Width="5*" />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="File"
-                                                   HorizontalAlignment="Left" />
-                                        <TextBlock Text="D:\DieInfoFile.xml"
-                                                   Grid.Column="1" />
-                                        <Button Content="..."
-                                                VerticalAlignment="Center"
-                                                Grid.Column="2" />
                                     </Grid>
-                                    <UniformGrid Columns="2"
+                                </GroupBox>
+                                <Grid Margin="5,2"
+                              Opacity="0">
+                                    <StackPanel>
+
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="1.2*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Grid Grid.Column="0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="3*" />
+                                        <RowDefinition Height="0.5*"/>
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <GroupBox Header="Coordinate">
+                                        <Grid Margin="5,2">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="20" />
+                                                <RowDefinition Height="3*" />
+                                                <RowDefinition Height="20" />
+                                                <RowDefinition Height="7*" />
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="0.5*" />
+                                                    <ColumnDefinition Width="5*" />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="File"
+                                                   HorizontalAlignment="Left" />
+                                                <TextBlock Text="D:\DieInfoFile.xml"
+                                                   Grid.Column="1" />
+                                            </Grid>
+                                            <UniformGrid Columns="2"
                                                  Margin="0,5"
                                                  Grid.Row="1">
-                                        <TextBlock Text="Die Size"
+                                                <TextBlock Text="Die Size(um)"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="17972, 50504"
+                                                <TextBlock Text="17972, 50504"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="Scribe Lane Size"
+                                                <TextBlock Text="Scribe Lane Size(um)"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="280, 280"
+                                                <TextBlock Text="280, 280"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="Shot Size"
+                                                <TextBlock Text="Shot Size(um)"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="127484, 101288"
+                                                <TextBlock Text="127484, 101288"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="Shot"
+                                                <TextBlock Text="Shot(um)"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="64.18, 180.37"
+                                                <TextBlock Text="64.18, 180.37"
                                                    HorizontalAlignment="Left" />
-                                    </UniformGrid>
-                                    <Grid Grid.Row="2"
+                                            </UniformGrid>
+                                            <Grid Grid.Row="2"
                                           Grid.ColumnSpan="2"/>
-                                    <CheckBox Content="Manual Input"
-                                              Grid.ColumnSpan="2"
-                                              x:Name="cbManualMap"
-                                              Margin="0,5,0,0"
-                                              Grid.Row="2" />
-                                    <Grid IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                            <Grid IsEnabled="False"
                                           Grid.Row="3">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="40" />
-                                            <ColumnDefinition Width="4*" />
-                                            <ColumnDefinition Width="3*" />
-                                            <ColumnDefinition Width="3*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition />
-                                            <RowDefinition />
-                                            <RowDefinition />
-                                            <RowDefinition />
-                                            <RowDefinition />
-                                            <RowDefinition />
-                                            <RowDefinition />
-                                            <RowDefinition />
-                                            <RowDefinition />
-                                            <RowDefinition Height="30" />
-                                        </Grid.RowDefinitions>
-                                        <TextBlock Text="Index"
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40" />
+                                                    <ColumnDefinition Width="4*" />
+                                                    <ColumnDefinition Width="3*" />
+                                                    <ColumnDefinition Width="3*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Index"
                                                    Grid.Column="0"
                                                    HorizontalAlignment="Left"
                                                    Margin="0,2" />
-                                        <TextBlock Text="Property"
+                                                <TextBlock Text="Property"
                                                    Grid.Column="1"
                                                    Margin="0,2"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="X"
+                                                <TextBlock Text="X"
                                                    Grid.Column="2"
                                                    Margin="3,2" />
-                                        <TextBlock Text="Y"
+                                                <TextBlock Text="Y"
                                                    Grid.Column="3"
                                                    Margin="3,2" />
-                                        <TextBlock Text="a."
+                                                <TextBlock Text="a."
                                                    Grid.Row="1"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="b."
+                                                <TextBlock Text="b."
                                                    Grid.Row="2"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="c."
+                                                <TextBlock Text="c."
                                                    Grid.Row="3"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="d."
+                                                <TextBlock Text="d."
                                                    Grid.Row="4"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="e."
+                                                <TextBlock Text="e."
                                                    Grid.Row="5"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="f."
+                                                <TextBlock Text="f."
                                                    Grid.Row="6"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="g."
+                                                <TextBlock Text="g."
                                                    Grid.Row="7"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="h."
+                                                <TextBlock Text="h."
                                                    Grid.Row="8"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="FirstDieLeft"
+                                                <TextBlock Text="FirstDieLeft"
                                                    Grid.Column="1"
                                                    Grid.Row="1"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="FirstDieRight"
+                                                <TextBlock Text="FirstDieRight"
                                                    Grid.Column="1"
                                                    Grid.Row="2"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="SecondDieLeft"
+                                                <TextBlock Text="SecondDieLeft"
                                                    Grid.Column="1"
                                                    Grid.Row="3"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="LastDieRight"
+                                                <TextBlock Text="LastDieRight"
                                                    Grid.Column="1"
                                                    Grid.Row="4"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="FirstDieBottom"
+                                                <TextBlock Text="FirstDieBottom"
                                                    Grid.Column="1"
                                                    Grid.Row="5"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="FirstDieUp"
+                                                <TextBlock Text="FirstDieTop"
                                                    Grid.Column="1"
                                                    Grid.Row="6"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="SecondDieBottom"
+                                                <TextBlock Text="SecondDieBottom"
                                                    Grid.Column="1"
                                                    Grid.Row="7"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="LastDieUp"
+                                                <TextBlock Text="LastDieTop"
                                                    Grid.Column="1"
                                                    Grid.Row="8"
                                                    HorizontalAlignment="Left" />
-                                        <TextBox Grid.Column="2"
+                                                <TextBox Grid.Column="2"
                                                  Grid.Row="1"
                                                  Margin="3,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="2"
+                                                <TextBox Grid.Column="2"
                                                  Grid.Row="2"
                                                  Margin="3,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="2"
+                                                <TextBox Grid.Column="2"
                                                  Grid.Row="3"
                                                  Margin="3,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="2"
+                                                <TextBox Grid.Column="2"
                                                  Grid.Row="4"
                                                  Margin="3,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="2"
+                                                <TextBox Grid.Column="2"
                                                  Grid.Row="5"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="2"
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
+                                                <TextBox Grid.Column="2"
                                                  Grid.Row="6"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="2"
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
+                                                <TextBox Grid.Column="2"
                                                  Grid.Row="7"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="2"
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
+                                                <TextBox Grid.Column="2"
                                                  Grid.Row="8"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="3"
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
+                                                <TextBox Grid.Column="3"
                                                  Grid.Row="1"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="3"
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
+                                                <TextBox Grid.Column="3"
                                                  Grid.Row="2"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="3"
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
+                                                <TextBox Grid.Column="3"
                                                  Grid.Row="3"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="3"
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
+                                                <TextBox Grid.Column="3"
                                                  Grid.Row="4"
                                                  Margin="3,0"
-                                                 VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="3"
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed" />
+                                                <TextBox Grid.Column="3"
                                                  Grid.Row="5"
                                                  Margin="3,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="3"
+                                                <TextBox Grid.Column="3"
                                                  Grid.Row="6"
                                                  Margin="3,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="3"
+                                                <TextBox Grid.Column="3"
                                                  Grid.Row="7"
                                                  Margin="3,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="3"
+                                                <TextBox Grid.Column="3"
                                                  Grid.Row="8"
                                                  Margin="3,0"
                                                  VerticalAlignment="Center" />
-                                        <Button Content="Adjust"
-                                                Grid.ColumnSpan="4"
-                                                Grid.Row="9"
-                                                Height="25"
-                                                VerticalAlignment="Bottom" />
-                                    </Grid>
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Alignment"
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="Alignment"
                                       Grid.Row="1">
-                                <Grid Margin="5,2">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition Height="30" />
-                                        <RowDefinition Height="30" />
-                                    </Grid.RowDefinitions>
-                                    <UniformGrid Columns="3"
+                                        <Grid Margin="5,2">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+                                            <UniformGrid Columns="3"
                                                  Rows="1">
-                                        <TextBlock Text="Reticle Type"
-                                                   HorizontalAlignment="Left" />
-                                        <CheckBox Content="EUV"
-                                                  Margin="0,1,0,0" />
-                                        <CheckBox Content="DUV"
-                                                  Margin="0,1,0,0" />
-                                    </UniformGrid>
-                                    <UniformGrid Columns="3"
+                                                <TextBlock Text="Reticle Type"
+                                                   HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                                <CheckBox Content="EUV"
+                                                  Margin="0,2,0,0" VerticalAlignment="Center" />
+                                                <CheckBox Content="DUV"
+                                                  Margin="0,2,0,0" VerticalAlignment="Center" />
+                                            </UniformGrid>
+                                            <UniformGrid Columns="3"
                                                  Rows="1"
                                                  Grid.Row="1">
-                                        <TextBlock Text="Option"
-                                                   HorizontalAlignment="Left" />
-                                        <CheckBox Content="2 Point"
-                                                  Margin="0,1,0,0" />
-                                        <CheckBox Content="3 Point"
-                                                  Margin="0,1,0,0" />
-                                        <Grid />
-                                        <CheckBox Content="Use Edge"
-                                                  Margin="0,2,0,0" />
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Score"
-                                                       Margin="0,0,5,0" />
-                                            <TextBox Width="50"
+                                                <TextBlock Text="Option" VerticalAlignment="Center"
+                                                   HorizontalAlignment="Left" TextAlignment="Center"/>
+
+                                                <CheckBox Content="Use Edge"
+                                                  Margin="0,0,0,0" VerticalAlignment="Center" />
+                                                <Grid VerticalAlignment="Stretch">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="0.5*"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="Score" VerticalAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Width="50"
                                                      VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </UniformGrid>
-                                    <Button Content="Algin Test"
-                                            Height="25"
-                                            Grid.Row="3"
-                                            VerticalAlignment="Bottom" />
-                                    <Button Content="Auto Align"
-                                            Height="25"
-                                            Grid.Row="4"
-                                            VerticalAlignment="Bottom" />
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Illumination"
-                                      Grid.Row="2"
+                                                </Grid>                                                
+                                                <!--<StackPanel Margin="0,2,0,0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Text="Score" VerticalAlignment="Center"
+                                                       Margin="0,2,5,0" Height="18" />
+                                                    <TextBox Width="50"
+                                                     VerticalAlignment="Center" />
+                                                </StackPanel>-->
+                                            </UniformGrid>
+                                        </Grid>
+                                    </GroupBox>
+                                    <Grid Grid.Row="2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <GroupBox Header="Illumination"
                                       TextElement.FontSize="15">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition />
-                                        <ColumnDefinition Width="8*" />
-                                        <ColumnDefinition />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Text="R"
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="R" Foreground="Red"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="0" />
-                                    <TextBlock Text="G"
+                                                <TextBlock Text="G" Foreground="Green"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="1" />
-                                    <TextBlock Text="B"
+                                                <TextBlock Text="B" Foreground="Blue"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="2" />
-                                    <TextBlock Text="W"
+                                                <TextBlock Text="W" Foreground="LightSlateGray"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="3" />
-                                    <Slider Grid.Row="0"
-                                            Grid.Column="1"
-                                            VerticalAlignment="Center" />
-                                    <Slider Grid.Row="1"
-                                            Grid.Column="1"
-                                            VerticalAlignment="Center" />
-                                    <Slider Grid.Row="2"
-                                            Grid.Column="1"
-                                            VerticalAlignment="Center" />
-                                    <Slider Grid.Row="3"
-                                            Grid.Column="1"
-                                            VerticalAlignment="Center" />
-                                    <TextBlock Text="0"
+                                                <TextBlock Text="0"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="0"
                                                Grid.Column="2" />
-                                    <TextBlock Text="0"
+                                                <TextBlock Text="0"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="1"
                                                Grid.Column="2" />
-                                    <TextBlock Text="0"
+                                                <TextBlock Text="0"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="2"
                                                Grid.Column="2" />
-                                    <TextBlock Text="0"
+                                                <TextBlock Text="0"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
                                                Grid.Row="3"
                                                Grid.Column="2" />
+                                            </Grid>
+                                        </GroupBox>
+                                        <GroupBox Header="Align Illumination"
+                                      Grid.Column="1"
+                                      TextElement.FontSize="15">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="R" Foreground="Red"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0" />
+                                                <TextBlock Text="G" Foreground="Green"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1" />
+                                                <TextBlock Text="B" Foreground="Blue"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2" />
+                                                <TextBlock Text="W" Foreground="LightSlateGray"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3" />
+                                                <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0"
+                                               Grid.Column="2" />
+                                                <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1"
+                                               Grid.Column="2" />
+                                                <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2"
+                                               Grid.Column="2" />
+                                                <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3"
+                                               Grid.Column="2" />
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
                                 </Grid>
-                            </GroupBox>
-                        </Grid>
-                        <Grid Grid.Column="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="3*" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <GroupBox Header="Map" Grid.Row="0">
-                                <Image Source="Resource/Reticle.png"
-                                       Stretch="Fill" />
-                            </GroupBox>
-                            <GroupBox Header="Inspection Item" Grid.Row="1">
-                                <Grid Margin="5,2">
-
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Inspection Area"
-                                      Grid.Row="3">
-                                <Grid Margin="5,2">
+                                <Grid Grid.Column="1">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="5*" />
+                                        <RowDefinition Height="*" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox Content="Manual Input"
+                                    <GroupBox Header="Map" Grid.Row="0">
+                                        <Image Source="Resource/Reticle.png"
+                                       Stretch="Fill" />
+                                    </GroupBox>
+                                    <GroupBox Header="Align Key" Grid.Row="1" Grid.RowSpan="2">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Background="Black" Margin="3">
+                                                <TextBlock Foreground="White">
+                                                    <Image x:Name="imageLeftTopAlignKey" Source="{Binding p_bmpLeftTopAlignKeySrc}" />
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Background="Black" Margin="3" Grid.Column="1">
+                                                <TextBlock Foreground="White">
+                                                    <Image x:Name="imageLeftBottomAlignKey" Source="{Binding p_bmpLeftBottomAlignKeySrc}" />
+                                                </TextBlock>
+                                            </Border>
+                                        </Grid>
+                                    </GroupBox>
+                                    
+                                    
+                                    <!--<GroupBox Header="Inspection Item" Grid.Row="1">
+                                        <Grid Margin="5,2">
+
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="Inspection Area"
+                                      Grid.Row="3">
+                                        <Grid Margin="5,2">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="20" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <CheckBox Content="Manual Input"
                                               Grid.ColumnSpan="2"
                                               x:Name="cbManualROI"
                                               Margin="0,5,0,0" />
-                                    <Grid IsEnabled="{Binding ElementName=cbManualROI, Path=IsChecked}"
+                                            <Grid IsEnabled="{Binding ElementName=cbManualROI, Path=IsChecked}"
                                           Grid.Row="1">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="2*" />
-                                            <ColumnDefinition />
-                                            <ColumnDefinition />
-                                            <ColumnDefinition />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition />
-                                            <RowDefinition />
-                                            <RowDefinition />
-                                            <RowDefinition Height="30" />
-                                        </Grid.RowDefinitions>
-                                        <TextBlock Text="Property"
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="2*" />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition Height="30" />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Property"
                                                    Grid.Column="0"
                                                    Grid.Row="0"
                                                    VerticalAlignment="Center"
                                                    HorizontalAlignment="Left" />
-                                        <TextBlock Text="X"
+                                                <TextBlock Text="X"
                                                    VerticalAlignment="Center"
                                                    Grid.Column="1"
                                                    Grid.Row="0" />
-                                        <TextBlock Text="Y"
+                                                <TextBlock Text="Y"
                                                    VerticalAlignment="Center"
                                                    Grid.Column="2"
                                                    Grid.Row="0" />
-                                        <TextBlock Text="Width"
+                                                <TextBlock Text="Width"
                                                    VerticalAlignment="Center"
                                                    Grid.Column="3"
                                                    Grid.Row="0" />
-                                        <TextBlock Text="Height"
+                                                <TextBlock Text="Height"
                                                    VerticalAlignment="Center"
                                                    Grid.Column="4"
                                                    Grid.Row="0" />
-                                        <TextBlock Text="Pattern(D2D)"
+                                                <TextBlock Text="Pattern(D2D)"
                                                    VerticalAlignment="Center"
                                                    Grid.Column="0"
                                                    Grid.Row="1"
                                                    HorizontalAlignment="Left" />
-                                        <TextBox Grid.Column="1"
+                                                <TextBox Grid.Column="1"
                                                  Grid.Row="1"
                                                  Margin="2,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="2"
+                                                <TextBox Grid.Column="2"
                                                  Grid.Row="1"
                                                  Margin="2,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="3"
+                                                <TextBox Grid.Column="3"
                                                  Grid.Row="1"
                                                  Margin="2,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="4"
+                                                <TextBox Grid.Column="4"
                                                  Grid.Row="1"
                                                  Margin="2,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBlock Text="NonPattern(Surface)"
+                                                <TextBlock Text="NonPattern(Surface)"
                                                    VerticalAlignment="Center"
                                                    Grid.Column="0"
                                                    Grid.Row="2"
                                                    HorizontalAlignment="Left" />
-                                        <TextBox Grid.Column="1"
+                                                <TextBox Grid.Column="1"
                                                  Grid.Row="2"
                                                  Margin="2,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="2"
+                                                <TextBox Grid.Column="2"
                                                  Grid.Row="2"
                                                  Margin="2,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="3"
+                                                <TextBox Grid.Column="3"
                                                  Grid.Row="2"
                                                  Margin="2,0"
                                                  VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="4"
+                                                <TextBox Grid.Column="4"
                                                  Grid.Row="2"
                                                  Margin="2,0"
                                                  VerticalAlignment="Center" />
-                                        <Button Content="Adjust"
+                                                <Button Content="Adjust"
                                                 Grid.ColumnSpan="5"
                                                 Grid.Row="3"
                                                 Height="25"
                                                 VerticalAlignment="Bottom" />
-                                    </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>-->
                                 </Grid>
-                            </GroupBox>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Grid>
 
-                <!--<Grid Grid.Column="1"
+                        <!--<Grid Grid.Column="1"
                       Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -892,11 +954,200 @@
                                            Grid.Row="2"
                                            Grid.Column="2" />
                             </Grid>
-                        </GroupBox>
+                        </GroupBox> 
                         
                     </Grid>
                 </Grid>-->
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Align Key">
+                <local:AlignTeaching_UI DataContext="{Binding p_alignTeaching_ViewModel}"/>
+            </TabItem>
+            <TabItem Header="Point">
+                <local:RecipeWizard_UI DataContext="{Binding p_recipeWizard_ViewModel}"/>
+            </TabItem>
+            <TabItem Header="Filtering">
+            </TabItem>
+        </TabControl>
+        <Grid Grid.Row="1" Background="White">
+            <Grid.ColumnDefinitions> 
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0.47*"/>
+            </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                <GroupBox Header="Illumination"
+                                      Grid.Row="3" Width="200"
+                                      TextElement.FontSize="15">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="8*" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="R"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0" />
+                        <TextBlock Text="G"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1" />
+                        <TextBlock Text="B"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2" />
+                        <TextBlock Text="W"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3" />
+                        <Slider Grid.Row="0"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="1"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="2"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="3"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3"
+                                               Grid.Column="2" />
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Align Illumination"
+                                      Grid.Row="3" Width="200"
+                                      TextElement.FontSize="15">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="8*" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="R"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0" />
+                        <TextBlock Text="G"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1" />
+                        <TextBlock Text="B"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2" />
+                        <TextBlock Text="W"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3" />
+                        <Slider Grid.Row="0"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="1"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="2"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <Slider Grid.Row="3"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="0"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="1"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="2"
+                                               Grid.Column="2" />
+                        <TextBlock Text="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Row="3"
+                                               Grid.Column="2" />
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Snap Option">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Button Content="Snap" Background="AntiqueWhite"
+                    Margin="2,5" Command="{Binding CmdSnap}"
+                    Style="{StaticResource SetupPanelBtn}"/>
+                        <Button Content="Stop" Grid.Column="1"
+                    Margin="2,5" Command="{Binding CmdSnap}"
+                    Style="{StaticResource SetupPanelBtn}"/>
+                        <UniformGrid Columns="4" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Center">
+                            <TextBlock Text="Start Swathe" FontWeight="Bold" TextAlignment="Right" VerticalAlignment="Center" RenderTransformOrigin="0.678,0.594" Margin="11,0,-11,0"/>
+                            <TextBox Height="25" Width="30" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                            <TextBlock Margin="11,0,-7,0" Text="End Swathe" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox Width="30" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
             </StackPanel>
-        </ScrollViewer>
+            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+                <Grid Background="#55ff0000" Width="100" Margin="5,10,5,10">
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <TextBlock TextAlignment="Center" Text="Align" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+                <Grid Background="#5500ff00" Width="100"  Margin="5,10,5,10">
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <TextBlock TextAlignment="Center" Text="Point" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+                <Grid Background="#550000ff" Width="100"  Margin="5,10,5,10">
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <TextBlock TextAlignment="Center" Text="???" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

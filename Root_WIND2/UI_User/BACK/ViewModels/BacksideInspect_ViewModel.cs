@@ -33,6 +33,7 @@ namespace Root_WIND2.UI_User
         {
             public static SolidColorBrush NoChip = Brushes.LightGray;
             public static SolidColorBrush Normal = Brushes.DimGray;
+            public static SolidColorBrush Extra = Brushes.DarkSlateGray;
             public static SolidColorBrush Snap = Brushes.LightSkyBlue;
             public static SolidColorBrush Position = Brushes.SkyBlue;
             public static SolidColorBrush Inspection = Brushes.Gold;
@@ -73,7 +74,21 @@ namespace Root_WIND2.UI_User
             
             // Initialize MapViewer
             this.mapViewerVM = new MapViewer_ViewModel();
+
+            this.p_DataViewer_VM.SelectedCellsChanged += SelectedCellsChanged_Callback;
         }
+        private void SelectedCellsChanged_Callback(object obj)
+        {
+            DataRowView row = (DataRowView)obj;
+            if (row == null) return;
+
+            System.Drawing.Rectangle m_View_Rect = new System.Drawing.Rectangle((int)(double)row["m_fAbsX"] - ImageViewerVM.p_View_Rect.Width / 2, (int)(double)row["m_fAbsY"] - this.imageViewerVM.p_View_Rect.Height / 2, this.imageViewerVM.p_View_Rect.Width, this.imageViewerVM.p_View_Rect.Height);
+            ImageViewerVM.p_View_Rect = m_View_Rect;
+            ImageViewerVM.SetImageSource();
+            ImageViewerVM.UpdateImageViewer(); // replace RedrawShapes()
+        }
+
+
 
         private string currentRecipe = "";
         public void LoadRecipe()
@@ -84,17 +99,28 @@ namespace Root_WIND2.UI_User
             {
                 RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
                 currentRecipe = GlobalObjects.Instance.Get<RecipeBack>().Name;
-                this.MapViewerVM.CreateMap(waferMap.MapSizeX, waferMap.MapSizeY);
+                if(waferMap.UseExtraMap)
+                {
+                    this.MapViewerVM.CreateMap(waferMap.ExtraMapSizeX, waferMap.ExtraMapSizeY);
+                }
+                else
+                {
+                    this.MapViewerVM.CreateMap(waferMap.MapSizeX, waferMap.MapSizeY);
+                }
                 ResetMapColor();
             }
             else
             {
                 RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
-                if (waferMap.MapSizeX != this.MapViewerVM.MapSizeX || waferMap.MapSizeY != this.MapViewerVM.MapSizeY)
+                if (waferMap.UseExtraMap)
+                {
+                    this.MapViewerVM.CreateMap(waferMap.ExtraMapSizeX, waferMap.ExtraMapSizeY);
+                }
+                else
                 {
                     this.MapViewerVM.CreateMap(waferMap.MapSizeX, waferMap.MapSizeY);
-                    ResetMapColor();
                 }
+                ResetMapColor();
             }
         }
 
@@ -102,20 +128,46 @@ namespace Root_WIND2.UI_User
         public void ResetMapColor()
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
-            for (int i = 0; i < waferMap.MapSizeY; i++)
+            if(waferMap.UseExtraMap)
             {
-                for (int j = 0; j < waferMap.MapSizeX; j++)
+                for (int i = 0; i < waferMap.ExtraMapSizeY; i++)
                 {
-                    int index = j + i * waferMap.MapSizeX;
-                    CHIP_TYPE type = (CHIP_TYPE)waferMap.Data[index];
-                    switch (type)
+                    for (int j = 0; j < waferMap.ExtraMapSizeX; j++)
                     {
-                        case CHIP_TYPE.NO_CHIP:
-                            this.mapViewerVM.SetChipColor(j, i, MapViewerColorDefines.NoChip);
-                            break;
-                        case CHIP_TYPE.NORMAL:
-                            this.mapViewerVM.SetChipColor(j, i, MapViewerColorDefines.Normal);
-                            break;
+                        int index = j + i * waferMap.ExtraMapSizeX;
+                        CHIP_TYPE type = (CHIP_TYPE)waferMap.ExtraMapdata[index];
+                        switch (type)
+                        {
+                            case CHIP_TYPE.NO_CHIP:
+                                this.mapViewerVM.SetChipColor(j, i, MapViewerColorDefines.NoChip);
+                                break;
+                            case CHIP_TYPE.EXTRA:
+                                this.mapViewerVM.SetChipColor(j, i, MapViewerColorDefines.Extra);
+                                break;
+                            case CHIP_TYPE.NORMAL:
+                                this.mapViewerVM.SetChipColor(j, i, MapViewerColorDefines.Normal);
+                                break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < waferMap.MapSizeY; i++)
+                {
+                    for (int j = 0; j < waferMap.MapSizeX; j++)
+                    {
+                        int index = j + i * waferMap.MapSizeX;
+                        CHIP_TYPE type = (CHIP_TYPE)waferMap.Data[index];
+                        switch (type)
+                        {
+                            case CHIP_TYPE.NO_CHIP:
+                                this.mapViewerVM.SetChipColor(j, i, MapViewerColorDefines.NoChip);
+                                break;
+                            case CHIP_TYPE.NORMAL:
+                                this.mapViewerVM.SetChipColor(j, i, MapViewerColorDefines.Normal);
+                                break;
+                        }
                     }
                 }
             }
@@ -148,6 +200,16 @@ namespace Root_WIND2.UI_User
         {
             get { return this.m_DataViewer_VM; }
             set { SetProperty(ref m_DataViewer_VM, value); }
+        }
+
+        private string inspectionID;
+        public string InspectionID
+        {
+            get => this.inspectionID;
+            set
+            {
+                SetProperty(ref this.inspectionID, value);
+            }
         }
         #endregion
 
@@ -205,6 +267,8 @@ namespace Root_WIND2.UI_User
 
                    RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
                    GlobalObjects.Instance.GetNamed<WorkManager>("backInspection").Start();
+
+                   this.InspectionID = DatabaseManager.Instance.GetInspectionID();
                 }
             });
         }
@@ -300,6 +364,14 @@ namespace Root_WIND2.UI_User
                        settings_backside.OutputImageSizeY, polygon, (int)(settings_backside.SaveWaferSize * 1000 / grabMode.m_dRealResX_um), (int)(settings_backside.SaveWaferSize * 1000 / grabMode.m_dRealResY_um),
                        backRecipe.CenterX,
                        backRecipe.CenterY);
+            });
+        }
+
+        public RelayCommand btnInspectionIDSearchCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                m_DataViewer_VM.pDataTable = DatabaseManager.Instance.SelectTablewithInspectionID("defect", this.inspectionID);
             });
         }
         #endregion

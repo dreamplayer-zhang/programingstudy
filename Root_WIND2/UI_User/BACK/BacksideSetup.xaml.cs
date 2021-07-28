@@ -24,5 +24,27 @@ namespace Root_WIND2.UI_User
         {
             InitializeComponent();
         }
+
+        private void Button_KeyDown(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void TextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                TextBox tb = sender as TextBox;
+                //tb.IsReadOnly = false;
+                //tb.IsReadOnly = true;
+                //tb.Focusable = false;
+                //tb.Focusable = true;
+            }
+
+            if (!Char.IsDigit((char)KeyInterop.VirtualKeyFromKey(e.Key)) & e.Key != Key.Back & e.Key != Key.OemPeriod | e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
     }
 }

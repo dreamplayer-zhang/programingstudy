@@ -185,6 +185,8 @@ namespace Root_WIND2
             {
                 // Settings
                 Settings settings = GlobalObjects.Instance.Register<Settings>();
+                SettingItem_Setup setupSetting = settings.GetItem<SettingItem_Setup>();
+
 
                 // Engineer
                 WIND2_Engineer engineer = GlobalObjects.Instance.Register<WIND2_Engineer>();
@@ -197,6 +199,7 @@ namespace Root_WIND2
                 ImageData maskLayer;
 
                 // ImageData
+                
                 if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
                 {
                     MemoryData memoryData = memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront);
@@ -399,7 +402,7 @@ namespace Root_WIND2
                             ebrImage.p_Size.Y,
                             ebrImage.GetBytePerPixel()));
 
-                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeEBR.CameraInfoIndex));
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_EdgeSideVision.GetGrabMode(recipeEBR.CameraInfoIndex));
                     ebrInspection.SetCameraInfo(camInfo);
                 }
 
@@ -426,6 +429,7 @@ namespace Root_WIND2
                 dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
                 dialogService.Register<TK4S, TK4SModuleUI>();
                 dialogService.Register<FFUModule, FFUModuleUI>();
+                dialogService.Register<ManualAlignViewer_ViewModel, ManualAlignViewer>();
                 //dialogService.Register<Dialog_PortSelect_ViewModel, Dialog_PortSelect>();
                 dialogService.Register<Dialog_MapCreator_ViewModel, Dialog_MapCreator>();
 

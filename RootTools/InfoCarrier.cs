@@ -223,9 +223,9 @@ namespace RootTools
         {
             if (nID < 0) return;
             if (nID >= p_lWafer) return;
-            if (EQ.p_nRnR <= 1)
+            if (EQ.p_nRnR < 1)
             {
-                if (infoWafer == null && m_aInfoWafer[nID] != null) m_aInfoWafer[nID].ClearInfo();
+                if (infoWafer == null && m_aInfoWafer[nID] != null) m_aInfoWafer[nID].ClearInfo(); //? 왜 클리어?
             }
             m_aInfoWafer[nID] = infoWafer;
             SaveInfoWafer(nID);
@@ -267,8 +267,11 @@ namespace RootTools
                 else Thread.Sleep(10);
             }
             p_eReqTransfer = (p_ePresentSensor == ePresent.Exist) ? eTransfer.ReadyToUnload : eTransfer.ReadyToLoad;
-            if ((p_ePresentSensor == ePresent.Empty) && (m_gem != null) && m_gem.p_bOffline == false) 
+            if ((p_ePresentSensor == ePresent.Empty) && (m_gem != null) && m_gem.p_bOffline == false)
+            {
+                p_sCarrierID = "";
                 m_gem.RemoveCarrierInfo(p_sLocID);
+            }
         }
         #endregion
 

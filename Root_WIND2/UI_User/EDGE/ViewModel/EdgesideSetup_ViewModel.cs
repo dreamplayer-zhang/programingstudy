@@ -152,6 +152,9 @@ namespace Root_WIND2.UI_User
 			if (recipe.GetItem<EdgeSurfaceParameter>() == null) return;
 						
 			ModuleVM.OriginRecipe = recipe.GetItem<OriginRecipe>();
+			ModuleVM.ProcessDefectParameter = recipe.GetItem<ProcessDefectEdgeParameter>();
+			ModuleVM.SetOptionDefect();
+
 			if (IsTopChecked)
 				ModuleVM.SetRecipeParameter(recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop, recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop);
 			else if (IsSideChecked)

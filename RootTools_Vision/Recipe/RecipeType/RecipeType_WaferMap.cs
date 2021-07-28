@@ -12,6 +12,7 @@ namespace RootTools_Vision
     {
         NO_CHIP = 0,
         NORMAL = 1,
+        EXTRA = 3,
         FLAT_ZONE = 4
     }
 
@@ -41,6 +42,16 @@ namespace RootTools_Vision
         private double scribeLaneY = 0;
         private double sampleCenterLocationX = 0;
         private double sampleCenterLocationY = 0;
+
+
+        private bool useExtraMap = false;
+        private int[] extraMapdata = new int[0];
+        private int extraMapSizeX = 0;
+        private int extraMapSizeY = 0;
+        private int extraMasterDieX = 0;
+        private int extraMasterDieY = 0;
+        private int extraDieOffsetX = 0;
+        private int extraDieOffsetY = 0;
 
         #region [Getter Setter]
         public int MapSizeX
@@ -137,10 +148,55 @@ namespace RootTools_Vision
                         }
                     }
                 }
-
-               
             }
         }
+
+        [XmlIgnore]
+        public int[] ExtraMapdata 
+        { 
+            get => extraMapdata; 
+        }
+
+        [XmlArray("ExtraMapdata")]
+        [XmlArrayItem("row")]
+        public string[] ExtraMapDataToString
+        {
+            get
+            {
+                string[] map = new string[extraMapSizeY];
+                for (int i = 0; i < extraMapSizeY; i++)
+                {
+                    for (int j = 0; j < extraMapSizeX; j++)
+                        map[i] += string.Format("{0}", extraMapdata[i * extraMapSizeX + j]);
+                }
+
+                return map;
+            }
+            set
+            {
+                string[] map = value;
+                if (map.Length == 0)
+                {
+                    extraMapSizeX = 0;
+                    extraMapSizeY = 0;
+                }
+                else
+                {
+                    extraMapSizeX = map[0].Length;
+                    extraMapSizeY = map.Length;
+                    extraMapdata = new int[extraMapSizeX * extraMapSizeY];
+
+                    for (int i = 0; i < extraMapSizeY; i++)
+                    {
+                        for (int j = 0; j < extraMapSizeX; j++)
+                        {
+                            extraMapdata[i * extraMapSizeX + j] = int.Parse(map[i][j].ToString());
+                        }
+                    }
+                }
+            }
+        }
+
 
         public double ChipWidth { get => chipWidth; set => chipWidth = value; }
         public double ChipHeight { get => chipHeight; set => chipHeight = value; }
@@ -153,6 +209,35 @@ namespace RootTools_Vision
         public int OriginDieX { get => originDieX; set => originDieX = value; }
         public int OriginDieY { get => originDieY; set => originDieY = value; }
 
+        // Extra Map
+        public bool UseExtraMap { get => useExtraMap; set => useExtraMap = value; }
+        
+        public int ExtraMapSizeX { get => extraMapSizeX; set => extraMapSizeX = value; }
+        public int ExtraMapSizeY { get => extraMapSizeY; set => extraMapSizeY = value; }
+        public int ExtraMasterDieX { get => extraMasterDieX; set => extraMasterDieX = value; }
+        public int ExtraMasterDieY { get => extraMasterDieY; set => extraMasterDieY = value; }
+        public int ExtraDieOffsetX { get => extraDieOffsetX; set => extraDieOffsetX = value; }
+        public int ExtraDieOffsetY { get => extraDieOffsetY; set => extraDieOffsetY = value; }
+
+
+        public int GrossDie
+        {
+            get
+            {
+                int grossDie = 0;
+                if (mapdata != null && mapdata.Length != 0)
+                {
+                    for(int i = 0;  i < mapdata.Length; i++)
+                    {
+                        if(mapdata[i] == (int)CHIP_TYPE.NORMAL)
+                        {
+                            grossDie++;
+                        }
+                    }
+                }
+                return grossDie;
+            }
+        }
         #endregion
 
         public RecipeType_WaferMap()
@@ -184,6 +269,34 @@ namespace RootTools_Vision
             }
         }
 
+        public void CreateExtraMap(int mapSizeX, int mapSizeY, int[] _mapdata, int offsetX, int offsetY)
+        {
+            this.extraMapSizeX = mapSizeX;
+            this.extraMapSizeY = mapSizeY;
+            this.extraDieOffsetX = offsetX;
+            this.extraDieOffsetY = offsetY;
+
+            this.extraMapdata = new int[this.extraMapSizeX * this.extraMapSizeY];
+            this.extraMapdata = (int[])_mapdata.Clone();
+
+            bool bDone = false;
+            for (int x = 0; x < this.extraMapSizeX; x++)
+            {
+                for (int y = 0; y < this.extraMapSizeY; y++)
+                {
+                    if (this.extraMapdata[x + y * this.extraMapSizeX] == (byte)CHIP_TYPE.NORMAL ||
+                        this.extraMapdata[x + y * this.extraMapSizeX] == (byte)CHIP_TYPE.EXTRA)
+                    {
+                        this.extraMasterDieX = x;
+                        this.extraMasterDieY = y;
+                        bDone = true;
+                        break;
+                    }
+                }
+                if (bDone) break;
+            }
+        }
+
         public void Clear()
         {
             mapdata = new int[0];
@@ -191,6 +304,13 @@ namespace RootTools_Vision
             mapSizeY = 0;
             masterDieX = 0;
             masterDieY = 0;
+
+            UseExtraMap = false;
+            extraMapdata = new int[0];
+            ExtraMapSizeX = 0;
+            ExtraMapSizeY = 0;
+            ExtraMasterDieX = 0;
+            ExtraMasterDieY = 0;
         }
 
         public void CreateWaferMap(int mapSizeX, int mapSizeY, CHIP_TYPE type)

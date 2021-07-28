@@ -34,17 +34,17 @@ namespace RootTools_CLR
 		// OutPosX, OutPosY는 Matching Box의 좌상단. {CenterX, CenterY} = {OutPosX + nTempW / 2, OutPosY + nTempH / 2}
 		static float Cpp_TemplateMatching(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt, int nChIdx);
 		static float Cpp_TemplateMatching(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt, int nChIdx);
-
+		static float Cpp_TemplateMatching(array<byte>^ pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt);
+		static float Cpp_TemplateMatching_LargeTrigger(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt, int nChIdx);
+		static float Cpp_TemplateMatching_LargeTrigger(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt, int nChIdx);
 		// ********* D2D ******** //
 		static void Cpp_SubtractAbs(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
-		static void Cpp_SelectMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH);
+		static void Cpp_Subtract(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
+		static void Cpp_SelectAbsMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH);
+		static void Cpp_SelectMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH, bool isDark);
 		static void Cpp_FindMinDiffLoc(array<byte>^ pSrcImg, array<byte>^ pInOutTarget, int nTransX, int nTransY, int nTargetW, int nTargetH, int nTrigger);
 
-		// Create Golden Image
-		// Memory 낭비가 심함
-		static void Cpp_CreateGoldenImage_Avg(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH);
-		static void Cpp_CreateGoldenImage_MedianAvg(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH);
-		static void Cpp_CreateGoldenImage_Median(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH);
+		// Create Golden Image	
 		// 전체 이미지 포인터를 받아와 필요한 만큼 잘라서 사용 (추후 SSE 등으로 한번 더 최적화 필요)
 		static void Cpp_CreateGoldenImage_Avg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH);
 		static void Cpp_CreateGoldenImage_MedianAvg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH);
@@ -60,6 +60,10 @@ namespace RootTools_CLR
 
 		// Elementwise Operation
 		static void Cpp_Multiply(array<byte>^ pSrcImg1, array<float>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
+		static void Cpp_Multiply(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
+		static void Cpp_Bitwise_NOT(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH);
+		static void Cpp_Bitwise_AND(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
+		static void Cpp_Bitwise_OR(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
 
 		// Filtering
 		static void Cpp_GaussianBlur(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH, int nSig);
@@ -75,6 +79,7 @@ namespace RootTools_CLR
 		static array<int>^ Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode);
 		// Map Size 넘겨주면 N * M 크기로 Map Data 생성
 		static array<int>^ Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, float& outChipSzX, float& outChipSzY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode);
+		static int Cpp_FindDominantIntensity(array<byte>^ pSrcImg, array<byte>^ pMaskImg, int  nMemW, int  nMemH);
 
 		// Image(Feature/Defect Image) Load/Save
 		static void Cpp_SaveBMP(System::String^ strFilePath, array<byte>^ pSrcImg, int  nMemW, int  nMemH, int nByteCnt);

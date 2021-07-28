@@ -34,11 +34,11 @@ namespace Root_VEGA_D.Engineer
         public ModuleList p_moduleList { get; set; }
         public VEGA_D_Recipe m_recipe;
         public VEGA_D_Process m_process;
-        public Vision m_vision;
+        public Vision m_vision { get; set; }
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
-        public Interlock m_interlock;
+        public Interlock m_interlock { get; set; }
         public TowerLamp m_towerlamp;
-        public FFU m_FFU;
+        public FFU m_FFU { get; set; }
 
         void InitModule()
         {
@@ -92,7 +92,7 @@ namespace Root_VEGA_D.Engineer
             Cymechs,
         }
         eWTR m_eWTR = eWTR.Cymechs;
-        public WTR_Cymechs m_wtr;
+        public WTR_Cymechs m_wtr { get; set; }
         void InitWTR()
         {
             m_wtr = new WTR_Cymechs("WTR", m_engineer);
@@ -112,8 +112,8 @@ namespace Root_VEGA_D.Engineer
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
-        public List<ILoadport> m_aLoadport = new List<ILoadport>();
-        public List<ModuleBase> m_loadport = new List<ModuleBase>();
+        public List<ILoadport> m_aLoadport { get; set; } = new List<ILoadport>();
+        public List<ModuleBase> m_loadport { get; set; } = new List<ModuleBase>();
         int m_lLoadport = 2;
         void InitLoadport()
         {
@@ -270,6 +270,7 @@ namespace Root_VEGA_D.Engineer
         #endregion
 
         #region Calc Sequence
+        public bool m_bIsRNR = false;
         public int p_nRnRCount = 0;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
@@ -368,6 +369,8 @@ namespace Root_VEGA_D.Engineer
             }
             return null;
         }
+        public RnRData GetRnRData() { return null; }
+        public void UpdateEvent() { return; }
         #endregion
 
         #region Thread

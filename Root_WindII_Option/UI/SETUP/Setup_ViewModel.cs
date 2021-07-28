@@ -10,7 +10,6 @@ namespace Root_WindII_Option
 {
     public class Setup_ViewModel : ObservableObject
     {
-
         public Setup_ViewModel()
         {
             this.menuPanel = new SetupMenuPanel();
