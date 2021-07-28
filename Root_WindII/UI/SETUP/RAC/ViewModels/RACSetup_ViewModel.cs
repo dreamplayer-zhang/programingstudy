@@ -9,10 +9,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Shapes;
+using System.Windows.Media;
 
 namespace Root_WindII
 {
-    public class RACSetup_ViewModel : ObservableObject
+    public class RACSetup_ViewModel : MapViewer_ViewModel
     {
         RACSetup_ImageViewer_ViewModel _RACSetupImageViewer_VM;
         public RACSetup_ImageViewer_ViewModel RACSetupImageViewer_VM
@@ -26,6 +29,16 @@ namespace Root_WindII
                 SetProperty(ref _RACSetupImageViewer_VM, value);
             }
         }
+
+        //private MapViewer_ViewModel mapViewer_VM = new MapViewer_ViewModel();
+        //public MapViewer_ViewModel MapViewer_VM
+        //{
+        //    get => this.mapViewer_VM;
+        //    set
+        //    {
+        //        SetProperty<MapViewer_ViewModel>(ref this.mapViewer_VM, value);
+        //    }
+        //}
 
         XMLData _XMLData;
         public XMLData XMLData
@@ -49,6 +62,7 @@ namespace Root_WindII
             RACSetupImageViewer_VM.OriginBoxDone += OriginBoxDone_Callback;
             RACSetupImageViewer_VM.PitchPointDone += PitchPointDone_Callback;
             RACSetupImageViewer_VM.CenteringPointDone += CenteringPointDone_Callback;
+            RACSetupImageViewer_VM.OriginDieChanged += OriginDieChanged_Callback;
 
             XMLData = GlobalObjects.Instance.Get<XMLData>();
             XMLParser.Parsing += DataUpdate;
@@ -73,12 +87,62 @@ namespace Root_WindII
             RACSetupImageViewer_VM.MapOffsetY = XMLData.MapOffsetY;
             RACSetupImageViewer_VM.SmiOffsetX = XMLData.SMIOffsetX;
             RACSetupImageViewer_VM.SmiOffsetY = XMLData.SMIOffsetY;
-            RACSetupImageViewer_VM.OriginDieX = XMLData.OriginDieY;
             RACSetupImageViewer_VM.ShotSizeX = XMLData.ShotX;
             RACSetupImageViewer_VM.ShotSizeY = XMLData.ShotY;
 
+            double[] tempMap = XMLData.GetWaferMap();
+            RACSetupImageViewer_VM.OriginDieX = XMLData.OriginDieUnit.X;
+            RACSetupImageViewer_VM.OriginDieY = XMLData.OriginDieUnit.Y;
+
+
+
+            CreateMap((int)XMLData.GetUnitSize().Width, (int)XMLData.GetUnitSize().Height, tempMap.Select(d => (int)d).ToArray());
+            SelectPoint = new Point(XMLData.OriginDieUnit.X, XMLData.OriginDieUnit.Y);
+
+            ChipItems[(int)(SelectPoint.Y * MapSizeX + SelectPoint.X)].Fill = Brushes.Chocolate;
+
+
             RACSetupImageViewer_VM.DataLoadDone();
             RACSetupImageViewer_VM.IsLoad = true;
+
+            
+        }
+
+        public override void Chip_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Rectangle rect = sender as Rectangle;
+            if(rect.Fill == Brushes.Chocolate)
+                rect.Fill = Brushes.RosyBrown;
+            else
+                rect.Fill = Brushes.Blue;
+        }
+
+        public override void Chip_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Rectangle rect = sender as Rectangle;
+            CPoint pt = (CPoint)rect.Tag;
+            if (SelectPoint.X != pt.X || SelectPoint.Y != pt.Y)
+                rect.Fill = Brushes.YellowGreen;
+            else
+                rect.Fill = Brushes.Chocolate;
+        }
+
+        public override void Chip_MouseLeftUp(object sender, MouseEventArgs e)
+        {
+            Rectangle rect = sender as Rectangle;
+
+            if(SelectPoint.X != -1 && SelectPoint.Y != -1)
+                ChipItems[(int)(SelectPoint.Y * MapSizeX + SelectPoint.X)].Fill = Brushes.YellowGreen;
+            //ResetMapColor();
+            CPoint pt = (CPoint)rect.Tag;
+            //SelectPoint = new Point(pt.X, pt.Y);
+            rect.Fill = Brushes.Chocolate;
+
+            RACSetupImageViewer_VM.OriginDieX = pt.X;
+            RACSetupImageViewer_VM.OriginDieY = pt.Y;
+
+            SelectPoint = new Point(pt.X, pt.Y);
+            //ChangeDie();
         }
 
         public void OriginBoxReset_Callback()
@@ -117,6 +181,23 @@ namespace Root_WindII
 
         }
 
+        CPoint CurrentOriginDie { get; set; } = new CPoint();
+        void ChangeDie()
+        {
+            if (ChipItems!=null && RACSetupImageViewer_VM.OriginDieX != -1 && RACSetupImageViewer_VM.OriginDieY != -1 && ChipItems[(int)(RACSetupImageViewer_VM.OriginDieY * MapSizeX + RACSetupImageViewer_VM.OriginDieX)].Fill == Brushes.YellowGreen)
+                ChipItems[(int)(RACSetupImageViewer_VM.OriginDieY * MapSizeX + RACSetupImageViewer_VM.OriginDieX)].Fill = Brushes.Chocolate;
+        }
+
+        public void OriginDieChanged_Callback(string axis)
+        {
+
+            if (ChipItems != null && SelectPoint.X != -1 && SelectPoint.Y != -1 && ChipItems[(int)(SelectPoint.Y * MapSizeX + SelectPoint.X)].Fill == Brushes.Chocolate)
+                ChipItems[(int)(SelectPoint.Y * MapSizeX + SelectPoint.X)].Fill = Brushes.YellowGreen;
+            SelectPoint = new Point(RACSetupImageViewer_VM.OriginDieX, RACSetupImageViewer_VM.OriginDieY);
+
+            ChangeDie();
+
+        }
         public void CenteringPointDone_Callback()
         {
 
@@ -153,7 +234,7 @@ namespace Root_WindII
             {
                 return new RelayCommand(() =>
                 {
-                    int i = 10;
+                    RACSetupImageViewer_VM.CreateXMLData();
                 });
             }
         }
