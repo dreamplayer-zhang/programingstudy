@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.Dalsa;
+using RootTools.Camera.Matrox;
 using RootTools.Comm;
 using RootTools.Light;
 using RootTools.Memory;
@@ -26,7 +27,8 @@ namespace Root_Pine2_Vision.Module
         #region ToolBox
         Camera_Dalsa m_camera;
         public LightSet m_lightSet;
-        RS232 m_rs232RGBW; 
+        RS232 m_rs232RGBW;
+        Camera_Matrox m_CamMatrox;
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)
@@ -41,7 +43,10 @@ namespace Root_Pine2_Vision.Module
                 {
                     m_tcpRequest.EventReceiveData += M_tcpRequest_EventReceiveData;
                     m_rs232RGBW.p_bConnect = true;
-                    m_camera.Connect();
+                    if(m_camera != null)
+                    m_camera.Connect();   
+                    //
+                   // RootTools.Camera.Matrox.Camera_Matrox camera_Matrox = new RootTools.Camera.Matrox.Camera_Matrox("dd",m_log); 
                 }
             }
             m_remote.GetTools(bInit);
@@ -430,7 +435,7 @@ namespace Root_Pine2_Vision.Module
 
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 Thread.Sleep(200);
-                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+                while (m_camera.p_CamInfo.p_eState != RootTools.Camera.Dalsa.eCamState.Ready)
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
