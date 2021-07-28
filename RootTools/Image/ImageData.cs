@@ -227,13 +227,13 @@ namespace RootTools
 
         public byte[] GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
         {
-            return m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight, m_sPool, m_sGroup, m_sMem, p_nPlane);
+            return m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight, m_sPool, m_sGroup, m_sMem, p_nByte, p_nPlane);
             //return new byte[5];  // 이게 머여??
         }
 
         public async Task<byte[]> GetDataAsync(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
         {
-            Task<byte[]> getMemory = m_ToolMemory.GetOtherMemoryAsync(View_Rect, CanvasWidth, CanvasHeight, m_sPool, m_sGroup, m_sMem, p_nPlane);
+            Task<byte[]> getMemory = m_ToolMemory.GetOtherMemoryAsync(View_Rect, CanvasWidth, CanvasHeight, m_sPool, m_sGroup, m_sMem, p_nByte, p_nPlane);
 
             return await getMemory;
         }

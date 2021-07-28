@@ -175,7 +175,7 @@ namespace Root_Pine2.Module
                 m_transfer.m_gripper.p_bEnable = false; 
                 m_ePosDst = ePos;
                 double dPos = 1000 * (m_transfer.m_pine2.m_widthDefaultStrip - m_transfer.m_pine2.p_widthStrip) / 2;
-                m_xOffset = (bPushPos ? m_dxPulse : 0) + dPos + xOffset;
+                m_xOffset = (bPushPos ? 0 : -m_dxPulse) + dPos + xOffset;
                 foreach (MagazineEV magazineEV in m_transfer.m_magazineEV.m_aEV.Values) magazineEV.m_conveyor.m_bInv = false;
                 m_transfer.m_magazineEV.m_aEV[ePos].m_conveyor.m_bInv = true; 
                 m_axis.StartMove(ePos, m_xOffset); 

@@ -151,14 +151,14 @@ namespace Root_EFEM.Module
             #region AxisZ
             public enum ePosZ
             {
-                PutReady, // -300000
-                PutDown, //-106400
-                GetReady, // 35000
-                GetUp, // -126992
-                InversePutReady, // -300000
-                InversePutDown, // -155000
-                InverseGetReady, //-300000
-                InverseGetDown // -142500
+                PutReady, // -200000
+                PutDown, // 34000
+                GetReady, // 260000
+                GetUp, // 46000
+                InversePutReady, // -200000
+                InversePutDown, // 3000
+                InverseGetReady, //-200000
+                InverseGetDown // 15500
             }
             void InitPosZ()
             {
@@ -212,6 +212,9 @@ namespace Root_EFEM.Module
         {
             // Start Init
             if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
+            if (Run(m_axisCamOCRX.StartMove(ePosOCR.Ready))) return p_sInfo;
+            if (Run(m_axisCamOCRTopZ.StartMove(ePosOCR.Ready))) return p_sInfo;
+            if (Run(m_axisCamOCRBotZ.StartMove(ePosOCR.Ready))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
@@ -238,6 +241,9 @@ namespace Root_EFEM.Module
         {
             // Start Init
             if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
+            if (Run(m_axisCamOCRX.StartMove(ePosOCR.Ready))) return p_sInfo;
+            if (Run(m_axisCamOCRTopZ.StartMove(ePosOCR.Ready))) return p_sInfo;
+            if (Run(m_axisCamOCRBotZ.StartMove(ePosOCR.Ready))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
@@ -276,6 +282,9 @@ namespace Root_EFEM.Module
         {
             // Start Init
             if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
+            if (Run(m_axisCamOCRX.StartMove(ePosOCR.Ready))) return p_sInfo;
+            if (Run(m_axisCamOCRTopZ.StartMove(ePosOCR.Ready))) return p_sInfo;
+            if (Run(m_axisCamOCRBotZ.StartMove(ePosOCR.Ready))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
@@ -290,8 +299,8 @@ namespace Root_EFEM.Module
             if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(false))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetReady))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
             // End InversePut
 
@@ -302,6 +311,9 @@ namespace Root_EFEM.Module
         {
             // Start Init
             if (Run(AxisMoveAlign(ePosAlign.Ready, true))) return p_sInfo;
+            if (Run(m_axisCamOCRX.StartMove(ePosOCR.Ready))) return p_sInfo;
+            if (Run(m_axisCamOCRTopZ.StartMove(ePosOCR.Ready))) return p_sInfo;
+            if (Run(m_axisCamOCRBotZ.StartMove(ePosOCR.Ready))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
