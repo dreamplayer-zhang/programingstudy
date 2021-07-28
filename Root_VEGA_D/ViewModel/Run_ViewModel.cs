@@ -114,6 +114,14 @@ namespace Root_VEGA_D
 		private void UpdateData()
 		{
 			int idx;
+			if (SelectedResultTable == null)
+			{
+				SelectedTDIImage = null;
+				SelectedProcessImage = null;
+				SelectedCurrentImage = null;
+
+				return;
+			}
 			if (int.TryParse(SelectedResultTable["idx"].ToString(), out idx))
 			{
 				//Image파일을 불러올 Index확보
@@ -192,7 +200,7 @@ namespace Root_VEGA_D
 		}
 		Bitmap DownloadImage(string targetDirPath, ImageType type, string inspID, int idx, string nameKey)
 		{
-			if(!App.IsServerEnabled)
+			if (!App.IsServerEnabled)
 			{
 				return null;
 			}
@@ -204,7 +212,7 @@ namespace Root_VEGA_D
 			//var inspID = SelectedDataTable["InspectionID"].ToString();
 			var fileName = nameKey + targetKey;
 
-			var fileUrl =App.ServerIP + ":" + App.ServerWebPort + "/" + inspID + "/" + fileName;//웹서버(IPU PC) 정보가 필요함
+			var fileUrl = App.ServerIP + ":" + App.ServerWebPort + "/" + inspID + "/" + fileName;//웹서버(IPU PC) 정보가 필요함
 
 			if (!fileUrl.StartsWith("http://"))
 			{
