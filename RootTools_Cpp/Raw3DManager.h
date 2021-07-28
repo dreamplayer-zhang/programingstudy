@@ -2,17 +2,13 @@
 #include "Raw3D_Calculation.h"
 #include "Raw3D_RawData.h"
 
-
-
 class Raw3DManager
 {
 public:
 	Raw3DManager();
 	~Raw3DManager();
 
-	void Initialize(HWND pDlgGrabber, LPBYTE* ppMainImage, int n3DImageWidth, int n3DImageHeight, CSize szRawImage, int nMaxOverlapSize);
-
-
+	void Initialize(LPBYTE* ppMainImage, int n3DImageWidth, int n3DImageHeight, CSize szRawImage, int nMaxOverlapSize);
 
 	void MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CPoint ptDataPos
 		, int nMinGV1, int nMinGV2, int nThreadNum, int nSnapFrameNum, int nOverlapStartPos, int nOverlapSize
@@ -26,8 +22,6 @@ public:
 	LPBYTE* GetRawBuffFG();
 	Raw3D_RawData* GetRawData();
 	void CheckSnapCalcDone();
-
-	void SetLogFormHandle(HWND hLogHandle);
 
 	void StopCalculation();
 
@@ -56,9 +50,6 @@ private:
 
 	int* m_pnCurrFrameNum;
 
-	HWND m_pDlgGrabber;
-	HWND m_hLogForm;
-	//void SendLog(CString strMsg);
 
 	int m_nSnapFrameNum;
 	int m_nThreadNum;

@@ -749,7 +749,7 @@ namespace Root_Pine2_Vision.Module
                 m_logSnap.Info("Send Snap Ready Done to Handler");
 
                 // Wait for Grab
-                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+                while (m_camera.p_CamInfo.p_eState != RootTools.Camera.Dalsa.eCamState.Ready)
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
