@@ -95,6 +95,9 @@ namespace RootTools_Vision
 		private bool chG = false;
 		private bool chB = false;
 		private double notchOffsetDegree = 5;
+
+		// probability method
+		private bool useProbabilityMethod = false;
 		#endregion
 
 		#region [Property]
@@ -203,6 +206,14 @@ namespace RootTools_Vision
 		{
 			get => this.edgeSearchLevel;
 			set => SetProperty(ref edgeSearchLevel, value);
+		}
+
+		[Category("Method")]
+		[DisplayName("Use Probability Method")]
+		public bool UseProbabilityMethod
+		{
+			get => this.useProbabilityMethod;
+			set => SetProperty(ref useProbabilityMethod, value);
 		}
 		#endregion
 	}

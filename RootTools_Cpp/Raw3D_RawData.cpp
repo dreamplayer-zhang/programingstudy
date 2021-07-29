@@ -15,8 +15,6 @@ Raw3D_RawData::Raw3D_RawData()
 	m_ppBuffHeight = NULL;
 	m_ppBuffBright = NULL;
 
-	m_hLogForm = NULL;
-
 	m_ppBuffRaw = NULL;
 
 	m_nCurrFrameNum = 0;

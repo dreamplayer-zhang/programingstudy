@@ -146,6 +146,27 @@ namespace Root_WindII
         }
     }
 
+    public class PointToValueConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Point pt = (Point)value;
+            if(parameter.ToString() == "X")
+            {
+                return pt.X;
+            }
+            else
+            {
+                return pt.Y;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class EnumToRadioButtonConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

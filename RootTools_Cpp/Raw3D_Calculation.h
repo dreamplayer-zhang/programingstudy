@@ -111,7 +111,6 @@ private:
 	int m_nSnapFrameNum;
 	int* m_pnCurrFrameNum;
 
-	HWND m_hLogForm;
 	//void SendLog(CString strMsg);
 
 	Calc3DState m_State;

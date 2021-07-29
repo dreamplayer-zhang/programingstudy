@@ -22,6 +22,7 @@ namespace Root_VEGA_D
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static string MainFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
         Version assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
         #region TitleBar
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
@@ -135,6 +136,23 @@ namespace Root_VEGA_D
             this.DataContext = m_mainWindowViewModel;
 
             m_handler.m_vision.LineScanStatusChanged += m_mainWindowViewModel.M_vision_LineScanStatusChanged;
+
+            string serverPath = Path.Combine(MainFolder, "ServerSettings.txt");
+
+            App.ServerIP = "";
+            App.ServerWebPort = "80";//웹서버 기본 포트
+            App.IsServerEnabled = false;
+
+            if (File.Exists(serverPath))
+			{
+                var lines = File.ReadAllLines(serverPath);
+                if(lines.Length >= 2)
+                {
+                    App.ServerIP = lines[0];
+                    App.ServerWebPort = lines[1];
+                    App.IsServerEnabled = true;
+                }
+			}
         }
 
         //bool m_blogin = false;

@@ -12,7 +12,7 @@ namespace RootTools_CLR
 		{
 			m_pRaw3DMgr = new Raw3DManager();
 			m_pRaw3DMgr->GetRawData()->Initialize(CSize(200, 200), CSize(200, 200), 100, 1000);
-			m_pRaw3DMgr->Initialize(NULL, ConvertedImage, 200, 200, CSize(200, 200), 100);
+			m_pRaw3DMgr->Initialize(ConvertedImage, 200, 200, CSize(200, 200), 100);
 		}
 		CLR_3D::~CLR_3D()
 		{
