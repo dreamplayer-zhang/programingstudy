@@ -11,6 +11,7 @@ namespace RootTools.Camera.Dalsa
         Ready,
         GrabMem,
         GrabLive,
+        TriggerGrab,
         Done,
     };
 

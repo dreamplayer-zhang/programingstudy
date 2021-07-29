@@ -8,9 +8,43 @@
              xmlns:tools="clr-namespace:RootTools" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style x:Key="DalsaButton" TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="5,5,5,5"></Setter>
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                CornerRadius="6"
+                                Background="{TemplateBinding Background}"
+                                
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
+                            </Trigger>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_press}"/>
+                                <Setter Property="Foreground" Value="{StaticResource groupbox_button_press_text}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
             <RowDefinition Height="10*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid>
@@ -25,25 +59,31 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Content="Connect" Command="{Binding ConnectCommand}"/>
-                <Button Grid.Column="1" Content="DisConnect" Command="{Binding DisConnectCommand}"/>
-                <Button Grid.Column="2" Content="Live" Command="{Binding LiveGrabCommand}"/>
-                <Button Grid.Column="3" Content="Stop Live" Command="{Binding StopGrabCommand}"/>
+                <Button Style="{StaticResource DalsaButton}" Content="Connect" Command="{Binding ConnectCommand}"/>
+                <Button Style="{StaticResource DalsaButton}" Grid.Column="1" Content="DisConnect" Command="{Binding DisConnectCommand}"/>
+                <Button Style="{StaticResource DalsaButton}" Grid.Column="2" Content="Live" Command="{Binding LiveGrabCommand}"/>
+                <Button Style="{StaticResource DalsaButton}" Grid.Column="3" Content="Stop Live" Command="{Binding StopGrabCommand}"/>
             </Grid>
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="1" Background="{PriorityBinding}">
+                <ProgressBar Height="{PriorityBinding}"
+                             Margin="5,5"
+                             Value="{Binding p_nGrabProgress}" />
+                <TextBlock Text="{Binding p_nGrabProgress}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center" />
             </Grid>
         </Grid>
         <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="290*"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="507*"/>
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="290*"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="507*"/>
+            </Grid.RowDefinitions>
             <tree:TreeUI x:Name="treeRootUI"/>
-            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" BorderThickness="2" BorderBrush="Black" ShowsPreview="True" Width="3" />
+            <GridSplitter Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" BorderThickness="2" BorderBrush="Black" ShowsPreview="True" Width="3" />
             <tools:ImageViewer Width="{PriorityBinding}"
                                Height="{PriorityBinding}"
-                               Grid.Column="2" DataContext="{Binding p_ImageViewer}" Grid.ColumnSpan="2"/>
+                               Grid.Row="2" DataContext="{Binding p_ImageViewer}" Grid.ColumnSpan="2"/>
         </Grid>
     </Grid>
 </UserControl>

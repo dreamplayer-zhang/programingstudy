@@ -18,6 +18,7 @@ namespace RootTools.Module
 {
     public class ModuleBase : NotifyProperty
     {
+        
         #region eState
         public delegate void dgOnChangeState(eState eState);
         public event dgOnChangeState OnChangeState;
@@ -97,6 +98,20 @@ namespace RootTools.Module
             p_sInfo = sInfo;
             if (EQ.IsStop()) p_sInfo = "EQ Stop";
             return sInfo != "OK";
+        }
+
+        ICamera m_GrabCam;
+        public ICamera p_GrabCam
+        {
+            get
+            {
+                return m_GrabCam;
+            }
+            set
+            {
+                m_GrabCam = value;
+                OnPropertyChanged();
+            }
         }
         #endregion
 

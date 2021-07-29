@@ -151,6 +151,7 @@ namespace Root_EFEM.Module.FrontsideVision
                     gd.nScanOffsetY = (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_nYOffset;
                     gd.ReverseOffsetY = m_grabMode.m_nReverseOffsetY;
                     //카메라 그랩 시작
+                    m_module.p_GrabCam = m_grabMode.m_camera;
                     m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_GD);
                     //Y축 트리거 발생
                     if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
@@ -187,7 +188,6 @@ namespace Root_EFEM.Module.FrontsideVision
                     }
                     // X축을 미리 움직임
                     axisXY.p_axisX.StartMove(dNextPosX);
-                    axisXY.p_axisY.RunTrigger(false);
 
                     // 카메라 그랩 완료 대기
                     int nCameraTimeOut = nTimeOut_10s / nTimeOutInterval;                    
@@ -199,6 +199,7 @@ namespace Root_EFEM.Module.FrontsideVision
                         {
                             m_log.Info("TimeOut Camera GrabProcess");
                             bNormal = false;
+                            axisXY.p_axisY.RunTrigger(false);
                             break;
                         }
                     }
@@ -226,7 +227,10 @@ namespace Root_EFEM.Module.FrontsideVision
                             cpMemoryOffset.X -= m_grabMode.m_GD.m_nFovSize;
                         }
                     }
+                    axisXY.p_axisY.WaitReady();
+                    axisXY.p_axisY.RunTrigger(false);
                 }
+
                 m_grabMode.m_camera.StopGrab();
 
 
