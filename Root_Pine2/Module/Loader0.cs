@@ -285,7 +285,7 @@ namespace Root_Pine2.Module
 
         string RunShakeUp(double dzPulse)
         {
-            m_axis.p_axisZ.StartShift(dzPulse, p_dZ);
+            m_axis.p_axisZ.StartShift(dzPulse + p_dZ);
             return m_axis.WaitReady(); 
         }
         #endregion
