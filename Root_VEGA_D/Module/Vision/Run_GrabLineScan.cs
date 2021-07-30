@@ -322,7 +322,7 @@ namespace Root_VEGA_D.Module
                 // Align Key 찾기
                 if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
                     return p_sInfo;
-                if (m_module.Run(FindAlignKey(mem, imgBot, imgBot_div4, m_grabMode.m_nTopCenterY, eFindAlignKeyDir.LeftTop, m_grabMode.p_sTempLeftTopAlignKeyFile, out rectLeftTop)))
+                if (m_module.Run(FindAlignKey(mem, imgTop, imgTop_div4, m_grabMode.m_nTopCenterY, eFindAlignKeyDir.LeftTop, m_grabMode.p_sTempLeftTopAlignKeyFile, out rectLeftTop)))
                     return p_sInfo;
                 if (m_module.Run(FindAlignKey(mem, imgBot, imgBot_div4, m_grabMode.m_nBottomCenterY, eFindAlignKeyDir.LeftBottom, m_grabMode.p_sTempLeftBottomAlignKeyFile, out rectLeftBottom)))
                     return p_sInfo;

@@ -1027,7 +1027,7 @@ namespace Root_VEGA_D.Module
                             break;
                         case TCPIPComm_VEGA_D.Command.LineEndAck:
                             {
-                                p_bWaitIPULineEnd = true;
+                                p_bWaitIPULineEnd = false;
                             }
                             break;
                         default:
