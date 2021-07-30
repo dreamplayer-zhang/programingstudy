@@ -301,6 +301,13 @@ namespace Root_Pine2.Module
                 return "Align Timeout";
             }
 
+            public string RunPreAlign(bool bAlign)
+            {
+                m_doAlign.Write("Backward", !bAlign);
+                m_doAlign.Write("Forward", bAlign);
+                return "OK";
+            }
+
             bool IsAlignOn()
             {
                 if (m_diAlign.ReadDI("Backward")) return false;
@@ -643,7 +650,8 @@ namespace Root_Pine2.Module
             return "OK";
         }
 
-        double m_secProductDelay = 0.2; 
+        double m_secProductDelay = 0.2;
+        int m_msecPreAlignTime = 500;
         string RunLoad(InfoStrip.eMagazinePos eMagazinePos)
         {
             try
@@ -656,6 +664,15 @@ namespace Root_Pine2.Module
                 if (Run(m_elevator.WaitProduct(eMagazinePos))) return p_sInfo;
                 Thread.Sleep((int)m_secProductDelay);
                 m_conveyor.RunMoveStop();
+
+                // Pre Align
+                if (Run(m_elevator.RunPreAlign(true))) return p_sInfo;
+                Thread.Sleep(m_msecPreAlignTime);
+                if (Run(m_elevator.RunPreAlign(false))) return p_sInfo;
+                m_conveyor.RunMove(Conveyor.eMove.Forward);
+                Thread.Sleep(m_msecPreAlignTime);
+                m_conveyor.RunMoveStop();
+
                 if (Run(m_elevator.MoveToConveyor(eMagazinePos, (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 7 : 0))) return p_sInfo;
                 if (Run(m_elevator.RunAlign(true))) return p_sInfo;
                 if (Run(m_elevator.MoveElevator(eMagazinePos))) return p_sInfo; 

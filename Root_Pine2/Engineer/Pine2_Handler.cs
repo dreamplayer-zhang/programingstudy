@@ -37,6 +37,7 @@ namespace Root_Pine2.Engineer
             m_loadEV.p_iStrip = 0;
             m_sLotSend = "";
             SendLotInfo();
+            m_qInfoStripSend.Clear();
             m_summary.ClearCount(); 
         }
 
@@ -277,7 +278,8 @@ namespace Root_Pine2.Engineer
             gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
             Thread.Sleep(100);
-            if (IsModuleReady(moduleList)) EQ.p_eState = EQ.eState.Ready; 
+            if (IsModuleReady(moduleList)) EQ.p_eState = EQ.eState.Ready;
+            m_qInfoStripSend.Clear();
             EQ.p_bStop = false;
         }
 
