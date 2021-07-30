@@ -386,11 +386,9 @@ namespace RootTools.Control.Ajin
         void GetAxisStatusMode()
         {
             uint u = 0;
-            AXM("AxmMotGetPulseOutMethod", CAXM.AxmMotGetPulseOutMethod(m_nAxis, ref u));
-            m_ePulse = (ePulseOutMethod)u;
-            AXM("AxmMotGetEncInputMethod", CAXM.AxmMotGetEncInputMethod(m_nAxis, ref u));
-            m_eEncoder = (eEncoderMethod)u;
-            AXM("", CAXM.AxmMotGetProfileMode(m_nAxis, ref u));
+            if (CAXM.AxmMotGetPulseOutMethod(m_nAxis, ref u) == 0) m_ePulse = (ePulseOutMethod)u;
+            if (CAXM.AxmMotGetEncInputMethod(m_nAxis, ref u) == 0) m_eEncoder = (eEncoderMethod)u;
+            AXM("AxmMotGetProfileMode", CAXM.AxmMotGetProfileMode(m_nAxis, ref u));
             m_eProfile = (eProfile)u;
             AXM("AxmMotGetMaxVel", CAXM.AxmMotGetMaxVel(m_nAxis, ref m_maxV));
         }
