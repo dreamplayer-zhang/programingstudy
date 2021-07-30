@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:local="clr-namespace:Root_WindII"
-             xmlns:helper="clr-namespace:Helper"
-             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
+             xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1200">
     <i:Interaction.Triggers>
@@ -39,130 +39,32 @@
                     <Button Content="BOX" Command="{Binding btnViewBoxCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                 </StackPanel>
                 <Grid Grid.Row="1" >
-                    <tools:RootViewer />
-                    <local:LoadingControl Grid.ColumnSpan="3" 
-                                          Panel.ZIndex="100"
-                                          Opacity="{Binding p_LoadingOpacity}"/>
+                    <tools:RootViewer/>
                 </Grid>
             </Grid>
         </GroupBox>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="226"/>
-                <RowDefinition />
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Header="Mask" Margin="4"
-                              Style="{StaticResource main_view_groupbox}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="42"/>
-                    </Grid.RowDefinitions>
-                    <ScrollViewer Grid.Row="0"
-                                  helper:AutoScrollHelper.AutoScroll="True" Margin="4,4,4,0">
-                        <StackPanel>
-                            <DataGrid ItemsSource="{Binding p_cInspROI}"
-                                                  SelectedItem="{Binding p_SelectedROI}"
-                                                  SelectionMode="Single"
-                                                  IsReadOnly="True"
-                                                  RowHeaderWidth="0"
-                                                  AutoGenerateColumns="False">
-                                <DataGrid.Resources>
-                                    <CollectionViewSource Source="{Binding p_cInspROI}" x:Key="items"/>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                    </Style>
-                                    <Style x:Key="TextInCellCenter" TargetType="{x:Type TextBlock}" >
-                                        <Setter Property="TextAlignment" Value="Center"/>
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                    </Style>
-                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
-                                                                 Color="Gainsboro"/>
-                                </DataGrid.Resources>
 
-                                <DataGrid.Columns>
-                                    <DataGridTemplateColumn Width="35">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="Index"
-                                                        Width="50"
-                                                        Binding="{Binding p_Index}" 
-                                                        ElementStyle="{StaticResource TextInCellCenter}"/>
-
-                                    <DataGridTextColumn Header="Area Ratio(%)" Width="*" Binding="{Binding p_AreaRatio, StringFormat={}{0:F2}}"
-                                                                ElementStyle="{StaticResource TextInCellCenter}"/>
-
-                                    <DataGridTemplateColumn Width="*" Header="Color">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <local:ColorPicker Tag="{Binding p_Color, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-
-                                    <DataGridTemplateColumn Width="60" Header="-">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Button Content="Delete" Margin="1" 
-                                                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, 
-                                                                          Path=DataContext.DeleteROI}"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </StackPanel>
-                    </ScrollViewer>
-                    <StackPanel Grid.Row="1"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Center">
-                        <Button Content="Create" Width ="120" Style="{StaticResource groupbox_button}" Margin="2" Grid.Row="2" Command="{Binding CreateROI}"/>
-                        <Button Content="Delete" Width ="120" Style="{StaticResource groupbox_button}" Margin="2" Grid.Row="2" Command="{Binding DeleteROI}"/>
-                        <Button Content="Clear" Width ="120" Style="{StaticResource groupbox_button}" Margin="2" Grid.Row="3" Command="{Binding ClearROIList}"/>
-                    </StackPanel>
-                </Grid>
+            <GroupBox Grid.Row="0" 
+                Header="Select Measurement" 
+                Margin="4"
+                Style="{StaticResource main_view_groupbox}">
+                <ComboBox ItemsSource="{Binding MeasurementList}" SelectedIndex="{Binding SelectedMode}"
+                     Margin="4,4,4,4"
+                     HorizontalAlignment="Stretch"/>
             </GroupBox>
-            <GroupBox Grid.Row="1" 
-                      Header="Tools"
-                      Margin="4,0,4,4"
-                      IsEnabled="{Binding p_ToolEnable}"
-                      Style="{StaticResource main_view_groupbox}">
-                <Grid Margin="4">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="150"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <ListBox SelectedIndex="{Binding p_SelectedToolIndex}">
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="3"/>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBoxItem Content="None" Style="{StaticResource mask_tools_listboxItem}"/>
-                        <ListBoxItem IsEnabled="False"  Background="LightBlue" Content="Select"
-                                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                        <ListBoxItem Background="LightBlue" Content="Line"
-                                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                        <ListBoxItem Background="LightBlue" Content="Rect"
-                                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                        <ListBoxItem Background="LightBlue" Content="Circle"
-                                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                        <ListBoxItem Background="LightBlue" Content="Polygon"
-                                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                    </ListBox>
-                    <StackPanel Grid.Row="1">
-                        <Button Content="Clear" 
-                                Style="{StaticResource groupbox_button}"
-                                Command="{Binding ClearROI}"/>
-                    </StackPanel>
-                </Grid>
-            </GroupBox>
+            <Grid Grid.Row="1">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonUp">
+                        <i:InvokeCommandAction Command="{Binding RefCoordItemClickedCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <vision:VericalWire_RecipeTeacing DataContext="{Binding VericalWireVM}"/>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

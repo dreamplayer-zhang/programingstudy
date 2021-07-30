@@ -1,15 +1,20 @@
-﻿using Root_VEGA_D.Module;
+﻿using Root_VEGA_D.Engineer;
+using Root_VEGA_D.Module;
 using Root_VEGA_D.Module.Recipe;
 using RootTools;
+using RootTools.Database;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace Root_VEGA_D
 {
@@ -21,6 +26,24 @@ namespace Root_VEGA_D
 
         #region Dialog
         public DialogService m_dialogService;
+        #endregion
+
+        #region UI
+
+        UserControl m_CurrentPanel;
+        public UserControl p_CurrentPanel
+        {
+            get => m_CurrentPanel;
+            set
+            {
+                SetProperty(ref m_CurrentPanel, value);
+            }
+        }
+
+        Information_UI info;
+        RecipeManager_UI recipe;
+        Run_UI run;
+        VEGA_D_Engineer_UI engineer;
         #endregion
 
         #region ViewModel
@@ -47,6 +70,31 @@ namespace Root_VEGA_D
             set
             {
                 SetProperty(ref m_recipeManager_ViewModel, value);
+            }
+        }
+
+        Information_ViewModel m_informantion_ViewModel;
+        public Information_ViewModel p_information_ViewModel
+        {
+            get
+            {
+                return m_informantion_ViewModel;
+            }
+            set
+            {
+                SetProperty(ref m_informantion_ViewModel, value);
+            }
+        }
+        Run_ViewModel m_run_ViewModel;
+        public Run_ViewModel p_run_ViewModel
+        {
+            get
+            {
+                return m_run_ViewModel;
+            }
+            set
+            {
+                SetProperty(ref m_run_ViewModel, value);
             }
         }
         #endregion
@@ -97,18 +145,39 @@ namespace Root_VEGA_D
             m_MainWindow = mainwindow;
             m_recipe = recipe;
 
+
+            InitUI();
             InitViewModel();
             DialogInit(m_MainWindow);
         }
+        Dispatcher runDispathcer = null;
 
+        void InitUI()
+        {
+            info = new Information_UI();
+            recipe = new RecipeManager_UI();
+            run = new Run_UI();
+            runDispathcer = run.Dispatcher;
+            engineer = new VEGA_D_Engineer_UI();
+            engineer.Init(App.m_engineer);
+            p_CurrentPanel = info;
+        }
         void InitViewModel()
         {
             p_recipeManager_ViewModel = new RecipeManager_VM(m_recipe);
-            //p_recipeWizard_ViewModel = new RecipeWizard_VM();
+            p_information_ViewModel = new Information_ViewModel(this);
+            p_run_ViewModel = new Run_ViewModel(this);
+            if (runDispathcer != null)
+			{
+                p_run_ViewModel.Dispatcher = runDispathcer;
+			}
         }
         private void DialogInit(MainWindow main)
         {
             m_dialogService = new DialogService(main);
+            info.DataContext = p_information_ViewModel;
+            recipe.DataContext = p_recipeManager_ViewModel;
+            run.DataContext = p_run_ViewModel;
         }
 
 
@@ -124,7 +193,54 @@ namespace Root_VEGA_D
             }
         }
 
+        public ICommand CmdInfo
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(info);
+                });
+            }
+        }
+        public ICommand CmdRun
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(run);
+                });
+            }
+        }
+        public ICommand CmdEngineer
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(engineer);
+                });
+            }
+        }
+
+        public ICommand CmdRecipe
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(recipe);
+                });
+            }
+        }
+
         #endregion
+
+        void SetPage(UserControl userControl)
+        {
+            p_CurrentPanel = userControl;
+        }
 
         public void M_vision_LineScanStatusChanged(Vision vision, Run_GrabLineScan moduleRun, Vision.LineScanStatus status, object data)
         {
@@ -184,6 +300,40 @@ namespace Root_VEGA_D
                             p_InspProgressValue = val;
                             p_InspDispText = val.ToString("P0");
                         });
+                        if(p_run_ViewModel != null)
+						{
+                            p_run_ViewModel.Dispatcher.Invoke(new Action(delegate () 
+                            {
+								try
+                                {
+                                    if(App.IsServerEnabled)
+                                    {
+                                        //TODO 여기에 DB 갱신도 넣기?
+                                        //p_run_ViewModel.ResultTable
+                                        DatabaseManager MyDatabaseManager = new DatabaseManager();
+                                        MyDatabaseManager.SetDatabase(1, App.ServerIP, "inspections", "root", "`ati5344");
+
+                                        var tempDataSet = MyDatabaseManager.GetDataSet("SELECT * FROM inspections.currentinspinfo;");
+                                        if (tempDataSet.Tables.Count > 0)
+                                        {
+                                            if (tempDataSet.Tables[0].Rows.Count > 0)
+                                            {
+                                                var id = tempDataSet.Tables[0].Rows[0].Field<string>("InspectionID");
+
+                                                var query = string.Format("SELECT * FROM inspections.inspdata WHERE InspectionID = '{0}';", id);
+
+                                                var resultDataSet = MyDatabaseManager.GetDataSet(query);
+                                                p_run_ViewModel.ResultTable = resultDataSet.Tables[0].Copy();
+                                            }
+                                        }
+                                    }
+                                }
+								catch (Exception ex)
+								{
+                                    TempLogger.Write("RunViewDebug", ex.Message);
+								}
+                            }));
+						}
                     }
                     break;
                 case Vision.LineScanStatus.End:

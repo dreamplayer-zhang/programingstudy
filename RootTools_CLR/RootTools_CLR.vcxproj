@@ -105,12 +105,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)Lib\mariadb-connector-c\include;$(SolutionDir)Lib\opencv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Lib\mariadb-connector-c\include;$(SolutionDir)Lib\opencv\include;$(SolutionDir)\RootTools_Cpp\3D\Lib_Insp_3D;$(SolutionDir)\RootTools_Cpp\3D\ez3D;$(SolutionDir)\RootTools_Cpp\3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libmariadb.lib;mariadbclient.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb;$(SolutionDir)Lib\opencv\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb;$(SolutionDir)Lib\opencv\lib;$(SolutionDir)\RootTools_Cpp\3D;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
@@ -143,6 +143,7 @@
     <ClInclude Include="CCLRD2DModule.h" />
     <ClInclude Include="CCLRD2DStructure.h" />
     <ClInclude Include="CDefectDataWrapper.h" />
+    <ClInclude Include="CLR_3D.h" />
     <ClInclude Include="CLR_Inspection.h" />
     <ClInclude Include="CLR_InspConnector.h" />
     <ClInclude Include="CLR_IP.h" />
@@ -158,6 +159,7 @@
     <ClCompile Include="CCLRD2DModule.cpp" />
     <ClCompile Include="CCLRD2DStructure.cpp" />
     <ClCompile Include="CDefectDataWrapper.cpp" />
+    <ClCompile Include="CLR_3D.cpp" />
     <ClCompile Include="CLR_Inspection.cpp" />
     <ClCompile Include="CLR_InspConnector.cpp" />
     <ClCompile Include="CLR_IP.cpp" />

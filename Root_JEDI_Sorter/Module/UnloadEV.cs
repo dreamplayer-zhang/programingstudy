@@ -15,10 +15,10 @@ namespace Root_JEDI_Sorter.Module
         public DIO_I m_diProtrude;
         public void GetTools(ToolBox toolBox, ModuleBase module, bool bInit)
         {
-            toolBox.GetAxis(ref m_axis, module, p_id + ".Snap");
-            toolBox.GetDIO(ref m_diCheck, module, p_id + ".Check", new string[2] { "0", "1" });
-            toolBox.GetDIO(ref m_diFull, module, p_id + ".Full");
-            toolBox.GetDIO(ref m_diProtrude, module, p_id + ".Protrude");
+            toolBox.GetAxis(ref m_axis, module, "Elevator");
+            toolBox.GetDIO(ref m_diCheck, module, "Check", new string[2] { "0", "1" });
+            toolBox.GetDIO(ref m_diFull, module, "Full");
+            toolBox.GetDIO(ref m_diProtrude, module, "Protrude");
             if (bInit) InitPosition();
         }
         #endregion

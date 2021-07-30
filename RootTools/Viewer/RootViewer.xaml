@@ -58,7 +58,7 @@
                 </StackPanel>
             </Grid>
         </Grid>
-        <Grid>
+        <Grid x:Name="mainGrid">
             <!--<Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -86,7 +86,7 @@
                         <i:CallMethodAction TargetObject="{Binding}" MethodName="MouseWheel"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-                <Canvas Background="Black" obs:SizeObserver.Observe="true" Focusable="True"
+                <Canvas Background="Transparent" obs:SizeObserver.Observe="true" Focusable="True"
                 obs:SizeObserver.ObservedWidth="{Binding p_CanvasWidth, Mode=TwoWay}"
                 obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}" Grid.ColumnSpan="2">
                     <Image Source="{Binding Path=p_ImgSource}" Stretch="Fill"/>
@@ -103,7 +103,8 @@
                 </Canvas>
                 <ItemsControl ItemsSource="{Binding p_ViewElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}"
+                              VirtualizingPanel.VirtualizationMode="Recycling">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas ClipToBounds="True"/>
@@ -112,7 +113,8 @@
                 </ItemsControl> 
                 <ItemsControl ItemsSource="{Binding p_UIElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}"
+                              VirtualizingPanel.VirtualizationMode="Recycling">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas ClipToBounds="True" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
@@ -121,7 +123,8 @@
                 </ItemsControl>
                 <ItemsControl ItemsSource="{Binding p_DrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}"
+                              VirtualizingPanel.VirtualizationMode="Recycling">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas ClipToBounds="True"/>

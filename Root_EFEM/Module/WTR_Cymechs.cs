@@ -78,7 +78,7 @@ namespace Root_EFEM.Module
             A,
             B,
         }
-        public Dictionary<eArm, Arm> m_dicArm = new Dictionary<eArm, Arm>();
+        public Dictionary<eArm, Arm> m_dicArm { get; set; } = new Dictionary<eArm, Arm>();
         protected virtual void InitArms(string id, IEngineer engineer)
         {
             m_dicArm.Add(eArm.A, new Arm(id, eArm.A, this, engineer, true, false));

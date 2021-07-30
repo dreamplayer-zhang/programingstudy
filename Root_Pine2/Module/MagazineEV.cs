@@ -227,7 +227,7 @@ namespace Root_Pine2.Module
                     if ((m_axis.p_posCommand > fPos) && (fDown > fPos)) return "Can't Move Down cause Down Magazine";
                 }
                 m_axis.StartMove(ePos, fOffset);
-                return "OK";
+                return m_axis.WaitReady();
             }
 
             public string MoveToConveyor(InfoStrip.eMagazinePos eMagazinePos, double mmUp, bool bWait = true)
@@ -630,6 +630,7 @@ namespace Root_Pine2.Module
                     if (m_aMagazine[pos] == null)
                     {
                         if (Run(RunLoad(pos))) return p_sInfo;
+                        if (Run(m_elevator.MoveElevator(Elevator.ePos.TransferUp))) return p_sInfo;
                         m_aMagazine[pos] = new Magazine(this, pos, m_pine2.p_iBundle++);
                         return "OK";
                     }

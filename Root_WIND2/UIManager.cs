@@ -27,11 +27,11 @@ namespace Root_WIND2
 
         public SelectMode ModeWindow { get => modeWindow; set => modeWindow = value; }
         public Setup SetupWindow { get => setupWindow; set => setupWindow = value; }
-        public Review ReviewWindow { get => reviewWindow; set => reviewWindow = value; }
+        public Root_WIND2.UI_User.Review ReviewWindow { get => reviewWindow; set => reviewWindow = value; }
         public Run RunWindow { get => runWindow; set => runWindow = value; }
         public Grid MainPanel { get => mainPanel; set => mainPanel = value; }
         public Setup_ViewModel SetupViewModel { get => setupViewModel; set => setupViewModel = value; }
-        internal Review_ViewModel ReviewViewModel { get => reviewViewModel; set => reviewViewModel = value; }
+        internal Root_WIND2.UI_User.Review_ViewModel ReviewViewModel { get => reviewViewModel; set => reviewViewModel = value; }
         internal Run_ViewModel RunViewModel { get => runViewModel; set => runViewModel = value; }
         public SettingDialog SettingDialog { get => settingDialog; set => settingDialog = value; }
         public SettingDialog_ViewModel SettingDialogViewModel { get => settingDialogViewModel; set => settingDialogViewModel = value; }
@@ -47,7 +47,8 @@ namespace Root_WIND2
         private Setup setupWindow;
 
         private Root_WIND2.UI_User.Setup setupUserWindow;
-        private Review reviewWindow;
+        //private Review reviewWindow;
+        private Root_WIND2.UI_User.Review reviewWindow;
         private Run runWindow;
 
         private SettingDialog settingDialog;
@@ -57,7 +58,8 @@ namespace Root_WIND2
         private Root_WIND2.UI_User.Setup_ViewModel setupUserViewModel;
 
         private Setup_ViewModel setupViewModel;
-        private Review_ViewModel reviewViewModel;
+        //private Review_ViewModel reviewViewModel;
+        private Root_WIND2.UI_User.Review_ViewModel reviewViewModel;
         private Run_ViewModel runViewModel;
 
         private SettingDialog_ViewModel settingDialogViewModel;
@@ -95,8 +97,8 @@ namespace Root_WIND2
         }
         void InitReviewMode()
         {
-            reviewWindow = new Review();
-            reviewViewModel = new Review_ViewModel(reviewWindow);
+            reviewWindow = new Root_WIND2.UI_User.Review();
+            reviewViewModel = new Root_WIND2.UI_User.Review_ViewModel(reviewWindow);
             reviewWindow.DataContext = ReviewViewModel;
         }
         void InitRunMode()

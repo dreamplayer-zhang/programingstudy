@@ -604,36 +604,36 @@ namespace Root_VEGA_D
 
             if (m_KeyEvent != null && !(m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown))
             {
-                if (p_isAlign)
-                {
+                //if (p_isAlign)
+                //{
 
-                    if (e.LeftButton == MouseButtonState.Pressed)
-                    {
-                        //ClearDrawElement();
-                        //p_lineShape.Clear();
-                       // if (!m_isFirstCheck || m_isSecondCheck)
-                        {
-                            p_firstPoint = new CPoint(p_MouseMemX, p_MouseMemY);
-                            DrawAlignCrossLine();
-                            m_isFirstCheck = true;
-                        }
-                        //DrawCrossLine(p_firstPoint);
+                //    if (e.LeftButton == MouseButtonState.Pressed)
+                //    {
+                //        //ClearDrawElement();
+                //        //p_lineShape.Clear();
+                //       // if (!m_isFirstCheck || m_isSecondCheck)
+                //        {
+                //            p_firstPoint = new CPoint(p_MouseMemX, p_MouseMemY);
+                //            DrawAlignCrossLine();
+                //            m_isFirstCheck = true;
+                //        }
+                //        //DrawCrossLine(p_firstPoint);
 
-                    }
-                    else
-                    {
-                        if (m_isFirstCheck)
-                        {
-                            p_secondPoint = new CPoint(p_MouseMemX, p_MouseMemY);
-                            DrawAlignCrossLine(false);
-                            DrawLines();
-                            m_isSecondCheck = true;
-                        }
-                    }
+                //    }
+                //    else
+                //    {
+                //        if (m_isFirstCheck)
+                //        {
+                //            p_secondPoint = new CPoint(p_MouseMemX, p_MouseMemY);
+                //            DrawAlignCrossLine(false);
+                //            DrawLines();
+                //            m_isSecondCheck = true;
+                //        }
+                //    }
 
-                    CalcAngle();
-                }
-                else
+                //    CalcAngle();
+                //}
+                //else
                 {
                     p_coordinatePoint = new CPoint(p_MouseMemX, p_MouseMemY);
                     CheckCoordinate();

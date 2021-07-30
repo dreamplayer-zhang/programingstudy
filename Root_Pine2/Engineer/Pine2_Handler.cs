@@ -274,13 +274,12 @@ namespace Root_Pine2.Engineer
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            EQ.p_bStop = true;
+            //EQ.p_bStop = true;
             gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
             Thread.Sleep(100);
-            if (IsModuleReady(moduleList)) EQ.p_eState = EQ.eState.Ready;
-            m_qInfoStripSend.Clear();
-            EQ.p_bStop = false;
+            if (IsModuleReady(moduleList)) EQ.p_eState = EQ.eState.Ready; 
+            //EQ.p_bStop = false;
         }
 
         bool IsModuleReady(ModuleList moduleList)
