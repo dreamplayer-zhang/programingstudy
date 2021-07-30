@@ -261,7 +261,7 @@ namespace Root_Rinse_Loader.Module
 
         public override string StateHome()
         {
-            return p_sInfo;
+            return "OK";
         }
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
@@ -491,7 +491,7 @@ namespace Root_Rinse_Loader.Module
             {
                 Thread.Sleep(10);
                 p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
-                if (m_diRinseUnloader.p_bIn == false) p_eStateUnloader = EQ.eState.Error;
+                if ((EQ.p_eState == EQ.eState.Run) && ( m_diRinseUnloader.p_bIn == false)) p_eStateUnloader = EQ.eState.Error;
                 RunThreadDIO();
                 if (m_qProtocolReply.Count > 0)
                 {

@@ -133,9 +133,9 @@ namespace Root_Rinse_Loader.Module
         {
             p_id = id;
             m_rinse = rinse;
-            InitALID(); 
             InitILines();
             InitBase(id, engineer);
+            InitALID();
         }
 
         public override void ThreadStop()
