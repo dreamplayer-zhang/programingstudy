@@ -32,6 +32,7 @@ namespace RootTools.Camera.Matrox
         private MIL_ID[] m_MilBuffers = new MIL_ID[c_nBuf];  // 버퍼
 
         static int m_nTest = 0;
+        int m_nOffset = 0;
         
         int m_nWidth = 0;
         public int p_nWidth
@@ -140,8 +141,8 @@ namespace RootTools.Camera.Matrox
                 SetProperty(ref m_CamInfo, value);
             }
         }
-        const int c_nBuf = 400;
-        int _nBuf = 400;
+        const int c_nBuf = 4000;
+        int _nBuf = 4000;
         public int p_nBuf
         {
             get
@@ -235,7 +236,6 @@ namespace RootTools.Camera.Matrox
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
             p_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-            //m_clr3D
         }
 
         public void Connect()
@@ -444,6 +444,7 @@ namespace RootTools.Camera.Matrox
             m_MemPtr = memory.GetPtr();
             m_cpScanOffset = cpScanOffset;
             p_CamInfo.p_eState = eCamState.GrabMem;
+            m_nOffset = m_GrabData.nScanOffsetY;
 
             MIL_INT licenseModules = 0;
             MIL_INT frameCount = 0;
@@ -646,7 +647,8 @@ namespace RootTools.Camera.Matrox
                     });
                     iBlock++;
                 }
-            }finally
+            }
+            finally
             {
                 p_CamInfo.p_eState = eCamState.Ready;
                 userObjectHandle.Free();
@@ -668,7 +670,7 @@ namespace RootTools.Camera.Matrox
                     MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarray);
                     Parallel.For(0, p_nHeight, (y) =>
                     {
-                        int yp = y + (iBlock) * p_nHeight;
+                        int yp = y + (iBlock) * p_nHeight + m_nOffset;
                         fixed (byte* p = srcarray)
                         {
                             IntPtr srcPtr = (IntPtr)p + p_nWidth * y;
