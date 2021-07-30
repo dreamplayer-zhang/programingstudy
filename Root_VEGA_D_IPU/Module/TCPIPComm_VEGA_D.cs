@@ -55,6 +55,7 @@ namespace Root_VEGA_D_IPU.Module
             None,
             LineStart,
             LineEnd,
+            LineEndAck,
             RcpName,
             ScanInfo,
             Result,

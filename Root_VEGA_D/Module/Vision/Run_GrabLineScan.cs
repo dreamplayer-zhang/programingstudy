@@ -826,7 +826,18 @@ namespace Root_VEGA_D.Module
                         {
                             Thread.Sleep(3000); // IPU에서 검사로 인한 이미지 그랩 지연을 감안하여 LineEnd 메세지를 3초 후에 전달
 
+                            m_module.p_bWaitIPULineEnd = true;
                             m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.LineEnd);
+
+                            // IPU에서 LineEndAck 메세지 전달될 때까지 대기 (타임아웃은 1분)
+                            StopWatch sw = new StopWatch();
+                            sw.Start();
+                            while(m_module.p_bWaitIPULineEnd)
+                            {
+                                Thread.Sleep(10);
+                                if (sw.Elapsed.TotalSeconds > 60)
+                                    break;
+                            }
                         }
 
                         // 라인스캔 끝났을 때 이벤트 함수 호출
