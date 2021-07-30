@@ -177,9 +177,9 @@ namespace Root_Rinse_Loader.Module
         {
             p_id = id;
             m_rinse = rinse;
-            InitALID(); 
             InitLines(); 
             InitBase(id, engineer);
+            InitALID();
             InitThreadCheck();
         }
 
