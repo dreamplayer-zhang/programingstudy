@@ -159,8 +159,8 @@ namespace Root_Pine2.Module
         public string RunAvoidX(double fPos)
         {
             m_axis.p_axisX.StartMove(fPos);
-            m_axis.p_axisY.StartMove((p_infoStrip == null) ? ePosTransfer.Transfer7.ToString() : GetPosString(eUnloadVision.Top2D, eWorks.A)); 
-            return m_axis.WaitReady();
+            //m_axis.p_axisY.StartMove((p_infoStrip == null) ? ePosTransfer.Transfer7.ToString() : GetPosString(eUnloadVision.Top2D, eWorks.A)); 
+            return m_axis.p_axisX.WaitReady();
         }
         #endregion
 
@@ -233,7 +233,7 @@ namespace Root_Pine2.Module
         #region AxisZ
         double p_dZ
         {
-            get { return m_pine2.m_thicknessDefault - m_pine2.p_thickness; }
+            get { return 0;/* (m_pine2.m_thicknessDefault - m_pine2.p_thickness) * 10;*/ }
         }
 
         public string RunMoveZ(string sPos, double dPos, bool bWait = true)
@@ -285,7 +285,7 @@ namespace Root_Pine2.Module
 
         string RunShakeUp(double dzPulse)
         {
-            m_axis.p_axisZ.StartShift(dzPulse);
+            m_axis.p_axisZ.StartShift(dzPulse + p_dZ);
             return m_axis.WaitReady(); 
         }
         #endregion
@@ -360,6 +360,7 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveTransfer(ePos, -xOffset))) return p_sInfo;
                 if (Run(RunMoveZ(ePos))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(true))) return p_sInfo;
+                Thread.Sleep(300);
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (m_picker.IsVacuum() == false) return p_sInfo;
                 m_picker.p_infoStrip = gripper.p_infoStrip;
