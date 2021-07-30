@@ -217,7 +217,8 @@ namespace Root_Rinse_Loader.Module
             {
                 if (_eStateUnloader == value) return;
                 _eStateUnloader = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
+                if (value == EQ.eState.Error) m_handler.StopRotate(); 
             }
         }
 

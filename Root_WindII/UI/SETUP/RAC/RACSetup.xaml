@@ -3,16 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:local="clr-namespace:Root_WindII"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="1200">
+             d:DesignHeight="790" d:DesignWidth="1200">
     <Grid Background="{StaticResource main_view_background}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="7*"/>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="8*"/>
+            <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
-        <GroupBox Style="{StaticResource main_view_groupbox}" Header="Image Viewer" DataContext="{Binding RACSetupImageViewer_VM}">
+        <GroupBox Style="{StaticResource main_view_groupbox}" Header="Image Viewer" DataContext="{Binding RACSetupImageViewer_VM}" Margin="4">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
@@ -44,13 +45,17 @@
                     <tools:RootViewer/>
                 </Grid>
             </Grid>
-        </GroupBox> 
-        <StackPanel Grid.Column="1">
+        </GroupBox>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5.4*"/>
+                <RowDefinition Height="6*"/>
+            </Grid.RowDefinitions>
             <GroupBox Header="XML Data Viewer"
                       Margin="4"
                       Style="{StaticResource main_view_groupbox}">
-                <StackPanel Orientation="Vertical" Margin="12, 12, 12, 12" >
-                    <Grid  Margin="12, 12, 12, 12" DataContext="{Binding RACSetupImageViewer_VM}">
+                <StackPanel Orientation="Vertical" Margin="12, 0, 12, 12" >
+                    <Grid  Margin="12, 0, 12, 12" DataContext="{Binding RACSetupImageViewer_VM}">
                         <!-- StackPanel로 수정하자 카메라 레졸루션도 넣어야함 -->
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
@@ -133,6 +138,9 @@
                     <Button Style="{StaticResource groupbox_button}" Content="Create" Command="{Binding CmdCreate}"></Button>
                 </StackPanel>
             </GroupBox>
-        </StackPanel>
+            <GroupBox Header="Map" Grid.Row="1" Style="{StaticResource main_view_groupbox}" Margin="4">
+                <vision:MapViewer Margin="4"/>
+            </GroupBox>
+        </Grid>
     </Grid>
 </UserControl>

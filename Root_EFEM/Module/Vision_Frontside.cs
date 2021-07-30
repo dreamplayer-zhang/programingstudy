@@ -29,6 +29,9 @@ namespace Root_EFEM
         Axis m_axisRotate;
         Axis m_axisZ;
         AxisXY m_axisXY;
+        Axis m_axisPusherZ;
+        Axis m_axisOptZ1;
+        Axis m_axisOptZ2;
         DIO_O m_doVac;
         DIO_O m_doVac2;
         DIO_O m_doVac3;
@@ -80,6 +83,9 @@ namespace Root_EFEM
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
         public Axis AxisZ { get => m_axisZ; private set => m_axisZ = value; }
         public AxisXY AxisXY { get => m_axisXY; private set => m_axisXY = value; }
+        public Axis AxisPusherZ { get => m_axisPusherZ; private set => m_axisPusherZ = value; }
+        public Axis AxisOptZ1 { get => m_axisOptZ1; private set => m_axisOptZ1 = value; }
+        public Axis AxisOptZ2 { get => m_axisOptZ2; private set => m_axisOptZ2 = value; }
         public DIO_O DoVac { get => m_doVac; private set => m_doVac = value; }
         public DIO_O DoVac2 { get => m_doVac2; private set => m_doVac3 = value; }
         public DIO_O DoVac3 { get => m_doVac2; private set => m_doVac3 = value; }
@@ -102,7 +108,10 @@ namespace Root_EFEM
             {
                 p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "Axis Rotate");
                 p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "Axis Z");
-                p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis XY");
+                p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis ");
+                p_sInfo = m_toolBox.GetAxis(ref m_axisPusherZ, this, "Axis PusherZ");
+                p_sInfo = m_toolBox.GetAxis(ref m_axisOptZ1, this, "Axis OptZ1");
+                p_sInfo = m_toolBox.GetAxis(ref m_axisOptZ2, this, "Axis OptZ2");
                 p_sInfo = m_toolBox.GetDIO(ref m_doVac, this, "Stage Vacuum");
                 p_sInfo = m_toolBox.GetDIO(ref m_doVac2, this, "Stage Vacuum2");
                 p_sInfo = m_toolBox.GetDIO(ref m_doVac3, this, "Stage Vacuum3");

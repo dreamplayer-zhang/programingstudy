@@ -383,8 +383,15 @@ namespace Root_VEGA_D_IPU.Module
                     case TCPIPComm_VEGA_D.Command.LineEnd:
                         {
                             // Grab 스레드 작업 정지
-                            m_CamMain.AbortGrabThread();
+                            while(m_CamMain.p_CamInfo.p_eState != eCamState.Ready)
+                            {
+                                Thread.Sleep(10);
+                            }
+
                             m_CamMain.StopGrab();
+
+                            // LineEndAck 메세지 메인으로 전달
+                            m_tcpipCommClient.SendMessage(TCPIPComm_VEGA_D.Command.LineEndAck);
 
                             // 작업 중인 이미지 그랩 데이터 얻어오기
                             int totalScanLine = m_regTCPIP.Read(REGSUBKEYNAME_TOTALSCANLINE, -1);

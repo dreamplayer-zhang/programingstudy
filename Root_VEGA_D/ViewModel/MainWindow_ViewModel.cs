@@ -2,8 +2,10 @@
 using Root_VEGA_D.Module;
 using Root_VEGA_D.Module.Recipe;
 using RootTools;
+using RootTools.Database;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -12,6 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace Root_VEGA_D
 {
@@ -147,12 +150,14 @@ namespace Root_VEGA_D
             InitViewModel();
             DialogInit(m_MainWindow);
         }
+        Dispatcher runDispathcer = null;
 
         void InitUI()
         {
             info = new Information_UI();
             recipe = new RecipeManager_UI();
             run = new Run_UI();
+            runDispathcer = run.Dispatcher;
             engineer = new VEGA_D_Engineer_UI();
             engineer.Init(App.m_engineer);
             p_CurrentPanel = info;
@@ -162,6 +167,10 @@ namespace Root_VEGA_D
             p_recipeManager_ViewModel = new RecipeManager_VM(m_recipe);
             p_information_ViewModel = new Information_ViewModel(this);
             p_run_ViewModel = new Run_ViewModel(this);
+            if (runDispathcer != null)
+			{
+                p_run_ViewModel.Dispatcher = runDispathcer;
+			}
         }
         private void DialogInit(MainWindow main)
         {
@@ -291,6 +300,40 @@ namespace Root_VEGA_D
                             p_InspProgressValue = val;
                             p_InspDispText = val.ToString("P0");
                         });
+                        if(p_run_ViewModel != null)
+						{
+                            p_run_ViewModel.Dispatcher.Invoke(new Action(delegate () 
+                            {
+								try
+                                {
+                                    if(App.IsServerEnabled)
+                                    {
+                                        //TODO 여기에 DB 갱신도 넣기?
+                                        //p_run_ViewModel.ResultTable
+                                        DatabaseManager MyDatabaseManager = new DatabaseManager();
+                                        MyDatabaseManager.SetDatabase(1, App.ServerIP, "inspections", "root", "`ati5344");
+
+                                        var tempDataSet = MyDatabaseManager.GetDataSet("SELECT * FROM inspections.currentinspinfo;");
+                                        if (tempDataSet.Tables.Count > 0)
+                                        {
+                                            if (tempDataSet.Tables[0].Rows.Count > 0)
+                                            {
+                                                var id = tempDataSet.Tables[0].Rows[0].Field<string>("InspectionID");
+
+                                                var query = string.Format("SELECT * FROM inspections.inspdata WHERE InspectionID = '{0}';", id);
+
+                                                var resultDataSet = MyDatabaseManager.GetDataSet(query);
+                                                p_run_ViewModel.ResultTable = resultDataSet.Tables[0].Copy();
+                                            }
+                                        }
+                                    }
+                                }
+								catch (Exception ex)
+								{
+                                    TempLogger.Write("RunViewDebug", ex.Message);
+								}
+                            }));
+						}
                     }
                     break;
                 case Vision.LineScanStatus.End:
