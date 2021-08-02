@@ -29,7 +29,8 @@ namespace Root_EFEM.Module
         DIO_I m_diWaferExist;
         MemoryPool m_memoryPool;
         CameraBasler m_camAlign;
-        Camera_CognexOCR m_camOCR;
+        Camera_CognexOCR m_camOCRTop;
+        Camera_CognexOCR m_camOCRBot;
 
         ALID m_alid_WaferExist;
 
@@ -54,7 +55,8 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.GetDIO(ref m_diWaferExist, this, "WaferExist");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.GetCamera(ref m_camAlign, this, "Align");
-            p_sInfo = m_toolBox.GetCamera(ref m_camOCR, this, "OCR");
+            p_sInfo = m_toolBox.GetCamera(ref m_camOCRTop, this, "OCRUp");
+            p_sInfo = m_toolBox.GetCamera(ref m_camOCRBot, this, "OCRDown");
 
             m_alid_WaferExist = m_gaf.GetALID(this, "Aligner Wafer Exist", "Aligner Wafer Exist");
             if (bInit) InitTools();
@@ -893,7 +895,8 @@ namespace Root_EFEM.Module
             if (Run(m_axisCamOCRX.WaitReady())) return p_sInfo;
             if (Run(m_axisCamOCRTopZ.WaitReady())) return p_sInfo;
             if (Run(m_axisCamOCRBotZ.WaitReady())) return p_sInfo;
-            if (Run(m_camOCR.SendReadOCR())) return p_sInfo;
+            if (Run(m_camOCRTop.SendReadOCR())) return p_sInfo;
+            if (Run(m_camOCRBot.SendReadOCR())) return p_sInfo;
             AxisMoveOCRX(ePosOCR.Ready, true);
             AxisMoveOCRTopZ(ePosOCR.Ready, true);
             AxisMoveOCRBotZ(ePosOCR.Ready, true);
