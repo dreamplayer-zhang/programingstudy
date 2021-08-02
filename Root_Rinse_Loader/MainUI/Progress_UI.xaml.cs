@@ -18,8 +18,6 @@ namespace Root_Rinse_Loader.MainUI
         {
             m_rinse = rinse;
             DataContext = rinse;
-            listViewSend.ItemsSource = rinse.p_aSend;
-            listViewReceive.ItemsSource = rinse.p_aReceive; 
         }
     }
 }
