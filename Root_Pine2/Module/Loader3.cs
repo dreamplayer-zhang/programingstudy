@@ -130,8 +130,8 @@ namespace Root_Pine2.Module
         public string RunAvoidX(double fPos)
         {
             m_axis.p_axisX.StartMove(fPos);
-            m_axis.p_axisY.StartMove((p_infoStrip == null) ? GetPosString(eWorks.A) : ePosTransfer.Transfer0.ToString()); 
-            return m_axis.WaitReady(); 
+            //m_axis.p_axisY.StartMove((p_infoStrip == null) ? GetPosString(eWorks.A) : ePosTransfer.Transfer0.ToString()); 
+            return m_axis.p_axisX.WaitReady(); 
         }
         #endregion
 
@@ -172,7 +172,7 @@ namespace Root_Pine2.Module
         #region AxisZ
         double p_dZ
         {
-            get { return m_pine2.m_thicknessDefault - m_pine2.p_thickness; }
+            get { return 0;/* (m_pine2.m_thicknessDefault - m_pine2.p_thickness) * 10;*/ }
         }
 
         public string RunMoveZ(eWorks eWorks, double dPos, bool bWait = true)
@@ -235,9 +235,9 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveBoat(eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);
-                boat.RunBlow(true);
                 if (Run(m_picker.RunVacuum(true))) return p_sInfo;
-                Thread.Sleep(500);
+                boat.RunBlow(true);
+                Thread.Sleep(1500);
                 if (Run(RunMoveUp())) return p_sInfo;
                 boat.RunBlow(false);
                 if (m_picker.IsVacuum() == false)

@@ -57,6 +57,15 @@
     <ClInclude Include="ResizeSSE.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Raw3D_Calculation.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Raw3D_RawData.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Raw3DManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PitSizer.cpp">
@@ -81,6 +90,15 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ResizeSSE.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Raw3D_Calculation.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Raw3D_RawData.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Raw3DManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

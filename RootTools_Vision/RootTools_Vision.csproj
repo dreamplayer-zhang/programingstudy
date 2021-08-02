@@ -293,6 +293,7 @@
     <Compile Include="UserControls\MotionViewer\MotionViewer_ViewModel.cs" />
     <Compile Include="UserControls\SizeObserver.cs" />
     <Compile Include="UserControls\MapViewer_ViewModel.cs" />
+    <Compile Include="Utility\SimpleCSVFile.cs" />
     <Compile Include="Utility\Enums.cs" />
     <Compile Include="Utility\Helper.cs" />
     <Compile Include="Utility\KlarfData.cs" />

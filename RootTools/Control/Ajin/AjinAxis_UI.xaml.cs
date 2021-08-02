@@ -181,5 +181,16 @@ namespace RootTools.Control.Ajin
             m_bRepeat = false;
             m_axis.StopAxis(); 
         }
+
+        private void checkBoxTrigger_Checked(object sender, RoutedEventArgs e)
+        {
+            m_axis.SetTrigger(Convert.ToInt32(m_axis.GetPosValue(comboRepeatPos0.Text)), Convert.ToInt32(m_axis.GetPosValue(comboRepeatPos1.Text)), Convert.ToDouble(tbInterval.Text), Convert.ToDouble(tbUpTime.Text), true);
+            //m_axis.RunTrigger(true);
+        }
+
+        private void checkBoxTrigger_Unchecked(object sender, RoutedEventArgs e)
+        {
+            m_axis.RunTrigger(false);
+        }
     }
 }

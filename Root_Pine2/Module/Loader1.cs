@@ -51,7 +51,7 @@ namespace Root_Pine2.Module
 
         double p_dZ
         {
-            get { return m_pine2.m_thicknessDefault - m_pine2.p_thickness; }
+            get { return 0;/* (m_pine2.m_thicknessDefault - m_pine2.p_thickness) * 10;*/ }
         }
 
         public string RunMoveZ(string sPos, bool bWait = true)

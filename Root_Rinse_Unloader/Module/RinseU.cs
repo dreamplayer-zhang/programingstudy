@@ -401,8 +401,8 @@ namespace Root_Rinse_Unloader.Module
                 case EQ.eState.Run: m_doLamp.Write(eLamp.Green); break;
                 case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
             }
-            m_doEnable[0].Write(EQ.p_eState == EQ.eState.Error);
-            m_doEnable[1].Write(EQ.p_eState == EQ.eState.Error);
+            m_doEnable[0].Write(EQ.p_eState != EQ.eState.Error);
+            m_doEnable[1].Write(EQ.p_eState != EQ.eState.Error);
         }
         #endregion
 
@@ -689,5 +689,37 @@ namespace Root_Rinse_Unloader.Module
             base.ThreadStop();
         }
 
+        #region ModuleRun
+        protected override void InitModuleRuns()
+        {
+            AddModuleRunList(new Run_EQError(this), false, "Set EQ Error");
+        }
+
+        public class Run_EQError : ModuleRunBase
+        {
+            RinseU m_module;
+            public Run_EQError(RinseU module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_EQError run = new Run_EQError(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                EQ.p_eState = EQ.eState.Error; 
+                return "OK";
+            }
+        }
+        #endregion
     }
 }

@@ -11,6 +11,7 @@ namespace RootTools.SQLogs
         public static _SQLog m_sqLog;
         public static void Init(IEngineer engineer)
         {
+            // System.BadImageFormatException -> 속성 -> 빌드 -> 32 비트 기본 사용 X
             m_sqLog = new _SQLog(engineer);
         }
 

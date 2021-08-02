@@ -45,6 +45,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>false</CLRSupport>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -109,6 +110,10 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)\Lib\opencv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <CompileAsManaged>false</CompileAsManaged>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -175,6 +180,9 @@
     <ClInclude Include="IP.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PitSizer.h" />
+    <ClInclude Include="Raw3DManager.h" />
+    <ClInclude Include="Raw3D_Calculation.h" />
+    <ClInclude Include="Raw3D_RawData.h" />
     <ClInclude Include="ResizeSSE.h" />
     <ClInclude Include="TypeDefines.h" />
   </ItemGroup>
@@ -191,6 +199,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PitSizer.cpp" />
+    <ClCompile Include="Raw3DManager.cpp" />
+    <ClCompile Include="Raw3D_Calculation.cpp" />
+    <ClCompile Include="Raw3D_RawData.cpp" />
     <ClCompile Include="ResizeSSE.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

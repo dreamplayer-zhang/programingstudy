@@ -488,12 +488,18 @@ namespace RootTools
                                     {
                                         IntPtr ptrImg = m_ImageData.GetPtr();
                                         byte* arrByte = (byte*)ptrImg.ToPointer();
+                                        if(arrByte != null)
+                                        {
+                                            long idx = ((long)p_MouseMemY * m_ImageData.p_Size.X + p_MouseMemX) * m_ImageData.p_nByte;
+                                            byte b1 = arrByte[idx + 0];
+                                            byte b2 = arrByte[idx + 1];
 
-                                        long idx = ((long)p_MouseMemY * m_ImageData.p_Size.X + p_MouseMemX) * m_ImageData.p_nByte;
-                                        byte b1 = arrByte[idx + 0];
-                                        byte b2 = arrByte[idx + 1];
-
-                                        p_PixelData = "GV " + BitConverter.ToUInt16(new byte[2] { b1, b2 }, 0);
+                                            p_PixelData = "GV " + BitConverter.ToUInt16(new byte[2] { b1, b2 }, 0);
+                                        }
+                                        else
+                                        {
+                                            p_PixelData = "GV ";
+                                        }
                                     }
                                 }
                             }
@@ -743,13 +749,16 @@ namespace RootTools
 								byte[,,] viewptr = view.Data;
 								byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
 								//for (int yy = 0; yy < p_CanvasHeight; yy++)
-								Parallel.For(0, p_CanvasHeight, (yy) =>
-								{
-									for (int xx = 0; xx < p_CanvasWidth; xx++)
-									{
-										viewptr[yy, xx, 0] = ApplyContrastAndBrightness(image[p_CanvasWidth * yy + xx]);
-									}
-								});
+                                if(image != null)
+                                {
+                                    Parallel.For(0, p_CanvasHeight, (yy) =>
+                                    {
+                                        for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                        {
+                                            viewptr[yy, xx, 0] = ApplyContrastAndBrightness(image[p_CanvasWidth * yy + xx]);
+                                        }
+                                    });
+                                }
 								p_ImgSource = ImageHelper.ToBitmapSource(view);
 							}
 						}
@@ -760,6 +769,24 @@ namespace RootTools
                                 Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
                                 byte[,,] viewptr = view.Data;
                                 byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+
+                                if (image != null)
+                                {
+                                    Parallel.For(0, p_CanvasHeight, (yy) =>
+                                    {
+                                        for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                        {
+                                            byte b1 = image[(p_CanvasWidth * yy + xx) * 2];
+                                            byte b2 = image[(p_CanvasWidth * yy + xx) * 2 + 1];
+
+                                            ushort us = BitConverter.ToUInt16(new byte[] { b1, b2 }, 0);
+                                            byte b = (byte)(((double)us / (Math.Pow(2, 16) - 1)) * (Math.Pow(2, 8) - 1));
+
+                                            viewptr[yy, xx, 0] = ApplyContrastAndBrightness(b);
+                                        }
+                                    });
+                                }
+                                p_ImgSource = ImageHelper.ToBitmapSource(view);
                             }
                         }
 						else if (p_ImageData.GetBytePerPixel() == 3)
@@ -936,9 +963,9 @@ namespace RootTools
 
                                                     if (pix_x + (long)pix_y * sizeX >= 0)
                                                     {
-                                                        viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[(long)pix_x + (long)pix_y * sizeX]);
-                                                        viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[(long)pix_x + (long)pix_y * sizeX]);
-                                                        viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[(long)pix_x + (long)pix_y * sizeX]);
+                                                        //viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[(long)pix_x + (long)pix_y * sizeX]);
+                                                        //viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[(long)pix_x + (long)pix_y * sizeX]);
+                                                        //viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[(long)pix_x + (long)pix_y * sizeX]);
                                                     }
                                                 }
                                             }
@@ -1398,9 +1425,9 @@ namespace RootTools
 					for (int xx = 0; xx < p_ThumbWidth; xx++)
 					{
 						pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
-						view.Data[yy, xx, 2] = ApplyContrastAndBrightness(((byte*)imageptrR)[0 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
-						view.Data[yy, xx, 1] = ApplyContrastAndBrightness(((byte*)imageptrG)[1 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
-						view.Data[yy, xx, 0] = ApplyContrastAndBrightness(((byte*)imageptrB)[2 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
+						//view.Data[yy, xx, 2] = ApplyContrastAndBrightness(((byte*)imageptrR)[0 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
+						//view.Data[yy, xx, 1] = ApplyContrastAndBrightness(((byte*)imageptrG)[1 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
+						//view.Data[yy, xx, 0] = ApplyContrastAndBrightness(((byte*)imageptrB)[2 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
 					}
 				}
 				if (view.Width != 0 && view.Height != 0)

@@ -183,7 +183,7 @@
                                 <ColumnDefinition Width="3*"/>
                             </Grid.ColumnDefinitions>
                             <Button Grid.Column="0" x:Name="buttonMoveStop" Content="Stop" Margin="3" Click="buttonMoveStop_Click"/>
-                            <Button Grid.Column="2" x:Name="buttonSetPos" Content="Set Position" Margin="3" Click="buttonSetPos_Click"/>
+                            <Button Grid.Column="1" Grid.ColumnSpan="2" x:Name="buttonSetPos" Content="Set Position" Margin="3" Click="buttonSetPos_Click"/>
                         </Grid>
                     </Grid>
                 </GroupBox>
@@ -193,10 +193,11 @@
                     </GroupBox.Header>
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
@@ -222,7 +223,19 @@
                             <Button Grid.Column="0" x:Name="buttonRepeatStop" Content="Stop" Margin="3" Click="buttonRepeatStop_Click"/>
                             <ComboBox Grid.Column="1" x:Name="comboRepeatPos1" ItemsSource="{Binding p_asPos}" Margin="3"/>
                         </Grid>
-                        <CheckBox Grid.Row="3" x:Name="checkBoxTrigger" Content="Trigger On" Margin="3"/>
+                        <Grid Grid.Row="3" DataContext="{Binding p_Trigger}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Uptime" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                            <TextBox x:Name="tbUpTime" Grid.Column="1" Text="{Binding p_dUptime}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBox>
+                            <TextBlock Grid.Column="2" Text="Interval" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <TextBox x:Name="tbInterval" Grid.Column="3" Text="{Binding p_dPos}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBox>
+                        </Grid>
+                        <CheckBox Grid.Row="4" x:Name="checkBoxTrigger" Content="Trigger On" Margin="3" Checked="checkBoxTrigger_Checked" Unchecked="checkBoxTrigger_Unchecked"/>
                     </Grid>
                 </GroupBox>
                 <Grid>
@@ -243,7 +256,6 @@
                 <TabItem>
                     <TabItem.Header>
                         <WrapPanel>
-                            
                             <TextBlock Text="Setting"></TextBlock>
                         </WrapPanel>
                     </TabItem.Header>

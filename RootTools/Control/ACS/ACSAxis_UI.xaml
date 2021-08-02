@@ -183,7 +183,7 @@
                                 <ColumnDefinition Width="3*"/>
                             </Grid.ColumnDefinitions>
                             <Button Grid.Column="0" x:Name="buttonMoveStop" Content="Stop" Margin="3" Click="buttonMoveStop_Click"/>
-                            <Button Grid.Column="2" x:Name="buttonSetPos" Content="Set Position" Margin="3" Click="buttonSetPos_Click"/>
+                            <Button Grid.Column="1" Grid.ColumnSpan="2" x:Name="buttonSetPos" Content="Set Position" Margin="3" Click="buttonSetPos_Click"/>
                         </Grid>
                     </Grid>
                 </GroupBox>
@@ -222,7 +222,8 @@
                             <Button Grid.Column="0" x:Name="buttonRepeatStop" Content="Stop" Margin="3" Click="buttonRepeatStop_Click"/>
                             <ComboBox Grid.Column="1" x:Name="comboRepeatPos1" ItemsSource="{Binding p_asPos}" Margin="3"/>
                         </Grid>
-                        <CheckBox Grid.Row="3" x:Name="checkBoxTrigger" Content="Trigger On" Margin="3"/>
+                        <CheckBox Grid.Row="3" x:Name="checkBoxTrigger" Content="Trigger On" Margin="3" Checked="checkBoxTrigger_Checked" Unchecked ="checkBoxTrigger_Unchecked"/>
+                        
                     </Grid>
                 </GroupBox>
                 <Grid>

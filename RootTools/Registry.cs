@@ -30,7 +30,7 @@ namespace RootTools
 
         public void Write(string sSub, object obj)
         {
-            if (m_reg == null) return;
+            if (m_reg == null || obj == null) return;
             m_reg.SetValue(sSub, obj);
         }
 
