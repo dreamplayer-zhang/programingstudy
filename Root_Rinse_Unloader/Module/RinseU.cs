@@ -323,7 +323,6 @@ namespace Root_Rinse_Unloader.Module
             EQUeState,
             SetRotateSpeed,
             BuzzerOff,
-            Finish,
             EQUReady,
             NewMagazine,
         }
@@ -425,7 +424,6 @@ namespace Root_Rinse_Unloader.Module
                         case eCmd.EQLeState:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateLoader = GetEQeState(asRead[2]);
-                            //switch (GetEQeState(asRead[2]))
                             switch (p_eStateLoader)
                             {
                                 case EQ.eState.Home:
@@ -445,10 +443,6 @@ namespace Root_Rinse_Unloader.Module
                         case eCmd.BuzzerOff:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             RunBuzzerOff();
-                            break;
-                        case eCmd.Finish:
-                            AddProtocol(asRead[0], eCmd, asRead[2]);
-                            //RunFinishTimer(); 
                             break;
                         case eCmd.EQUReady:
                             AddProtocol(asRead[0], eCmd, asRead[2]);

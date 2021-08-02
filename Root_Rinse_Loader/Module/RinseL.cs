@@ -42,7 +42,6 @@ namespace Root_Rinse_Loader.Module
             get { return _widthStrip; }
             set
             {
-                if (_widthStrip == value) return;
                 _widthStrip = value;
                 OnPropertyChanged();
                 AddProtocol(p_id, RinseU.eCmd.SetWidth, value); 
@@ -55,7 +54,6 @@ namespace Root_Rinse_Loader.Module
             get { return _fRotateSpeed; }
             set
             {
-                if (_fRotateSpeed == value) return;
                 _fRotateSpeed = value;
                 OnPropertyChanged();
                 AddProtocol(p_id, RinseU.eCmd.SetRotateSpeed, value);
@@ -344,30 +342,12 @@ namespace Root_Rinse_Loader.Module
 
         #region Protocol
         public string[] m_asCmd = Enum.GetNames(typeof(RinseU.eCmd));
-
-        public class Protocol
-        {
-            public string p_sCmd
-            {
-                get { return m_id + "," + m_eCmd.ToString() + "," + m_value.ToString(); }
-            }
-
-            public string m_id;
-            public RinseU.eCmd m_eCmd;
-            public dynamic m_value;
-            public Protocol(string id, RinseU.eCmd eCmd, dynamic value)
-            {
-                m_id = id;
-                m_eCmd = eCmd;
-                m_value = value;
-            }
-        }
         #endregion
 
         #region Thread Send
-        Protocol m_protocolSend = null;
-        Queue<Protocol> m_qProtocolSend = new Queue<Protocol>();
-        Queue<Protocol> m_qProtocolReply = new Queue<Protocol>();
+        RinseU.Protocol m_protocolSend = null;
+        Queue<RinseU.Protocol> m_qProtocolSend = new Queue<RinseU.Protocol>();
+        Queue<RinseU.Protocol> m_qProtocolReply = new Queue<RinseU.Protocol>();
         bool m_bRunSend = false;
         Thread m_threadSend;
         void InitThread()
@@ -388,7 +368,7 @@ namespace Root_Rinse_Loader.Module
                 RunThreadDIO();
                 if (m_qProtocolReply.Count > 0)
                 {
-                    Protocol protocol = m_qProtocolReply.Dequeue();
+                    RinseU.Protocol protocol = m_qProtocolReply.Dequeue();
                     m_tcpip.Send(protocol.p_sCmd);
                     Thread.Sleep(10);
                 }
@@ -401,9 +381,9 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
-        public Protocol AddProtocol(string id, RinseU.eCmd eCmd, dynamic value)
+        public RinseU.Protocol AddProtocol(string id, RinseU.eCmd eCmd, dynamic value)
         {
-            Protocol protocol = new Protocol(id, eCmd, value);
+            RinseU.Protocol protocol = new RinseU.Protocol(id, eCmd, value);
             if (id == p_id) m_qProtocolSend.Enqueue(protocol);
             else m_qProtocolReply.Enqueue(protocol); 
             return protocol;
@@ -512,7 +492,6 @@ namespace Root_Rinse_Loader.Module
         public void SendFinish()
         {
             RunBuzzer(eBuzzer.Finish);
-            AddProtocol(p_id, RinseU.eCmd.Finish, 0); 
         }
 
         public void SendEQUReady()
