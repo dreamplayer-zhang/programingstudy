@@ -61,7 +61,6 @@
                 </Grid>
             </GroupBox>
         </Grid>
-        <Grid Grid.Row="1">
-        </Grid>
+        <local:ALID_UI Grid.Row="1" x:Name="alidUI"/>
     </Grid>
 </UserControl>

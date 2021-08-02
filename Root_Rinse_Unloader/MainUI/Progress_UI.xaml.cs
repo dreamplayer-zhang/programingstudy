@@ -1,4 +1,5 @@
-﻿using Root_Rinse_Unloader.Module;
+﻿using Root_Rinse_Unloader.Engineer;
+using Root_Rinse_Unloader.Module;
 using System.Windows.Controls;
 
 namespace Root_Rinse_Unloader.MainUI
@@ -14,10 +15,11 @@ namespace Root_Rinse_Unloader.MainUI
         }
 
         RinseU m_rinse;
-        public void Init(RinseU rinse)
+        public void Init(RinseU rinse, RinseU_Engineer engineer)
         {
             m_rinse = rinse;
             DataContext = rinse;
+            alidUI.Init(engineer.ClassGAF().m_listALID, engineer);
         }
     }
 }

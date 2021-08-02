@@ -6,14 +6,14 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace Root_Pine2.Engineer
+namespace Root_Rinse_Unloader.MainUI
 {
     /// <summary>
-    /// Pine2_ALID.xaml에 대한 상호 작용 논리
+    /// ALID_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Pine2_ALID_UI : UserControl
+    public partial class ALID_UI : UserControl
     {
-        public Pine2_ALID_UI()
+        public ALID_UI()
         {
             InitializeComponent();
         }
@@ -25,7 +25,7 @@ namespace Root_Pine2.Engineer
         {
             m_listALID = listALID;
             m_engineer = engineer;
-            m_gaf = engineer.ClassGAF(); 
+            m_gaf = engineer.ClassGAF();
             DataContext = listALID;
             listViewALID.ItemsSource = listALID.p_aSetALID;
 
@@ -46,6 +46,5 @@ namespace Root_Pine2.Engineer
             if (EQ.p_eState == EQ.eState.Error) EQ.p_eState = (EQ.m_EQ.m_eStateOld != EQ.eState.Home) ? EQ.m_EQ.m_eStateOld : EQ.eState.Init;
             EQ.p_bStop = false; 
         }
-
     }
 }

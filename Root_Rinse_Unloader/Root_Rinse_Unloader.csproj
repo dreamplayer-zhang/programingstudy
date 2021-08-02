@@ -180,6 +180,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MainUI\ALID_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainUI\MagazineClamp_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -214,6 +218,9 @@
     </Compile>
     <Compile Include="Icon\AtiLogo.xaml.cs">
       <DependentUpon>AtiLogo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainUI\ALID_UI.xaml.cs">
+      <DependentUpon>ALID_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainUI\MagazineClamp_UI.xaml.cs">
       <DependentUpon>MagazineClamp_UI.xaml</DependentUpon>
