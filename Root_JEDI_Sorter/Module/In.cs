@@ -46,12 +46,30 @@ namespace Root_JEDI_Sorter.Module
         }
         public string RunLoad()
         {
-            if (m_stage.p_infoTray != null) return "RunLoad : p_infoTray != null";
-            if (Run(m_loadEV.RunMove(LoadEV.ePos.Up, false))) return p_sInfo; 
-            if (Run(m_stage.RunAlign(false, false))) return p_sInfo;
-            if (Run(MoveStage(ePos.Elevator, true))) return p_sInfo; 
-            if (Run(m_stage.RunAlign(false, true))) return p_sInfo;
-            //forget
+            try
+            {
+                if (m_stage.p_infoTray != null) return "RunLoad : p_infoTray != null";
+                if (m_stage.IsCheck(false) == false) return "Check Tray in Stage";
+                if (m_loadEV.IsCheck(true) == false) return "No Tray in Elevator";
+                if (Run(MoveStage(ePos.Elevator, false))) return p_sInfo;
+                if (Run(m_stage.RunAlign(false, false))) return p_sInfo;
+                if (Run(m_loadEV.RunLoad())) return p_sInfo;
+                if (Run(MoveStage(ePos.Elevator, true))) return p_sInfo;
+                if (Run(m_loadEV.RunMove(LoadEV.ePos.Stage))) return p_sInfo;
+                if (m_stage.IsCheck(true) == false)
+                {
+                    m_loadEV.RunUnload();
+                    return "Stage Check Sensor Error when Elevator put Tray";
+                }
+                if (Run(m_loadEV.RunMove(LoadEV.ePos.Down))) return p_sInfo;
+                if (Run(m_stage.RunAlign(true))) return p_sInfo;
+                if (Run(MoveStage(ePos.Transfer, true))) return p_sInfo;
+                if (Run(m_loadEV.RunMove(LoadEV.ePos.Grip, false))) return p_sInfo;
+                if (Run(m_stage.RunAlign(false))) return p_sInfo;
+                m_stage.p_infoTray = new InfoTray("Test"); //forget
+                if (Run(m_loadEV.RunMove(LoadEV.ePos.Grip))) return p_sInfo;
+            }
+            finally { m_loadEV.RunMove(LoadEV.ePos.Grip); }
             return "OK";
         }
         #endregion
@@ -75,6 +93,8 @@ namespace Root_JEDI_Sorter.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+            AddModuleRunList(new Run_Grip(this), true, "Run Elevator Grip");
+            AddModuleRunList(new Run_Align(this), true, "Run Stage Align");
             m_runLoad = AddModuleRunList(new Run_Load(this), true, "Run Load Tray");
         }
 
@@ -104,6 +124,62 @@ namespace Root_JEDI_Sorter.Module
             {
                 Thread.Sleep((int)(1000 * m_secDelay / 2));
                 return "OK";
+            }
+        }
+
+        public class Run_Grip : ModuleRunBase
+        {
+            In m_module;
+            public Run_Grip(In module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            bool m_bGrip = true;
+            public override ModuleRunBase Clone()
+            {
+                Run_Grip run = new Run_Grip(m_module);
+                run.m_bGrip = m_bGrip;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bGrip = tree.Set(m_bGrip, m_bGrip, "Grip", "Run Grip", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.m_loadEV.RunGrip(m_bGrip);
+            }
+        }
+
+        public class Run_Align : ModuleRunBase
+        {
+            In m_module;
+            public Run_Align(In module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            bool m_bAlign = true;
+            public override ModuleRunBase Clone()
+            {
+                Run_Align run = new Run_Align(m_module);
+                run.m_bAlign = m_bAlign;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bAlign = tree.Set(m_bAlign, m_bAlign, "Align", "Run Grip", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.m_stage.RunAlign(m_bAlign); 
             }
         }
 
