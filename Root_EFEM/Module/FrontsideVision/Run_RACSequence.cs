@@ -27,19 +27,28 @@ namespace Root_EFEM.Module
         {
             // Read RAC Data
 
-            
+            double waferCenterX, waferCenterY;
 
-            
 
             // WAFER CENTERING ( Auto Focus )
+            double waferEdgeLeft, waferEdgeRight, waferEdgeTop, waferEdgeBottm;
+
 
             // VRS ALIGN
 
+
+
             // Coarse Align ( Auto illume )
+
+
 
             // Fine Align
 
+
+
             // Refind Center
+
+
 
             // Recipe Teach ( Auto Illum )
 

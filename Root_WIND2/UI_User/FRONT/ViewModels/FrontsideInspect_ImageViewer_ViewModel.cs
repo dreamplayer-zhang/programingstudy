@@ -2,6 +2,7 @@
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -282,7 +283,40 @@ namespace Root_WIND2.UI_User
                     Canvas.SetLeft(rt, canvasLeftTop.X < canvasRightBottom.X ? canvasLeftTop.X : canvasRightBottom.X);
                     Canvas.SetTop(rt, canvasLeftTop.Y < canvasRightBottom.Y ? canvasLeftTop.Y : canvasRightBottom.Y);
 
-                    rt.ToolTip = string.Format("W: {0}  H: {1}", tRect.MemoryRect.Width, tRect.MemoryRect.Height);
+                    
+                    IntPtr ptrR = this.p_ImageData.GetPtr(0);
+                    IntPtr ptrG = this.p_ImageData.GetPtr(1);
+                    IntPtr ptrB = this.p_ImageData.GetPtr(2);
+
+                    long avrR = 0;
+                    long avrG = 0;
+                    long avrB = 0;
+
+                    for(int i = tRect.MemoryRect.Top; i < tRect.MemoryRect.Bottom; i++ )
+                    {
+                        for(int j = tRect.MemoryRect.Left; j < tRect.MemoryRect.Right; j++)
+                        {
+                            byte byteR = Marshal.ReadByte(ptrR + i * this.p_ImageData.p_Size.X + j);
+                            byte byteG = Marshal.ReadByte(ptrG + i * this.p_ImageData.p_Size.X + j);
+                            byte byteB = Marshal.ReadByte(ptrB + i * this.p_ImageData.p_Size.X + j);
+
+                            avrR += (long)byteR;
+                            avrG += (long)byteG;
+                            avrB += (long)byteB;
+                        }
+                    }
+
+                    avrR /= (tRect.MemoryRect.Width * tRect.MemoryRect.Height);
+                    avrG /= (tRect.MemoryRect.Width * tRect.MemoryRect.Height);
+                    avrB /= (tRect.MemoryRect.Width * tRect.MemoryRect.Height);
+
+                    rt.ToolTip = string.Format(
+                        "W: {0}  H: {1}\n" +
+                        "Avg R : {2}\n" +
+                        "Avg G : {3}\n" +
+                        "Avg B : {4}", 
+                        tRect.MemoryRect.Width, tRect.MemoryRect.Height,
+                        avrR, avrG, avrB);
 
                     this.IsBoxChecked = false;
                 }
