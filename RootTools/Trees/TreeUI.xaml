@@ -182,6 +182,7 @@
                             <Border Name="Bd" Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
+                                    Height="{Binding p_bVisible, Converter={StaticResource HeightToBoolConverters}}"
                                     Padding="{TemplateBinding Padding}">
                                 <GridViewRowPresenter x:Name="PART_Header"
                                         Height="{Binding p_bVisible, Converter={StaticResource HeightToBoolConverters}}"

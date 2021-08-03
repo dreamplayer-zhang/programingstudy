@@ -159,6 +159,7 @@ namespace Root_Rinse_Unloader.Engineer
             InitXGem();
             m_handler.Init(id, this);
             m_gaf.Init(id, this);
+            m_gaf.m_listALID.m_bEnableShowPopup = false;
         }
 
         public void ThreadStop()

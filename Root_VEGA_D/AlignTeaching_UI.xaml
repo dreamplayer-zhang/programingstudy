@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="Root_VEGA_D.AlignTeaching_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_D"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             mc:Ignorable="d" d:DesignHeight="848"
+             d:DesignWidth="1056">
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <GroupBox Header="Viewer">
+            <tools:RootViewer/>
+        </GroupBox>
+        <Grid Grid.Column="1"
+              Margin="0,10,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.5*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <GroupBox Header="Align Tools">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button Content="Point" Style="{StaticResource SetupPanelBtn}" Margin="5"></Button>
+                    <Button Grid.Column="1" Content="Box" Style="{StaticResource SetupPanelBtn}" Margin="5"></Button>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Header="Align">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button Content="Manual Align" Style="{StaticResource SetupPanelBtn}" Margin="5"></Button>
+                    <Button Grid.Column="1" Content="Auto Align" Style="{StaticResource SetupPanelBtn}" Margin="5"></Button>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="2" Header="Align Key Top">
+                <Grid>
+                    <Grid Background="Black" Margin="5"></Grid>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="3" Header="Align Key Bottom">
+                <Grid>
+                    <Grid Background="Black" Margin="5"></Grid>
+                </Grid>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</UserControl>

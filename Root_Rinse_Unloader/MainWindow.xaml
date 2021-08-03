@@ -324,6 +324,7 @@
                                                  VerticalContentAlignment="Center"/>
                                         </Grid>
                                     </GroupBox>
+                                    <Label Grid.Column="3" x:Name="labelSend" Content="{Binding p_sProtocolSend}" FontSize="32" VerticalAlignment="Center"/>
                                 </Grid>
                                 <Grid Grid.Row="4" Grid.Column="1">
                                     <Grid.ColumnDefinitions>

@@ -151,7 +151,6 @@ namespace Root_Rinse_Loader.Module
                     if (picker.m_dioVacuum.p_bIn == false) picker.m_dioVacuum.Write(false);
                     sSend += picker.m_dioVacuum.p_bIn ? 'O' : '.'; 
                 }
-                m_rinse.AddStripSend(sSend); 
                 Thread.Sleep(100); 
             }
         }

@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.Dalsa;
+using RootTools.Camera.Matrox;
 using RootTools.Comm;
 using RootTools.Light;
 using RootTools.Memory;
@@ -22,6 +23,7 @@ namespace Root_Pine2_Vision.Module
         Camera_Dalsa m_camera;
         public LightSet m_lightSet;
         RS232 m_rs232RGBW;
+        Camera_Matrox m_CamMatrox;
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)
@@ -747,7 +749,7 @@ namespace Root_Pine2_Vision.Module
                 m_logSnap.Info("Send Snap Ready Done to Handler");
 
                 // Wait for Grab
-                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+                while (m_camera.p_CamInfo.p_eState != RootTools.Camera.Dalsa.eCamState.Ready)
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";

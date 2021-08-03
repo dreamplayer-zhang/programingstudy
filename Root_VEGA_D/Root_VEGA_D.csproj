@@ -203,8 +203,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AlignTeaching_UI.xaml.cs">
+      <DependentUpon>AlignTeaching_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AlignTeaching_VM.cs" />
+    <Compile Include="Converter\NullToBrushConverter.cs" />
     <Compile Include="Converter\PointToStringConverter.cs" />
     <Compile Include="Converter\StringConverter.cs" />
+    <Compile Include="Information_UI.xaml.cs">
+      <DependentUpon>Information_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\OHTs_UI.xaml.cs">
       <DependentUpon>OHTs_UI.xaml</DependentUpon>
     </Compile>
@@ -212,13 +220,22 @@
       <DependentUpon>OHT_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="RecipeManager_VM.cs" />
+    <Compile Include="Run_UI.xaml.cs">
+      <DependentUpon>Run_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_UserControl\Login_UI.xaml.cs">
       <DependentUpon>Login_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\Information_ViewModel.cs" />
     <Compile Include="ViewModel\MainWindow_ViewModel.cs" />
     <Compile Include="UI_UserControl\PM_UI.xaml.cs">
       <DependentUpon>PM_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\Run_ViewModel.cs" />
+    <Page Include="AlignTeaching_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\Arrow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -251,6 +268,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Information_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ManualJobSchedule\ManualJobSchedule_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -272,6 +293,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RecipeWizard_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Run_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

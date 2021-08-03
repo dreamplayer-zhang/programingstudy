@@ -132,6 +132,12 @@ namespace Root_Rinse_Loader.Engineer
             Thread.Sleep(100); 
             EQ.p_bStop = false; 
         }
+
+        public void StopRotate()
+        {
+            m_roller.RunRotate(false);
+            m_rail.RunRotate(false); 
+        }
         #endregion
 
         #region IHandler

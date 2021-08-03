@@ -18,6 +18,7 @@ namespace RootTools.Module
 {
     public class ModuleBase : NotifyProperty
     {
+        
         #region eState
         public delegate void dgOnChangeState(eState eState);
         public event dgOnChangeState OnChangeState;
@@ -97,6 +98,20 @@ namespace RootTools.Module
             p_sInfo = sInfo;
             if (EQ.IsStop()) p_sInfo = "EQ Stop";
             return sInfo != "OK";
+        }
+
+        ICamera m_GrabCam;
+        public ICamera p_GrabCam
+        {
+            get
+            {
+                return m_GrabCam;
+            }
+            set
+            {
+                m_GrabCam = value;
+                OnPropertyChanged();
+            }
         }
         #endregion
 
@@ -414,10 +429,12 @@ namespace RootTools.Module
         public string StartRun(ModuleRunBase moduleRun)
         {
             if (EQ.IsStop()) return "EQ Stop";
+            if (moduleRun == null) return "OK";
             if ((moduleRun.m_eRemote != eRemote.Local) && (moduleRun.m_eRemote == p_eRemote) || p_eRemote == eRemote.Client)
                 m_qModuleRemote.Enqueue(moduleRun);
             else
                 m_qModuleRun.Enqueue(moduleRun);
+            
             p_sInfo = "StartRun : " + moduleRun.m_sModuleRun;
             return "OK";
         }

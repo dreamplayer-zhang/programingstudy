@@ -62,6 +62,10 @@ namespace Root_VEGA_D
             string sPath = LogView._logView.p_sPath;
             string sPathPM = sPath + "\\PM";
 
+            if (!Directory.Exists(sPathPM))
+            {
+                Directory.CreateDirectory(sPathPM);
+            }
             string[] arrStr = Directory.GetFiles(sPathPM);
 
             DirectoryInfo dir = new DirectoryInfo(sPathPM);
