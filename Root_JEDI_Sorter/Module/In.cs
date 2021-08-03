@@ -9,6 +9,11 @@ namespace Root_JEDI_Sorter.Module
 {
     public class In : ModuleBase
     {
+        public enum eIn
+        {
+            InA,
+            InB
+        }
         #region ToolBox
         Axis m_axis; 
         public override void GetTools(bool bInit)
@@ -74,10 +79,40 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
+        #region override
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            if (m_loadEV.IsCheck(false) == false) return "Check Tray";
+            string sHome = StateHome(m_loadEV.m_axis);
+            if (sHome != "OK") return sHome;
+            sHome = StateHome(m_axis);
+            if (sHome == "OK") p_eState = eState.Ready;
+            return sHome; 
+        }
+
+        public override string StateReady()
+        {
+            return base.StateReady();
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+        }
+        #endregion
+
+        public eIn m_eIn = eIn.InA; 
         public LoadEV m_loadEV;
         public Stage m_stage; 
-        public In(string id, IEngineer engineer)
+        public In(eIn eIn, IEngineer engineer)
         {
+            m_eIn = eIn;
+            string id = eIn.ToString(); 
             m_loadEV = new LoadEV(id + ".LoadEV");
             m_stage = new Stage(id + ".Stage");
             base.InitBase(id, engineer);

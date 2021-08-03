@@ -78,7 +78,32 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
-        #region Override
+        #region override
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            if (m_unloadEV.IsCheck(false) == false) return "Check Tray";
+            string sHome = StateHome(m_unloadEV.m_axis);
+            if (sHome != "OK") return sHome;
+            sHome = StateHome(m_axis);
+            if (sHome == "OK") p_eState = eState.Ready;
+            return sHome;
+        }
+
+        public override string StateReady()
+        {
+            return base.StateReady();
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+        }
+
         public override void RunTree(Tree tree)
         {
             m_unloadEV.RunTree(tree.GetTree("Elevator")); 

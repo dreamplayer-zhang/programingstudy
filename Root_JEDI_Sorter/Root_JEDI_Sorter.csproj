@@ -216,6 +216,7 @@
     <Compile Include="Module\InfoTray.cs" />
     <Compile Include="Module\LoadEV.cs" />
     <Compile Include="Module\Stage.cs" />
+    <Compile Include="Module\Transfer.cs" />
     <Compile Include="Module\UnloadEV.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

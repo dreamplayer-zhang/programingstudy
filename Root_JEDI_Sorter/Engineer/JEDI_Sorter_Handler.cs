@@ -30,13 +30,18 @@ namespace Root_JEDI_Sorter.Engineer
         public ModuleList p_moduleList { get; set; }
         public In[] m_aIn = new In[2] { null, null };
         public Good[] m_aGood = new Good[2] { null, null };
+        public Bad[] m_aBad = new Bad[2] { null, null };
+        public Transfer m_transfer; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            InitModule(m_aIn[0] = new In("InA", m_engineer));
-            InitModule(m_aIn[1] = new In("InB", m_engineer));
+            InitModule(m_aIn[0] = new In(In.eIn.InA, m_engineer));
+            InitModule(m_aIn[1] = new In(In.eIn.InB, m_engineer));
             InitModule(m_aGood[0] = new Good("GoodA", m_engineer));
             InitModule(m_aGood[1] = new Good("GoodB", m_engineer));
+            InitModule(m_aBad[0] = new Bad(eResult.Reject, m_engineer));
+            InitModule(m_aBad[1] = new Bad(eResult.Rework, m_engineer));
+            InitModule(m_transfer = new Transfer("Transfer", m_engineer));
         }
 
         void InitModule(ModuleBase module)
