@@ -143,11 +143,6 @@ namespace Root_EFEM.Module.FrontsideVision
                 param = new CenteringParam(img, m_CamAlign.GetRoiSize(), edgeSearchRange, edgeSearchLevel, eDir.LT);
                 ThreadPool.QueueUserWorkItem(centering.FindEdge, param);
 
-
-
-
-
-
             }
             finally
             {
