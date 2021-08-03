@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:tree="clr-namespace:RootTools.Trees" 
              xmlns:local="clr-namespace:RootTools.Control.Ajin" 
-             mc:Ignorable="d" Background="White">
+             mc:Ignorable="d" Background="Transparent">
     <UserControl.Resources>
         <Style TargetType="Button">
             <Setter Property="FontWeight" Value="Bold"/>

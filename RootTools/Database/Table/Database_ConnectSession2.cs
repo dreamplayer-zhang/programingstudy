@@ -8,7 +8,7 @@ using MySql.Data.MySqlClient;
 
 namespace RootTools.Database
 {
-    class Database_ConnectSession
+    class Database_ConnectSession2
     {
         //string m_sServerName = "localhost";
         //string m_SDbName = "wind2"; // DB명
@@ -22,7 +22,7 @@ namespace RootTools.Database
         bool m_bConnected = false;
         int m_ThreadID;
         MySqlConnection m_sqlConnection;
-        public Database_ConnectSession(int nThreadID, string sServerName = "localhost", string sDBName = "wind2", string sUid = "root", string sPw= "root")
+        public Database_ConnectSession2(string sServerName = "localhost", string sDBName = "wind2", string sUid = "root", string sPw= "root", int nThreadID = 0)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace RootTools.Database
                 string sError = ex.Message;
             }
         }
-        ~Database_ConnectSession()
+        ~Database_ConnectSession2()
 		{
             if(m_sqlConnection!=null)
 			{
