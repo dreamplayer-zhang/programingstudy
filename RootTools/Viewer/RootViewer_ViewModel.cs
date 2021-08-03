@@ -963,9 +963,9 @@ namespace RootTools
 
                                                     if (pix_x + (long)pix_y * sizeX >= 0)
                                                     {
-                                                        //viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[(long)pix_x + (long)pix_y * sizeX]);
-                                                        //viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[(long)pix_x + (long)pix_y * sizeX]);
-                                                        //viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[(long)pix_x + (long)pix_y * sizeX]);
+                                                        viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[(long)pix_x + (long)pix_y * sizeX]);
+                                                        viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[(long)pix_x + (long)pix_y * sizeX]);
+                                                        viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[(long)pix_x + (long)pix_y * sizeX]);
                                                     }
                                                 }
                                             }
