@@ -345,7 +345,28 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region Thread Send
-        RinseU.Protocol m_protocolSend = null;
+        string _sProtocolSend = "";
+        public string p_sProtocolSend
+        {
+            get { return _sProtocolSend; }
+            set
+            {
+                _sProtocolSend = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        RinseU.Protocol _protocolSend = null;
+        RinseU.Protocol p_protocolSend 
+        { 
+            get { return _protocolSend; }
+            set
+            {
+                _protocolSend = value;
+                p_sProtocolSend = (value != null) ? value.p_sCmd : ""; 
+            }
+        }
+        
         Queue<RinseU.Protocol> m_qProtocolSend = new Queue<RinseU.Protocol>();
         Queue<RinseU.Protocol> m_qProtocolReply = new Queue<RinseU.Protocol>();
         bool m_bRunSend = false;
@@ -372,10 +393,10 @@ namespace Root_Rinse_Loader.Module
                     m_tcpip.Send(protocol.p_sCmd);
                     Thread.Sleep(10);
                 }
-                else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
+                else if ((m_qProtocolSend.Count > 0) && (p_protocolSend == null))
                 {
-                    m_protocolSend = m_qProtocolSend.Dequeue();
-                    m_tcpip.Send(m_protocolSend.p_sCmd);
+                    p_protocolSend = m_qProtocolSend.Dequeue();
+                    m_tcpip.Send(p_protocolSend.p_sCmd);
                     Thread.Sleep(10);
                 }
             }
@@ -403,7 +424,7 @@ namespace Root_Rinse_Loader.Module
                     return;
                 }
                 RinseU.eCmd eCmd = GetCmd(asRead[1]);
-                if (asRead[0] == p_id) m_protocolSend = null;
+                if (asRead[0] == p_id) p_protocolSend = null;
                 else
                 {
                     switch (eCmd)
@@ -513,7 +534,7 @@ namespace Root_Rinse_Loader.Module
         public void InitSendProtocol()
         {
             m_qProtocolSend.Clear();
-            m_protocolSend = null;
+            p_protocolSend = null;
         }
 
         public override void Reset()
@@ -532,6 +553,7 @@ namespace Root_Rinse_Loader.Module
         RinseL_Handler m_handler; 
         public RinseL(string id, IEngineer engineer)
         {
+            p_protocolSend = null; 
             p_id = id;
             m_handler = (RinseL_Handler)engineer.ClassHandler(); 
             InitBase(id, engineer);

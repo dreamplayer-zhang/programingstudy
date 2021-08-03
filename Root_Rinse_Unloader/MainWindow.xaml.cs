@@ -104,6 +104,7 @@ namespace Root_Rinse_Unloader
             textBlockRailState3.DataContext = m_handler.m_rail.m_aLine[3];
             checkBoxEQStop.DataContext = EQ.m_EQ; 
             progressUI.Init(m_handler.m_rinse, m_engineer);
+            labelSend.DataContext = m_handler.m_rinse; 
         }
         #endregion
 
