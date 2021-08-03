@@ -21,16 +21,21 @@ namespace Root_JEDI_Sorter.Module
             toolBox.GetDIO(ref m_diCheck, module, "Check", new string[2] { "0", "1"});
             toolBox.GetDIO(ref m_diFull, module, "Full");
             toolBox.GetDIO(ref m_diProtrude, module, "Protrude");
-            if (bInit) InitPosition();
+            if (bInit)
+            {
+                InitPosition();
+                RunGrip(true); 
+            }
         }
         #endregion
 
         #region Axis
         public enum ePos
         {
-            Stage,
-            Grip,
             Up,
+            Grip,
+            Stage,
+            Down,
         }
         void InitPosition()
         {
@@ -69,6 +74,52 @@ namespace Root_JEDI_Sorter.Module
         public bool IsProtrude()
         {
             return m_diProtrude.p_bIn; 
+        }
+        #endregion
+
+        #region Run
+        public string RunLoad()
+        {
+            try
+            {
+                if (Run(RunGrip(true))) return m_sInfo;
+                if (Run(RunMove(ePos.Up))) return m_sInfo;
+                if (Run(RunGrip(false))) return m_sInfo;
+                if (Run(RunMove(ePos.Grip))) return m_sInfo;
+                if (Run(RunGrip(true))) return m_sInfo;
+            }
+            finally 
+            { 
+                RunGrip(true);
+                RunMove(ePos.Grip);
+            }
+            return "OK"; 
+        }
+
+        public string RunUnload()
+        {
+            try
+            {
+                if (Run(RunGrip(true))) return m_sInfo;
+                if (Run(RunMove(ePos.Grip))) return m_sInfo;
+                if (Run(RunGrip(false))) return m_sInfo;
+                if (Run(RunMove(ePos.Up))) return m_sInfo;
+                if (Run(RunGrip(true))) return m_sInfo;
+                if (Run(RunMove(ePos.Grip))) return m_sInfo;
+            }
+            finally 
+            { 
+                RunGrip(true);
+                RunMove(ePos.Grip); 
+            }
+            return "OK";
+        }
+
+        string m_sInfo = "OK";
+        bool Run(string sRun)
+        {
+            m_sInfo = sRun;
+            return (sRun == "OK");
         }
         #endregion
 
