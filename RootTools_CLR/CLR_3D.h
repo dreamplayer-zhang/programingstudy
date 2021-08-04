@@ -16,20 +16,24 @@
 #pragma warning(disable: 4267)
 namespace RootTools_CLR
 {
-	public class CLR_3D
+	public ref class CLR_3D
 	{
 		
 	public:
 		CLR_3D();
 		virtual ~CLR_3D();
+		void Init3D(LPBYTE ppConvertedImage, WORD* ppBuffHeight, short* ppBuffBright, int szImageBufferX, int szImageBufferY, LPBYTE ppBuffRaw, int szMaxRawImageX, int szMaxRawImageY, int nMaxOverlapSize, int nMaxFrameNum);
 
 		byte** GetFGBuffer();
 		byte** GetRawBuffer();
 		void MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CPoint ptDataPos
 			, int nMinGV1, int nMinGV2, int nThreadNum, int nSnapFrameNum, int nOverlapStartPos, int nOverlapSize
-			, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, int* pnCurrFrameNum, Parameter3D param);
-
+			, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, Parameter3D param);
+		void MakeImageSimple(int ptDataPosX, int ptDataPosY
+			, int nMinGV1, int nMinGV2, int nThreadNum, int nSnapFrameNum, int nOverlapStartPos, int nOverlapSize
+			, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, int n3DScanParam, int nSnapFrameRest);
 		byte** ConvertedImage;
 		Raw3DManager* m_pRaw3DMgr;
+		void SetFrameNum(int n);
 	};
 }

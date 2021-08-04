@@ -11,7 +11,7 @@ class Raw3D_RawData
 public:
 	
 	static Raw3D_RawData* GetInstance();
-	void Initialize(CSize szImageBuffer, CSize szMaxRawImage, int nMaxOverlapSize, int nMaxFrameNum);
+	void Initialize(WORD* ppBuffHeight, short* ppBuffBright, CSize szImageBuffer, LPBYTE ppBuffRaw, CSize szMaxRawImage, int nMaxOverlapSize, int nMaxFrameNum);
 /*
 	void SaveRawImage(CString sFileName, CPoint ptLT, CPoint ptRB, int nFoV, int nOverlapSize);
 	BOOL ReadRawImage(CString sFileName);
@@ -42,13 +42,12 @@ private:
 	Raw3D_RawData();
 	Raw3D_RawData(const Raw3D_RawData& rhs);
 	~Raw3D_RawData();
-
+	/*
 	void DeleteBuffer();
 	void CreateBuffer(int n3DImageWidth, int n3DImageHeight);
-
 	void DeleteRawBuffer();
 	void CreateRawBuffer(int nMaxSnapFrameNum);
-
+	*/
 
 	WORD** m_ppBuffHeight;
 	short** m_ppBuffBright;

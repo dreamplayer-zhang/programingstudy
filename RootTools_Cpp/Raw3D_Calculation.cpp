@@ -91,7 +91,7 @@ UINT ThreadCalculation(LPVOID lParam)
 //Make Converted Image & Height/Bright Image & Display Image
 void Raw3D_Calculation::StartCalculation(ConvertMode cvtMode, Calc3DMode calcMode, DisplayMode displayMode, CPoint ptDataPos
 	, int nMinGV1, int nMinGV2, int nOverlapStartPos, int nOverlapSize, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, int* pnCurrFrameNum, Parameter3D param)
-{
+{	
 	m_cvtMode = cvtMode;
 	m_calcMode = calcMode;
 	m_displayMode = displayMode;
@@ -126,7 +126,7 @@ void Raw3D_Calculation::StartCalculation(ConvertMode cvtMode, Calc3DMode calcMod
 //}
 
 void Raw3D_Calculation::StopCalc()
-{
+{	
 	m_bStop = true;
 }
 
@@ -152,13 +152,6 @@ void Raw3D_Calculation::CalculateImage()
 		n = m_szRawImage.cy;
 	}
 
-	/*if (m_ptDataPos.y < 0)
-		m_ptDataPos.y = 0;
-	else if (m_ptDataPos.y + m_nSnapFrameNum >= m_sz3DImage.cy)
-		m_ptDataPos.y = m_sz3DImage.cy - m_nSnapFrameNum;*/
-
-		//int nPreFrameIndex = -1;
-		//int nSameFrameCount = 0;
 	int nFrameIndex = 0;
 	if (nFrameIndex < 0)
 	{
@@ -167,7 +160,8 @@ void Raw3D_Calculation::CalculateImage()
 	}
 
 	while (nFrameIndex < m_nSnapFrameNum)
-	{
+	{		
+		//DebugTxt("while\n", 7);
 		nFrameIndex = n + m_nThreadIndex;
 		if (*m_pnCurrFrameNum > nFrameIndex)
 		{
@@ -235,15 +229,6 @@ void Raw3D_Calculation::CalculateImage()
 
 			n += m_nThreadNum;
 		}
-		/*else if(nPreFrameIndex == *m_pnCurrFrameNum)
-		{
-			nSameFrameCount++;
-			if(nSameFrameCount >= MAX_SAME_FRAME_COUNT)
-			{
-				SetCalcState(Calc3DState::ErrorCalc);
-				return;
-			}
-		}*/
 
 		if (m_bStop == true)
 			break;

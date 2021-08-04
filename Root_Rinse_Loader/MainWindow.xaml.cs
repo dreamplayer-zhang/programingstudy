@@ -46,9 +46,10 @@ namespace Root_Rinse_Loader
             magazineUI.Init(m_handler.m_rinse, m_handler.m_storage);
             stackUI.Init(m_handler.m_storage.m_stack, m_handler.m_loader);
             tabControlStorage.SelectedIndex = (int)m_handler.m_rinse.p_eMode;
-            progressUI.Init(m_handler.m_rinse); 
+            progressUI.Init(m_handler.m_rinse, m_engineer); 
             textBoxRotateSpeed.DataContext = m_handler.m_rinse;
-            checkBoxEQStop.DataContext = EQ.m_EQ; 
+            checkBoxEQStop.DataContext = EQ.m_EQ;
+            labelSend.DataContext = m_handler.m_rinse; 
         }
         #endregion
 

@@ -71,7 +71,6 @@ namespace Root_Rinse_Loader.Module
             {
                 string sSend = "";
                 foreach (Line line in m_aLine) sSend += line.m_bExist ? 'O' : '.';
-                m_rinse.AddStripSend(sSend);
             }
             foreach (Line line in m_aLine) line.m_bExist = false;
         }
