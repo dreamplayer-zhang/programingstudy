@@ -22,6 +22,11 @@ namespace Root_JEDI_Sorter.Module
         Rework,
     }
 
+    public class InfoChip : NotifyProperty
+    {
+        public eResult m_eResult; 
+    }
+
     public class InfoTray : NotifyProperty
     {
         #region Result

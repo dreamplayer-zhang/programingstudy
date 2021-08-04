@@ -30,7 +30,7 @@ namespace Root_JEDI_Sorter.Engineer
         public ModuleList p_moduleList { get; set; }
         public Dictionary<In.eIn, In> m_in = new Dictionary<In.eIn, In>();
         public Dictionary<Good.eGood, Good> m_good = new Dictionary<Good.eGood, Good>();
-        public Dictionary<eResult, Bad> m_bad = new Dictionary<eResult, Bad>();
+        public Dictionary<Bad.eBad, Bad> m_bad = new Dictionary<Bad.eBad, Bad>();
         public Transfer m_transfer; 
         void InitModule()
         {
@@ -39,8 +39,8 @@ namespace Root_JEDI_Sorter.Engineer
             InitIn(In.eIn.InB);
             InitGood(Good.eGood.GoodA);
             InitGood(Good.eGood.GoodB);
-            InitBad(eResult.Reject);
-            InitBad(eResult.Rework);
+            InitBad(Bad.eBad.Reject);
+            InitBad(Bad.eBad.Rework);
             InitModule(m_transfer = new Transfer("Transfer", m_engineer));
         }
 
@@ -56,10 +56,10 @@ namespace Root_JEDI_Sorter.Engineer
             InitModule(m_good[eGood]); 
         }
 
-        void InitBad(eResult eResult)
+        void InitBad(Bad.eBad eBad)
         {
-            m_bad.Add(eResult, new Bad(eResult, m_engineer));
-            InitModule(m_bad[eResult]); 
+            m_bad.Add(eBad, new Bad(eBad, m_engineer));
+            InitModule(m_bad[eBad]); 
         }
 
         void InitModule(ModuleBase module)

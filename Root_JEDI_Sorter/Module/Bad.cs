@@ -9,6 +9,12 @@ namespace Root_JEDI_Sorter.Module
 {
     public class Bad : ModuleBase
     {
+        public enum eBad
+        {
+            Reject,
+            Rework
+        }
+
         #region ToolBox
         Axis m_axis;
         public override void GetTools(bool bInit)
@@ -43,6 +49,11 @@ namespace Root_JEDI_Sorter.Module
         {
             if (m_axis.p_posCommand >= m_axis.GetPosValue(ePos.Transfer)) return "OK";
             return MoveStage(ePos.Transfer, 0, true); 
+        }
+
+        public bool IsInPosition()
+        {
+            return (Math.Abs(m_axis.p_posCommand - m_axis.GetPosValue(ePos.Transfer)) < 1);
         }
         #endregion
 
@@ -110,13 +121,13 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
-        eResult m_eResult = eResult.Good; 
+        eBad m_eBad;
         public UnloadEV m_unloadEV;
         public Stage m_stage;
-        public Bad(eResult eResult, IEngineer engineer)
+        public Bad(eBad eBad, IEngineer engineer)
         {
-            m_eResult = eResult; 
-            string id = eResult.ToString(); 
+            m_eBad = eBad; 
+            string id = eBad.ToString(); 
             m_unloadEV = new UnloadEV(id + ".UnloadEV");
             m_stage = new Stage(id + ".Stage");
             base.InitBase(id, engineer);

@@ -6,10 +6,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Root_JEDI_Sorter.Module
 {
@@ -290,6 +287,32 @@ namespace Root_JEDI_Sorter.Module
             stage.p_infoTray = m_picker[eZ.Z1].m_stackTray.Pop(); 
             return "OK"; 
         }
+
+        public string StartUnloadBad(Bad.eBad eBad)
+        {
+            Run_UnloadBad run = (Run_UnloadBad)m_runUnloadBad.Clone();
+            run.m_eBad = eBad;
+            return StartRun(run);
+        }
+
+        public string RunUnloadBad(Bad.eBad eBad)
+        {
+            Bad bad = m_handler.m_bad[eBad];
+            Stage stage = bad.m_stage;
+            string sBad = eBad.ToString();
+            if (stage.p_infoTray != null) return "InfoTRay != null at " + sBad;
+            if (stage.IsCheck(false) == false) return "Tray Check Sensor Error at " + sBad;
+            if (bad.IsInPosition() == false) return sBad + " Stage Position not Ready";
+            ePosBad ePos = (eBad == Bad.eBad.Reject) ? ePosBad.Reject : ePosBad.Rework; 
+            if (Run(stage.RunAlign(false, false))) return p_sInfo;
+            if (Run(MoveBad(ePos))) return p_sInfo;
+            if (Run(stage.RunAlign(false))) return p_sInfo;
+            if (Run(m_picker[eZ.Z2].RunUnload())) return p_sInfo;
+            if (stage.IsCheck(true) == false) return "Tray Check Sensor Error after Unload at " + sBad;
+            if (Run(stage.RunAlign(true))) return p_sInfo;
+            stage.p_infoTray = m_picker[eZ.Z2].m_stackTray.Pop();
+            return "OK";
+        }
         #endregion
 
         #region override
@@ -342,13 +365,15 @@ namespace Root_JEDI_Sorter.Module
         ModuleRunBase m_runLoadIn;
         ModuleRunBase m_runLoadGood;
         ModuleRunBase m_runUnloadGood;
+        ModuleRunBase m_runUnloadBad;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Grip(this), true, "Run Elevator Grip");
             m_runLoadIn = AddModuleRunList(new Run_LoadIn(this), true, "Run Load at In");
             m_runLoadGood = AddModuleRunList(new Run_LoadGood(this), true, "Run Load at Good");
-            m_runUnloadGood = AddModuleRunList(new Run_UnloadGood(this), true, "Run Unload at Good");
+            m_runUnloadGood = AddModuleRunList(new Run_UnloadGood(this), true, "Run Unload to Good");
+            m_runUnloadBad = AddModuleRunList(new Run_UnloadBad(this), true, "Run Unload to Bad");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -491,13 +516,41 @@ namespace Root_JEDI_Sorter.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eGood = (Good.eGood)tree.Set(m_eGood, m_eGood, "Good", "Unload at", bVisible);
-                m_eStage = (Good.eStage)tree.Set(m_eStage, m_eStage, "Stage", "Unload at", bVisible);
+                m_eGood = (Good.eGood)tree.Set(m_eGood, m_eGood, "Good", "Unload to", bVisible);
+                m_eStage = (Good.eStage)tree.Set(m_eStage, m_eStage, "Stage", "Unload to", bVisible);
             }
 
             public override string Run()
             {
                 return m_module.RunUnloadGood(m_eGood, m_eStage);
+            }
+        }
+
+        public class Run_UnloadBad : ModuleRunBase
+        {
+            Transfer m_module;
+            public Run_UnloadBad(Transfer module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public Bad.eBad m_eBad;
+            public override ModuleRunBase Clone()
+            {
+                Run_UnloadBad run = new Run_UnloadBad(m_module);
+                run.m_eBad = m_eBad;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eBad = (Bad.eBad)tree.Set(m_eBad, m_eBad, "Bad", "Unload to", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunUnloadBad(m_eBad);
             }
         }
         #endregion
