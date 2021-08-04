@@ -41,6 +41,11 @@ namespace Root_JEDI_Sorter.Module
             m_axis.StartMove(ePos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
+
+        public bool IsLoadPosition()
+        {
+            return (Math.Abs(m_axis.p_posCommand - m_axis.GetPosValue(ePos.Transfer)) < 1); 
+        }
         #endregion
 
         #region RunLoad

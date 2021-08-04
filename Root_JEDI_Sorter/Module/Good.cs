@@ -10,6 +10,12 @@ namespace Root_JEDI_Sorter.Module
 {
     public class Good : ModuleBase
     {
+        public enum eGood
+        {
+            GoodA,
+            GoodB
+        }
+
         #region ToolBox
         Axis m_axis;
         public override void GetTools(bool bInit)
@@ -78,6 +84,11 @@ namespace Root_JEDI_Sorter.Module
             return MoveStage(ePos.TakerTransfer, 0, true);
         }
 
+        public bool IsInPosition(eStage eStage)
+        {
+            ePos ePos = (eStage == eStage.Taker) ? ePos.TakerTransfer : ePos.GiverTransfer; 
+            return (Math.Abs(m_axis.p_posCommand - m_axis.GetPosValue(ePos)) < 1);
+        }
         #endregion
 
         #region RunUnload
@@ -144,10 +155,13 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
+        public eGood m_eGood; 
         public UnloadEV m_unloadEV;
         public Dictionary<eStage, Stage> m_stage = new Dictionary<eStage, Stage>(); 
-        public Good(string id, IEngineer engineer)
+        public Good(eGood eGood, IEngineer engineer)
         {
+            m_eGood = eGood;
+            string id = eGood.ToString(); 
             m_unloadEV = new UnloadEV(id + ".UnloadEV");
             m_stage.Add(eStage.Taker, new Stage(id + ".Taker", "Taker."));
             m_stage.Add(eStage.Giver, new Stage(id + ".Giver", "Giver.")); 

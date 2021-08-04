@@ -39,7 +39,9 @@ namespace Root_JEDI_Sorter.Module
             public enum ePos
             {
                 Up,
-                Down,
+                Unload,
+                Stage,
+                Load
             }
             void InitPosition()
             {
@@ -69,17 +71,68 @@ namespace Root_JEDI_Sorter.Module
             #endregion
 
             #region InfoTray
-            InfoTray _infoTray = null;
-            public InfoTray p_infoTray
+            int m_maxStack = 2; 
+            public Stack<InfoTray> m_stackTray = new Stack<InfoTray>(); 
+
+            public void RunTree(Tree tree)
             {
-                get { return _infoTray; }
-                set
-                {
-                    _infoTray = value;
-                    OnPropertyChanged();
-                }
+                m_maxStack = tree.Set(m_maxStack, m_maxStack, "Max Stack", "Max Stack Count"); 
             }
             #endregion
+
+            public string RunLoad()
+            {
+                try
+                {
+                    if (IsCheck(false) == false) return "Picker Load Error : Check Sensor";
+                    if (m_stackTray.Count >= m_maxStack) return "Picker Stack Count >= MaxStack";
+                    if (Run(RunGrip(true))) return m_sInfo;
+                    if (Run(RunMove(ePos.Up))) return m_sInfo;
+                    if (Run(RunMove(ePos.Stage))) return m_sInfo;
+                    if (Run(RunGrip(false))) return m_sInfo;
+                    if (Run(RunMove(ePos.Load))) return m_sInfo;
+                    if (Run(RunGrip(true))) return m_sInfo;
+                    if (IsCheck(true))
+                    {
+                        if (Run(RunMove(ePos.Up))) return m_sInfo;
+                        return "OK";
+                    }
+                    else
+                    {
+                        if (Run(RunGrip(false))) return m_sInfo;
+                        if (Run(RunMove(ePos.Stage))) return m_sInfo;
+                        if (Run(RunGrip(true))) return m_sInfo;
+                        if (Run(RunMove(ePos.Up))) return m_sInfo;
+                        return "Check Sensor not Checked";
+                    }
+                }
+                finally { RunMove(ePos.Up); }
+            }
+
+            public string RunUnload()
+            {
+                try
+                {
+                    if (IsCheck(true) == false) return "Picker Unload Error : Check Sensor";
+                    if (m_stackTray.Count <= 0) return "Picker Stack Count == 0";
+                    if (Run(RunGrip(true))) return m_sInfo;
+                    if (Run(RunMove(ePos.Up))) return m_sInfo;
+                    if (Run(RunMove(ePos.Stage))) return m_sInfo;
+                    if (Run(RunGrip(false))) return m_sInfo;
+                    if (Run(RunMove(ePos.Load))) return m_sInfo;
+                    if (Run(RunGrip(true))) return m_sInfo;
+                    if (Run(RunMove(ePos.Up))) return m_sInfo;
+                }
+                finally { RunMove(ePos.Up); }
+                return "OK";
+            }
+
+            string m_sInfo = "OK";
+            bool Run(string sInfo)
+            {
+                m_sInfo = sInfo;
+                return sInfo == "OK"; 
+            }
 
             string p_id { get; set; }
             public Picker(string id)
@@ -160,12 +213,82 @@ namespace Root_JEDI_Sorter.Module
         public string StartLoadIn(In.eIn eIn)
         {
             Run_LoadIn run = (Run_LoadIn)m_runLoadIn.Clone();
+            run.m_eIn = eIn; 
             return StartRun(run);
         }
 
         public string RunLoadIn(In.eIn eIn)
         {
+            In In = m_handler.m_in[eIn];
+            Stage stage = In.m_stage;
+            if (stage.p_infoTray == null) return "InfoTray == null at " + eIn.ToString(); 
+            if (stage.IsCheck(true) == false) return "Tray Check Sensor Error at " + eIn.ToString();
+            if (In.IsLoadPosition() == false) return eIn.ToString() + " Stage Position not Ready"; 
+            ePosIn ePosIn = (eIn == In.eIn.InA) ? ePosIn.InA : ePosIn.InB;
+            if (Run(stage.RunAlign(false, false))) return p_sInfo;
+            if (Run(MoveIn(ePosIn))) return p_sInfo;
+            if (Run(stage.RunAlign(false))) return p_sInfo; 
+            if (Run(m_picker[eZ.Z1].RunLoad())) return p_sInfo;
+            if (stage.IsCheck(false) == false) return "Tray Check Sensor Error after Load at " + eIn.ToString();
+            m_picker[eZ.Z1].m_stackTray.Push(stage.p_infoTray);
+            stage.p_infoTray = null; 
             return "OK";
+        }
+
+        public string StartLoadGood(eZ eZ, Good.eGood eGood)
+        {
+            Run_LoadGood run = (Run_LoadGood)m_runLoadGood.Clone();
+            run.m_eZ = eZ;
+            run.m_eGood = eGood;
+            return StartRun(run);
+        }
+
+        public string RunLoadGood(eZ eZ, Good.eGood eGood)
+        {
+            Good good = m_handler.m_good[eGood];
+            Stage stage = good.m_stage[Good.eStage.Giver];
+            Picker picker = m_picker[eZ];
+            if (stage.p_infoTray == null) return "InfoTray == null at " + eGood.ToString();
+            if (stage.IsCheck(true) == false) return "Tray Check Sensor Error at " + eGood.ToString();
+            if (good.IsInPosition(Good.eStage.Giver) == false) return eGood.ToString() + " Stage Position not Ready";
+            ePosGood ePosGood = (eGood == Good.eGood.GoodA) ? ePosGood.GoodA : ePosGood.GoodB;
+            if (Run(stage.RunAlign(false, false))) return p_sInfo;
+            if (Run(MoveGood(ePosGood, eZ))) return p_sInfo;
+            if (Run(stage.RunAlign(false))) return p_sInfo;
+            if (Run(picker.RunLoad())) return p_sInfo;
+            if (stage.IsCheck(false) == false) return "Tray Check Sensor Error after Load at " + eGood.ToString();
+            picker.m_stackTray.Push(stage.p_infoTray);
+            stage.p_infoTray = null;
+            return "OK";
+        }
+        #endregion
+
+        #region RunUnload
+        public string StartUnloadGood(Good.eGood eGood, Good.eStage eStage)
+        {
+            Run_UnloadGood run = (Run_UnloadGood)m_runUnloadGood.Clone();
+            run.m_eGood = eGood;
+            run.m_eStage = eStage; 
+            return StartRun(run); 
+        }
+
+        public string RunUnloadGood(Good.eGood eGood, Good.eStage eStage)
+        {
+            Good good = m_handler.m_good[eGood];
+            Stage stage = good.m_stage[eStage];
+            string sStage = eGood.ToString() + "." + eStage.ToString(); 
+            if (stage.p_infoTray != null) return "InfoTRay != null at " + sStage;
+            if (stage.IsCheck(false) == false) return "Tray Check Sensor Error at " + sStage; 
+            if (good.IsInPosition(eStage) == false) return sStage + " Stage Position not Ready";
+            ePosGood ePosGood = (eGood == Good.eGood.GoodA) ? ePosGood.GoodA : ePosGood.GoodB;
+            if (Run(stage.RunAlign(false, false))) return p_sInfo;
+            if (Run(MoveGood(ePosGood, eZ.Z1))) return p_sInfo;
+            if (Run(stage.RunAlign(false))) return p_sInfo;
+            if (Run(m_picker[eZ.Z1].RunUnload())) return p_sInfo;
+            if (stage.IsCheck(true) == false) return "Tray Check Sensor Error after Unload at " + sStage;
+            if (Run(stage.RunAlign(true))) return p_sInfo;
+            stage.p_infoTray = m_picker[eZ.Z1].m_stackTray.Pop(); 
+            return "OK"; 
         }
         #endregion
 
@@ -197,13 +320,15 @@ namespace Root_JEDI_Sorter.Module
         public override void RunTree(Tree tree)
         {
             RunTreeAxis(tree.GetTree("Transfer"));
+            m_picker[eZ.Z1].RunTree(tree.GetTree("Picker Z1"));
+            m_picker[eZ.Z2].RunTree(tree.GetTree("Picker Z2"));
         }
         #endregion
 
-        JEDI_Sorter_Handler m_hadler; 
+        JEDI_Sorter_Handler m_handler; 
         public Transfer(string id, IEngineer engineer)
         {
-            m_hadler = (JEDI_Sorter_Handler)engineer.ClassHandler(); 
+            m_handler = (JEDI_Sorter_Handler)engineer.ClassHandler(); 
             InitPicker();
             base.InitBase(id, engineer);
         }
@@ -215,11 +340,15 @@ namespace Root_JEDI_Sorter.Module
 
         #region ModuleRun
         ModuleRunBase m_runLoadIn;
+        ModuleRunBase m_runLoadGood;
+        ModuleRunBase m_runUnloadGood;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Grip(this), true, "Run Elevator Grip");
             m_runLoadIn = AddModuleRunList(new Run_LoadIn(this), true, "Run Load at In");
+            m_runLoadGood = AddModuleRunList(new Run_LoadGood(this), true, "Run Load at Good");
+            m_runUnloadGood = AddModuleRunList(new Run_UnloadGood(this), true, "Run Unload at Good");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -291,7 +420,7 @@ namespace Root_JEDI_Sorter.Module
                 InitModuleRun(module);
             }
 
-            In.eIn m_eIn = In.eIn.InA; 
+            public In.eIn m_eIn = In.eIn.InA; 
             public override ModuleRunBase Clone()
             {
                 Run_LoadIn run = new Run_LoadIn(m_module);
@@ -307,6 +436,68 @@ namespace Root_JEDI_Sorter.Module
             public override string Run()
             {
                 return m_module.RunLoadIn(m_eIn);
+            }
+        }
+
+        public class Run_LoadGood : ModuleRunBase
+        {
+            Transfer m_module;
+            public Run_LoadGood(Transfer module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public eZ m_eZ;
+            public Good.eGood m_eGood;
+            public override ModuleRunBase Clone()
+            {
+                Run_LoadGood run = new Run_LoadGood(m_module);
+                run.m_eZ = m_eZ; 
+                run.m_eGood = m_eGood;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eZ = (eZ)tree.Set(m_eZ, m_eZ, "Picker", "Load at", bVisible);
+                m_eGood = (Good.eGood)tree.Set(m_eGood, m_eGood, "Good", "Load at", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunLoadGood(m_eZ, m_eGood);
+            }
+        }
+
+        public class Run_UnloadGood : ModuleRunBase
+        {
+            Transfer m_module;
+            public Run_UnloadGood(Transfer module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public Good.eGood m_eGood;
+            public Good.eStage m_eStage; 
+            public override ModuleRunBase Clone()
+            {
+                Run_UnloadGood run = new Run_UnloadGood(m_module);
+                run.m_eGood = m_eGood;
+                run.m_eStage = m_eStage;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eGood = (Good.eGood)tree.Set(m_eGood, m_eGood, "Good", "Unload at", bVisible);
+                m_eStage = (Good.eStage)tree.Set(m_eStage, m_eStage, "Stage", "Unload at", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunUnloadGood(m_eGood, m_eStage);
             }
         }
         #endregion

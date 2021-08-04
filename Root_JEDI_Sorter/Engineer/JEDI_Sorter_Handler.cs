@@ -28,20 +28,38 @@ namespace Root_JEDI_Sorter.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        public In[] m_aIn = new In[2] { null, null };
-        public Good[] m_aGood = new Good[2] { null, null };
-        public Bad[] m_aBad = new Bad[2] { null, null };
+        public Dictionary<In.eIn, In> m_in = new Dictionary<In.eIn, In>();
+        public Dictionary<Good.eGood, Good> m_good = new Dictionary<Good.eGood, Good>();
+        public Dictionary<eResult, Bad> m_bad = new Dictionary<eResult, Bad>();
         public Transfer m_transfer; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            InitModule(m_aIn[0] = new In(In.eIn.InA, m_engineer));
-            InitModule(m_aIn[1] = new In(In.eIn.InB, m_engineer));
-            InitModule(m_aGood[0] = new Good("GoodA", m_engineer));
-            InitModule(m_aGood[1] = new Good("GoodB", m_engineer));
-            InitModule(m_aBad[0] = new Bad(eResult.Reject, m_engineer));
-            InitModule(m_aBad[1] = new Bad(eResult.Rework, m_engineer));
+            InitIn(In.eIn.InA);
+            InitIn(In.eIn.InB);
+            InitGood(Good.eGood.GoodA);
+            InitGood(Good.eGood.GoodB);
+            InitBad(eResult.Reject);
+            InitBad(eResult.Rework);
             InitModule(m_transfer = new Transfer("Transfer", m_engineer));
+        }
+
+        void InitIn(In.eIn eIn)
+        {
+            m_in.Add(eIn, new In(eIn, m_engineer));
+            InitModule(m_in[eIn]); 
+        }
+
+        void InitGood(Good.eGood eGood)
+        {
+            m_good.Add(eGood, new Good(eGood, m_engineer));
+            InitModule(m_good[eGood]); 
+        }
+
+        void InitBad(eResult eResult)
+        {
+            m_bad.Add(eResult, new Bad(eResult, m_engineer));
+            InitModule(m_bad[eResult]); 
         }
 
         void InitModule(ModuleBase module)
