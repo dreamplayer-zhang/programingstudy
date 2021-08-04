@@ -91,8 +91,7 @@ UINT ThreadCalculation(LPVOID lParam)
 //Make Converted Image & Height/Bright Image & Display Image
 void Raw3D_Calculation::StartCalculation(ConvertMode cvtMode, Calc3DMode calcMode, DisplayMode displayMode, CPoint ptDataPos
 	, int nMinGV1, int nMinGV2, int nOverlapStartPos, int nOverlapSize, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, int* pnCurrFrameNum, Parameter3D param)
-{
-	DebugTxt("StartCalculation\n", 18);
+{	
 	m_cvtMode = cvtMode;
 	m_calcMode = calcMode;
 	m_displayMode = displayMode;
@@ -127,8 +126,7 @@ void Raw3D_Calculation::StartCalculation(ConvertMode cvtMode, Calc3DMode calcMod
 //}
 
 void Raw3D_Calculation::StopCalc()
-{
-	DebugTxt("StopCalc\n", 10);
+{	
 	m_bStop = true;
 }
 
@@ -142,7 +140,6 @@ UINT ThreadConvertDisplay(LPVOID lParam)
 
 void Raw3D_Calculation::CalculateImage()
 {
-	DebugTxt("CalculateImage\n",16);
 	//스레드 인덱스에 따른 n 계산 해야함
 	//역방향 추가해야함
 	int n = 0;
@@ -159,7 +156,6 @@ void Raw3D_Calculation::CalculateImage()
 	if (nFrameIndex < 0)
 	{
 		SetCalcState(Calc3DState::ErrorCalc);
-		DebugTxt("Calc3DState::ErrorCalc\n", 24);
 		return;
 	}
 
@@ -169,7 +165,6 @@ void Raw3D_Calculation::CalculateImage()
 		nFrameIndex = n + m_nThreadIndex;
 		if (*m_pnCurrFrameNum > nFrameIndex)
 		{
-			DebugTxt("m_nSnapFrameNum\n", 17);
 			switch (m_cvtMode)
 			{
 			case ConvertMode::NoConvert:
@@ -211,7 +206,6 @@ void Raw3D_Calculation::CalculateImage()
 			switch (m_calcMode)
 			{
 			case Calc3DMode::Normal:
-				DebugTxt("Calc3DMode::Normal\n", 17);
 				CalcHBImage(nYPos, ptOLDataPos, m_nMinGV1, m_nMinGV2, m_bUseMinGV2);
 				break;
 			case Calc3DMode::FromTop:
@@ -239,7 +233,6 @@ void Raw3D_Calculation::CalculateImage()
 		if (m_bStop == true)
 			break;
 	}
-	DebugTxt("while End\n", 11);
 	SetCalcState(Calc3DState::Done);
 }
 
@@ -306,7 +299,6 @@ void Raw3D_Calculation::ConvertImageBump(int nFrameIndex, bool bReverseScan)
 //Height, Bright Image 만들기
 void Raw3D_Calculation::CalcHBImage(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)
 {
-	DebugTxt("CalcHBImage\n", 13);
 	long nSum, nYSum, nBSum, nMax, yMax, yAve, nGV, y0, dy;
 	long yHMax = 0;
 	long yHMin = 255;
@@ -507,7 +499,6 @@ void Raw3D_Calculation::CalcHBImage(int nFrameIndex, CPoint ptDataPos, int nMinG
 			}
 		}
 	}
-	DebugTxt("CalcHBImage End\n", 17);
 }
 
 void Raw3D_Calculation::CalcHBImage_FromTop(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)

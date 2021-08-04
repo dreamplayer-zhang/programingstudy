@@ -21,7 +21,7 @@ namespace RootTools_CLR
 		void CLR_3D::Init3D(LPBYTE ppConvertedImage,WORD* ppBuffHeight, short* ppBuffBright,int szImageBufferX, int szImageBufferY, LPBYTE ppBuffRaw, int szMaxRawImageX, int szMaxRawImageY, int nMaxOverlapSize, int nMaxFrameNum)
 		{
 			m_pRaw3DMgr->GetRawData()->Initialize(ppBuffHeight, ppBuffBright,CSize( szImageBufferX,szImageBufferY), ppBuffRaw,CSize( szMaxRawImageX, szMaxRawImageY), nMaxOverlapSize, nMaxFrameNum);
-			m_pRaw3DMgr->Initialize(NULL, ppConvertedImage, szImageBufferX, szImageBufferY, CSize(szMaxRawImageX, szMaxRawImageY), nMaxOverlapSize);
+			m_pRaw3DMgr->Initialize(ppConvertedImage, szImageBufferX, szImageBufferY, CSize(szMaxRawImageX, szMaxRawImageY), nMaxOverlapSize);
 		}
 		byte** CLR_3D::GetFGBuffer()
 		{

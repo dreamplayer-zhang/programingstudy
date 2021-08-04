@@ -33,7 +33,7 @@ Raw3DManager::~Raw3DManager()
 	//ClearBuffImageAddress();
 }
 
-void Raw3DManager::Initialize(LPBYTE* ppMainImage, int n3DImageWidth, int n3DImageHeight, CSize szRawImage, int nMaxOverlapSize)
+void Raw3DManager::Initialize(LPBYTE ppMainImage, int n3DImageWidth, int n3DImageHeight, CSize szRawImage, int nMaxOverlapSize)
 {
 
 	if (m_ppImageMain == NULL)
@@ -116,7 +116,6 @@ void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, Displ
 	, int nMinGV1, int nMinGV2, int nThreadNum, int nSnapFrameNum, int nOverlapStartPos, int nOverlapSize
 	, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, Parameter3D param)
 {
-	DebugTxt("MakeImage\n",11);
 	if (m_pThreadCalc != NULL)
 	{
 		//Thread 비정상종료 안전장치
@@ -148,7 +147,7 @@ void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, Displ
 	{
 		m_pThreadCalc[n].Initialize(n, m_nThreadNum, m_szImageBuffer, m_szRawImage, m_ppImageMain, m_ppBuffHeight, m_ppBuffBright, m_ppBuffFG, m_nSnapFrameNum);
 		//m_pThreadCalc[n].SetLogFormHandle(m_hLogForm);
-		m_pThreadCalc[n].StartCalculation(convertMode, calcMode, displayMode, ptDataPos, nMinGV1, nMinGV2, nOverlapStartPos, nOverlapSize, nDisplayOffsetX, nDisplayOffsetY, bRevScan, bUseMinGV2, m_pnCurrFrameNum, param);
+		m_pThreadCalc[n].StartCalculation(convertMode, calcMode, displayMode, ptDataPos, nMinGV1, nMinGV2, nOverlapStartPos, nOverlapSize, nDisplayOffsetX, nDisplayOffsetY, bRevScan, bUseMinGV2, &m_nCurrFrameNum, param);
 	}	
 	thread t1(CheckThread,this);
 	//AfxBeginThread(CheckThread, this);

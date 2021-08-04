@@ -47,7 +47,7 @@ private:
 	void CreateBuffer(int n3DImageWidth, int n3DImageHeight);
 	void DeleteRawBuffer();
 	void CreateRawBuffer(int nMaxSnapFrameNum);
-
+	*/
 
 	WORD** m_ppBuffHeight;
 	short** m_ppBuffBright;
