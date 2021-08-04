@@ -26,7 +26,7 @@ namespace RootTools_CLR
 
 		byte** GetFGBuffer();
 		byte** GetRawBuffer();
-		void MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CPoint ptDataPos
+		void MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CCPoint ptDataPos
 			, int nMinGV1, int nMinGV2, int nThreadNum, int nSnapFrameNum, int nOverlapStartPos, int nOverlapSize
 			, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, Parameter3D param);
 		void MakeImageSimple(int ptDataPosX, int ptDataPosY

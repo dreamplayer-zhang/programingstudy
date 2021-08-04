@@ -18,13 +18,14 @@ Raw3DManager::Raw3DManager()
 	m_ppBuffFG = NULL;
 	m_pThreadCalc = NULL;
 
-	m_szRawImage = CSize(0, 0);
-	m_szImageBuffer = CSize(0, 0);
+	m_szRawImage = CCSize(0, 0);
+	m_szImageBuffer = CCSize(0, 0);
 	m_nMaxOverlapSize = 100;
 	m_nSnapFrameNum = 0;
 	m_nThreadNum = 4; 
 	m_nCurrFrameNum=0;
 	RAWDATA = Raw3D_RawData::GetInstance();
+	m_ppImageMain = NULL;
 }
 
 
@@ -33,7 +34,7 @@ Raw3DManager::~Raw3DManager()
 	//ClearBuffImageAddress();
 }
 
-void Raw3DManager::Initialize(LPBYTE ppMainImage, int n3DImageWidth, int n3DImageHeight, CSize szRawImage, int nMaxOverlapSize)
+void Raw3DManager::Initialize(LPBYTE ppMainImage, int n3DImageWidth, int n3DImageHeight, CCSize szRawImage, int nMaxOverlapSize)
 {
 
 	if (m_ppImageMain == NULL)
@@ -110,9 +111,13 @@ UINT CheckThread(LPVOID lParam)
 void Raw3DManager::SetFrameNum(int fn)
 {
 	m_nCurrFrameNum = fn;
-	//DebugTxt("SetFrameNum\n", 13);
+	for (int n = 0; n < m_nThreadNum; n++)
+	{
+		m_pThreadCalc[n].SetFrameNum(m_nCurrFrameNum);
+	}
 }
-void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CPoint ptDataPos
+thread* th;
+void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CCPoint ptDataPos
 	, int nMinGV1, int nMinGV2, int nThreadNum, int nSnapFrameNum, int nOverlapStartPos, int nOverlapSize
 	, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, Parameter3D param)
 {
@@ -149,9 +154,8 @@ void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, Displ
 		//m_pThreadCalc[n].SetLogFormHandle(m_hLogForm);
 		m_pThreadCalc[n].StartCalculation(convertMode, calcMode, displayMode, ptDataPos, nMinGV1, nMinGV2, nOverlapStartPos, nOverlapSize, nDisplayOffsetX, nDisplayOffsetY, bRevScan, bUseMinGV2, &m_nCurrFrameNum, param);
 	}	
-	thread t1(CheckThread,this);
+	th= new thread(CheckThread,this);
 	//AfxBeginThread(CheckThread, this);
-	
 }
 
 void Raw3DManager::CheckSnapCalcDone()
@@ -250,7 +254,7 @@ void Raw3DManager::SendLog(CString strMsg)
 	}
 }*/
 
-CSize Raw3DManager::GetImageBufferSize()
+CCSize Raw3DManager::GetImageBufferSize()
 {
 	if (m_szImageBuffer.cx == 0 || m_szImageBuffer.cy == 0)
 		//AfxMessageBox("[Warning] 3D Grabber is not initialized. - GetImageBufferSize()");
@@ -258,7 +262,7 @@ CSize Raw3DManager::GetImageBufferSize()
 	return m_szImageBuffer;
 }
 
-CSize Raw3DManager::GetRawImageSize()
+CCSize Raw3DManager::GetRawImageSize()
 {
 	if (m_szRawImage.cx == 0 || m_szRawImage.cy == 0)
 		//AfxMessageBox("[Warning] 3D Grabber is not initialized. - GetRawImageSize()");

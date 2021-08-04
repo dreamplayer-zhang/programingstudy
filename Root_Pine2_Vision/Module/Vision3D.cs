@@ -626,7 +626,7 @@ namespace Root_Pine2_Vision.Module
             int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.MATROX) ? iSnap % (nTotalSnap / 2) : iSnap;
 
             // 이미지 시작점 설정
-            CPoint cpOffset = CalcOffset(nSnapLineIndex, nFOVpx, nReverseOffset, recipe);
+            CPoint cpOffset =new CPoint(0, 0);// CalcOffset(nSnapLineIndex, nFOVpx, nReverseOffset, recipe);
             MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
 
             MemoryData memConv = m_aWorks[eWorks].m_memoryGroup.GetMemory(Works3D.Mem3DViewH);
