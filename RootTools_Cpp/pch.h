@@ -31,47 +31,46 @@ typedef float               FLOAT;
 
 typedef BYTE* LPBYTE;
 
-class CSize
+class CCSize
 {
 public:
-	CSize() {}
-	CSize(int _x, int _y)
+	CCSize() {}
+	CCSize(int _x, int _y)
 	{
 		cx = _x;
 		cy = _y;
 	}
-	int cy;
 	int cx;
+	int cy;
 };
-class CPoint
+class CCPoint
 {
 public:
-	CPoint() {}
-	CPoint(int _x, int _y)
+	CCPoint() {}
+	CCPoint(int _x, int _y)
 	{
 		x = _x;
 		y = _y;
 	}
-	int y;
 	int x;
+	int y;
 };
 
-class CRect
+class CCRect
 {
 public:
-	CRect() {}
-	CRect(int _x, int _y, int _cx, int _cy )
+	CCRect() {}
+	CCRect(int _x, int _y, int _cx, int _cy )
 	{
 		x = _x;
 		y = _y;
 		cy = _cy;
 		cx = _cx;
 	}
-	int y;
 	int x;
-	int cy;
+	int y;
 	int cx;
-
+	int cy;
 };
 
 #endif //PCH_H

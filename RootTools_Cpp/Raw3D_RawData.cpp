@@ -27,7 +27,7 @@ Raw3D_RawData::~Raw3D_RawData()
 	//PurgeInstance();//이게 여기서 되는지 모르겠네
 }
 
-void Raw3D_RawData::Initialize(WORD* ppBuffHeight, short* ppBuffBright, CSize szImageBuffer,LPBYTE ppBuffRaw, CSize szMaxRawImage, int nMaxOverlapSize, int nMaxFrameNum)
+void Raw3D_RawData::Initialize(WORD* ppBuffHeight, short* ppBuffBright, CCSize szImageBuffer,LPBYTE ppBuffRaw, CCSize szMaxRawImage, int nMaxOverlapSize, int nMaxFrameNum)
 {
 	if (m_ppBuffBright == NULL)
 	{
@@ -336,12 +336,12 @@ BOOL Raw3D_RawData::ReadRawImageCSV(CString sFileName)
 	return FALSE;
 }
 */
-CSize Raw3D_RawData::GetMaxRawImageSize()
+CCSize Raw3D_RawData::GetMaxRawImageSize()
 {
 	return m_szMaxRawImage;
 }
 
-CSize Raw3D_RawData::GetRawDataBufferSize()
+CCSize Raw3D_RawData::GetRawDataBufferSize()
 {
 	return m_szImageBuffer;
 }

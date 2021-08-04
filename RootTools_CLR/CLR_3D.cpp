@@ -20,8 +20,8 @@ namespace RootTools_CLR
 		}
 		void CLR_3D::Init3D(LPBYTE ppConvertedImage,WORD* ppBuffHeight, short* ppBuffBright,int szImageBufferX, int szImageBufferY, LPBYTE ppBuffRaw, int szMaxRawImageX, int szMaxRawImageY, int nMaxOverlapSize, int nMaxFrameNum)
 		{
-			m_pRaw3DMgr->GetRawData()->Initialize(ppBuffHeight, ppBuffBright,CSize( szImageBufferX,szImageBufferY), ppBuffRaw,CSize( szMaxRawImageX, szMaxRawImageY), nMaxOverlapSize, nMaxFrameNum);
-			m_pRaw3DMgr->Initialize(ppConvertedImage, szImageBufferX, szImageBufferY, CSize(szMaxRawImageX, szMaxRawImageY), nMaxOverlapSize);
+			m_pRaw3DMgr->GetRawData()->Initialize(ppBuffHeight, ppBuffBright,CCSize( szImageBufferX,szImageBufferY), ppBuffRaw,CCSize( szMaxRawImageX, szMaxRawImageY), nMaxOverlapSize, nMaxFrameNum);
+			m_pRaw3DMgr->Initialize(ppConvertedImage, szImageBufferX, szImageBufferY, CCSize(szMaxRawImageX, szMaxRawImageY), nMaxOverlapSize);
 		}
 		byte** CLR_3D::GetFGBuffer()
 		{
@@ -31,7 +31,7 @@ namespace RootTools_CLR
 		{
 			return m_pRaw3DMgr->GetRawData()->GetRawBuffer();
 		}
-		void CLR_3D::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CPoint ptDataPos
+		void CLR_3D::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CCPoint ptDataPos
 			, int nMinGV1, int nMinGV2, int nThreadNum, int nSnapFrameNum, int nOverlapStartPos, int nOverlapSize
 			, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, Parameter3D param)
 		{
@@ -45,7 +45,7 @@ namespace RootTools_CLR
 			Parameter3D p;
 			p.n3DScanParam = n3DScanParam;
 			p.nSnapFrameRest = nSnapFrameRest;
-			m_pRaw3DMgr->MakeImage(ConvertMode::Bump, Calc3DMode::Normal, DisplayMode::HeightImage, CPoint(ptDataPosX, ptDataPosY), nMinGV1, nMinGV2, nThreadNum, nSnapFrameNum, nOverlapStartPos, nOverlapSize
+			m_pRaw3DMgr->MakeImage(ConvertMode::Bump, Calc3DMode::Normal, DisplayMode::HeightImage, CCPoint(ptDataPosX, ptDataPosY), nMinGV1, nMinGV2, nThreadNum, nSnapFrameNum, nOverlapStartPos, nOverlapSize
 				, nDisplayOffsetX, nDisplayOffsetY, bRevScan, bUseMinGV2, p);
 		}
 		void CLR_3D::SetFrameNum(int n)

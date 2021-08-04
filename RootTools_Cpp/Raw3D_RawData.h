@@ -11,7 +11,7 @@ class Raw3D_RawData
 public:
 	
 	static Raw3D_RawData* GetInstance();
-	void Initialize(WORD* ppBuffHeight, short* ppBuffBright, CSize szImageBuffer, LPBYTE ppBuffRaw, CSize szMaxRawImage, int nMaxOverlapSize, int nMaxFrameNum);
+	void Initialize(WORD* ppBuffHeight, short* ppBuffBright, CCSize szImageBuffer, LPBYTE ppBuffRaw, CCSize szMaxRawImage, int nMaxOverlapSize, int nMaxFrameNum);
 /*
 	void SaveRawImage(CString sFileName, CPoint ptLT, CPoint ptRB, int nFoV, int nOverlapSize);
 	BOOL ReadRawImage(CString sFileName);
@@ -23,15 +23,15 @@ public:
 	short** GetBrightBuffer();
 	LPBYTE* GetRawBuffer();
 
-	CSize GetMaxRawImageSize();
-	CSize GetRawDataBufferSize();
+	CCSize GetMaxRawImageSize();
+	CCSize GetRawDataBufferSize();
 
 	//void SendLog(CString strMsg);
 	
-	inline CPoint GetPosViewtoData(CPoint ptView, int nFoV, int nOverlapSize, int nDisplayOffsetX = 0, int nDisplayOffsetY = 0)
+	inline CCPoint GetPosViewtoData(CCPoint ptView, int nFoV, int nOverlapSize, int nDisplayOffsetX = 0, int nDisplayOffsetY = 0)
 	{
 		int nOverlapNum = ptView.x / (nFoV - nOverlapSize);
-		CPoint ptResult;
+		CCPoint ptResult;
 		ptResult.x = ptView.x + (nOverlapNum * nOverlapSize) - nDisplayOffsetX;
 		ptResult.y = ptView.y - nDisplayOffsetY;
 		return ptResult;
@@ -54,9 +54,9 @@ private:
 
 	LPBYTE* m_ppBuffRaw;
 
-	CSize m_szImageBuffer;
-	CSize m_szRawImage;
-	CSize m_szMaxRawImage;
+	CCSize m_szImageBuffer;
+	CCSize m_szRawImage;
+	CCSize m_szMaxRawImage;
 
 	int m_nMaxOverlapSize;
 	int m_nMaxSnapFrameNum;

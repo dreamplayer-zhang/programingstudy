@@ -646,7 +646,7 @@ namespace RootTools.Camera.Matrox
                     {
                         MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarray);
 
-                        //Parallel.For(0, p_nHeight, (y) =>
+                   //     Parallel.For(0, p_nHeight, (y) =>
                           for(int y = 0;y< p_nHeight;y++)
                         {
                             int yp = y + (iBlock) * p_nHeight;
@@ -658,7 +658,7 @@ namespace RootTools.Camera.Matrox
                                  Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
                             }
                         }
-                       // );
+                     //  );
                         int ypp = (iBlock) * p_nHeight;
                         ppDst[iBlock] = (byte*)((long)m_MemPtr + m_cpScanOffset.X + (ypp + m_cpScanOffset.Y) * (long)m_Memory.W);
                         m_clr3D.SetFrameNum(iBlock);
