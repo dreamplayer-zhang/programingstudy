@@ -25,6 +25,9 @@ typedef unsigned char byte;
 #include <atltypes.h>
 #include <afxwin.h>
 
+
 #define BLOCK_SIZE 1000
 #define MAX_SAME_FRAME_COUNT 10000
+
+void DebugTxt(const void* s, int size);
 #endif //PCH_H

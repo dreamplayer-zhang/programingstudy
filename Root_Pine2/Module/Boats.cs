@@ -257,7 +257,6 @@ namespace Root_Pine2.Module
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(true);
                 int xLine = m_aBoat[eWorks].m_recipe.m_aSnap.Count;
-                if (m_aBoat[eWorks].m_recipe.p_eSnapMode == Vision3D.Recipe.eSnapMode.ALL) xLine /= 2;
                 switch (xLine)
                 {
                     case 2: m_aCamOffset = m_aBoat[eWorks].m_aCam2Offset; break;

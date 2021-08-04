@@ -112,6 +112,7 @@
       <AdditionalDependencies>libmariadb.lib;mariadbclient.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb;$(SolutionDir)Lib\opencv\lib;$(SolutionDir)\RootTools_Cpp\3D;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <LargeAddressAware>true</LargeAddressAware>
+      <SubSystem>NotSet</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
