@@ -676,7 +676,7 @@ namespace Root_Pine2.Module
 
                 if (Run(m_elevator.MoveToConveyor(eMagazinePos, (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 7 : 0))) return p_sInfo;
                 if (Run(m_elevator.RunAlign(true))) return p_sInfo;
-                if (Run(m_elevator.MoveElevator(eMagazinePos))) return p_sInfo; 
+                //if (Run(m_elevator.MoveElevator(eMagazinePos))) return p_sInfo; 
                 m_magazineSet.MagazineLoaded(p_eMagazine, eMagazinePos); 
             }
             finally
