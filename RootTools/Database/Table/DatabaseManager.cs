@@ -40,7 +40,7 @@ namespace RootTools.Database
 	public class DatabaseManager : ObservableObject
 	{
 		#region Singleton
-		private DatabaseManager() { }
+		public DatabaseManager() { }
 		static readonly DatabaseManager _DBManager = new DatabaseManager();
 		//private static readonly Lazy<DatabaseManager> instacne = new Lazy<DatabaseManager>(() => new DatabaseManager());
 		public static DatabaseManager Instance
@@ -276,7 +276,37 @@ namespace RootTools.Database
 				m_ThreadConnectSession[i].Connect();
 			}
 		}
+		public DataSet GetDataSet(string sQueryMessage) // Main
+		{
+			if (m_MainConnectSession.IsConnected == false)
+				return null;
+#if !DEBUG
+			try
+			{
 
+#endif
+			MySqlCommand cmd = new MySqlCommand(sQueryMessage, m_MainConnectSession.GetConnection());
+
+			MySqlDataReader table = cmd.ExecuteReader();
+			DataSet ds = new DataSet();
+			DataTable dataTable = new DataTable();
+			ds.Tables.Add(dataTable);
+			ds.EnforceConstraints = false;
+			dataTable.Load(table);
+			table.Close();
+
+			return ds;
+
+#if !DEBUG
+			}
+			catch (Exception ex)
+			{
+				string sMessage = ex.Message;
+				return -1;
+			}
+
+#endif
+		}
 		public int SendQuery(string sQueryMessage) // Main
 		{
 			if (m_MainConnectSession.IsConnected == false)
@@ -821,8 +851,8 @@ namespace RootTools.Database
 		{
 			//Inspection ID 생성(KEY)
 			m_Loftinfo.SetLotinfo(inspectionstart, inspectionend, "LotID", "CSTID", "SetupID", "CSID", "WaferID", recipeid.Replace(".rcp", ""));
-			m_sInspectionID = MakeInspectionID(m_Loftinfo);
-			string sLotinfoQuery;
+            m_sInspectionID = MakeInspectionID(m_Loftinfo);
+            string sLotinfoQuery;
 
 			sLotinfoQuery = string.Format("INSERT INTO lotinfo(InspectionStart, InspectionEnd, sInspectionID, sLotID, sCSTID, sWaferID, sRecipeID)" +
 				" values('{0}','{1}','{2}','{3}','{4}','{5}','{6}')"
@@ -841,8 +871,8 @@ namespace RootTools.Database
 		{
 			//Inspection ID 생성(KEY)
 			m_Loftinfo.SetLotinfo(lotInfo);
-			m_sInspectionID = MakeInspectionID(m_Loftinfo);
-			string sLotinfoQuery;
+            m_sInspectionID = MakeInspectionID(m_Loftinfo);
+            string sLotinfoQuery;
 
 			sLotinfoQuery = string.Format("INSERT INTO lotinfo(InspectionStart, InspectionEnd, sInspectionID, sLotID, sCSTID, sWaferID, sRecipeID)" +
 				" values('{0}','{1}','{2}','{3}','{4}','{5}','{6}')"

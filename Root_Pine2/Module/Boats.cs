@@ -48,7 +48,7 @@ namespace Root_Pine2.Module
         public string RunMoveSnapStart(eWorks eWorks, Vision2D.Recipe.Snap snapData, int xLine, bool bWait = true)
         {
             double xp = m_xCamScale * snapData.m_dpAxis.X + ((m_aCamOffset != null) ? 10 * m_aCamOffset[xLine].X : 0);
-            double yp = (m_pine2.m_thicknessDefault - m_pine2.p_thickness) * 10; 
+            double yp = (m_pine2.m_thicknessDefault - m_pine2.p_thickness) * 10;
             m_axisCam.StartMove(eWorks, new RPoint(xp, yp));
             int yOffset = (m_aCamOffset != null) ? (int)(10 * m_aCamOffset[xLine].Y) : 0;
             if (Run(m_aBoat[eWorks].RunMoveSnapStart(snapData, yOffset, bWait))) return p_sInfo;
@@ -135,6 +135,15 @@ namespace Root_Pine2.Module
         {
             m_aBoat.Add(eWorks.A, new Boat(p_id + ".A", this, eWorks.A, m_vision.p_eVision == eVision.Top3D));
             m_aBoat.Add(eWorks.B, new Boat(p_id + ".B", this, eWorks.B, m_vision.p_eVision == eVision.Top3D));
+        }
+        #endregion
+
+        #region SnapLog
+        public Dictionary<eWorks, Log> m_aSnapLog = new Dictionary<eWorks, Log>();
+        void InitSnapLog()
+        {
+            m_aSnapLog.Add(eWorks.A, LogView.GetLog("Snap " + p_id + ".A"));
+            m_aSnapLog.Add(eWorks.B, LogView.GetLog("Snap " + p_id + ".B"));
         }
         #endregion
 
@@ -266,6 +275,7 @@ namespace Root_Pine2.Module
                 int iSnap = 0;
                 for (int i = 0; i < m_aBoat[eWorks].m_recipe.m_aSnap.Count; i++)
                 {
+                    m_aSnapLog[eWorks].Info("Snap Start Idx : " + i.ToString());
                     Vision3D.Recipe.Snap snap = m_aBoat[eWorks].m_recipe.m_aSnap[i];
                     if (bBiDirectionalScan == true) snap.m_eDirection = Vision3D.Recipe.Snap.eDirection.Forward;
                     vision.RunLight(snap.m_lightPower);
@@ -286,7 +296,7 @@ namespace Root_Pine2.Module
                     }
                     if (vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++;
-
+                    m_aSnapLog[eWorks].Info("Snap End Idx : " + i.ToString());
                 }
                 vision.RunLightOff();
                 m_bgwDone.RunWorkerAsync(eWorks);
@@ -342,6 +352,7 @@ namespace Root_Pine2.Module
 
                 for (int i = 0; i < m_aBoat[eWorks].m_recipe.m_aSnap.Count; i++)
                 {
+                    m_aSnapLog[eWorks].Info("Snap Start Idx : " + i.ToString());
                     Vision2D.Recipe.Snap snap = m_aBoat[eWorks].m_recipe.m_aSnap[i];
                     vision.RunLight(snap.m_lightPower);
                     m_bSnapReady = false;
@@ -361,7 +372,7 @@ namespace Root_Pine2.Module
                     }
                     if (vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++;
-
+                    m_aSnapLog[eWorks].Info("Snap End Idx : " + i.ToString());
                 }
                 vision.RunLightOff();
                 m_bgwDone.RunWorkerAsync(eWorks);
@@ -478,6 +489,7 @@ namespace Root_Pine2.Module
             p_id = "Boats " + vision.p_eVision.ToString();
             m_pine2 = pine2;
             InitBoat();
+            InitSnapLog();
             InitBase(p_id, engineer);
         }
 

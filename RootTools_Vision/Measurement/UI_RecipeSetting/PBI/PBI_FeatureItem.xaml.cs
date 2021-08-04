@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace RootTools_Vision
 {
     /// <summary>
-    /// VericalWire_RecipeTeacing.xaml에 대한 상호 작용 논리
+    /// PBI_FeatureItem.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class VericalWire_RecipeTeacing : UserControl
+    public partial class PBI_FeatureItem : UserControl
     {
-        public VericalWire_RecipeTeacing()
+        public PBI_FeatureItem()
         {
             InitializeComponent();
         }

@@ -31,6 +31,8 @@ namespace RootTools.Camera.Matrox
         private MIL_ID m_MilImage = MIL.M_NULL;              // MIL Image buffer identifier.
         private MIL_ID[] m_MilBuffers = new MIL_ID[c_nBuf];  // 버퍼
 
+        static int m_nTest = 0;
+        int m_nOffset = 0;
         
         public bool m_bGrabThreadOn = false;   // true When thread is arrived in Grab Loop
 
@@ -236,7 +238,6 @@ namespace RootTools.Camera.Matrox
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
             p_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-            //m_clr3D
         }
         public void Init3D(MemoryData MemConv, MemoryData MemHeight, MemoryData MemBright,MemoryData MemRaw, int nMaxOverlapSize,int nMaxFrameNum)
         {
@@ -376,8 +377,6 @@ namespace RootTools.Camera.Matrox
 
         public void LiveGrab()
         {
-         //   Grab3DScan(null, new CPoint(0, 0), 0);
-          //  return;
             // variable
             UserDataObject userObject = new UserDataObject();
 
@@ -475,6 +474,7 @@ namespace RootTools.Camera.Matrox
             m_MemPtr = memory.GetPtr();
             m_cpScanOffset = cpScanOffset;
             p_CamInfo.p_eState = eCamState.GrabMem;
+            m_nOffset = m_GrabData.nScanOffsetY;
 
             MIL_INT licenseModules = 0;
             MIL_INT frameCount = 0;
@@ -712,7 +712,8 @@ namespace RootTools.Camera.Matrox
                     });
                     iBlock++;
                 }
-            }finally
+            }
+            finally
             {
                 p_CamInfo.p_eState = eCamState.Ready;
                // userObjectHandle.Free();
@@ -734,7 +735,7 @@ namespace RootTools.Camera.Matrox
                     MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarray);
                     Parallel.For(0, p_nHeight, (y) =>
                     {
-                        int yp = y + (iBlock) * p_nHeight;
+                        int yp = y + (iBlock) * p_nHeight + m_nOffset;
                         fixed (byte* p = srcarray)
                         {
                             IntPtr srcPtr = (IntPtr)p + p_nWidth * y;
@@ -743,7 +744,6 @@ namespace RootTools.Camera.Matrox
                         }
                     });
                     iBlock++;
-                    //m_clr3D.MakeImage(global::ConvertMode)
                     //GrabEvent();
                     //if (m_nGrabCount != 0)
                     //    p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);

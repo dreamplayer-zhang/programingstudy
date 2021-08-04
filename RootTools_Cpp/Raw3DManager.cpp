@@ -1,12 +1,15 @@
 #include "pch.h"
 #include "Raw3DManager.h"
 #include <omp.h> 
-
+#include <thread>
+using namespace std;
+/*
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+*/
 
 Raw3DManager::Raw3DManager()
 {
@@ -14,9 +17,7 @@ Raw3DManager::Raw3DManager()
 	m_ppBuffBright = NULL;
 	m_ppBuffFG = NULL;
 	m_pThreadCalc = NULL;
-	m_hLogForm = NULL;
-	m_pDlgGrabber = NULL;
-	m_ppImageMain = NULL;
+
 	m_szRawImage = CSize(0, 0);
 	m_szImageBuffer = CSize(0, 0);
 	m_nMaxOverlapSize = 100;
@@ -32,9 +33,8 @@ Raw3DManager::~Raw3DManager()
 	//ClearBuffImageAddress();
 }
 
-void Raw3DManager::Initialize(HWND pDlgGrabber, LPBYTE ppMainImage, int n3DImageWidth, int n3DImageHeight, CSize szRawImage, int nMaxOverlapSize)
+void Raw3DManager::Initialize(LPBYTE* ppMainImage, int n3DImageWidth, int n3DImageHeight, CSize szRawImage, int nMaxOverlapSize)
 {
-	m_pDlgGrabber = pDlgGrabber;
 
 	if (m_ppImageMain == NULL)
 	{
@@ -66,11 +66,6 @@ void Raw3DManager::Initialize(HWND pDlgGrabber, LPBYTE ppMainImage, int n3DImage
 
 	m_ppBuffHeight = RAWDATA->GetHeightBuffer();
 	m_ppBuffBright = RAWDATA->GetBrightBuffer();
-}
-
-void Raw3DManager::SetLogFormHandle(HWND hLogHandle)
-{
-	m_hLogForm = hLogHandle;
 }
 
 
@@ -152,10 +147,12 @@ void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, Displ
 	for (int n = 0; n < m_nThreadNum; n++)
 	{
 		m_pThreadCalc[n].Initialize(n, m_nThreadNum, m_szImageBuffer, m_szRawImage, m_ppImageMain, m_ppBuffHeight, m_ppBuffBright, m_ppBuffFG, m_nSnapFrameNum);
-		m_pThreadCalc[n].SetLogFormHandle(m_hLogForm);
-		m_pThreadCalc[n].StartCalculation(convertMode, calcMode, displayMode, ptDataPos, nMinGV1, nMinGV2, nOverlapStartPos, nOverlapSize, nDisplayOffsetX, nDisplayOffsetY, bRevScan, bUseMinGV2, &m_nCurrFrameNum, param);
-	}
-	AfxBeginThread(CheckThread, this);
+		//m_pThreadCalc[n].SetLogFormHandle(m_hLogForm);
+		m_pThreadCalc[n].StartCalculation(convertMode, calcMode, displayMode, ptDataPos, nMinGV1, nMinGV2, nOverlapStartPos, nOverlapSize, nDisplayOffsetX, nDisplayOffsetY, bRevScan, bUseMinGV2, m_pnCurrFrameNum, param);
+	}	
+	thread t1(CheckThread,this);
+	//AfxBeginThread(CheckThread, this);
+	
 }
 
 void Raw3DManager::CheckSnapCalcDone()
@@ -187,7 +184,7 @@ void Raw3DManager::CheckSnapCalcDone()
 		}
 		if (bDone == true)
 		{
-			if (m_pDlgGrabber != NULL)
+		//	if (m_pDlgGrabber != NULL)
 			{
 			//	::SendMessage(m_pDlgGrabber, WM_MESSAGE_FRAMEGRABBER_SNAP_DONE, 0, 1);
 			//	SendLog("Snap Done");
@@ -197,7 +194,7 @@ void Raw3DManager::CheckSnapCalcDone()
 		}
 		if (bError == true)
 		{
-			if (m_pDlgGrabber != NULL)
+		//	if (m_pDlgGrabber != NULL)
 			{
 			//	::SendMessage(m_pDlgGrabber, WM_MESSAGE_FRAMEGRABBER_SNAP_DONE, 0, -1);
 			}
@@ -218,7 +215,7 @@ void Raw3DManager::CheckSnapCalcDone()
 				//s.Format("[Error] Cannot snap next frames / Curr Frame Num = %d / Need Snap Frame Num = %d", *m_pnCurrFrameNum, m_nSnapFrameNum);
 				//SendLog(s);
 
-				if (m_pDlgGrabber != NULL)
+			//	if (m_pDlgGrabber != NULL)
 				{
 				//	::SendMessage(m_pDlgGrabber, WM_MESSAGE_FRAMEGRABBER_SNAP_DONE, 0, -1);
 				}

@@ -105,6 +105,7 @@ namespace Root_WindII
                 if (xmlNodeList.Count > 0)
                 {
                     xmlNodeList = xmlDoc.SelectNodes("/XMLCONTENTS/BASIC_TAB/DIE_LIST/DIE_INFO");
+                    xmlData.DieList.Clear();
                     foreach (XmlNode node in xmlNodeList)
                     {
                         Point pt = new Point();
@@ -147,6 +148,11 @@ namespace Root_WindII
             xmlData.SMIOffsetX_Backside = xmlData.ShotX * xmlData.DiePitchX - xmlData.SMIOffsetX;
 
             return true;
+        }
+
+        static public void CreateXMLData()
+        {
+
         }
 
         static public string GetMapInfoPartId(string filePath)

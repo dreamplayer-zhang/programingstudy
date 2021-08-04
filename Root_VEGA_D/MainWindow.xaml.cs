@@ -3,6 +3,7 @@ using Root_VEGA_D.Engineer;
 using Root_VEGA_D.Module;
 using Root_VEGA_D.Module.Recipe;
 using RootTools;
+using RootTools.GAFs;
 using RootTools.Module;
 using System;
 using System.ComponentModel;
@@ -22,6 +23,7 @@ namespace Root_VEGA_D
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static string MainFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
         Version assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
         #region TitleBar
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
@@ -130,11 +132,28 @@ namespace Root_VEGA_D
             //RecipeManagerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed; ;
             //RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
-
+            buttonAlarm.DataContext = m_handler.m_gaf.m_listALID;
             m_mainWindowViewModel = new MainWindow_ViewModel(this, m_recipe);
             this.DataContext = m_mainWindowViewModel;
 
             m_handler.m_vision.LineScanStatusChanged += m_mainWindowViewModel.M_vision_LineScanStatusChanged;
+
+            string serverPath = Path.Combine(MainFolder, "ServerSettings.txt");
+
+            App.ServerIP = "";
+            App.ServerWebPort = "80";//웹서버 기본 포트
+            App.IsServerEnabled = false;
+
+            if (File.Exists(serverPath))
+			{
+                var lines = File.ReadAllLines(serverPath);
+                if(lines.Length >= 2)
+                {
+                    App.ServerIP = lines[0];
+                    App.ServerWebPort = lines[1];
+                    App.IsServerEnabled = true;
+                }
+			}
         }
 
         //bool m_blogin = false;
@@ -285,7 +304,9 @@ namespace Root_VEGA_D
             //btn_Y_Bottom.IsChecked = m_handler.m_interlock.m_diY_BottomPre.p_bIn;
             //btn_Y_Side_Master.IsChecked = m_handler.m_interlock.m_diY_SideMasterPre.p_bIn;
             //btn_Y_Side_Slave.IsChecked = m_handler.m_interlock.m_diY_SideSlavePre.p_bIn;
+
         }
+
         void TimerUI()
         {
             if (EQ.p_eState != EQ.eState.Run) EQ.p_bRecovery = false;
@@ -324,7 +345,13 @@ namespace Root_VEGA_D
             else m_ohts.Show();
 
         }
-    }
+
+		private void buttonAlarm_Click(object sender, RoutedEventArgs e)
+		{
+            if (ALIDList.m_bPopUpUI) return;
+            ALIDList.m_bPopUpUI = true;
+        }
+	}
 	public class StateToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

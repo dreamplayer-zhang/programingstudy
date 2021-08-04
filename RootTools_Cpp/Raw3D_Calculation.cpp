@@ -1,13 +1,15 @@
 #include "pch.h"
 #include "Raw3D_Calculation.h"
-#include <afxwin.h>
+#include <thread>
+using namespace std;
 //#include "Raw3D_RawData.h"
-
+/*
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+*/
 
 Raw3D_Calculation::Raw3D_Calculation()
 {
@@ -18,7 +20,6 @@ Raw3D_Calculation::Raw3D_Calculation()
 	m_ppBuffBright = NULL;
 	m_pBuffRaw = NULL;
 
-	m_hLogForm = NULL;
 
 	m_bStop = false;
 
@@ -58,7 +59,7 @@ void Raw3D_Calculation::Initialize(int nThreadIndex, int nThreadNum, CSize sz3DI
 
 	SetCalcState(Calc3DState::ReadyCalc);
 }
-
+typedef unsigned char       BYTE;
 void Raw3D_Calculation::CreateCvtBuffer(CSize szRawImage)
 {
 	if (m_pBuffRaw != NULL)
@@ -69,10 +70,6 @@ void Raw3D_Calculation::CreateCvtBuffer(CSize szRawImage)
 	m_pBuffRaw = new BYTE[szRawImage.cx * szRawImage.cy];
 }
 
-void Raw3D_Calculation::SetLogFormHandle(HWND hLogHandle)
-{
-	m_hLogForm = hLogHandle;
-}
 /*
 void Raw3D_Calculation::SendLog(CString strMsg)
 {
@@ -119,7 +116,9 @@ void Raw3D_Calculation::StartCalculation(ConvertMode cvtMode, Calc3DMode calcMod
 	m_param = param;
 
 	SetCalcState(Calc3DState::Calculating);
-	AfxBeginThread(ThreadCalculation, this);
+	
+	thread t1(ThreadCalculation,this);
+	// AfxBeginThread(ThreadCalculation, this);
 }
 
 //디스플레이되는 이미지 컨버팅만
@@ -146,7 +145,6 @@ void Raw3D_Calculation::CalculateImage()
 	DebugTxt("CalculateImage\n",16);
 	//스레드 인덱스에 따른 n 계산 해야함
 	//역방향 추가해야함
-	CString strLog = "";
 	int n = 0;
 	if (m_cvtMode == ConvertMode::NoConvert)
 	{
@@ -232,7 +230,7 @@ void Raw3D_Calculation::CalculateImage()
 				break;
 			}
 
-			CRect rtCvtROI = CRect(CPoint(m_ptDataPos.x, nYPos + ptOLDataPos.y), CSize(m_szRawImage.cx, 1));
+			CRect rtCvtROI = CRect(m_ptDataPos.x, nYPos + ptOLDataPos.y, m_szRawImage.cx, 1);
 			ConvertDisplayImage(m_displayMode, rtCvtROI, m_nOverlapStartPos, m_nOverlapSize, m_nDisplayOffsetX, m_nDisplayOffsetY);
 
 			n += m_nThreadNum;
@@ -1574,9 +1572,9 @@ void Raw3D_Calculation::ConvertDisplayImage(DisplayMode displayMode, CRect rtROI
 	//	pWord++;
 	//} //forget
 
-	int nOverlapNum = (rtROI.left - m_nOverlapStartPos) / (m_szRawImage.cx - m_nOverlapSize);
+	int nOverlapNum = (rtROI.x - m_nOverlapStartPos) / (m_szRawImage.cx - m_nOverlapSize);
 
-	if (m_nOverlapStartPos > 0 && rtROI.left > m_nOverlapStartPos)
+	if (m_nOverlapStartPos > 0 && rtROI.x > m_nOverlapStartPos)
 		nOverlapNum++;
 
 	int nOffsetX = m_nOverlapSize * nOverlapNum;
@@ -1584,9 +1582,9 @@ void Raw3D_Calculation::ConvertDisplayImage(DisplayMode displayMode, CRect rtROI
 	switch (displayMode)
 	{
 	case DisplayMode::HeightImage:
-		for (int y = rtROI.top; y < rtROI.bottom; y++)
+		for (int y = rtROI.y; y < rtROI.y + rtROI.cy; y++)
 		{
-			for (int x = rtROI.left; x < rtROI.right; x++)
+			for (int x = rtROI.x; x < rtROI.x + rtROI.cx; x++)
 			{
 
 				if (IsMinGV2(x + nOffsetX, y) == true)
@@ -1601,9 +1599,9 @@ void Raw3D_Calculation::ConvertDisplayImage(DisplayMode displayMode, CRect rtROI
 		}
 		break;
 	case DisplayMode::BrightImage:
-		for (int y = rtROI.top; y < rtROI.bottom; y++)
+		for (int y = rtROI.y; y < rtROI.y + rtROI.cy; y++)
 		{
-			for (int x = rtROI.left; x < rtROI.right; x++)
+			for (int x = rtROI.x; x < rtROI.x + rtROI.cx; x++)
 			{
 				if (IsMinGV2(x + nOffsetX, y) == true)
 				{

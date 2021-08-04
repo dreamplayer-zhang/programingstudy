@@ -9,6 +9,7 @@ struct Parameter3D
 class Raw3D_RawData
 {
 public:
+	
 	static Raw3D_RawData* GetInstance();
 	void Initialize(WORD* ppBuffHeight, short* ppBuffBright, CSize szImageBuffer, LPBYTE ppBuffRaw, CSize szMaxRawImage, int nMaxOverlapSize, int nMaxFrameNum);
 /*
@@ -26,12 +27,13 @@ public:
 	CSize GetRawDataBufferSize();
 
 	//void SendLog(CString strMsg);
-
+	
 	inline CPoint GetPosViewtoData(CPoint ptView, int nFoV, int nOverlapSize, int nDisplayOffsetX = 0, int nDisplayOffsetY = 0)
 	{
 		int nOverlapNum = ptView.x / (nFoV - nOverlapSize);
-		CPoint ptResult = CPoint(ptView.x + (nOverlapNum * nOverlapSize) - nDisplayOffsetX, ptView.y - nDisplayOffsetY);
-
+		CPoint ptResult;
+		ptResult.x = ptView.x + (nOverlapNum * nOverlapSize) - nDisplayOffsetX;
+		ptResult.y = ptView.y - nDisplayOffsetY;
 		return ptResult;
 	}
 
@@ -45,8 +47,7 @@ private:
 	void CreateBuffer(int n3DImageWidth, int n3DImageHeight);
 	void DeleteRawBuffer();
 	void CreateRawBuffer(int nMaxSnapFrameNum);
-	*/
-	HWND m_hLogForm;
+
 
 	WORD** m_ppBuffHeight;
 	short** m_ppBuffBright;

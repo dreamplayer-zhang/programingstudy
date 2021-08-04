@@ -58,7 +58,8 @@ namespace Root_WindII
         public int OriginDieY { get; set; }
         public string EvenOdd { get; set; }
         public List<Point> DieList { get; set; }
-
+        public Point OriginDieUnit { get; set; }
+        public Point DieMinXY { get; set; }
         public int[] MapData
         {
             get;
@@ -168,8 +169,10 @@ namespace Root_WindII
             foreach (Point pt in DieList)
             {
                 dieList.Add(new Point(pt.X - minX, pt.Y - minY));
+                if (pt.X == OriginDieX && pt.Y == OriginDieY)
+                    OriginDieUnit = new Point(pt.X - minX, pt.Y - minY);
             }
-
+            DieMinXY = new Point(minX, minY);
             return dieList;
         }
 

@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using RootTools;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,7 @@ namespace Root_WindII
         public delegate void EventOriginBoxReset();
         public delegate void EventPitchPointDone();
         public delegate void EventCenteringPointDone();
+        public delegate void EventOriginDieChanged(string changeAxis);
 
         #region [Color]
 
@@ -60,6 +62,7 @@ namespace Root_WindII
         public event EventOriginBoxReset OriginBoxReset;
         public event EventPitchPointDone PitchPointDone;
         public event EventCenteringPointDone CenteringPointDone;
+        public event EventOriginDieChanged OriginDieChanged;
         #endregion
 
         #region [ViewerState]
@@ -419,13 +422,18 @@ namespace Root_WindII
                 SetProperty(ref smiOffsetY, value);
             }
         }
+
         double originDieX = 0;
         public double OriginDieX
         {
             get => originDieX;
             set
             {
+                if (value >= UnitX)
+                    return;
                 SetProperty(ref originDieX, value);
+                if (OriginDieChanged != null)
+                    OriginDieChanged("X");
             }
         }
         double originDieY = 0;
@@ -434,7 +442,11 @@ namespace Root_WindII
             get => originDieY;
             set
             {
+                if (value >= UnitY)
+                    return;
                 SetProperty(ref originDieY, value);
+                if (OriginDieChanged != null)
+                    OriginDieChanged("Y");
             }
         }
         int shotSizeX = 0;
@@ -694,13 +706,10 @@ namespace Root_WindII
         Grid CenterLTBox_UI = null;
         Grid CenterLTPoint_UI = null;
         CPoint CenterLTPoint = new CPoint();
-        //Grid CenterLeftTopRT_UI = null;
-        //Grid CenterRightBottomRT_UI = null;
         Grid CenterRTBox_UI = null;
         Grid CenterRTPoint_UI = null;
         CPoint CenterRTPoint = new CPoint();
-        //Grid CenterLeftTopRB_UI = null;
-        //Grid CenterRightBottomRB_UI = null;
+
         Grid CenterRBBox_UI = null;
         Grid CenterRBPoint_UI = null;
         CPoint CenterRBPoint = new CPoint();
@@ -1175,11 +1184,22 @@ namespace Root_WindII
 
             double shotCenterX = ShotKeyPoint.X + (DiePitchX / 4 * shotSizeX / 2);
             double shotCenterY = ShotKeyPoint.Y - (DiePitchY / 4 * ShotSizeY / 2);
-            ShotOffsetX = (centerPoint.X - shotCenterX) * 4;
-            ShotOffsetY = (shotCenterY - centerPoint.Y) * 4;
-            ShotCenterPoint = new CPoint((int)(centerPoint.X - ShotOffsetX / 4), (int)(centerPoint.Y + ShotOffsetY / 4));
-            //ShotCenterPoint.X = (int)(ShotKeyPoint.X + (DiePitchX * ShotSizeX));
-            //ShotCenterPoint.Y = (int)(ShotKeyPoint.X + (DiePitchY * ShotSizeY));
+
+
+            //ShotOffsetX = (centerPoint.X - shotCenterX) * 4;
+            //ShotOffsetY = (shotCenterY - centerPoint.Y) * 4;
+            //ShotCenterPoint = new CPoint((int)(centerPoint.X - ShotOffsetX / 4), (int)(centerPoint.Y + ShotOffsetY / 4));
+            //double pitchX = pitchBox.Left;
+            //double pitchY = pitchBox.Bottom;
+
+            //double shotX = ShotKeyPoint.X;
+            //double shotY = ShotKeyPoint.Y;
+           
+
+           // ShotCenterPoint = new CPoint((int)(ShotStart.Y - (DiePitchY / 4 * ShotSizeY / 2)));
+
+            //ShotCenterPoint.X = (int)(pitchX + (DiePitchX / 4 * ShotSizeX / 2));
+            //ShotCenterPoint.Y = (int)(pitchY - (DiePitchY / 4 * ShotSizeY / 2));
             for (int i = 0; i < totalShot; i++)
             {
                 if (ShotList.Count != 0 && ShotList[i] != null && p_UIElement.Contains(ShotList_UI[i]))
@@ -1205,11 +1225,15 @@ namespace Root_WindII
             DrawShotList();
 
 
+            ShotCenterPoint = new CPoint((int)(ShotStart.X + (DiePitchX / 4 * ShotSizeX / 2)), (int)(ShotStart.Y - (DiePitchY / 4 * ShotSizeY / 2)));
+
             if (p_UIElement.Contains(ShotCenterPoint_UI))
                 p_UIElement.Remove(ShotCenterPoint_UI);
 
             DrawShotCenterPoint();
 
+            ShotOffsetX = (centerPoint.X - ShotCenterPoint.X) * 4;
+            ShotOffsetY = (ShotCenterPoint.Y - centerPoint.Y) * 4;
 
         }
         #endregion
@@ -2061,6 +2085,7 @@ namespace Root_WindII
             int bottom = pitchBox.Bottom;
 
 
+            //* 읽을 때만 하도록 수정 필요할듯.
             DiePitchX = pitchBox.Width * 4;
             DiePitchY = pitchBox.Height * 4;
 
@@ -2279,6 +2304,77 @@ namespace Root_WindII
 
         }
         
+        void SetLoadData()
+        {
+            CPoint memPt = new CPoint((int)(centerPoint.X - MapOffsetX / 4), (int)(centerPoint.Y + MapOffsetY / 4));
+            originLeftBottom.X = memPt.X;
+            originLeftBottom.Y = memPt.Y;
+            DrawOriginLeftBottomPoint(originLeftBottom);
+            originRightTop.X = (int)(originLeftBottom.X + DiePitchX / 4 - ScribeLaneX / 4);
+            originRightTop.Y = (int)(originLeftBottom.Y - DiePitchY / 4 + scribeLaneY / 4);
+
+            originBox.Left = originLeftBottom.X;
+            originBox.Right = originRightTop.X;
+            originBox.Top = originRightTop.Y;
+            originBox.Bottom = originLeftBottom.Y;
+
+            DrawOriginRightTopPoint(originRightTop);
+            DrawingSetPitchPoint();
+            DrawOriginBox();
+
+            DrawPitchBox();
+
+            //double shotCenterX = ShotKeyPoint.X + (DiePitchX / 4 * shotSizeX / 2);
+            //double shotCenterY = ShotKeyPoint.Y - (DiePitchY / 4 * ShotSizeY / 2);
+            //ShotOffsetX = (centerPoint.X - shotCenterX) * 4;
+            //ShotOffsetY = (shotCenterY - centerPoint.Y) * 4;
+
+            ShotCenterPoint = new CPoint((int)(centerPoint.X - ShotOffsetX / 4), (int)(centerPoint.Y + ShotOffsetY / 4));
+
+            //ShotCenterPoint.X = (int)(ShotStart.X + (DiePitchX / 4 * ShotSizeX / 2));
+            //ShotCenterPoint.Y = (int)(ShotStart.Y - (DiePitchY / 4 * ShotSizeY / 2));
+
+
+            if (p_UIElement.Contains(ShotCenterPoint_UI))
+                p_UIElement.Remove(ShotCenterPoint_UI);
+
+            DrawShotCenterPoint();
+
+
+            ShotKeyPoint = new CPoint((int)(ShotCenterPoint.X - (ShotSizeX * DiePitchX / 4) / 2), (int)(ShotCenterPoint.Y + (ShotSizeY * DiePitchY / 4) / 2));
+
+
+
+            if (p_UIElement.Contains(ShotKeyPoint_UI))
+                p_UIElement.Remove(ShotKeyPoint_UI);
+            DrawShotKeyPoint();
+
+            for (int i = 0; i < totalShot; i++)
+            {
+                if (ShotList.Count != 0 && ShotList[i] != null && p_UIElement.Contains(ShotList_UI[i]))
+                    p_UIElement.Remove(ShotList_UI[i]);
+            }
+            totalShot = ShotSizeX * ShotSizeY;
+            ShotList.Clear();
+            ShotList_UI.Clear();
+            for (byte i = 0; i < totalShot; i++)
+            {
+
+                Grid grid = new Grid();
+                grid.Children.Add(new Line());
+                grid.Children.Add(new Line());
+                grid.Children.Add(new Line());
+                grid.Children.Add(new Line());
+                grid.Width = DiePitchX / 4;
+                grid.Height = DiePitchY / 4;
+                ShotList_UI.Add(grid);
+                ShotList.Add(new CRect());
+            }
+
+            DrawShotList();
+
+            IsLoad = false;
+        }
         void SetData()
         {
             if (!IsLoad)
@@ -2311,13 +2407,10 @@ namespace Root_WindII
             DrawPitchBox();
 
 
-            if (!IsLoad)
-            {
-                double shotCenterX = ShotKeyPoint.X + (DiePitchX / 4 * shotSizeX / 2);
-                double shotCenterY = ShotKeyPoint.Y - (DiePitchY / 4 * ShotSizeY / 2);
-                ShotOffsetX = (centerPoint.X - shotCenterX) * 4;
-                ShotOffsetY = (shotCenterY - centerPoint.Y) * 4;
-            }
+            double shotCenterX = ShotKeyPoint.X + (DiePitchX / 4 * shotSizeX / 2);
+            double shotCenterY = ShotKeyPoint.Y - (DiePitchY / 4 * ShotSizeY / 2);
+            ShotOffsetX = (centerPoint.X - shotCenterX) * 4;
+            ShotOffsetY = (shotCenterY - centerPoint.Y) * 4;
 
 
             //memPt = new CPoint((int)(centerPoint.X - xmlData.MapOffsetX / 4), (int)(centerPoint.Y + xmlData.MapOffsetY / 4));
@@ -2433,19 +2526,41 @@ namespace Root_WindII
                 p_UIElement.Add(ShotList_UI[idx]);
             }
         }
+
+        CPoint ShotStart { get; set; } = new CPoint();
         private void DrawShotList()
         {
             //double x = ShotKeyPoint.X;
             //double y = ShotKeyPoint.Y;
             int sizeX = ShotSizeX;
             int sizeY = ShotSizeY;
+
+            // Shot List 출력 계산해야함.
+            double pitchX = pitchBox.Left;
+            double pitchY = pitchBox.Bottom;
+
+            double shotX = ShotKeyPoint.X;
+            double shotY = ShotKeyPoint.Y;
+
+            int xCnt = (int)((pitchX - shotX) / (DiePitchX / 4));
+            int yCnt = (int)((shotY - pitchY) / (DiePitchY / 4));
+            //if (pitchX - shotX < DiePitchX / 4)
+            //{
+
+            //}
+
+            double startX = pitchX - (DiePitchX / 4  * xCnt);
+            double startY = pitchY + (DiePitchY / 4  * yCnt);
+            ShotStart = new CPoint((int)startX, (int)startY);
+
+
             for (int i = 0; i < sizeY; i++)
             {
-                double y = ShotKeyPoint.Y;
+                double y = startY;
                 y -= i * DiePitchY / 4;
                 for (int j = 0; j < sizeX; j++)
                 {
-                    double x = ShotKeyPoint.X;
+                    double x = startX;
                     x += j * DiePitchX / 4;
 
                     double left = x;
@@ -2548,16 +2663,7 @@ namespace Root_WindII
             line2.StrokeThickness = 3;
             line2.Opacity = 1;
 
-            //ShotCenterPoint = new CPoint((int)(centerPoint.X - xmlData.ShotOffsetX / 4), (int)(centerPoint.Y + xmlData.ShotOffsetY / 4));
-            if (IsLoad)
-            {
-                ShotKeyPoint = new CPoint((int)(ShotCenterPoint.X - (ShotSizeX * DiePitchX / 4) / 2),(int)(ShotCenterPoint.Y + (ShotSizeY * DiePitchY / 4) / 2));
-                IsLoad = false;
-            }
-            else
-            {
-                
-            }
+            //ShotCenterPoint = new CPoint((int)(centerPoint.X - xmlData.ShotOffsetX / 4), (int)(centerPoint.Y + xmlData.ShotOffsetY / 4)); 
 
             CPoint memPt = ShotKeyPoint;
             CPoint canvasPt = GetCanvasPoint(memPt);
@@ -2591,8 +2697,12 @@ namespace Root_WindII
             line2.StrokeThickness = 3;
             line2.Opacity = 1;
             //if (IsLoad)
+
             //{
-                ShotCenterPoint = new CPoint((int)(centerPoint.X - ShotOffsetX / 4), (int)(centerPoint.Y + ShotOffsetY / 4));
+            double pitchX = pitchBox.Left;
+            double pitchY = pitchBox.Bottom;
+
+           
             //}
 
             CPoint memPt = ShotCenterPoint;
@@ -2678,7 +2788,15 @@ namespace Root_WindII
             Canvas.SetLeft(CenterPoint_UI, canvasPt.X);
             Canvas.SetTop(CenterPoint_UI, canvasPt.Y);
             p_UIElement.Add(CenterPoint_UI);
-            SetData();
+
+            if (IsLoad)
+            {
+                SetLoadData();
+            }
+            else
+            {
+                SetData();
+            }
         }
         #endregion
 
@@ -2804,8 +2922,13 @@ namespace Root_WindII
 
         public void SetCenter()
         {
-            //if(!IsOriginEnable)
-            //    IsOriginEnable = true;
+            if(!IsOriginEnable)
+                IsOriginEnable = true;
+            if (DiePitchX != 0 && DiePitchY != 0)
+            {
+                IsPitchEnable = true;
+                IsShotKeyEnable = true;
+            }
         }
 
         public void SetOrigin()
@@ -2829,9 +2952,26 @@ namespace Root_WindII
         public void DataLoadDone()
         {
             ClearAllObjects();
-            IsOriginEnable = true;
-            IsPitchEnable = true;
-            IsShotKeyEnable = true;
+            IsOriginEnable = false;
+            IsPitchEnable = false;
+            IsShotKeyEnable = false;
+
+            IsLoad = true;
+        }
+
+        public void CreateXMLData()
+        {
+            
+            XMLParser.CreateXMLData();
+        }
+
+        void UpdateXMLData()
+        {
+            XMLData xmlData = GlobalObjects.Instance.Get<XMLData>();
+            xmlData.Device = DeviceID;
+            xmlData.DiePitchX = DiePitchX;
+            xmlData.DiePitchY = DiePitchY;
+           
         }
 
         #endregion

@@ -379,6 +379,7 @@ namespace RootTools_Vision
                     RedrawTrendMap();
                     RedrawDefectListFront();
                     RedrawDefectListBack();
+                    RedrawDefectListEdge();
                 });
             }
         }
@@ -410,8 +411,6 @@ namespace RootTools_Vision
                 this.MapSizeX = this.recipeFront.WaferMap.MapSizeX.ToString();
                 this.MapSizeY = this.recipeFront.WaferMap.MapSizeY.ToString();
                 this.GrossDie = this.recipeFront.WaferMap.GrossDie.ToString();
-
-                
 
                 CreateMap(this.recipeFront.WaferMap);
             }
@@ -619,52 +618,68 @@ namespace RootTools_Vision
 
         private void ClassifyDefectListEdge()
         {
-            return;
             // Front
-            if (this.recipeFront == null) return;
+            if (this.recipeEdge == null) return;
 
-            OriginRecipe originRecipe = this.recipeFront.GetItem<OriginRecipe>();
-            RecipeType_WaferMap waferMap = this.recipeFront.WaferMap;
-
-            if (waferMap.MapSizeX == 0 || waferMap.MapSizeY == 0) return;
-
-            int sizeX = waferMap.MapSizeX;
-            int sizeY = waferMap.MapSizeY;
+            OriginRecipe originRecipe = this.recipeEdge.GetItem<OriginRecipe>();
+            RecipeType_WaferMap waferMap = this.recipeEdge.WaferMap;
 
             int offsetX = waferOffsetX + dieOffsetX;
             int offsetY = waferOffsetY + dieOffsetY;
 
-            double canvasChipWidth = (double)(CanvasWidth - offsetX * 2) / (double)sizeX;
-            double canvasChipHeight = (double)(CanvasHeight - offsetY * 2) / (double)sizeY;
+            double canvasRadius = (CanvasWidth - (waferOffsetX * 2)) / 2;
 
-            this.FrontItems.Clear();
+            int canvasCenterX = (int)CanvasWidth / 2;
+            int canvasCenterY = (int)CanvasHeight / 2;
 
-            this.FrontDefectCount = this.defectList.Count;
+            this.EdgeItems.Clear();
+            this.edgeDefectList.Clear();
+            int count = 0;
+            ObservableCollection<Ellipse> defectList = new ObservableCollection<Ellipse>();
 
             foreach (Defect defect in this.defectList)
             {
-                if (CheckDefectCode(defect.m_nDefectCode) != MODULE_TYPE.Front)
+                if (CheckDefectCode(defect.m_nDefectCode) != MODULE_TYPE.Edge)
                     continue;
 
                 Ellipse defectUI = new Ellipse();
-                defectUI.Fill = Brushes.Red;
+
+                defectUI.Fill = Brushes.Magenta;
                 defectUI.Width = 4;
                 defectUI.Height = 4;
 
-                int mapX = defect.m_nChipIndexX;
-                int mapY = defect.m_nChipIndexY;
+                double angle = defect.m_fRelY - 90;
+                int canvasX = canvasCenterX + (int)((double)canvasRadius * Math.Cos(angle * Math.PI / 180.0 ));
+                int canvasY = canvasCenterY - (int)((double)canvasRadius * Math.Sin(angle * Math.PI / 180.0));
 
-                int canvasChipPosX = (int)(offsetX + mapX * canvasChipWidth);
-                int canvasChipPosY = (int)(offsetY + (mapY + 1) * canvasChipHeight); // 좌하단 기준
+                Canvas.SetLeft(defectUI, canvasX - 2);
+                Canvas.SetTop(defectUI, canvasY - 2);
 
-                int canvasDefectPosX = canvasChipPosX + (int)(defect.m_fRelX / originRecipe.OriginWidth * canvasChipWidth);
-                int canvasDefectPosY = canvasChipPosY - (int)(defect.m_fRelY / originRecipe.OriginHeight * canvasChipHeight);
+                this.edgeDefectList.Add(new DefectData(defect, defectUI));
 
-                Canvas.SetLeft(defectUI, canvasDefectPosX);
-                Canvas.SetTop(defectUI, canvasDefectPosY);
-
-                this.FrontItems.Add(defectUI);
+                defectList.Add(defectUI);
+                count++;
             }
+
+            this.EdgeItems = defectList;
+            this.EdgeDefectCount = count;
+
+            RedrawDefectListEdge();
+        }
+
+        private double CalculateEdgeDefectTheta(double absY, int startY, int endY)
+        {
+            int imageHeight = endY - startY;
+
+            int nNotch = 0;
+            double nTheta = 0;
+
+            if (absY > nNotch)
+                nTheta = (absY - nNotch) / (double)imageHeight * 360F;
+            if (absY < nNotch)
+                nTheta = (nNotch - absY) / (double)imageHeight * 360F;
+
+            return nTheta;
         }
 
         private MODULE_TYPE CheckDefectCode(int defectcode)
@@ -791,7 +806,48 @@ namespace RootTools_Vision
             }
         }
 
+        public void RedrawDefectListEdge()
+        {
+            if (this.isCheckedEdge == false)
+            {
+                foreach (Ellipse rect in this.EdgeItems)
+                    rect.Visibility = Visibility.Hidden;
 
+                return;
+            }
+            else
+            {
+                foreach (Ellipse rect in this.EdgeItems)
+                    rect.Visibility = Visibility.Visible;
+            }
+
+            if (this.recipeEdge == null) return;
+
+
+            OriginRecipe originRecipe = this.recipeEdge.GetItem<OriginRecipe>();
+            RecipeType_WaferMap waferMap = this.recipeEdge.WaferMap;
+
+            int offsetX = waferOffsetX + dieOffsetX;
+            int offsetY = waferOffsetY + dieOffsetY;
+
+            double canvasRadius = (CanvasWidth - (waferOffsetX * 2)) / 2;
+
+            int canvasCenterX = (int)CanvasWidth / 2;
+            int canvasCenterY = (int)CanvasHeight / 2;
+
+            foreach (DefectData data in this.edgeDefectList)
+            {
+                Defect defect = data.Defect;
+                Ellipse defectUI = data.UIElement;
+
+                double angle = defect.m_fRelY - 90;
+                int canvasX = canvasCenterX + (int)((double)canvasRadius * Math.Cos(angle * Math.PI / 180.0));
+                int canvasY = canvasCenterY - (int)((double)canvasRadius * Math.Sin(angle * Math.PI / 180.0));
+
+                Canvas.SetLeft(defectUI, canvasX - 2);
+                Canvas.SetTop(defectUI, canvasY - 2);
+            }
+        }
 
         #region [Drawing Objects]
         private Ellipse baseWafer;
@@ -1174,7 +1230,7 @@ namespace RootTools_Vision
                     defect.IsSelected = false;
                     defect.UIElement.Height = 4;
                     defect.UIElement.Width = 4;
-                    defect.UIElement.Fill = Brushes.YellowGreen;
+                    defect.UIElement.Fill = Brushes.Magenta;
                 }
 
                 if (defect.Defect.m_strInspectionID == selected.m_strInspectionID &&

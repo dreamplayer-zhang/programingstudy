@@ -66,6 +66,7 @@ namespace RootTools_Vision
             }
         }
 
+        public Point SelectPoint { get; set; } = new Point(-1, -1);
 
         // OneWayToSource
         public double CanvasWidth { get; set; }
@@ -94,6 +95,14 @@ namespace RootTools_Vision
                 });
             }
         }
+        #endregion
+
+        #region [Event]
+        public virtual void Chip_MouseLeave(object sender, MouseEventArgs e) { }
+
+        public virtual void Chip_MouseEnter(object sender, MouseEventArgs e) { }
+
+        public virtual void Chip_MouseLeftUp(object sender, MouseEventArgs e) { }
         #endregion
 
         #region [Draw Method]
@@ -138,6 +147,9 @@ namespace RootTools_Vision
                         else if (mapData[y * sizeX + x] == (int)CHIP_TYPE.NORMAL)
                         {
                             rect.Fill = Brushes.YellowGreen;
+                            rect.MouseEnter += Chip_MouseEnter;
+                            rect.MouseLeave += Chip_MouseLeave;
+                            rect.MouseLeftButtonUp += Chip_MouseLeftUp;
                         }
                         else if (mapData[y * sizeX + x] == (int)CHIP_TYPE.EXTRA)
                         {
@@ -150,8 +162,6 @@ namespace RootTools_Vision
                     }
                     
                     Canvas.SetZIndex(rect, 99);
-                    //rect.MouseLeftButtonDown += ChipMouseLeftButtonDown;
-
                     ChipItems.Add(rect);
                 }
             }
@@ -188,6 +198,7 @@ namespace RootTools_Vision
 
         public void ResetMapColor()
         {
+            SelectPoint = new Point();
             if (this.mapSizeX == 0 || this.mapSizeY == 0) return;
 
             int sizeX = this.mapSizeX;

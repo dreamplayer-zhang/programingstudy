@@ -282,7 +282,6 @@ namespace Root_Rinse_Unloader.Module
                 if (EQ.p_eState != EQ.eState.Run) return "OK";
                 string sReceive = "";
                 foreach (Line line in m_aLine) sReceive += (line.p_eSensor == Line.eSensor.Arrived) ? 'O' : '.';
-                m_rinse.AddStripReceive(sReceive);
                 if (Run(RunAlign())) return p_sInfo; 
             }
             return "OK"; 
