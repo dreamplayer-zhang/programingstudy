@@ -1,4 +1,5 @@
 ﻿using Root_Rinse_Loader.Engineer;
+using Root_Rinse_Unloader.Module;
 using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
@@ -7,11 +8,9 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Windows.Threading;
 
 namespace Root_Rinse_Loader.Module
 {
@@ -31,10 +30,9 @@ namespace Root_Rinse_Loader.Module
             get { return _eMode; }
             set
             {
-                if (_eMode == value) return;
                 _eMode = value;
                 OnPropertyChanged();
-                AddProtocol(p_id, eCmd.SetMode, value); 
+                AddProtocol(p_id, RinseU.eCmd.SetMode, value); 
             }
         }
 
@@ -44,10 +42,9 @@ namespace Root_Rinse_Loader.Module
             get { return _widthStrip; }
             set
             {
-                if (_widthStrip == value) return;
                 _widthStrip = value;
                 OnPropertyChanged();
-                AddProtocol(p_id, eCmd.SetWidth, value); 
+                AddProtocol(p_id, RinseU.eCmd.SetWidth, value); 
             }
         }
 
@@ -57,10 +54,9 @@ namespace Root_Rinse_Loader.Module
             get { return _fRotateSpeed; }
             set
             {
-                if (_fRotateSpeed == value) return;
                 _fRotateSpeed = value;
                 OnPropertyChanged();
-                AddProtocol(p_id, eCmd.SetRotateSpeed, value);
+                AddProtocol(p_id, RinseU.eCmd.SetRotateSpeed, value);
             }
         }
 
@@ -90,96 +86,7 @@ namespace Root_Rinse_Loader.Module
 
         public void SendNewMagazine()
         {
-            AddProtocol(p_id, eCmd.NewMagazine, 0);
-        }
-        #endregion
-
-        #region Strips
-        public class Strips : NotifyProperty
-        {
-            string _sSend = "....";
-            public string p_sSend
-            {
-                get { return _sSend; }
-                set
-                {
-                    _sSend = value;
-                    OnPropertyChanged(); 
-                }
-            }
-
-            string _sReceive = "....";
-            public string p_sReceive
-            {
-                get { return _sReceive; }
-                set
-                {
-                    _sReceive = value;
-                    OnPropertyChanged();
-                    if (p_sSend != p_sReceive) p_sError = "Error"; 
-                }
-            }
-
-            string _sError = ""; 
-            public string p_sError
-            {
-                get { return _sError; }
-                set
-                {
-                    _sError = value;
-                    OnPropertyChanged(); 
-                }
-            }
-
-            public Strips(string sSend)
-            {
-                p_sSend = sSend; 
-            }
-        }
-        Queue<Strips> m_qSend = new Queue<Strips>();
-        public void AddStripSend(string sStrip)
-        {
-            Strips strips = new Strips(sStrip);
-            m_qSend.Enqueue(strips);
-            AddProtocol(p_id, eCmd.StripSend, sStrip);
-        }
-
-        Queue<string> m_qReceive = new Queue<string>();
-        public void AddStripReceive(string sStrip)
-        {
-            m_qReceive.Enqueue(sStrip);
-        }
-
-        public void ClearStripResult()
-        {
-            p_aSend.Clear();
-            p_aReceive.Clear();
-        }
-
-        DispatcherTimer m_timer = new DispatcherTimer();
-        void InitTimer()
-        {
-            m_timer.Interval = TimeSpan.FromMilliseconds(100);
-            m_timer.Tick += M_timer_Tick; 
-            m_timer.Start();
-        }
-
-        public ObservableCollection<Strips> p_aSend = new ObservableCollection<Strips>();
-        public ObservableCollection<Strips> p_aReceive = new ObservableCollection<Strips>();
-        private void M_timer_Tick(object sender, EventArgs e)
-        {
-            if (m_qSend.Count > 0) p_aSend.Add(m_qSend.Dequeue());
-            if (m_qReceive.Count > 0)
-            {
-                string sStrip = m_qReceive.Dequeue();
-                if (p_aSend.Count > 0)
-                {
-                    Strips strip = p_aSend[0];
-                    p_aSend.RemoveAt(0);
-                    strip.p_sReceive = sStrip;
-                    p_aReceive.Add(strip);
-                }
-            }
+            AddProtocol(p_id, RinseU.eCmd.NewMagazine, 0);
         }
         #endregion
 
@@ -271,10 +178,10 @@ namespace Root_Rinse_Loader.Module
                 case _EQ.eEQ.State:
                     if (value == EQ.eState.Run)
                     {
-                        AddProtocol(p_id, eCmd.SetMode, p_eMode);
-                        AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
+                        AddProtocol(p_id, RinseU.eCmd.SetMode, p_eMode);
+                        AddProtocol(p_id, RinseU.eCmd.SetWidth, p_widthStrip);
                     }
-                    if (!EQ.p_bPickerSet || value != EQ.eState.Run) AddProtocol(p_id, eCmd.EQLeState, value);
+                    if (!EQ.p_bPickerSet || value != EQ.eState.Run) AddProtocol(p_id, RinseU.eCmd.EQLeState, value);
                     switch ((EQ.eState)value)
                     {
                         case EQ.eState.Error: RunBuzzer(eBuzzer.Error); break;
@@ -391,7 +298,7 @@ namespace Root_Rinse_Loader.Module
         public void RunBuzzerOff()
         {
             m_doBuzzer.AllOff();
-            AddProtocol(p_id, eCmd.BuzzerOff, "Off"); 
+            AddProtocol(p_id, RinseU.eCmd.BuzzerOff, "Off"); 
         }
 
         StopWatch m_swBuzzer = new StopWatch();
@@ -434,47 +341,34 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region Protocol
-        public enum eCmd
-        {
-            Unknown,
-            SetMode,
-            SetWidth,
-            EQLeState,
-            EQUeState,
-            StripSend,
-            StripReceive,
-            ResultClear,
-            SetRotateSpeed,
-            BuzzerOff,
-            Finish,
-            EQUReady,
-            NewMagazine,
-        }
-        public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
-
-        public class Protocol
-        {
-            public string p_sCmd
-            {
-                get { return m_id + "," + m_eCmd.ToString() + "," + m_value.ToString(); }
-            }
-
-            public string m_id;
-            public eCmd m_eCmd;
-            public dynamic m_value;
-            public Protocol(string id, eCmd eCmd, dynamic value)
-            {
-                m_id = id;
-                m_eCmd = eCmd;
-                m_value = value;
-            }
-        }
+        public string[] m_asCmd = Enum.GetNames(typeof(RinseU.eCmd));
         #endregion
 
         #region Thread Send
-        Protocol m_protocolSend = null;
-        Queue<Protocol> m_qProtocolSend = new Queue<Protocol>();
-        Queue<Protocol> m_qProtocolReply = new Queue<Protocol>();
+        string _sProtocolSend = "";
+        public string p_sProtocolSend
+        {
+            get { return _sProtocolSend; }
+            set
+            {
+                _sProtocolSend = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        RinseU.Protocol _protocolSend = null;
+        RinseU.Protocol p_protocolSend 
+        { 
+            get { return _protocolSend; }
+            set
+            {
+                _protocolSend = value;
+                p_sProtocolSend = (value != null) ? value.p_sCmd : ""; 
+            }
+        }
+        
+        Queue<RinseU.Protocol> m_qProtocolSend = new Queue<RinseU.Protocol>();
+        Queue<RinseU.Protocol> m_qProtocolReply = new Queue<RinseU.Protocol>();
         bool m_bRunSend = false;
         Thread m_threadSend;
         void InitThread()
@@ -495,22 +389,22 @@ namespace Root_Rinse_Loader.Module
                 RunThreadDIO();
                 if (m_qProtocolReply.Count > 0)
                 {
-                    Protocol protocol = m_qProtocolReply.Dequeue();
+                    RinseU.Protocol protocol = m_qProtocolReply.Dequeue();
                     m_tcpip.Send(protocol.p_sCmd);
                     Thread.Sleep(10);
                 }
-                else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
+                else if ((m_qProtocolSend.Count > 0) && (p_protocolSend == null))
                 {
-                    m_protocolSend = m_qProtocolSend.Dequeue();
-                    m_tcpip.Send(m_protocolSend.p_sCmd);
+                    p_protocolSend = m_qProtocolSend.Dequeue();
+                    m_tcpip.Send(p_protocolSend.p_sCmd);
                     Thread.Sleep(10);
                 }
             }
         }
 
-        public Protocol AddProtocol(string id, eCmd eCmd, dynamic value)
+        public RinseU.Protocol AddProtocol(string id, RinseU.eCmd eCmd, dynamic value)
         {
-            Protocol protocol = new Protocol(id, eCmd, value);
+            RinseU.Protocol protocol = new RinseU.Protocol(id, eCmd, value);
             if (id == p_id) m_qProtocolSend.Enqueue(protocol);
             else m_qProtocolReply.Enqueue(protocol); 
             return protocol;
@@ -529,13 +423,13 @@ namespace Root_Rinse_Loader.Module
                     p_sInfo = "Invalid Protocol";
                     return;
                 }
-                eCmd eCmd = GetCmd(asRead[1]);
-                if (asRead[0] == p_id) m_protocolSend = null;
+                RinseU.eCmd eCmd = GetCmd(asRead[1]);
+                if (asRead[0] == p_id) p_protocolSend = null;
                 else
                 {
                     switch (eCmd)
                     {
-                        case eCmd.EQUeState:
+                        case RinseU.eCmd.EQUeState:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateUnloader = GetEQeState(asRead[2]);
                             if (p_eStateUnloader == EQ.eState.Error)
@@ -545,15 +439,7 @@ namespace Root_Rinse_Loader.Module
                                 m_handler.Reset(); 
                             }
                             break;
-                        case eCmd.StripReceive:
-                            AddProtocol(asRead[0], eCmd, asRead[2]);
-                            AddStripReceive(asRead[2]);
-                            break;
-                        case eCmd.ResultClear:
-                            AddProtocol(asRead[0], eCmd, asRead[2]);
-                            ClearStripResult(); 
-                            break;
-                        case eCmd.BuzzerOff:
+                        case RinseU.eCmd.BuzzerOff:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             RunBuzzerOff();
                             break;
@@ -563,13 +449,13 @@ namespace Root_Rinse_Loader.Module
             catch (Exception e) { p_sInfo = "EventRecieveData Exception : " + e.Message; }
         }
 
-        eCmd GetCmd(string sCmd)
+        RinseU.eCmd GetCmd(string sCmd)
         {
             for (int n = 0; n < m_asCmd.Length; n++)
             {
-                if (sCmd == m_asCmd[n]) return (eCmd)n;
+                if (sCmd == m_asCmd[n]) return (RinseU.eCmd)n;
             }
-            return eCmd.Unknown;
+            return RinseU.eCmd.Unknown;
         }
 
         EQ.eState GetEQeState(string sState)
@@ -627,12 +513,11 @@ namespace Root_Rinse_Loader.Module
         public void SendFinish()
         {
             RunBuzzer(eBuzzer.Finish);
-            AddProtocol(p_id, eCmd.Finish, 0); 
         }
 
         public void SendEQUReady()
         {
-            AddProtocol(p_id, eCmd.EQUReady, 0);
+            AddProtocol(p_id, RinseU.eCmd.EQUReady, 0);
         }
         #endregion
 
@@ -649,7 +534,7 @@ namespace Root_Rinse_Loader.Module
         public void InitSendProtocol()
         {
             m_qProtocolSend.Clear();
-            m_protocolSend = null;
+            p_protocolSend = null;
         }
 
         public override void Reset()
@@ -658,25 +543,25 @@ namespace Root_Rinse_Loader.Module
             if (m_tcpip.p_bConnect == false) m_tcpip.Connect();
             Thread.Sleep(10); 
             if (m_tcpip.p_bConnect == false) return;
-            AddProtocol(p_id, eCmd.SetMode, p_eMode); 
-            AddProtocol(p_id, eCmd.SetWidth, p_widthStrip); 
-            AddProtocol(p_id, eCmd.SetRotateSpeed, p_fRotateSpeed);
-            AddProtocol(p_id, eCmd.EQLeState, EQ.p_eState);
+            AddProtocol(p_id, RinseU.eCmd.SetMode, p_eMode); 
+            AddProtocol(p_id, RinseU.eCmd.SetWidth, p_widthStrip); 
+            AddProtocol(p_id, RinseU.eCmd.SetRotateSpeed, p_fRotateSpeed);
+            AddProtocol(p_id, RinseU.eCmd.EQLeState, EQ.p_eState);
             base.Reset();
         }
 
         RinseL_Handler m_handler; 
         public RinseL(string id, IEngineer engineer)
         {
+            p_protocolSend = null; 
             p_id = id;
             m_handler = (RinseL_Handler)engineer.ClassHandler(); 
             InitBase(id, engineer);
 
             InitThread();
-            InitTimer(); 
-            AddProtocol(p_id, eCmd.SetMode, p_eMode);
-            AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
-            AddProtocol(p_id, eCmd.SetRotateSpeed, p_fRotateSpeed);
+            AddProtocol(p_id, RinseU.eCmd.SetMode, p_eMode);
+            AddProtocol(p_id, RinseU.eCmd.SetWidth, p_widthStrip);
+            AddProtocol(p_id, RinseU.eCmd.SetRotateSpeed, p_fRotateSpeed);
         }
 
         public override void ThreadStop()

@@ -31,31 +31,55 @@ namespace Root_Pine2_Vision.Module
 
         #region Memory
         public MemoryGroup m_memoryGroup;
+        // 2D
         MemoryData[] m_memoryExt = new MemoryData[2] { null, null };
         MemoryData[] m_memoryColor = new MemoryData[3] { null, null, null };
         MemoryData[] m_memoryRGB = new MemoryData[3] { null, null, null };
         MemoryData[] m_memoryAPS = new MemoryData[3] { null, null, null };
         MemoryData[] m_memoryHSI = new MemoryData[3] { null, null, null };
-        //MemoryData m_memoryGerbber;
+
+        // 3D
+        MemoryData m_memory2DViewH = null;
+        MemoryData m_memory2DViewB = null;
+        MemoryData m_memoryHeight = null;
+        MemoryData m_memoryBright = null;
+        MemoryData m_memoryRawImage = null;
+
+               
+        public const string Mem3DViewH = "2D View H";
+        public const string Mem3DViewB = "2D View B";
+        public const string Mem3DHeight = "Height";
+        public const string Mem3DBright= "Bright";
+        public const string Mem3DRaw = "Raw";
         List<MemoryData> m_aMemory = new List<MemoryData>();
         void InitMemory()
         {
             m_memoryGroup = m_memoryPool.GetGroup("Pine2");
-            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT1", 3, 1, new CPoint(50000, 90000))); // Red Green Blue      -> VisionWorks2 Gerbber/RGBtoG/CtoG
-            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT2", 3, 1, new CPoint(50000, 90000))); // Axial Pad Side      -> VisionWorks2 Ext1/Ext2/SideTemp
 
-            m_aMemory.Add(m_memoryColor[0] = m_memoryGroup.CreateMemory("Color1", 1, 3, new CPoint(50000, 90000))); // RGB 합성 이미지 버퍼
-            m_aMemory.Add(m_memoryColor[1] = m_memoryGroup.CreateMemory("Color2", 1, 3, new CPoint(50000, 90000))); // APS 합성 이미지 버퍼
-            m_aMemory.Add(m_memoryColor[2] = m_memoryGroup.CreateMemory("Color3", 1, 3, new CPoint(50000, 90000))); // HSI 합성 이미지 버퍼
-            m_aMemory.Add(m_memoryRGB[0] = m_memoryGroup.CreateMemory("Red", 1, 1, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryRGB[1] = m_memoryGroup.CreateMemory("Green", 1, 1, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryRGB[2] = m_memoryGroup.CreateMemory("Blue", 1, 1, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryAPS[0] = m_memoryGroup.CreateMemory("Axial", 1, 1, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryAPS[1] = m_memoryGroup.CreateMemory("Pad", 1, 1, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryAPS[2] = m_memoryGroup.CreateMemory("Side", 1, 1, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryHSI[0] = m_memoryGroup.CreateMemory("Hue", 1, 1, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryHSI[1] = m_memoryGroup.CreateMemory("Saturation", 1, 1, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryHSI[2] = m_memoryGroup.CreateMemory("Intensity", 1, 1, new CPoint(50000, 90000)));
+            // 2D
+            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT1", 3, 1, new CPoint(10000, 10000))); // Red Green Blue      -> VisionWorks2 Gerbber/RGBtoG/CtoG
+            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT2", 3, 1, new CPoint(10000, 10000))); // Axial Pad Side      -> VisionWorks2 Ext1/Ext2/SideTemp
+
+            m_aMemory.Add(m_memoryColor[0] = m_memoryGroup.CreateMemory("Color1", 1, 3, new CPoint(10000, 10000))); // RGB 합성 이미지 버퍼
+            m_aMemory.Add(m_memoryColor[1] = m_memoryGroup.CreateMemory("Color2", 1, 3, new CPoint(10000, 10000))); // APS 합성 이미지 버퍼
+            m_aMemory.Add(m_memoryColor[2] = m_memoryGroup.CreateMemory("Color3", 1, 3, new CPoint(10000, 10000))); // HSI 합성 이미지 버퍼
+            m_aMemory.Add(m_memoryRGB[0] = m_memoryGroup.CreateMemory("Red", 1, 1, new CPoint(10000, 10000)));
+            m_aMemory.Add(m_memoryRGB[1] = m_memoryGroup.CreateMemory("Green", 1, 1, new CPoint(10000, 10000)));
+            m_aMemory.Add(m_memoryRGB[2] = m_memoryGroup.CreateMemory("Blue", 1, 1, new CPoint(10000, 10000)));
+            m_aMemory.Add(m_memoryAPS[0] = m_memoryGroup.CreateMemory("Axial", 1, 1, new CPoint(10000, 10000)));
+            m_aMemory.Add(m_memoryAPS[1] = m_memoryGroup.CreateMemory("Pad", 1, 1, new CPoint(10000, 10000)));
+            m_aMemory.Add(m_memoryAPS[2] = m_memoryGroup.CreateMemory("Side", 1, 1, new CPoint(10000, 10000)));
+            m_aMemory.Add(m_memoryHSI[0] = m_memoryGroup.CreateMemory("Hue", 1, 1, new CPoint(10000, 10000)));
+            m_aMemory.Add(m_memoryHSI[1] = m_memoryGroup.CreateMemory("Saturation", 1, 1, new CPoint(10000, 10000)));
+            m_aMemory.Add(m_memoryHSI[2] = m_memoryGroup.CreateMemory("Intensity", 1, 1, new CPoint(10000, 10000)));
+
+            // 3D
+            m_aMemory.Add(m_memory2DViewH = m_memoryGroup.CreateMemory(Mem3DViewH, 1, 1, new CPoint(40000, 80000)));
+            m_aMemory.Add(m_memory2DViewB = m_memoryGroup.CreateMemory(Mem3DViewB, 1, 1, new CPoint(40000, 80000)));
+            m_aMemory.Add(m_memoryHeight = m_memoryGroup.CreateMemory(Mem3DHeight, 1, 2, new CPoint(40000, 80000)));
+            m_aMemory.Add(m_memoryBright = m_memoryGroup.CreateMemory(Mem3DBright, 1, 2, new CPoint(40000, 80000)));
+            m_aMemory.Add(m_memoryRawImage = m_memoryGroup.CreateMemory(Mem3DRaw, 1, 1, new CPoint(153600, 80000)));
+
 
             string regGroup = "MMF Data " + p_id;   // MMF Data A, MMF Data B
             Registry reg = new Registry(false, regGroup, "MemoryOffset");

@@ -1127,6 +1127,7 @@ namespace Root_Pine2_Vision.Module
             InitBase(id, engineer, eRemote);
             InitVision_Snap_UI();
             InitThreadCheck();
+            p_eState = eState.Ready; 
         }
 
         public override void ThreadStop()
@@ -1172,6 +1173,7 @@ namespace Root_Pine2_Vision.Module
         string RemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
         {
             if (m_remote.p_bEnable == false) return "OK";
+            if (m_remote.m_client.p_bConnect == false) return "Remote TCPIP not Connected";
             Run_Remote run = GetRemoteRun(eRemoteRun, eRemote, value);
             StartRun(run);
             while (run.p_eRunState != ModuleRunBase.eRunState.Done)

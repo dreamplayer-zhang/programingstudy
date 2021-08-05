@@ -382,6 +382,7 @@
                                                  PreviewKeyDown="textBoxRotateSpeed_PreviewKeyDown" Grid.ColumnSpan="2"/>
                                         </Grid>
                                     </GroupBox>
+                                    <Label Grid.Column="3" x:Name="labelSend" Content="{Binding p_sProtocolSend}" FontSize="32" VerticalAlignment="Center"/>
                                 </Grid>
                             </Grid>
                             <Grid Grid.Row="1" Margin="30,20">

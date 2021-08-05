@@ -48,10 +48,10 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="X" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontWeight="Bold" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <TextBox  Grid.Column="4" Text="{Binding AxisPositionX.p_posActual}" Margin="4" Height="24" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" IsEnabled="False" IsChecked="{Binding AxisPosionX.p_sensorHome}"/>
+                <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" IsEnabled="False" IsChecked="{Binding AxisPosionX.p_sensorMinusLimit}"/>
+                <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" IsEnabled="False" IsChecked="{Binding AxisPosionX.p_sensorPlusLimit}"/>
+                <TextBox Grid.Column="4" Text="{Binding AxisPositionX.p_posActual}" Margin="4" Height="24" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -62,10 +62,10 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Y" Foreground="White"  VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontWeight="Bold" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <TextBox  Grid.Column="4" Text="{Binding AxisPositionY.p_posActual}" Margin="4" Height="24" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" IsEnabled="False" IsChecked="{Binding AxisPosionY.p_sensorHome}"/>
+                <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" IsEnabled="False" IsChecked="{Binding AxisPosionY.p_sensorMinusLimit}"/>
+                <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" IsEnabled="False" IsChecked="{Binding AxisPosionY.p_sensorPlusLimit}"/>
+                <TextBox Grid.Column="4" Text="{Binding AxisPositionY.p_posActual}" Margin="4" Height="24" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -76,10 +76,10 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Th" Foreground="White"  VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontWeight="Bold" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <TextBox  Grid.Column="4"  Text="{Binding AxisPositionTheta.p_posActual}" Margin="4" Height="24"  IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" IsEnabled="False" IsChecked="{Binding AxisPositionTheta.p_sensorHome}"/>
+                <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" IsEnabled="False" IsChecked="{Binding AxisPositionTheta.p_sensorMinusLimit}"/>
+                <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" IsEnabled="False" IsChecked="{Binding AxisPositionTheta.p_sensorPlusLimit}"/>
+                <TextBox Grid.Column="4"  Text="{Binding AxisPositionTheta.p_posActual}" Margin="4" Height="24"  IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -91,10 +91,10 @@
                     <ColumnDefinition Width="311*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Z" Foreground="White"  VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontWeight="Bold" FontFamily="Bahnschrift Light" Margin="14,8"/>
-                <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" Margin="6,4,2,4"/>
-                <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" Margin="6,4,2,4"/>
-                <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" Margin="6,4,2,4"/>
-                <TextBox  Grid.Column="4"  Text="{Binding AxisPositionZ.p_posActual}" Margin="4,7" Height="24"  IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.ColumnSpan="2"/>
+                <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" Margin="6,4,2,4" IsEnabled="False" IsChecked="{Binding AxisPositionZ.p_sensorHome}"/>
+                <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" Margin="6,4,2,4" IsEnabled="False" IsChecked="{Binding AxisPositionZ.p_sensorMinusLimit}"/>
+                <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" Margin="6,4,2,4" IsEnabled="False" IsChecked="{Binding AxisPositionZ.p_sensorPlusLimit}"/>
+                <TextBox Grid.Column="4"  Text="{Binding AxisPositionZ.p_posActual}" Margin="4,7" Height="24"  IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.ColumnSpan="2"/>
             </Grid>
         </StackPanel>
     </Grid>

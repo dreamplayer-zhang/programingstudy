@@ -98,6 +98,8 @@ namespace RootTools_Vision
 
 		// probability method
 		private bool useProbabilityMethod = false;
+		private double proportionThreshold = 20;
+		private double proportionLimit = 20;
 		#endregion
 
 		#region [Property]
@@ -131,14 +133,28 @@ namespace RootTools_Vision
 			set => SetProperty(ref threshold, value);
 		}
 		[Category("Parameter")]
-		[DisplayName("2. Width Size Min")]
+		[DisplayName("2. Proportion Threshold")]
+		public double ProportionThreshold
+		{
+			get => this.proportionThreshold;
+			set => SetProperty(ref proportionThreshold, value);
+		}
+		[Category("Parameter")]
+		[DisplayName("3. Proportion Limit")]
+		public double ProportionLimit
+		{
+			get => this.proportionLimit;
+			set => SetProperty(ref proportionLimit, value);
+		}
+		[Category("Parameter")]
+		[DisplayName("4. Width Size Min")]
 		public int DefectSizeMinX
 		{
 			get => this.defectSizeMinX;
 			set => SetProperty(ref defectSizeMinX, value);
 		}
 		[Category("Parameter")]
-		[DisplayName("3. Width Size Max")]
+		[DisplayName("5. Width Size Max")]
 		public int DefectSizeMaxX
 		{
 			get => this.defectSizeMaxX;
@@ -146,14 +162,14 @@ namespace RootTools_Vision
 		}
 
 		[Category("Parameter")]
-		[DisplayName("4. Height Size Min")]
+		[DisplayName("6. Height Size Min")]
 		public int DefectSizeMinY
 		{
 			get => this.defectSizeMinY;
 			set => SetProperty(ref defectSizeMinY, value);
 		}
 		[Category("Parameter")]
-		[DisplayName("5. Height Size Max")]
+		[DisplayName("7. Height Size Max")]
 		public int DefectSizeMaxY
 		{
 			get => this.defectSizeMaxY;

@@ -1,15 +1,21 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows.Controls;
 
 namespace RootTools.Camera
 {
-    public class CameraSet : ITool
+    public class CameraSet : ObservableObject, ITool
     {
         public delegate void dgOnChangeTool();
         public event dgOnChangeTool OnChangeTool;
 
         #region List Camera
-        public List<ICamera> m_aCamera = new List<ICamera>(); 
+        public ObservableCollection<ICamera> m_aCamera = new ObservableCollection<ICamera>(); 
+        public ObservableCollection<ICamera> p_aCamera
+        {
+            get { return m_aCamera; }
+            set { SetProperty(ref m_aCamera, value); }
+        }
         public List<string> p_asCamera
         {
             get

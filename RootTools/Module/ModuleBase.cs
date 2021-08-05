@@ -237,7 +237,10 @@ namespace RootTools.Module
                 moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
                 p_sInfo = m_remote.RemoteSend(moduleRun);
             }
-            catch (Exception e) { p_sInfo = "RemoteClient Exception = " + e.Message; }
+            catch (Exception e) 
+            { 
+                p_sInfo = "RemoteClient Exception = " + e.Message; 
+            }
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
             m_log.Info("RemoteClient : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
             if (m_qModuleRemote.Count > 0) m_qModuleRemote.Dequeue();
@@ -616,16 +619,19 @@ namespace RootTools.Module
 
             void Recieve(Protocol protocol)
             {
-                for (int n = 0; n < m_aProtocol.Count; n++)
+                int nCount = m_aProtocol.Count;
+                for (int n = nCount-1; n >= 0; n--)
                 {
                     if (m_aProtocol[n].IsSame(protocol))
-                    {
+                    {            
                         m_aProtocol[n].p_sRun = protocol.p_sRun; 
                         m_aProtocol[n].m_bDone = true;
                         m_aProtocol.RemoveAt(n);
-                        return; 
+                        // return; 
+                      //  break;
                     }
                 }
+              
             }
             #endregion
 

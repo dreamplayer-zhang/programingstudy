@@ -749,9 +749,8 @@ namespace Root_WIND2.UI_User
                         reviewDefectlist, 
                         sInspectionID);
 
-
                     // 이거 없애야됨
-                    DisplayDefectData(sInspectionID);
+                    //DisplayDefectData(sInspectionID);
                 }
                 catch (Exception ex)
                 {

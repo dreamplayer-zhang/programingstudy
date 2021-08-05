@@ -10,7 +10,8 @@ namespace RootTools.GAFs
     public partial class ALIDList_PopupUI : Window, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-
+        public delegate void CallbackClear();
+        public CallbackClear m_CallbackClear;
         static public bool m_bShow = false; 
         public ALIDList_PopupUI()
         {
@@ -64,15 +65,16 @@ namespace RootTools.GAFs
         {
             m_bShow = false; 
         }
-
         private void buttonClearALID_Click(object sender, RoutedEventArgs e)
         {
             m_listALID.ClearALID();
+            m_CallbackClear();
             //SetLableBinding(null);
-            if(m_listALID.p_aSetALID.Count == 0)
+            if (m_listALID.p_aSetALID.Count == 0)
             {
                 return;
             }
+
 
             //int idx = 0;
             //for (int i = 0; i < m_listALID.p_aSetALID.Count; i++)

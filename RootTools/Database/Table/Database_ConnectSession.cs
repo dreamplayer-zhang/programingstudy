@@ -35,6 +35,29 @@ namespace RootTools.Database
                 string sError = ex.Message;
             }
         }
+        ~Database_ConnectSession()
+		{
+            if(m_sqlConnection!=null)
+			{
+                try
+                {
+                    m_sqlConnection.Close();
+                }
+                catch (Exception ex)
+                {
+                    TempLogger.Write("MYSQL", "m_sqlConnection Close Error : " + ex.Message);
+                }
+                try
+                {
+                    m_sqlConnection.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    TempLogger.Write("MYSQL", "m_sqlConnection Dispose Error : " + ex.Message);
+                }
+                m_bConnected = false;
+            }
+        }
 
         public bool Connect()
         {
@@ -63,5 +86,17 @@ namespace RootTools.Database
         {
             return m_sqlConnection;
         }
+
+		internal void Disconnect()
+		{
+            if(m_sqlConnection!=null)
+			{
+                if(IsConnected)
+				{
+                    m_sqlConnection.Close();
+
+                }
+			}
+		}
     }
 }
