@@ -316,5 +316,9 @@ namespace Root_JEDI_Sorter.Module
             foreach (Picker picker in m_picker) picker.ThreadStop();
             base.ThreadStop();
         }
+
+        #region ModuleRun
+
+        #endregion
     }
 }

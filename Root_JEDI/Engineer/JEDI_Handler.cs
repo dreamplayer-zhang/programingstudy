@@ -98,12 +98,16 @@ namespace Root_JEDI.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         public JEDI m_JEDI;
+        public TrayStack m_stackMetal;
+        public TrayStack m_stackTray;
         public Dictionary<eVision, IVision> m_vision = new Dictionary<eVision, IVision>(); 
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             InitModule(m_JEDI = new JEDI("JEDI", m_engineer));
+            InitModule(m_stackTray = new TrayStack("MetalStack", m_engineer));
+            InitModule(m_stackMetal = new TrayStack("TrayStack", m_engineer));
             InitVision(eVision.Top2D, new Vision2D(eVision.Top2D, m_engineer, ModuleBase.eRemote.Client));
             InitVision(eVision.Bottom, new Vision2D(eVision.Bottom, m_engineer, ModuleBase.eRemote.Client));
         }
