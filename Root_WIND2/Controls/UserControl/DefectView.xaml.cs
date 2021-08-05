@@ -226,7 +226,6 @@ namespace Root_WIND2
                 //defect.Width = 2;
                 //defect.Height = 2;
                 //defect.RenderTransformOrigin = new Point(0.5, -249);
-
             }
 
             gridArea.Children.Add(defect);             

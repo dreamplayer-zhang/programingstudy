@@ -40,26 +40,26 @@ public:
 	Raw3D_Calculation();
 	~Raw3D_Calculation();
 
-	void Initialize(int nThreadIndex, int nThreadNum, CSize sz3DImage, CSize szRawImage
+	void Initialize(int nThreadIndex, int nThreadNum, CCSize sz3DImage, CCSize szRawImage
 		, LPBYTE* ppMainImage, WORD** ppBuffHeight, short** ppBuffBright, LPBYTE* ppBuffFG, int nSnapFrameNum);
-	void CreateCvtBuffer(CSize szRawImage);
+	void CreateCvtBuffer(CCSize szRawImage);
 
 	void SetLogFormHandle(HWND hLogHandle);
-
-	void StartCalculation(ConvertMode cvtMode, Calc3DMode calcMode, DisplayMode displayMode, CPoint ptDataPos, int nMinGV1, int nMinGV2
+	void SetFrameNum(int n);
+	void StartCalculation(ConvertMode cvtMode, Calc3DMode calcMode, DisplayMode displayMode, CCPoint ptDataPos, int nMinGV1, int nMinGV2
 		, int nOverlapStartPos, int nOverlapSize, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, int* pnCurrFrameNum, Parameter3D param);
 
 	void CalculateImage();
 	void NoConvertImage(int nFrameIndex);
 	void ConvertImageBump(int nFrameIndex, bool bReverseScan);
 
-	void CalcHBImage(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV);
-	void CalcHBImage_FromTop(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV);
-	void CalcHBImage_SKPAD_MinGV1(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV);
-	void CalcHBImage_ConsiderZeroBump(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV);
-	void CalcHBImage_ConsiderZeroBump_AutoBeamThickness(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV);
+	void CalcHBImage(int nFrameIndex, CCPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV);
+	void CalcHBImage_FromTop(int nFrameIndex, CCPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV);
+	void CalcHBImage_SKPAD_MinGV1(int nFrameIndex, CCPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV);
+	void CalcHBImage_ConsiderZeroBump(int nFrameIndex, CCPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV);
+	void CalcHBImage_ConsiderZeroBump_AutoBeamThickness(int nFrameIndex, CCPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV);
 
-	void ConvertDisplayImage(DisplayMode displayMode, CRect rtROI, int nOverlapStartPos, int nOverlapSize, int nDisplayOffsetX, int nDisplayOffsetY);
+	void ConvertDisplayImage(DisplayMode displayMode, CCRect rtROI, int nOverlapStartPos, int nOverlapSize, int nDisplayOffsetX, int nDisplayOffsetY);
 
 	ConvertMode GetConvertMode();
 	Calc3DMode GetCalculationMode();
@@ -81,8 +81,8 @@ private:
 	int m_nThreadIndex;
 	int m_nThreadNum;
 
-	CSize m_sz3DImage;
-	CSize m_szRawImage;
+	CCSize m_sz3DImage;
+	CCSize m_szRawImage;
 
 	LPBYTE* m_ppMainImage;
 	LPBYTE m_pBuffRaw;
@@ -94,7 +94,7 @@ private:
 	Calc3DMode m_calcMode;
 	DisplayMode m_displayMode;
 
-	CPoint m_ptDataPos;
+	CCPoint m_ptDataPos;
 
 	int m_nOverlapStartPos;
 	int m_nOverlapSize;
@@ -109,7 +109,7 @@ private:
 	LPBYTE* m_ppBuffFG;
 
 	int m_nSnapFrameNum;
-	int* m_pnCurrFrameNum;
+	int m_nCurrFrameNum;
 
 	//void SendLog(CString strMsg);
 

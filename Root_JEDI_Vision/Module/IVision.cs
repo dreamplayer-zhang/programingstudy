@@ -205,5 +205,6 @@ namespace Root_JEDI_Vision.Module
         string p_id { get; set; }
         eVision p_eVision { get; set; }
         string p_sInfo { get; set; }
+        InfoTray p_infoTray { get; set; }
     }
 }

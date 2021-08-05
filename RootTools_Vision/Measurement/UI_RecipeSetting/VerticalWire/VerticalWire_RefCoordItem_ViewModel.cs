@@ -11,6 +11,9 @@ namespace RootTools_Vision
 {
     public class VerticalWire_RefCoordItem_ViewModel : ObservableObject
     {
+        public delegate void ChangedEventHandler();
+        public event ChangedEventHandler CollectionChanged;
+
         public ArrangeType eArrangeType;
 
         #region [Properties]
@@ -101,6 +104,8 @@ namespace RootTools_Vision
                         RefCoord = new CPoint(RefX + RefW / 2, RefY + RefH / 2);
                         break;
                 }
+
+                CollectionChanged?.Invoke();
             }
         }
         

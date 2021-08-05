@@ -30,9 +30,13 @@ namespace RootTools.Module
         DispatcherTimer m_timer = new DispatcherTimer();
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            while (m_qInfo.Count > 0) p_aInfo.Add(m_qInfo.Dequeue());
-            while (p_aInfo.Count > 100) p_aInfo.RemoveAt(0);
-            OnPropertyChanged("p_aInfo");
+            try
+            {
+                while (m_qInfo.Count > 0) p_aInfo.Add(m_qInfo.Dequeue());
+                while (p_aInfo.Count > 100) p_aInfo.RemoveAt(0);
+                OnPropertyChanged("p_aInfo");
+            }
+            catch { }
         }
 
         Queue<Info> m_qInfo = new Queue<Info>();

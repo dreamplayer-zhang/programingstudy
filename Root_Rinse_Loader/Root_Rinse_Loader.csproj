@@ -270,6 +270,10 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Root_Rinse_Unloader\Root_Rinse_Unloader.csproj">
+      <Project>{5fc85c77-783d-4a56-b3a4-898aacbb8d0c}</Project>
+      <Name>Root_Rinse_Unloader</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

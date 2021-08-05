@@ -169,7 +169,7 @@ namespace RootTools.Control.ACS
             if (m_bRepeat == false) return;
             if (m_axis.p_eState != Axis.eState.Ready) return;
             string sDst = m_bDstRepeat ? comboRepeatPos1.Text : comboRepeatPos0.Text;
-            m_axis.RunTrigger(m_bDstRepeat && (checkBoxTrigger.IsChecked == true)); 
+            //m_axis.RunTrigger(m_bDstRepeat && (checkBoxTrigger.IsChecked == true)); 
             m_axis.StartMove(sDst, 0, comboSpeedRepeat.Text);
             m_bDstRepeat = !m_bDstRepeat;
         }
@@ -179,6 +179,16 @@ namespace RootTools.Control.ACS
         {
             m_bRepeat = false;
             m_axis.StopAxis();
+        }
+
+        private void checkBoxTrigger_Checked(object sender, RoutedEventArgs e)
+        {
+            m_axis.RunTrigger(true);
+        }
+
+        private void checkBoxTrigger_Unchecked(object sender, RoutedEventArgs e)
+        {
+            m_axis.RunTrigger(false);       
         }
     }
 }

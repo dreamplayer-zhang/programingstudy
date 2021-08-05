@@ -851,8 +851,8 @@ namespace RootTools.Database
 		{
 			//Inspection ID 생성(KEY)
 			m_Loftinfo.SetLotinfo(inspectionstart, inspectionend, "LotID", "CSTID", "SetupID", "CSID", "WaferID", recipeid.Replace(".rcp", ""));
-			m_sInspectionID = MakeInspectionID(m_Loftinfo);
-			string sLotinfoQuery;
+            m_sInspectionID = MakeInspectionID(m_Loftinfo);
+            string sLotinfoQuery;
 
 			sLotinfoQuery = string.Format("INSERT INTO lotinfo(InspectionStart, InspectionEnd, sInspectionID, sLotID, sCSTID, sWaferID, sRecipeID)" +
 				" values('{0}','{1}','{2}','{3}','{4}','{5}','{6}')"
@@ -871,8 +871,8 @@ namespace RootTools.Database
 		{
 			//Inspection ID 생성(KEY)
 			m_Loftinfo.SetLotinfo(lotInfo);
-			m_sInspectionID = MakeInspectionID(m_Loftinfo);
-			string sLotinfoQuery;
+            m_sInspectionID = MakeInspectionID(m_Loftinfo);
+            string sLotinfoQuery;
 
 			sLotinfoQuery = string.Format("INSERT INTO lotinfo(InspectionStart, InspectionEnd, sInspectionID, sLotID, sCSTID, sWaferID, sRecipeID)" +
 				" values('{0}','{1}','{2}','{3}','{4}','{5}','{6}')"

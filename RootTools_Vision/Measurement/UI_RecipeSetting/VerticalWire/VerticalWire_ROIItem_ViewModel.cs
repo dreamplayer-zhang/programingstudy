@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RootTools_Vision
 {
@@ -14,7 +15,7 @@ namespace RootTools_Vision
         public event ChangedEventHandler CollectionChanged;
 
         public ArrangeType eArrangeType;
-        public List<TRect> WireRectList = new List<TRect>();
+        public List<Point> WirePointList = new List<Point>();
 
         #region [Properties]
         private int itemIndex;
@@ -81,7 +82,7 @@ namespace RootTools_Vision
                 SetProperty<int>(ref this.selectedArrageMethod, value);
                 eArrangeType = (ArrangeType)selectedArrageMethod;
                 
-                if(WireRectList != null)
+                if(WirePointList != null)
                     ArrangeDetectPoint();
 
                 CollectionChanged?.Invoke();
@@ -114,13 +115,21 @@ namespace RootTools_Vision
             get => this.refCoordNum;
             set
             {
-                SetProperty<int>(ref this.refCoordNum, value);
-                this.RefCoordList.Clear();
-
-                for (int i = 1; i <= value; i++)
+                if(this.refCoordNum < value)
                 {
-                    this.RefCoordList.Add("ROI # " + i.ToString());
+                    int iter = value - refCoordNum;
+
+                    for (int i = this.refCoordNum + 1; i <= this.refCoordNum + iter; i++)
+                        this.RefCoordList.Add("Ref # " + i.ToString());
                 }
+                else
+                {
+                    int iter = refCoordNum - value;
+
+                    for(int i = 0; i < iter; i++)
+                        this.RefCoordList.RemoveAt(this.RefCoordList.Count() - 1);
+                }
+                SetProperty<int>(ref this.refCoordNum, value);
             }
         }
 
@@ -156,7 +165,7 @@ namespace RootTools_Vision
         #endregion
 
         public VerticalWire_ROIItem Main;
-        public VerticalWire_ROIItem_ViewModel(int ROIIdx)
+        public VerticalWire_ROIItem_ViewModel(int ROIIdx, int refNum)
         {
             this.Main = new VerticalWire_ROIItem();
             this.ItemIndex = ROIIdx;
@@ -175,7 +184,7 @@ namespace RootTools_Vision
             this.ChannelList.Add("Blue");
 
             this.RefCoordList = new ObservableCollection<string>();
-            this.RefCoordNum = 1;
+            this.RefCoordNum = refNum;
             this.SelectedRefCoord = 0;
         }
 
@@ -184,31 +193,31 @@ namespace RootTools_Vision
             switch(eArrangeType)
             {
                 case ArrangeType.Top2Bottom:
-                    WireRectList.Sort(delegate (TRect x, TRect y)
+                    WirePointList.Sort(delegate (Point x, Point y)
                     {
-                        return x.MemoryRect.Top.CompareTo(y.MemoryRect.Top);
+                        return x.Y.CompareTo(y.Y);
                     });
                     break;
                 case ArrangeType.Bottom2Top:
-                    WireRectList.Sort(delegate (TRect x, TRect y)
+                    WirePointList.Sort(delegate (Point x, Point y)
                     {
-                        return y.MemoryRect.Top.CompareTo(x.MemoryRect.Top);
+                        return y.Y.CompareTo(x.Y);
                     });
                     break;
                 case ArrangeType.Left2Right:
-                    WireRectList.Sort(delegate (TRect x, TRect y)
+                    WirePointList.Sort(delegate (Point x, Point y)
                     {
-                        return x.MemoryRect.Left.CompareTo(y.MemoryRect.Left);
+                        return x.X.CompareTo(y.X);
                     });
                     break;
                 case ArrangeType.Right2Left:
-                    WireRectList.Sort(delegate (TRect x, TRect y)
+                    WirePointList.Sort(delegate (Point x, Point y)
                     {
-                        return y.MemoryRect.Left.CompareTo(x.MemoryRect.Left);
+                        return y.X.CompareTo(x.X);
                     });
                     break;
             }
-            DetectNum = WireRectList.Count;
+            DetectNum = WirePointList.Count;
         }
 
         #region [Enum]

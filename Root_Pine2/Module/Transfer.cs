@@ -169,8 +169,20 @@ namespace Root_Pine2.Module
             public double m_xOffset = 0; 
             public string RunMove(InfoStrip.eMagazine ePos, double xOffset, bool bPushPos, bool bWait = true)
             {
-                if (m_transfer.m_pusher.p_bLock) return "Lock by Sorter Picker";
-                if (m_transfer.m_gripper.p_bLock) return "Lock by Loader Picker";
+                int nTimerLimit = 30 * 1000;
+                int nTimerCount = 0;
+
+                while (true)
+                {
+                    if (EQ.IsStop()) return "EQ Stop";
+                    if (m_transfer.m_gripper.p_bLock == false && m_transfer.m_pusher.p_bLock == false) break;
+                    else nTimerCount += 300;
+                    if (nTimerCount > nTimerLimit) return "Lock by Loader Picker";
+                    Thread.Sleep(300);
+                }
+
+                //if (m_transfer.m_pusher.p_bLock) return "Lock by Sorter Picker";
+                //if (m_transfer.m_gripper.p_bLock) return "Lock by Loader Picker";
                 m_transfer.m_pusher.p_bEnable = false;
                 m_transfer.m_gripper.p_bEnable = false; 
                 m_ePosDst = ePos;

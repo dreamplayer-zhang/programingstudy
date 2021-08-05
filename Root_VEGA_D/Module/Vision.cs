@@ -906,6 +906,19 @@ namespace Root_VEGA_D.Module
             }
         }
 
+        bool _bWaitIPULineEnd = false;
+        public bool p_bWaitIPULineEnd
+        {
+            get => _bWaitIPULineEnd;
+            set
+            {
+                if (_bWaitIPULineEnd == value) return;
+
+                m_log.Info(string.Format("{0}.p_bWaitIPULineEnd {1} -> {2}", p_id, _bWaitIPULineEnd, !_bWaitIPULineEnd));
+                _bWaitIPULineEnd = value;
+            }
+        }
+
         DispatcherTimer m_timerWaitReconnect = new DispatcherTimer();
         private void WaitReconnectTimerTick(object sender, EventArgs e)
         {
@@ -1010,6 +1023,11 @@ namespace Root_VEGA_D.Module
                                     if (LineScanStatusChanged != null)
                                         LineScanStatusChanged(this, runGrabLineScan, LineScanStatus.LineInspCompleted, new int[2] { runGrabLineScan.m_grabMode.m_ScanLineNum, nEndLine });
                                 }
+                            }
+                            break;
+                        case TCPIPComm_VEGA_D.Command.LineEndAck:
+                            {
+                                p_bWaitIPULineEnd = false;
                             }
                             break;
                         default:

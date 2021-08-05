@@ -33,6 +33,8 @@ namespace Root_EFEM
         Axis m_axisOptZ1;
         Axis m_axisOptZ2;
         DIO_O m_doVac;
+        DIO_O m_doVac2;
+        DIO_O m_doVac3;
         DIO_O m_doBlow;
         DIO_I m_diReadyX;
         DIO_I m_diReadyY;
@@ -75,6 +77,18 @@ namespace Root_EFEM
             }
         }
 
+        public Camera_Basler p_CamRADS
+        {
+            get
+            {
+                return m_CamRADS;
+            }
+            set
+            {
+                m_CamRADS = value;
+            }
+        }
+
         KlarfData_Lot m_KlarfData_Lot;
         LensLinearTurret m_LensLinearTurret;
         #region [Getter Setter]
@@ -85,6 +99,8 @@ namespace Root_EFEM
         public Axis AxisOptZ1 { get => m_axisOptZ1; private set => m_axisOptZ1 = value; }
         public Axis AxisOptZ2 { get => m_axisOptZ2; private set => m_axisOptZ2 = value; }
         public DIO_O DoVac { get => m_doVac; private set => m_doVac = value; }
+        public DIO_O DoVac2 { get => m_doVac2; private set => m_doVac3 = value; }
+        public DIO_O DoVac3 { get => m_doVac2; private set => m_doVac3 = value; }
         public DIO_O DoBlow { get => m_doBlow; private set => m_doBlow = value; }
         public MemoryPool MemoryPool { get => m_memoryPool; private set => m_memoryPool = value; }
         public MemoryGroup MemoryGroup { get => m_memoryGroup; private set => m_memoryGroup = value; }
@@ -109,6 +125,8 @@ namespace Root_EFEM
                 p_sInfo = m_toolBox.GetAxis(ref m_axisOptZ1, this, "Axis OptZ1");
                 p_sInfo = m_toolBox.GetAxis(ref m_axisOptZ2, this, "Axis OptZ2");
                 p_sInfo = m_toolBox.GetDIO(ref m_doVac, this, "Stage Vacuum");
+                p_sInfo = m_toolBox.GetDIO(ref m_doVac2, this, "Stage Vacuum2");
+                p_sInfo = m_toolBox.GetDIO(ref m_doVac3, this, "Stage Vacuum3");
                 p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Stage Blow");
                 p_sInfo = m_toolBox.GetDIO(ref m_diReadyX, this, "Stage Ready X");
                 p_sInfo = m_toolBox.GetDIO(ref m_diReadyY, this, "Stage Ready Y");
@@ -196,6 +214,8 @@ namespace Root_EFEM
                 if (m_doVac.p_bOut == value)
                     return;
                 m_doVac.Write(value);
+                m_doVac2.Write(value);
+                m_doVac3.Write(value);
             }
         }
 
@@ -341,7 +361,7 @@ namespace Root_EFEM
                 m_axisXY.WaitReady();
                 m_axisRotate.WaitReady();
                 m_axisZ.WaitReady();
-                DoVac.Write(false);
+                p_bStageVac = false;
                 if (!m_diReadyX.p_bIn || !m_diReadyY.p_bIn)
                     return "Ready Fail";
                 ClearData();
@@ -363,7 +383,7 @@ namespace Root_EFEM
                 m_axisXY.WaitReady();
                 m_axisRotate.WaitReady();
                 m_axisZ.WaitReady();
-                DoVac.Write(false);
+                p_bStageVac= false;
                 if (!m_diReadyX.p_bIn || !m_diReadyY.p_bIn)
                     return "Ready Fail";
                 return "OK";
@@ -373,7 +393,7 @@ namespace Root_EFEM
         public string AfterGet(int nID)
         {
         
-                DoVac.Write(false);
+                p_bStageVac=false;
                 if (m_diWaferExistLoad.p_bIn)
                 {
                     m_alid_WaferExist.Run(true, "WTR Get WaferExist Error In Stage");
@@ -389,7 +409,7 @@ namespace Root_EFEM
         public string AfterPut(int nID)
         {
 
-            DoVac.Write(true);
+            p_bStageVac = true;
             if (!m_diWaferExistLoad.p_bIn)
             {
                 m_alid_WaferExist.Run(true, "WTR Get WaferExist Error In Stage");
