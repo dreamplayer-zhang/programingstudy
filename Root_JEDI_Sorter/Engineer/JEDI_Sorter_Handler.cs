@@ -63,7 +63,7 @@ namespace Root_JEDI_Sorter.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        public JEDI m_JEDI; 
+        public JEDI_Sorter m_JEDI; 
         public Dictionary<In.eIn, In> m_in = new Dictionary<In.eIn, In>();
         public Dictionary<Good.eGood, Good> m_good = new Dictionary<Good.eGood, Good>();
         public Dictionary<Bad.eBad, Bad> m_bad = new Dictionary<Bad.eBad, Bad>();
@@ -71,7 +71,7 @@ namespace Root_JEDI_Sorter.Engineer
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            InitModule(m_JEDI = new JEDI("JEDI", m_engineer)); 
+            InitModule(m_JEDI = new JEDI_Sorter("JEDI", m_engineer)); 
             InitIn(In.eIn.InA);
             InitIn(In.eIn.InB);
             InitGood(Good.eGood.GoodA);

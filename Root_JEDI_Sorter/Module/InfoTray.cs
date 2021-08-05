@@ -64,10 +64,13 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
+        public string m_sTrayIn = "";
+        public string m_sTrayOut = "";
         public string p_id { get; set; }
         public InfoTray(string id)
         {
-            p_id = id; 
+            p_id = id;
+            m_sTrayIn = id; 
             InitInspect();
             InitCount(); 
         }

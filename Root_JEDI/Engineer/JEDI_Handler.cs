@@ -1,10 +1,12 @@
-﻿using Root_JEDI_Sorter.Module;
+﻿using Root_JEDI.Module;
+using Root_JEDI_Sorter.Module;
 using Root_JEDI_Vision.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -27,17 +29,89 @@ namespace Root_JEDI.Engineer
         }
         #endregion
 
+        #region Recipe
+        public string _sRecipe = "";
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_JEDI.RecipeOpen(value);
+            }
+        }
+
+        public List<string> p_asRecipe
+        {
+            get
+            {
+                List<string> asRecipe = new List<string>();
+                DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
+                foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
+                return asRecipe;
+            }
+            set { }
+        }
+        #endregion
+
+        #region Lot
+        public void NewLot()
+        {
+            SendLotInfo();
+            m_qSortInfoTray.Clear();
+            //m_summary.ClearCount();
+        }
+
+        string SendLotInfo()
+        {
+            foreach (IVision vision in m_vision.Values)
+            {
+                LotInfo lotInfo = new LotInfo(p_sRecipe, m_JEDI.p_sLotID, m_JEDI.p_thickness);
+                vision.SendLotInfo(lotInfo);
+            }
+            return "OK";
+        }
+
+        Queue<InfoTray> m_qSortInfoTray = new Queue<InfoTray>();
+        public void SendSortInfo(InfoTray infoTray)
+        {
+            if (infoTray.p_bInspect == false) return; 
+            m_qSortInfoTray.Enqueue(infoTray); 
+        }
+        
+        string SendSortInfo()
+        {
+            if (m_qSortInfoTray.Count == 0) return "OK";
+            InfoTray infoTray = m_qSortInfoTray.Dequeue();
+            foreach (IVision vision in m_vision.Values)
+            {
+                SortInfo sortInfo = new SortInfo(infoTray);
+                vision.SendSortInfo(sortInfo);
+            }
+            //string sRun = m_summary.SetSort(m_pine2.p_b3D, infoStrip);
+            //if (sRun != "OK") m_pine2.m_alidSummary.Run(true, sRun);
+            return "OK"; 
+        }
+        #endregion
+
         #region Module
         public ModuleList p_moduleList { get; set; }
-        public Dictionary<eVision, Vision2D> m_vision2D = new Dictionary<eVision, Vision2D>(); 
+        public JEDI m_JEDI;
+        public Dictionary<eVision, IVision> m_vision = new Dictionary<eVision, IVision>(); 
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_vision2D.Add(eVision.Top2D, new Vision2D(eVision.Top2D, m_engineer, ModuleBase.eRemote.Client));
-            InitModule(m_vision2D[eVision.Top2D]);
-            m_vision2D.Add(eVision.Bottom, new Vision2D(eVision.Bottom, m_engineer, ModuleBase.eRemote.Client));
-            InitModule(m_vision2D[eVision.Bottom]);
+            InitModule(m_JEDI = new JEDI("JEDI", m_engineer));
+            InitVision(eVision.Top2D, new Vision2D(eVision.Top2D, m_engineer, ModuleBase.eRemote.Client));
+            InitVision(eVision.Bottom, new Vision2D(eVision.Bottom, m_engineer, ModuleBase.eRemote.Client));
+        }
+
+        void InitVision(eVision eVision, IVision vision)
+        {
+            m_vision.Add(eVision, vision);
+            InitModule((ModuleBase)m_vision[eVision]); 
         }
 
         void InitModule(ModuleBase module)

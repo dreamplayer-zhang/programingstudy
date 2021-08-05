@@ -1,4 +1,4 @@
-﻿using Root_JEDI_Sorter.Engineer;
+﻿using Root_JEDI.Engineer;
 using RootTools;
 using RootTools.Control;
 using RootTools.GAFs;
@@ -9,7 +9,7 @@ using System;
 using System.IO;
 using System.Threading;
 
-namespace Root_JEDI_Sorter.Module
+namespace Root_JEDI.Module
 {
     public class JEDI : ModuleBase
     {
@@ -20,8 +20,8 @@ namespace Root_JEDI_Sorter.Module
         DIO_IO m_dioHome;
         DIO_I m_diEmergency;
         DIO_I m_diDoorOpen;
-        DIO_I[] m_diCDA = new DIO_I[2] { null, null };
-        DIO_O m_doFFU;
+        DIO_I m_diCDA;
+        DIO_O[] m_doFFU = new DIO_O[2] { null, null };
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetDIO(ref m_dioStart, this, "Start", false);
@@ -30,9 +30,9 @@ namespace Root_JEDI_Sorter.Module
             m_toolBox.GetDIO(ref m_dioHome, this, "Home", false);
             m_toolBox.GetDIO(ref m_diEmergency, this, "Emergency");
             m_toolBox.GetDIO(ref m_diDoorOpen, this, "Door Open");
-            m_toolBox.GetDIO(ref m_diCDA[0], this, "CDA 1");
-            m_toolBox.GetDIO(ref m_diCDA[1], this, "CDA 2");
-            m_toolBox.GetDIO(ref m_doFFU, this, "FFU");
+            m_toolBox.GetDIO(ref m_diCDA, this, "CDA");
+            m_toolBox.GetDIO(ref m_doFFU[0], this, "FFU Handler");
+            m_toolBox.GetDIO(ref m_doFFU[1], this, "FFU Vision");
             m_lamp.GetTools(m_toolBox, this);
             m_buzzer.GetTools(m_toolBox, this);
             if (bInit)
@@ -62,93 +62,6 @@ namespace Root_JEDI_Sorter.Module
             m_alidDoorOpen.p_bEQError = false;
             m_alidNewLot = m_gaf.GetALID(this, "NewLot", "New Lot Communication Error");
             m_alidSummary = m_gaf.GetALID(this, "Summary", "Summary Error");
-        }
-        #endregion
-
-        #region DIO
-        EQ.eState m_eEQState = EQ.eState.Idle;
-        void RunThreadDIO(bool bBlink)
-        {
-            if (m_eEQState != EQ.p_eState)
-            {
-                m_eEQState = EQ.p_eState;
-                m_dioStart.Write(false);
-                m_dioStop.Write(false);
-                m_dioReset.Write(false);
-                m_dioHome.Write(false);
-            }
-            switch (EQ.p_eState)
-            {
-                case EQ.eState.Init:
-                    m_dioHome.Write(bBlink);
-                    if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home;
-                    break;
-                case EQ.eState.Ready:
-                    m_dioHome.Write(bBlink);
-                    if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home;
-                    m_dioStart.Write(bBlink);
-                    if (m_dioStart.p_bIn) EQ.p_eState = EQ.eState.Run;
-                    m_dioReset.Write(bBlink);
-                    if (m_dioReset.p_bIn) m_handler.Reset();
-                    break;
-                case EQ.eState.Run:
-                    m_dioStop.Write(bBlink);
-                    if (m_dioStop.p_bIn) EQ.p_eState = EQ.eState.Ready;
-                    break;
-                case EQ.eState.Error:
-                    m_dioHome.Write(bBlink);
-                    if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home;
-                    m_dioReset.Write(bBlink);
-                    if (m_dioReset.p_bIn) m_handler.Reset();
-                    break;
-            }
-        }
-        #endregion
-
-        #region Emergency
-        bool _bEmergency = false;
-        public bool p_bEmergency
-        {
-            get { return _bEmergency; }
-            set
-            {
-                m_alidEMG.p_bSet = value;
-                if (_bEmergency == value) return;
-                _bEmergency = value;
-                if (value)
-                {
-                    EQ.p_bStop = true;
-                    EQ.p_eState = EQ.eState.Error;
-                    ((JEDI_Sorter_Engineer)m_engineer).m_ajin.m_listAxis.RunEmergency();
-                }
-                OnPropertyChanged();
-            }
-        }
-
-        bool _bCDA = false;
-        public bool p_bCDA
-        {
-            get { return _bCDA; }
-            set
-            {
-                m_alidCDA.p_bSet = value;
-                if (_bCDA == value) return;
-                _bCDA = value;
-                if (value)
-                {
-                    EQ.p_eState = EQ.eState.Error;
-                    EQ.p_bStop = true;
-                }
-                OnPropertyChanged();
-            }
-        }
-
-        void RunThreadEMG()
-        {
-            p_bEmergency = m_diEmergency.p_bIn;
-            EQ.p_bDoorOpen = m_diDoorOpen.p_bIn;
-            m_alidDoorOpen.p_bSet = m_diDoorOpen.p_bIn;
-            p_bCDA = m_diCDA[0].p_bIn || m_diCDA[1].p_bIn;
         }
         #endregion
 
@@ -245,6 +158,93 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
+        #region Emergency
+        bool _bEmergency = false;
+        public bool p_bEmergency
+        {
+            get { return _bEmergency; }
+            set
+            {
+                m_alidEMG.p_bSet = value;
+                if (_bEmergency == value) return;
+                _bEmergency = value;
+                if (value)
+                {
+                    EQ.p_bStop = true;
+                    EQ.p_eState = EQ.eState.Error;
+                    ((JEDI_Engineer)m_engineer).m_ajin.m_listAxis.RunEmergency();
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        bool _bCDA = false;
+        public bool p_bCDA
+        {
+            get { return _bCDA; }
+            set
+            {
+                m_alidCDA.p_bSet = value;
+                if (_bCDA == value) return;
+                _bCDA = value;
+                if (value)
+                {
+                    EQ.p_eState = EQ.eState.Error;
+                    EQ.p_bStop = true;
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        void RunThreadEMG()
+        {
+            p_bEmergency = m_diEmergency.p_bIn;
+            EQ.p_bDoorOpen = m_diDoorOpen.p_bIn;
+            m_alidDoorOpen.p_bSet = m_diDoorOpen.p_bIn;
+            p_bCDA = m_diCDA.p_bIn;
+        }
+        #endregion
+
+        #region DIO
+        EQ.eState m_eEQState = EQ.eState.Idle;
+        void RunThreadDIO(bool bBlink)
+        {
+            if (m_eEQState != EQ.p_eState)
+            {
+                m_eEQState = EQ.p_eState;
+                m_dioStart.Write(false);
+                m_dioStop.Write(false);
+                m_dioReset.Write(false);
+                m_dioHome.Write(false);
+            }
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Init:
+                    m_dioHome.Write(bBlink);
+                    if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home;
+                    break;
+                case EQ.eState.Ready:
+                    m_dioHome.Write(bBlink);
+                    if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home;
+                    m_dioStart.Write(bBlink);
+                    if (m_dioStart.p_bIn) EQ.p_eState = EQ.eState.Run;
+                    m_dioReset.Write(bBlink);
+                    if (m_dioReset.p_bIn) m_handler.Reset();
+                    break;
+                case EQ.eState.Run:
+                    m_dioStop.Write(bBlink);
+                    if (m_dioStop.p_bIn) EQ.p_eState = EQ.eState.Ready;
+                    break;
+                case EQ.eState.Error:
+                    m_dioHome.Write(bBlink);
+                    if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home;
+                    m_dioReset.Write(bBlink);
+                    if (m_dioReset.p_bIn) m_handler.Reset();
+                    break;
+            }
+        }
+        #endregion
+
         #region Thread DIO
         bool m_bRunDIO = false;
         Thread m_threadDIO;
@@ -283,6 +283,21 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
+        #region Mode
+        public double m_thicknessDefault = 0;
+        double _thickness = 0;
+        public double p_thickness
+        {
+            get { return _thickness; }
+            set
+            {
+                if (_thickness == value) return;
+                _thickness = value;
+                OnPropertyChanged();
+            }
+        }
+        #endregion
+
         #region override
         public override string StateHome()
         {
@@ -300,6 +315,8 @@ namespace Root_JEDI_Sorter.Module
         public override void RunTree(Tree tree)
         {
             m_buzzer.RunTree(tree.GetTree("Buzzer"));
+            p_thickness = tree.GetTree("Tray").Set(p_thickness, p_thickness, "Thickness", "Tray Thickness (um)");
+            m_thicknessDefault = tree.GetTree("Default Tray").Set(m_thicknessDefault, m_thicknessDefault, "Thickness", "Tray Thickness (um)");
         }
         #endregion
 
@@ -354,11 +371,11 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
-        JEDI_Sorter_Handler m_handler;
+        JEDI_Handler m_handler;
         public JEDI(string id, IEngineer engineer)
         {
             p_id = id;
-            m_handler = (JEDI_Sorter_Handler)engineer.ClassHandler();
+            m_handler = (JEDI_Handler)engineer.ClassHandler();
             p_sLotID = m_reg.Read("LotID", "");
             InitBase(id, engineer);
 
