@@ -31,11 +31,13 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region GAF
+        ALID m_alidHome;
         ALID m_alidArrived;
         ALID m_alidPusher;
         ALID m_alidAxis;
         void InitALID()
         {
+            m_alidHome = m_gaf.GetALID(this, "Home Error", "Home Error");
             m_alidArrived = m_gaf.GetALID(this, "Arrived", "Arrived Sensor Timeout");
             m_alidPusher = m_gaf.GetALID(this, "Pusher", "Pusher Error");
             m_alidAxis = m_gaf.GetALID(this, "Rotate Axis Alarm", "Rotate Axis Alarm");
@@ -236,12 +238,17 @@ namespace Root_Rinse_Unloader.Module
             {
                 foreach (DIO_I di in line.m_diCheck)
                 {
-                    if (di.p_bIn) return "Check Strip";
+                    if (di.p_bIn)
+                    {
+                        m_alidHome.Run(true, "Check Strip");
+                        return "Check Strip";
+                    }
                 }
             }
             m_axisRotate.ServoOn(true);
             p_sInfo = base.StateHome(m_axisWidth);
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            m_alidHome.Run(p_sInfo != "OK", p_sInfo);
             m_dioPusher.Write(false);
             RunPusherDown(m_rinse.p_eMode == RinseU.eRunMode.Stack);
             return p_sInfo;

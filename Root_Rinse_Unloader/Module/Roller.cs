@@ -71,9 +71,11 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region GAF
+        ALID m_alidHome;
         ALID m_alidAxis;
         void InitALID()
         {
+            m_alidHome = m_gaf.GetALID(this, "Home Error", "Home Error");
             m_alidAxis = m_gaf.GetALID(this, "Rotate Axis Alarm", "Rotate Axis Alarm");
         }
         #endregion
@@ -436,6 +438,7 @@ namespace Root_Rinse_Unloader.Module
             m_axisRotate[1].ServoOn(true);
             StateHome(m_axisAlign); 
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            m_alidHome.Run(p_sInfo != "OK", p_sInfo);
             return p_sInfo;
         }
 

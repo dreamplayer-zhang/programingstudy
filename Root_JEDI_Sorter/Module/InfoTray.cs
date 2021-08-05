@@ -1,9 +1,6 @@
 ﻿using RootTools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Root_JEDI_Sorter.Module
 {
@@ -22,10 +19,14 @@ namespace Root_JEDI_Sorter.Module
         Rework,
     }
 
+    public class InfoChip : NotifyProperty
+    {
+        public eResult m_eResult; 
+    }
+
     public class InfoTray : NotifyProperty
     {
-        #region Result
-
+        #region On Inspect
         Dictionary<eVision, bool> m_bInspect = new Dictionary<eVision, bool>();
         void InitInspect()
         {
@@ -50,11 +51,28 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
+        #region Chip Count
+        public Dictionary<eResult, int> m_aCount = new Dictionary<eResult, int>(); 
+        void InitCount()
+        {
+            foreach (eResult eResult in Enum.GetValues(typeof(eResult))) m_aCount.Add(eResult, 0); 
+        }
+
+        public int GetChipCount()
+        {
+            return m_aCount[eResult.Good] + m_aCount[eResult.Reject] + m_aCount[eResult.Rework]; 
+        }
+        #endregion
+
+        public string m_sTrayIn = "";
+        public string m_sTrayOut = "";
         public string p_id { get; set; }
         public InfoTray(string id)
         {
-            p_id = id; 
-            InitInspect(); 
+            p_id = id;
+            m_sTrayIn = id; 
+            InitInspect();
+            InitCount(); 
         }
     }
 }

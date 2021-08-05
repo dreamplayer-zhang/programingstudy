@@ -14,8 +14,8 @@ static char THIS_FILE[] = __FILE__;
 Raw3D_Calculation::Raw3D_Calculation()
 {
 	m_nThreadIndex = 1;
-	m_sz3DImage = CSize(0, 0);
-	m_szRawImage = CSize(0, 0);
+	m_sz3DImage = CCSize(0, 0);
+	m_szRawImage = CCSize(0, 0);
 	m_ppBuffHeight = NULL;
 	m_ppBuffBright = NULL;
 	m_pBuffRaw = NULL;
@@ -36,7 +36,7 @@ Raw3D_Calculation::~Raw3D_Calculation()
 	}
 }
 
-void Raw3D_Calculation::Initialize(int nThreadIndex, int nThreadNum, CSize sz3DImage, CSize szRawImage
+void Raw3D_Calculation::Initialize(int nThreadIndex, int nThreadNum, CCSize sz3DImage, CCSize szRawImage
 	, LPBYTE* ppMainImage, WORD** ppBuffHeight, short** ppBuffBright, LPBYTE* ppBuffFG, int nSnapFrameNum)
 {
 	m_nThreadIndex = nThreadIndex;
@@ -60,7 +60,7 @@ void Raw3D_Calculation::Initialize(int nThreadIndex, int nThreadNum, CSize sz3DI
 	SetCalcState(Calc3DState::ReadyCalc);
 }
 typedef unsigned char       BYTE;
-void Raw3D_Calculation::CreateCvtBuffer(CSize szRawImage)
+void Raw3D_Calculation::CreateCvtBuffer(CCSize szRawImage)
 {
 	if (m_pBuffRaw != NULL)
 	{
@@ -87,11 +87,15 @@ UINT ThreadCalculation(LPVOID lParam)
 
 	return 0;
 }
-
-//Make Converted Image & Height/Bright Image & Display Image
-void Raw3D_Calculation::StartCalculation(ConvertMode cvtMode, Calc3DMode calcMode, DisplayMode displayMode, CPoint ptDataPos
-	, int nMinGV1, int nMinGV2, int nOverlapStartPos, int nOverlapSize, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, int* pnCurrFrameNum, Parameter3D param)
+void Raw3D_Calculation::SetFrameNum(int n)
 {
+	m_nCurrFrameNum = n;
+}
+thread* t1;
+//Make Converted Image & Height/Bright Image & Display Image
+void Raw3D_Calculation::StartCalculation(ConvertMode cvtMode, Calc3DMode calcMode, DisplayMode displayMode, CCPoint ptDataPos
+	, int nMinGV1, int nMinGV2, int nOverlapStartPos, int nOverlapSize, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, int* pnCurrFrameNum, Parameter3D param)
+{	
 	m_cvtMode = cvtMode;
 	m_calcMode = calcMode;
 	m_displayMode = displayMode;
@@ -110,13 +114,13 @@ void Raw3D_Calculation::StartCalculation(ConvertMode cvtMode, Calc3DMode calcMod
 	m_bRevScan = bRevScan;
 	m_bUseMinGV2 = bUseMinGV2;
 
-	m_pnCurrFrameNum = pnCurrFrameNum;
+	//m_pnCurrFrameNum = pnCurrFrameNum;
 
 	m_param = param;
 
 	SetCalcState(Calc3DState::Calculating);
 	
-	thread t1(ThreadCalculation,this);
+	t1 = new thread(ThreadCalculation,this);
 	// AfxBeginThread(ThreadCalculation, this);
 }
 
@@ -126,7 +130,7 @@ void Raw3D_Calculation::StartCalculation(ConvertMode cvtMode, Calc3DMode calcMod
 //}
 
 void Raw3D_Calculation::StopCalc()
-{
+{	
 	m_bStop = true;
 }
 
@@ -152,13 +156,6 @@ void Raw3D_Calculation::CalculateImage()
 		n = m_szRawImage.cy;
 	}
 
-	/*if (m_ptDataPos.y < 0)
-		m_ptDataPos.y = 0;
-	else if (m_ptDataPos.y + m_nSnapFrameNum >= m_sz3DImage.cy)
-		m_ptDataPos.y = m_sz3DImage.cy - m_nSnapFrameNum;*/
-
-		//int nPreFrameIndex = -1;
-		//int nSameFrameCount = 0;
 	int nFrameIndex = 0;
 	if (nFrameIndex < 0)
 	{
@@ -167,9 +164,10 @@ void Raw3D_Calculation::CalculateImage()
 	}
 
 	while (nFrameIndex < m_nSnapFrameNum)
-	{
+	{		
+		//DebugTxt("while\n", 7);
 		nFrameIndex = n + m_nThreadIndex;
-		if (*m_pnCurrFrameNum > nFrameIndex)
+		if (m_nCurrFrameNum > nFrameIndex)
 		{
 			switch (m_cvtMode)
 			{
@@ -189,7 +187,7 @@ void Raw3D_Calculation::CalculateImage()
 			if (m_nOverlapStartPos > 0 && m_ptDataPos.x > m_nOverlapStartPos)
 				nOverlapNum += 2;
 
-			CPoint ptOLDataPos = CPoint(m_ptDataPos.x, m_ptDataPos.y);
+			CCPoint ptOLDataPos = CCPoint(m_ptDataPos.x, m_ptDataPos.y);
 			ptOLDataPos.x += (nOverlapNum * m_nOverlapSize);
 
 			if (ptOLDataPos.x + m_szRawImage.cx >= m_sz3DImage.cx)
@@ -230,20 +228,11 @@ void Raw3D_Calculation::CalculateImage()
 				break;
 			}
 
-			CRect rtCvtROI = CRect(m_ptDataPos.x, nYPos + ptOLDataPos.y, m_szRawImage.cx, 1);
+			CCRect rtCvtROI = CCRect(m_ptDataPos.x, nYPos + ptOLDataPos.y, m_szRawImage.cx, 1);
 			ConvertDisplayImage(m_displayMode, rtCvtROI, m_nOverlapStartPos, m_nOverlapSize, m_nDisplayOffsetX, m_nDisplayOffsetY);
 
 			n += m_nThreadNum;
 		}
-		/*else if(nPreFrameIndex == *m_pnCurrFrameNum)
-		{
-			nSameFrameCount++;
-			if(nSameFrameCount >= MAX_SAME_FRAME_COUNT)
-			{
-				SetCalcState(Calc3DState::ErrorCalc);
-				return;
-			}
-		}*/
 
 		if (m_bStop == true)
 			break;
@@ -312,7 +301,7 @@ void Raw3D_Calculation::ConvertImageBump(int nFrameIndex, bool bReverseScan)
 }
 
 //Height, Bright Image 만들기
-void Raw3D_Calculation::CalcHBImage(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)
+void Raw3D_Calculation::CalcHBImage(int nFrameIndex, CCPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)
 {
 	long nSum, nYSum, nBSum, nMax, yMax, yAve, nGV, y0, dy;
 	long yHMax = 0;
@@ -516,7 +505,7 @@ void Raw3D_Calculation::CalcHBImage(int nFrameIndex, CPoint ptDataPos, int nMinG
 	}
 }
 
-void Raw3D_Calculation::CalcHBImage_FromTop(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)
+void Raw3D_Calculation::CalcHBImage_FromTop(int nFrameIndex, CCPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)
 {
 	long nSum, nYSum, nBSum, nGV;
 
@@ -638,7 +627,7 @@ void Raw3D_Calculation::CalcHBImage_FromTop(int nFrameIndex, CPoint ptDataPos, i
 }
 
 // Beam 두께 parameter 사용
-void Raw3D_Calculation::CalcHBImage_SKPAD_MinGV1(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)
+void Raw3D_Calculation::CalcHBImage_SKPAD_MinGV1(int nFrameIndex, CCPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)
 {
 	BYTE* pBuf;
 	BYTE* pBufX;
@@ -949,7 +938,7 @@ void Raw3D_Calculation::CalcHBImage_SKPAD_MinGV1(int nFrameIndex, CPoint ptDataP
 }
 
 
-void Raw3D_Calculation::CalcHBImage_ConsiderZeroBump(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)//200520 이종현 Merge
+void Raw3D_Calculation::CalcHBImage_ConsiderZeroBump(int nFrameIndex, CCPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)//200520 이종현 Merge
 {
 	BYTE* pBuf;
 	BYTE* pBufX;
@@ -1139,7 +1128,7 @@ void Raw3D_Calculation::CalcHBImage_ConsiderZeroBump(int nFrameIndex, CPoint ptD
 
 
 ////#1. BeamThk 쓰는 방법
-void Raw3D_Calculation::CalcHBImage_ConsiderZeroBump_AutoBeamThickness(int nFrameIndex, CPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)//200623 이종현 빔두께
+void Raw3D_Calculation::CalcHBImage_ConsiderZeroBump_AutoBeamThickness(int nFrameIndex, CCPoint ptDataPos, int nMinGV1, int nMinGV2, bool bUseDualMinGV)//200623 이종현 빔두께
 {
 	BYTE* pBuf;
 	BYTE* pBufX;
@@ -1558,7 +1547,7 @@ void Raw3D_Calculation::CalcHBImage_ConsiderZeroBump_AutoBeamThickness(int nFram
 //
 //
 
-void Raw3D_Calculation::ConvertDisplayImage(DisplayMode displayMode, CRect rtROI, int nOverlapStartPos, int nOverlapSize, int nDisplayOffsetX, int nDisplayOffsetY)
+void Raw3D_Calculation::ConvertDisplayImage(DisplayMode displayMode, CCRect rtROI, int nOverlapStartPos, int nOverlapSize, int nDisplayOffsetX, int nDisplayOffsetY)
 {
 	//BYTE *pBYTE; WORD *pWord; long x, x0;
 

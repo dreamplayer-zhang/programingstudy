@@ -267,7 +267,6 @@ namespace Root_Pine2.Module
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(true);
                 int xLine = m_aBoat[eWorks].m_recipe.m_aSnap.Count;
-                if (m_aBoat[eWorks].m_recipe.p_eSnapMode == Vision3D.Recipe.eSnapMode.ALL) xLine /= 2;
                 switch (xLine)
                 {
                     case 2: m_aCamOffset = m_aBoat[eWorks].m_aCam2Offset; break;
@@ -280,7 +279,7 @@ namespace Root_Pine2.Module
                     m_aSnapLog[eWorks].Info("Snap Start Idx : " + i.ToString());
                     Vision3D.Recipe.Snap snap = m_aBoat[eWorks].m_recipe.m_aSnap[i];
                     if (bBiDirectionalScan == true) snap.m_eDirection = Vision3D.Recipe.Snap.eDirection.Forward;
-                    vision.RunLight(snap.m_lightPower);
+                    //vision.RunLight(snap.m_lightPower);
                     m_bSnapReady = false;
                     vision.StartSnap(snap, eWorks, iSnap);
                     if (Run(RunMoveSnapStart(eWorks, snap, i % xLine))) return p_sInfo;
@@ -293,14 +292,14 @@ namespace Root_Pine2.Module
                     if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (i < m_aBoat[eWorks].m_recipe.m_aSnap.Count - 1)
                     {
-                        SendChangeUserSet();
+                        //SendChangeUserSet();
                         if (Run(RunMoveSnapStart(eWorks, m_aBoat[eWorks].m_recipe.m_aSnap[i + 1], i % xLine))) return p_sInfo;
                     }
                     if (vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++;
                     m_aSnapLog[eWorks].Info("Snap End Idx : " + i.ToString());
                 }
-                vision.RunLightOff();
+                //vision.RunLightOff();
                 m_bgwDone.RunWorkerAsync(eWorks);
             }
             catch (Exception e) { p_sInfo = e.Message; }

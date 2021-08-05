@@ -88,6 +88,8 @@ namespace Root_Rinse_Loader.Module
         {
             AddProtocol(p_id, RinseU.eCmd.NewMagazine, 0);
         }
+
+        bool m_bLinkUnload = true; 
         #endregion
 
         #region Rinse
@@ -132,9 +134,11 @@ namespace Root_Rinse_Loader.Module
         public bool IsEnableStart()
         {
             if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (m_bLinkUnload == false) return true;
+            if (p_eStateRinse != eRinseRun.Run) return false;
             if (p_eStateUnloader == EQ.eState.Ready) return true;
             if (p_eStateUnloader == EQ.eState.Run) return true;
-            return false; 
+            return false;
         }
         #endregion
 
@@ -345,7 +349,28 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region Thread Send
-        RinseU.Protocol m_protocolSend = null;
+        string _sProtocolSend = "";
+        public string p_sProtocolSend
+        {
+            get { return _sProtocolSend; }
+            set
+            {
+                _sProtocolSend = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        RinseU.Protocol _protocolSend = null;
+        RinseU.Protocol p_protocolSend 
+        { 
+            get { return _protocolSend; }
+            set
+            {
+                _protocolSend = value;
+                p_sProtocolSend = (value != null) ? value.p_sCmd : ""; 
+            }
+        }
+        
         Queue<RinseU.Protocol> m_qProtocolSend = new Queue<RinseU.Protocol>();
         Queue<RinseU.Protocol> m_qProtocolReply = new Queue<RinseU.Protocol>();
         bool m_bRunSend = false;
@@ -363,8 +388,8 @@ namespace Root_Rinse_Loader.Module
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
-                p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
-                if ((EQ.p_eState == EQ.eState.Run) && ( m_diRinseUnloader.p_bIn == false)) p_eStateUnloader = EQ.eState.Error;
+                p_eStateRinse = (m_diRinseRun.p_bIn && (m_bLinkUnload == false)) ? eRinseRun.Run : eRinseRun.Ready;
+                if (m_bLinkUnload && (EQ.p_eState == EQ.eState.Run) && (m_diRinseUnloader.p_bIn == false)) p_eStateUnloader = EQ.eState.Error;
                 RunThreadDIO();
                 if (m_qProtocolReply.Count > 0)
                 {
@@ -372,10 +397,10 @@ namespace Root_Rinse_Loader.Module
                     m_tcpip.Send(protocol.p_sCmd);
                     Thread.Sleep(10);
                 }
-                else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
+                else if ((m_qProtocolSend.Count > 0) && (p_protocolSend == null))
                 {
-                    m_protocolSend = m_qProtocolSend.Dequeue();
-                    m_tcpip.Send(m_protocolSend.p_sCmd);
+                    p_protocolSend = m_qProtocolSend.Dequeue();
+                    m_tcpip.Send(p_protocolSend.p_sCmd);
                     Thread.Sleep(10);
                 }
             }
@@ -383,6 +408,7 @@ namespace Root_Rinse_Loader.Module
 
         public RinseU.Protocol AddProtocol(string id, RinseU.eCmd eCmd, dynamic value)
         {
+            if (m_bLinkUnload == false) return null; 
             RinseU.Protocol protocol = new RinseU.Protocol(id, eCmd, value);
             if (id == p_id) m_qProtocolSend.Enqueue(protocol);
             else m_qProtocolReply.Enqueue(protocol); 
@@ -403,7 +429,7 @@ namespace Root_Rinse_Loader.Module
                     return;
                 }
                 RinseU.eCmd eCmd = GetCmd(asRead[1]);
-                if (asRead[0] == p_id) m_protocolSend = null;
+                if (asRead[0] == p_id) p_protocolSend = null;
                 else
                 {
                     switch (eCmd)
@@ -506,14 +532,15 @@ namespace Root_Rinse_Loader.Module
             base.RunTree(tree);
             p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
             p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
-            m_secBuzzerOff = tree.Set(m_secBuzzerOff, m_secBuzzerOff, "Buzzer Off", "Buzzer Off Delay (sec)"); 
+            m_secBuzzerOff = tree.Set(m_secBuzzerOff, m_secBuzzerOff, "Buzzer Off", "Buzzer Off Delay (sec)");
+            m_bLinkUnload = tree.Set(m_bLinkUnload, m_bLinkUnload, "Link Unload", "Link Unload"); 
         }
         #endregion
 
         public void InitSendProtocol()
         {
             m_qProtocolSend.Clear();
-            m_protocolSend = null;
+            p_protocolSend = null;
         }
 
         public override void Reset()
@@ -532,6 +559,7 @@ namespace Root_Rinse_Loader.Module
         RinseL_Handler m_handler; 
         public RinseL(string id, IEngineer engineer)
         {
+            p_protocolSend = null; 
             p_id = id;
             m_handler = (RinseL_Handler)engineer.ClassHandler(); 
             InitBase(id, engineer);

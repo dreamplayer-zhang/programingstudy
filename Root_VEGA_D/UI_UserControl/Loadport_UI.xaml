@@ -22,8 +22,8 @@
         <GroupBox x:Name="LPNumber" Margin="0,5,0,0" BorderBrush="#FF5482A1" BorderThickness="2" Header="{Binding p_id}">
             <Grid Grid.Row="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1.2*"/>
-                    <RowDefinition Height="0.7*"/>
+                    <RowDefinition Height="1.6*"/>
+                    <RowDefinition Height="0.1*"/>
                     <RowDefinition Height="1*"/>
                     <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
@@ -80,15 +80,19 @@
                     </UniformGrid>
                 </GroupBox>
 
-                <GroupBox Grid.Row="1" Header="Progress">
+                <GroupBox Grid.Row="1" Header="Progress" Visibility="Hidden">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition Height="1.5*"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <TextBlock Text="0%" VerticalAlignment="Bottom" Margin="10,-4,10,0"/>
-                            <TextBlock Text="0 / 0" VerticalAlignment="Bottom" Margin="10,-4,10,0" HorizontalAlignment="Right"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="23*"/>
+                                <ColumnDefinition Width="29*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="0%" VerticalAlignment="Bottom" Margin="10,0" Grid.ColumnSpan="2"/>
+                            <TextBlock Text="0 / 0" VerticalAlignment="Bottom" Margin="0,0,9,0" HorizontalAlignment="Right" Grid.Column="1"/>
                         </Grid>
                         <Grid Grid.Row="1">
                             <ProgressBar Margin="2"/>
@@ -105,7 +109,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                        <Button Grid.Row="0" Grid.Column="0"
+                    <Button Grid.Row="0" Grid.Column="0"
                             Content="Manual"
                             Style="{StaticResource SetupPanelBtn}"
                             Foreground="White"
