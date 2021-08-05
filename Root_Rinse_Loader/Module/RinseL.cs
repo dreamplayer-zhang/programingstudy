@@ -132,9 +132,9 @@ namespace Root_Rinse_Loader.Module
         public bool IsEnableStart()
         {
             if (EQ.p_eState != EQ.eState.Ready) return false;
-            if (p_eStateUnloader == EQ.eState.Ready) return true;
-            if (p_eStateUnloader == EQ.eState.Run) return true;
-            return false; 
+            //if (p_eStateUnloader == EQ.eState.Ready) return true;
+            //if (p_eStateUnloader == EQ.eState.Run) return true;
+            return true; 
         }
         #endregion
 
@@ -384,8 +384,9 @@ namespace Root_Rinse_Loader.Module
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
-                p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
-                if ((EQ.p_eState == EQ.eState.Run) && ( m_diRinseUnloader.p_bIn == false)) p_eStateUnloader = EQ.eState.Error;
+                //p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
+                p_eStateRinse = eRinseRun.Run;
+                //if ((EQ.p_eState == EQ.eState.Run) && ( m_diRinseUnloader.p_bIn == false)) p_eStateUnloader = EQ.eState.Error;
                 RunThreadDIO();
                 if (m_qProtocolReply.Count > 0)
                 {
@@ -404,6 +405,7 @@ namespace Root_Rinse_Loader.Module
 
         public RinseU.Protocol AddProtocol(string id, RinseU.eCmd eCmd, dynamic value)
         {
+            return null; 
             RinseU.Protocol protocol = new RinseU.Protocol(id, eCmd, value);
             if (id == p_id) m_qProtocolSend.Enqueue(protocol);
             else m_qProtocolReply.Enqueue(protocol); 
