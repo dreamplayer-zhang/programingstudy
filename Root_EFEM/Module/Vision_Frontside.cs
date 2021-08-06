@@ -15,6 +15,7 @@ using RootTools.RADS;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
+using RootTools.Camera.Matrox;
 
 namespace Root_EFEM
 {
@@ -50,6 +51,8 @@ namespace Root_EFEM
         Camera_Basler m_CamAlign;
         Camera_Basler m_CamVRS;
         Camera_Basler m_CamRADS;
+        Camera_Matrox m_Cam3D_2um;
+        Camera_Matrox m_Cam3D_11um;
 
         RADSControl m_RADSControl;
 
@@ -87,17 +90,27 @@ namespace Root_EFEM
                 m_CamRADS = value;
             }
         }
-
-
-        public Camera_Basler p_CamRADS
+        public Camera_Matrox p_Cam3D_2um
         {
             get
             {
-                return m_CamRADS;
+                return m_Cam3D_2um;
             }
             set
             {
-                m_CamRADS = value;
+                m_Cam3D_2um = value;
+            }
+        }
+
+        public Camera_Matrox p_Cam3D_11um
+        {
+            get
+            {
+                return m_Cam3D_11um;
+            }
+            set
+            {
+                m_Cam3D_11um = value;
             }
         }
 
@@ -149,6 +162,8 @@ namespace Root_EFEM
                 p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRSCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamRADS, this, "RADS");
+                p_sInfo = m_toolBox.GetCamera(ref m_Cam3D_2um, this, "3D_2um");
+                p_sInfo = m_toolBox.GetCamera(ref m_Cam3D_11um, this, "3D_11um");
                 p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
                 p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", true);
             }
@@ -494,6 +509,12 @@ namespace Root_EFEM
                 if (m_CamRADS != null)
                     m_CamRADS.Connect();
 
+                if (m_Cam3D_2um != null)
+                    m_Cam3D_2um.Connect();
+
+                if (m_Cam3D_11um != null)
+                    m_Cam3D_11um.Connect();
+
                 //if (m_CamAlign != null)
                 //    m_CamAlign.Connect();
 
@@ -697,6 +718,7 @@ namespace Root_EFEM
             AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
             AddModuleRunList(new Run_VRSAlign(this), true, "Run VRSAlign");
             AddModuleRunList(new Run_Centering(this), true, "Run Centering");
+
             //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
         }
         #endregion
