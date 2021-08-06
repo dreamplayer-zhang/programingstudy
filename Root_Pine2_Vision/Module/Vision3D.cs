@@ -282,9 +282,9 @@ namespace Root_Pine2_Vision.Module
             {
                 RunTreeImage(tree.GetTree("Image"));
                 RunTreeFOV(tree.GetTree("FOV"));
-                RunTreeColor(tree.GetTree("Red"), 0);
-                RunTreeColor(tree.GetTree("Green"), 1);
-                RunTreeColor(tree.GetTree("Blue"), 2);
+                //RunTreeColor(tree.GetTree("Red"), 0);
+                //RunTreeColor(tree.GetTree("Green"), 1);
+                //RunTreeColor(tree.GetTree("Blue"), 2);
             }
 
             void RunTreeImage(Tree tree)
@@ -918,8 +918,8 @@ namespace Root_Pine2_Vision.Module
 
         void RunGrabDataTree(Tree tree)
         {
-            //m_aGrabData[eWorks.A].RunTree(tree.GetTree("GrabData A"));
-            //m_aGrabData[eWorks.B].RunTree(tree.GetTree("GrabData B"));
+            m_aGrabData[eWorks.A].RunTree(tree.GetTree("GrabData A"));
+            m_aGrabData[eWorks.B].RunTree(tree.GetTree("GrabData B"));
         }
         #endregion
 
