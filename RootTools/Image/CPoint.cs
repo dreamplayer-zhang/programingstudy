@@ -31,7 +31,7 @@ namespace RootTools
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public CPoint(System.Windows.Rect rect)
+        public CPoint(Rect rect)
         {
             X = (int)(rect.Left);
             Y = (int)(rect.Top);
