@@ -618,12 +618,13 @@ namespace Root_Pine2_Vision.Module
             int nFOVpx = m_aGrabData[eWorks].m_nFovSize;
             int nReverseOffset = m_aGrabData[eWorks].m_nReverseOffset;
             int nOverlap = m_aGrabData[eWorks].m_nOverlap;
+            nFOVpx -= nOverlap;
             int nYOffset = m_aGrabData[eWorks].m_nYOffset;
             Recipe.eSnapMode nSnapMode = m_RunningRecipe[eWorks].p_eSnapMode;
             int nTotalSnap = m_RunningRecipe[eWorks].p_lSnap;
            if (nTotalSnap < 2) 
                  nTotalSnap = 2;
-            int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.MATROX) ? iSnap % (nTotalSnap / 2) : iSnap;
+            int nSnapLineIndex = iSnap;// (nSnapMode == Recipe.eSnapMode.MATROX) ? iSnap % (nTotalSnap / 2) : iSnap;
 
             // 이미지 시작점 설정
             CPoint cpOffset = CalcOffset(nSnapLineIndex, nFOVpx, nReverseOffset, recipe);
