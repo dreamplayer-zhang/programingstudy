@@ -145,7 +145,10 @@ void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, Displ
 	CreateRawBuffer(m_nSnapFrameNum);
 
 	if (nOverlapSize > m_nMaxOverlapSize)
-		nOverlapSize = m_nMaxOverlapSize;
+		nOverlapSize = m_nMaxOverlapSize; //이것도 안되지
+
+	if (nOverlapSize > MAX_OVERLAP)
+		nOverlapSize = MAX_OVERLAP; //이상황이 나오면 안되지
 
 	m_pThreadCalc = new Raw3D_Calculation[m_nThreadNum];
 	for (int n = 0; n < m_nThreadNum; n++)

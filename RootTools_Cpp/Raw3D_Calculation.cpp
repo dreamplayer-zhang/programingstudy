@@ -1549,23 +1549,6 @@ void Raw3D_Calculation::CalcHBImage_ConsiderZeroBump_AutoBeamThickness(int nFram
 
 void Raw3D_Calculation::ConvertDisplayImage(DisplayMode displayMode, CCRect rtROI, int nOverlapStartPos, int nOverlapSize, int nDisplayOffsetX, int nDisplayOffsetY)
 {
-	//BYTE *pBYTE; WORD *pWord; long x, x0;
-
-	//int n0 = (m_cp0.x - m_nOverlapStartPos) / m_szRawImage.cx;	//몇번째 라인인가?
-
-	//if (m_nOverlapStartPos > 0 && m_cp0.x > m_nOverlapStartPos)
-	//	n0++;
-
-	//x0 = m_cp0.x - (m_nOverlap * n0);
-	//pBYTE = &(m_pBufI[n][x0]);
-	//pWord = &(m_pBufData[n][m_cpStart.x]);
-
-	//for (x = 0; x < m_szRawImage.cx; x++)
-	//{
-	//	*pBYTE = (BYTE)(*pWord / m_szRawImage.cy);
-	//	pBYTE++;
-	//	pWord++;
-	//} //forget
 
 	int nOverlapNum = (rtROI.x - m_nOverlapStartPos) / (m_szRawImage.cx - m_nOverlapSize);
 
@@ -1574,21 +1557,34 @@ void Raw3D_Calculation::ConvertDisplayImage(DisplayMode displayMode, CCRect rtRO
 
 	int nOffsetX = m_nOverlapSize * nOverlapNum;
 
+	double dRatio = 1.0 / m_nOverlapSize;
+	for (int n = 0; n < m_nOverlapSize; n++)
+	{
+		m_pdOverlap[n] = dRatio * (double)n;
+	}
+
 	switch (displayMode)
 	{
 	case DisplayMode::HeightImage:
 		for (int y = rtROI.y; y < rtROI.y + rtROI.cy; y++)
 		{
-			for (int x = rtROI.x; x < rtROI.x + rtROI.cx; x++)
+			for (int x = rtROI.x, o =0; x < rtROI.x + rtROI.cx; x++,o++)
 			{
-
+				
 				if (IsMinGV2(x + nOffsetX, y) == true)
 				{
 					m_ppMainImage[y + nDisplayOffsetY][x + nDisplayOffsetX] = 0;
 				}
 				else
 				{
-					m_ppMainImage[y + nDisplayOffsetY][x + nDisplayOffsetX] = (BYTE)(m_ppBuffHeight[y][x + nOffsetX] / m_szRawImage.cy);
+					double b = (BYTE)(m_ppBuffHeight[y][x + nOffsetX] / m_szRawImage.cy);
+					if (o < m_nOverlapSize)
+					{ //일단 노멀모드부터 만들어봄
+						double a = m_ppMainImage[y + nDisplayOffsetY][x + nDisplayOffsetX];						
+						m_ppMainImage[y + nDisplayOffsetY][x + nDisplayOffsetX] = (BYTE)((double)a * m_pdOverlap[o] + (double)b * m_pdOverlap[m_nOverlapSize - o - 1]);
+					}
+					else
+						m_ppMainImage[y + nDisplayOffsetY][x + nDisplayOffsetX] = b;
 				}
 			}
 		}

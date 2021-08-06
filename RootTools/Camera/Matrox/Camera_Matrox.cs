@@ -609,7 +609,7 @@ namespace RootTools.Camera.Matrox
             try
             {
                 if (m_GrabData != null)
-                    m_clr3D.MakeImageSimple(0, 0, 30, 30, 4, m_nGrabCount, 0, m_GrabData.m_nOverlap, 0, 0, false, false, 0, 0);
+                    m_clr3D.MakeImageSimple(m_cpScanOffset.X, m_cpScanOffset.Y, 30, 30, 4, m_nGrabCount, 0, m_GrabData.m_nOverlap, 0, 0, false, false, 0, 0);
 
                 StopWatch swGrab = new StopWatch();
                 int DelayGrab = (int)(1000 * m_nGrabCount);
@@ -653,14 +653,14 @@ namespace RootTools.Camera.Matrox
                             fixed (byte* p = srcarray)
                             {
                                 IntPtr srcPtr = (IntPtr)(p + p_nWidth * y);
-                                IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
+                                IntPtr dstPtr = (IntPtr)((long)m_MemPtr + 0+ (yp +0) * (long)m_Memory.W);
                          
                                  Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
                             }
                         }
                      //  );
                         int ypp = (iBlock) * p_nHeight;
-                        ppDst[iBlock] = (byte*)((long)m_MemPtr + m_cpScanOffset.X + (ypp + m_cpScanOffset.Y) * (long)m_Memory.W);
+                        ppDst[iBlock] = (byte*)((long)m_MemPtr + 0 + (ypp + 0) * (long)m_Memory.W);
                         m_clr3D.SetFrameNum(iBlock);
                         iBlock++;
 
