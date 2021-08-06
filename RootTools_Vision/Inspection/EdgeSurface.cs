@@ -102,7 +102,7 @@ namespace RootTools_Vision
 
 				double waferRadius = 150000.0;          // um
 				double resolutionX = this.currentWorkplace.CameraInfo.TargetResX;       // um
-				int alignTolerance = 3;			// 1-profile similar GV search range
+				int startXOffset = 5;
 
 				OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 
@@ -117,6 +117,8 @@ namespace RootTools_Vision
 				int roiWidth = originRecipe.OriginWidth;
 				int roiHeight = roiEndY - roiStartY;
 
+				int bufferWidth = this.currentWorkplace.SharedBufferInfo.Width;
+
 				#endregion
 
 				#region [Measure Edge X]
@@ -127,7 +129,7 @@ namespace RootTools_Vision
 				{
 					byte[] bufferRow = new byte[roiWidth];
 
-					Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[channelIndex] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), bufferRow, 0, roiWidth);
+					Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[channelIndex] + bufferWidth * (roiStartY + i), bufferRow, 0, roiWidth);
 
 					byte currentGV = 0;
 					byte maxGV = 0;
@@ -228,25 +230,25 @@ namespace RootTools_Vision
 					{
 						minEdgeX = calculatedEdgeXList[i];
 					}
-				}
+				}				
 
 				if (defectCode == EdgeDefectCode.Top)
                 {
 					Parallel.For(0, roiHeight, i =>
 					{
-						byte[] bufferRow = new byte[2 * roiWidth];
+						byte[] bufferRow = new byte[2 * bufferWidth];
 
 						Array.Clear(bufferRow, 0, bufferRow.Length);
-						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[0] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), bufferRow, roiWidth - calculatedEdgeXList[i] + minEdgeX, roiWidth);
-						Marshal.Copy(bufferRow, roiWidth, this.currentWorkplace.SharedBufferInfo.PtrList[0] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), roiWidth);
+						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[0] + bufferWidth * (roiStartY + i), bufferRow, bufferWidth - calculatedEdgeXList[i] + minEdgeX, bufferWidth);
+						Marshal.Copy(bufferRow, bufferWidth, this.currentWorkplace.SharedBufferInfo.PtrList[0] + bufferWidth * (roiStartY + i), bufferWidth);
 
 						Array.Clear(bufferRow, 0, bufferRow.Length);
-						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[1] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), bufferRow, roiWidth - calculatedEdgeXList[i] + minEdgeX, roiWidth);
-						Marshal.Copy(bufferRow, roiWidth, this.currentWorkplace.SharedBufferInfo.PtrList[1] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), roiWidth);
+						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[1] + bufferWidth * (roiStartY + i), bufferRow, bufferWidth - calculatedEdgeXList[i] + minEdgeX, bufferWidth);
+						Marshal.Copy(bufferRow, bufferWidth, this.currentWorkplace.SharedBufferInfo.PtrList[1] + bufferWidth * (roiStartY + i), bufferWidth);
 
 						Array.Clear(bufferRow, 0, bufferRow.Length);
-						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[2] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), bufferRow, roiWidth - calculatedEdgeXList[i] + minEdgeX, roiWidth);
-						Marshal.Copy(bufferRow, roiWidth, this.currentWorkplace.SharedBufferInfo.PtrList[2] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), roiWidth);
+						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[2] + bufferWidth * (roiStartY + i), bufferRow, bufferWidth - calculatedEdgeXList[i] + minEdgeX, bufferWidth);
+						Marshal.Copy(bufferRow, bufferWidth, this.currentWorkplace.SharedBufferInfo.PtrList[2] + bufferWidth * (roiStartY + i), bufferWidth);
 					}
 					);
 				}
@@ -254,19 +256,19 @@ namespace RootTools_Vision
 				{
 					Parallel.For(0, roiHeight, i =>
 					{
-						byte[] bufferRow = new byte[2 * roiWidth];
+						byte[] bufferRow = new byte[2 * bufferWidth];
 
 						Array.Clear(bufferRow, 0, bufferRow.Length);
-						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[3] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), bufferRow, roiWidth - calculatedEdgeXList[i] + minEdgeX, roiWidth);
-						Marshal.Copy(bufferRow, roiWidth, this.currentWorkplace.SharedBufferInfo.PtrList[3] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), roiWidth);
+						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[3] + bufferWidth * (roiStartY + i), bufferRow, bufferWidth - calculatedEdgeXList[i] + minEdgeX, bufferWidth);
+						Marshal.Copy(bufferRow, bufferWidth, this.currentWorkplace.SharedBufferInfo.PtrList[3] + bufferWidth * (roiStartY + i), bufferWidth);
 
 						Array.Clear(bufferRow, 0, bufferRow.Length);
-						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[4] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), bufferRow, roiWidth - calculatedEdgeXList[i] + minEdgeX, roiWidth);
-						Marshal.Copy(bufferRow, roiWidth, this.currentWorkplace.SharedBufferInfo.PtrList[4] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), roiWidth);
+						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[4] + bufferWidth * (roiStartY + i), bufferRow, bufferWidth - calculatedEdgeXList[i] + minEdgeX, bufferWidth);
+						Marshal.Copy(bufferRow, bufferWidth, this.currentWorkplace.SharedBufferInfo.PtrList[4] + bufferWidth * (roiStartY + i), bufferWidth);
 
 						Array.Clear(bufferRow, 0, bufferRow.Length);
-						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[5] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), bufferRow, roiWidth - calculatedEdgeXList[i] + minEdgeX, roiWidth);
-						Marshal.Copy(bufferRow, roiWidth, this.currentWorkplace.SharedBufferInfo.PtrList[5] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), roiWidth);
+						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[5] + bufferWidth * (roiStartY + i), bufferRow, bufferWidth - calculatedEdgeXList[i] + minEdgeX, bufferWidth);
+						Marshal.Copy(bufferRow, bufferWidth, this.currentWorkplace.SharedBufferInfo.PtrList[5] + bufferWidth * (roiStartY + i), bufferWidth);
 					}
 					);
 				}
@@ -274,28 +276,70 @@ namespace RootTools_Vision
 				{
 					Parallel.For(0, roiHeight, i =>
 					{
-						byte[] bufferRow = new byte[2 * roiWidth];
+						byte[] bufferRow = new byte[2 * bufferWidth];
 
 						Array.Clear(bufferRow, 0, bufferRow.Length);
-						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[6] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), bufferRow, roiWidth - calculatedEdgeXList[i] + minEdgeX, roiWidth);
-						Marshal.Copy(bufferRow, roiWidth, this.currentWorkplace.SharedBufferInfo.PtrList[6] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), roiWidth);
+						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[6] + bufferWidth * (roiStartY + i), bufferRow, bufferWidth - calculatedEdgeXList[i] + minEdgeX, bufferWidth);
+						Marshal.Copy(bufferRow, bufferWidth, this.currentWorkplace.SharedBufferInfo.PtrList[6] + bufferWidth * (roiStartY + i), bufferWidth);
 
 						Array.Clear(bufferRow, 0, bufferRow.Length);
-						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[7] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), bufferRow, roiWidth - calculatedEdgeXList[i] + minEdgeX, roiWidth);
-						Marshal.Copy(bufferRow, roiWidth, this.currentWorkplace.SharedBufferInfo.PtrList[7] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), roiWidth);
+						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[7] + bufferWidth * (roiStartY + i), bufferRow, bufferWidth - calculatedEdgeXList[i] + minEdgeX, bufferWidth);
+						Marshal.Copy(bufferRow, bufferWidth, this.currentWorkplace.SharedBufferInfo.PtrList[7] + bufferWidth * (roiStartY + i), bufferWidth);
 
 						Array.Clear(bufferRow, 0, bufferRow.Length);
-						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[8] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), bufferRow, roiWidth - calculatedEdgeXList[i] + minEdgeX, roiWidth);
-						Marshal.Copy(bufferRow, roiWidth, this.currentWorkplace.SharedBufferInfo.PtrList[8] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i), roiWidth);
+						Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[8] + bufferWidth * (roiStartY + i), bufferRow, bufferWidth - calculatedEdgeXList[i] + minEdgeX, bufferWidth);
+						Marshal.Copy(bufferRow, bufferWidth, this.currentWorkplace.SharedBufferInfo.PtrList[8] + bufferWidth * (roiStartY + i), bufferWidth);
 					}
 					);
 				}
 
 				#endregion
 
-				#region [Create Profile]
+				#region [Calculate Relative Threshold]
 
-				int inspectionWidth = roiWidth - minEdgeX;
+				int notchOffset = (int)(((param.EndPosition - param.StartPosition) / 360.0) * param.NotchOffsetDegree);
+				int inspectionStartX = minEdgeX + startXOffset;
+				int inspectoinStartY = roiStartY + notchOffset;
+				int inspectionEndY = roiEndY - notchOffset;
+				int inspectionWidth = roiWidth - inspectionStartX;
+				int inspectionHeight = inspectionEndY - inspectoinStartY;
+
+				double[] rowAverageGVList = new double[inspectionHeight];
+
+				Parallel.For(0, inspectionHeight, i =>
+				{
+					int rowWidth = roiWidth - calculatedEdgeXList[i + notchOffset] - startXOffset;
+
+					byte[] bufferRow = new byte[rowWidth];
+
+					Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[channelIndex] + bufferWidth * (inspectoinStartY + i) + inspectionStartX, bufferRow, 0, rowWidth);
+
+					double rowAverageGV = 0;
+
+					for (int j = 0; j < rowWidth; j++)
+                    {
+						rowAverageGV += bufferRow[j];
+					}
+
+					rowAverageGVList[i] = rowAverageGV / rowWidth;
+				}
+				);
+
+				double averageGV = 0;
+				int relativeThreshold = 0;
+
+				for (int i = 0; i < inspectionHeight; i++)
+                {
+					averageGV += rowAverageGVList[i];
+				}
+
+				averageGV /= inspectionHeight;
+				relativeThreshold = (int)(averageGV * param.ProportionThreshold / 100.0 + 0.5);
+
+				#endregion
+
+				#region [Check Limit]
+
 				int[][] histogram = new int[inspectionWidth][];
 
 				for (int i = 0; i < inspectionWidth; i++)
@@ -303,109 +347,84 @@ namespace RootTools_Vision
 					histogram[i] = new int[256];
 				}
 
-				for (int i = 0; i < roiHeight; i++)
+				for (int i = 0; i < inspectionHeight; i++)
 				{
-					int bufferWidth = roiWidth - calculatedEdgeXList[i];
+					int rowWidth = roiWidth - calculatedEdgeXList[i + notchOffset] - startXOffset;
 
-					byte[] bufferRow = new byte[bufferWidth];
+					byte[] bufferRow = new byte[rowWidth];
 
-					Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[channelIndex] + this.currentWorkplace.SharedBufferInfo.Width * (roiStartY + i) + minEdgeX, bufferRow, 0, bufferWidth);
+					Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[channelIndex] + bufferWidth * (inspectoinStartY + i) + inspectionStartX, bufferRow, 0, rowWidth);
 
-					for (int j = 0; j < bufferWidth; j++)
+					for (int j = 0; j < rowWidth; j++)
 					{
 						histogram[j][bufferRow[j]]++;
 					}
 				}
 
-				byte[] profile = new byte[inspectionWidth];
+				bool[] isInspectionColumnList = new bool[inspectionWidth];
+				double proportionLimit = param.ProportionLimit / 100.0;
 
-				for (int i = 0; i < inspectionWidth; i++)
+				Parallel.For(0, inspectionWidth, i =>
 				{
-					int maxBin = 0;
-					int maxIndex = 0;
+					isInspectionColumnList[i] = true;
 
-					for (int j = 0; j < 256; j++)
-					{
+					int cumulativeBin = 0;
+					int totalBin = 0;
+
+					for (int j = 0; j <= relativeThreshold; j++)
+                    {
 						int currentBin = histogram[i][j];
 
-						if (currentBin > maxBin)
-						{
-							maxBin = currentBin;
-							maxIndex = j;
-						}
+						cumulativeBin += currentBin;
+						totalBin += currentBin;
 					}
 
-					profile[i] = (byte)maxIndex;
+					for (int j = relativeThreshold + 1; j < 256; j++)
+					{
+						totalBin += histogram[i][j];
+					}
+
+					if ((cumulativeBin / (double)totalBin) > proportionLimit)
+                    {
+						isInspectionColumnList[i] = false;
+					}
 				}
+				);
 
 				#endregion
 
-				#region [Create Difference Image]
+				#region [Create Inspection Image]
 
-				int notchOffset = (int)(((param.EndPosition - param.StartPosition) / 360.0) * param.NotchOffsetDegree);
-				int inspectoinStartY = roiStartY + notchOffset;
-				int inspectionEndY = roiEndY - notchOffset;
-				int inspectionHeight = inspectionEndY - inspectoinStartY;
-
-				byte[] differenceImage = new byte[inspectionWidth * inspectionHeight];
-				Array.Clear(differenceImage, 0, differenceImage.Length);
+				byte[] inspectionImage = new byte[inspectionWidth * inspectionHeight];
+				Array.Clear(inspectionImage, 0, inspectionImage.Length);
 
 				Parallel.For(0, inspectionHeight, i =>
 				{
-					int bufferWidth = roiWidth - calculatedEdgeXList[i + notchOffset];
+					int rowWidth = roiWidth - calculatedEdgeXList[i + notchOffset] - startXOffset;
 
-					byte[] bufferRow = new byte[bufferWidth];
+					byte[] bufferRow = new byte[rowWidth];
 
-					Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[channelIndex] + this.currentWorkplace.SharedBufferInfo.Width * (inspectoinStartY + i) + minEdgeX, bufferRow, 0, bufferWidth);
+					Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[channelIndex] + bufferWidth * (inspectoinStartY + i) + inspectionStartX, bufferRow, 0, rowWidth);
 
-					for (int j = 0; j < bufferWidth; j++)
-					{
-						int startIndex = j - alignTolerance;
-						int endIndex = j + alignTolerance;
-
-						if (startIndex < 0)
-						{
-							startIndex = 0;
+					for (int j = 0; j < rowWidth; j++)
+                    {
+						if (isInspectionColumnList[j] == true)
+                        {
+							inspectionImage[i * inspectionWidth + j] = bufferRow[j];
 						}
-						if (endIndex > inspectionWidth - 1)
-						{
-							endIndex = inspectionWidth - 1;
-						}
-
-						int currentAbsDifference = 0;
-						int minAbsDifference = 255;
-						int minIndex = startIndex;
-
-						for (int k = startIndex; k <= endIndex; k++)
-						{
-							currentAbsDifference = Math.Abs(profile[k] - bufferRow[j]);
-
-							if (currentAbsDifference < minAbsDifference)
-							{
-								minAbsDifference = currentAbsDifference;
-								minIndex = k;
-							}
-						}
-
-						int currentDifference = profile[minIndex] - bufferRow[j];
-
-						if (currentDifference > 0)
-						{
-							int maxBin = histogram[minIndex][profile[minIndex]];
-							int currentBin = histogram[minIndex][bufferRow[j]];
-
-							differenceImage[i * inspectionWidth + j] = (byte)((currentDifference * (maxBin - currentBin)) / maxBin);
-						}
-						else
-						{
-							differenceImage[i * inspectionWidth + j] = 0;
-						}
+                        else
+                        {
+							inspectionImage[i * inspectionWidth + j] = 255;
+                        }
+					}
+					for (int j = rowWidth; j < inspectionWidth; j++)
+                    {
+						inspectionImage[i * inspectionWidth + j] = 255;
 					}
 
-                    //// Display Difference Image
-                    //Marshal.Copy(differenceImage, i * inspectionWidth, this.currentWorkplace.SharedBufferInfo.PtrList[1] + this.currentWorkplace.SharedBufferInfo.Width * (inspectoinStartY + i) + minEdgeX, inspectionWidth);
-                }
-				);
+                    // Display Inspection Image
+                    Marshal.Copy(inspectionImage, i * inspectionWidth, this.currentWorkplace.SharedBufferInfo.PtrList[1] + bufferWidth * (inspectoinStartY + i) + inspectionStartX, inspectionWidth);
+                });
 
 				#endregion
 
@@ -414,16 +433,16 @@ namespace RootTools_Vision
 				byte[] binaryImage = new byte[inspectionWidth * inspectionHeight];
 				Array.Clear(binaryImage, 0, binaryImage.Length);
 
-				CLR_IP.Cpp_Threshold(differenceImage, binaryImage, inspectionWidth, inspectionHeight, false, param.Threshold);
+				CLR_IP.Cpp_Threshold(inspectionImage, binaryImage, inspectionWidth, inspectionHeight, true, relativeThreshold);
 
-                //// Display Binary Image
-                //Parallel.For(0, inspectionHeight, i =>
-                //{
-                //    Marshal.Copy(binaryImage, i * inspectionWidth, this.currentWorkplace.SharedBufferInfo.PtrList[2] + this.currentWorkplace.SharedBufferInfo.Width * (inspectoinStartY + i) + minEdgeX, inspectionWidth);
-                //}
-                //);
+                // Display Binary Image
+                Parallel.For(0, inspectionHeight, i =>
+                {
+                    Marshal.Copy(binaryImage, i * inspectionWidth, this.currentWorkplace.SharedBufferInfo.PtrList[2] + bufferWidth * (inspectoinStartY + i) + inspectionStartX, inspectionWidth);
+                }
+                );
 
-                var label = CLR_IP.Cpp_Labeling(differenceImage, binaryImage, inspectionWidth, inspectionHeight, true);
+                var label = CLR_IP.Cpp_Labeling(inspectionImage, binaryImage, inspectionWidth, inspectionHeight, true);
 
 				int defectSizeMinX = param.DefectSizeMinX;
 				int defectSizeMaxX = param.DefectSizeMaxX;
@@ -437,10 +456,12 @@ namespace RootTools_Vision
 					if (label[l].width > defectSizeMinX && label[l].width < defectSizeMaxX
 							&& label[l].height > defectSizeMinY && label[l].height < defectSizeMaxY)
 					{
-						int defectLeft = minEdgeX + label[l].boundLeft;
-						int defectTop = inspectoinStartY + label[l].boundTop;
+                        int defectLeft = inspectionStartX + label[l].boundLeft;
+                        int defectTop = inspectoinStartY + label[l].boundTop;
+                        //int defectLeft = inspectionStartX + (int)label[l].centerX;
+                        //int defectTop = inspectoinStartY + (int)label[l].centerY;
 
-						this.currentWorkplace.AddDefect(sInspectionID,
+                        this.currentWorkplace.AddDefect(sInspectionID,
 							(int)defectCode /*10000 + (channelIndex * 100)*/,
 							(float)(label[l].area),
 							label[l].value,

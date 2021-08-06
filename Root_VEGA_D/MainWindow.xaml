@@ -458,7 +458,7 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
-                                <RowDefinition/>
+                                <RowDefinition Height ="0.8*"/>
                             </Grid.RowDefinitions>
                             <StackPanel>
                                 <RadioButton Style="{StaticResource TabRadio}" Command="{Binding CmdInfo}" Content="Information"/>
@@ -492,12 +492,52 @@
                                     Margin="5"
                                     Style="{StaticResource SetupPanelBtn}"
                                     Click="buttonRecovery_Click"/>
+                                    <Button Grid.Column="1" Height="40"
+                                    x:Name="buttonAlarm"
+                                    Content="Alarm"
+                                    Margin="5"
+                                    Click="buttonAlarm_Click">
+                                    <!--Style="{StaticResource SetupPanelBtn}"-->
+                                        <Button.Style>
+                                            <Style TargetType="Button" >
+                                                <Setter Property="FontFamily" Value="Arial"/>
+                                                <Setter Property="FontSize" Value="15"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <SolidColorBrush Color="Transparent"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding p_alarmBlink}" Value="True">
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard Name="sbBlink">
+                                                                <Storyboard RepeatBehavior="Forever">
+                                                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                                    AutoReverse="True"
+                                                                    From="Transparent" To="Red" FillBehavior="Stop"
+                                                                    BeginTime="0:0:0" Duration="0:0:0.4" />
+                                                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                                    From="Red" To="Transparent"
+                                                                    BeginTime="0:0:0.4" Duration="0:0:1"/>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </DataTrigger.EnterActions>
+                                                        <DataTrigger.ExitActions>
+                                                            <RemoveStoryboard BeginStoryboardName="sbBlink"/>
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
                                     <Button Grid.Column="2"
                                     x:Name="buttonBuzzOff" Height="40"
                                     Content="Buzzer Off"
                                     Margin="5"
                                     Style="{StaticResource SetupPanelBtn}"
                                     Click="buttonBuzzOff_Click"/>
+                 
                                 </StackPanel>
                             </Grid>
                         </Grid>

@@ -76,29 +76,35 @@ namespace Root_JEDI_Vision.Module
 
     public class SortInfo
     {
-        public string m_sStripID = "";
-        public string m_sSortID = "";
+        public string m_sTrayIn = "";
+        public string m_sTrayOut = "";
 
         public SortInfo Clone()
         {
-            return new SortInfo(m_sStripID, m_sSortID);
+            return new SortInfo(m_sTrayIn, m_sTrayOut);
         }
 
         public string GetString()
         {
-            return m_sStripID + "," + m_sSortID;
+            return m_sTrayIn + "," + m_sTrayOut;
         }
 
         public void RunTree(Tree tree, bool bVisible)
         {
-            m_sStripID = tree.Set(m_sStripID, m_sStripID, "StripID", "StripID", bVisible);
-            m_sSortID = tree.Set(m_sSortID, m_sSortID, "SortID", "SortID", bVisible);
+            m_sTrayIn = tree.Set(m_sTrayIn, m_sTrayIn, "Tray In", "Tray In", bVisible);
+            m_sTrayOut = tree.Set(m_sTrayOut, m_sTrayOut, "Tray Out", "Tray Out", bVisible);
         }
 
-        public SortInfo(string sStripID, string sSortID)
+        public SortInfo(string sTrayIn, string sTrayOut)
         {
-            m_sStripID = sStripID;
-            m_sSortID = sSortID;
+            m_sTrayIn = sTrayIn;
+            m_sTrayOut = sTrayOut;
+        }
+
+        public SortInfo(InfoTray infoTray)
+        {
+            m_sTrayIn = infoTray.m_sTrayIn;
+            m_sTrayOut = infoTray.m_sTrayOut;
         }
     }
 
@@ -205,5 +211,8 @@ namespace Root_JEDI_Vision.Module
         string p_id { get; set; }
         eVision p_eVision { get; set; }
         string p_sInfo { get; set; }
+        InfoTray p_infoTray { get; set; }
+        string SendLotInfo(LotInfo lotInfo);
+        string SendSortInfo(SortInfo sortInfo);
     }
 }

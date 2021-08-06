@@ -18,6 +18,7 @@ namespace RootTools.Module
 {
     public class ModuleBase : NotifyProperty
     {
+        
         #region eState
         public delegate void dgOnChangeState(eState eState);
         public event dgOnChangeState OnChangeState;
@@ -97,6 +98,20 @@ namespace RootTools.Module
             p_sInfo = sInfo;
             if (EQ.IsStop()) p_sInfo = "EQ Stop";
             return sInfo != "OK";
+        }
+
+        ICamera m_GrabCam;
+        public ICamera p_GrabCam
+        {
+            get
+            {
+                return m_GrabCam;
+            }
+            set
+            {
+                m_GrabCam = value;
+                OnPropertyChanged();
+            }
         }
         #endregion
 
@@ -222,7 +237,10 @@ namespace RootTools.Module
                 moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
                 p_sInfo = m_remote.RemoteSend(moduleRun);
             }
-            catch (Exception e) { p_sInfo = "RemoteClient Exception = " + e.Message; }
+            catch (Exception e) 
+            { 
+                p_sInfo = "RemoteClient Exception = " + e.Message; 
+            }
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
             m_log.Info("RemoteClient : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
             if (m_qModuleRemote.Count > 0) m_qModuleRemote.Dequeue();
@@ -328,14 +346,14 @@ namespace RootTools.Module
         {
             if (aAxis.Count == 0) return "OK";
             if (p_eState == eState.Run) return "Invalid State : Run";
-            if (EQ.IsStop()) return "Home Stop";
+            if (EQ.IsStop()) return "EQ Stop";
 
             foreach (Axis axis in aAxis)
             {
                 if (axis != null) axis.ServoOn(true); 
             }
             Thread.Sleep(200);
-            if (EQ.IsStop()) return "Home Stop";
+            if (EQ.IsStop()) return "EQ Stop";
             foreach (Axis axis in aAxis)
             {
                 if (axis != null) p_sInfo = axis.StartHome();
@@ -344,7 +362,7 @@ namespace RootTools.Module
             while (true)
             {
                 Thread.Sleep(10);
-                if (EQ.IsStop(1000)) return "Home Stop";
+                if (EQ.IsStop(1000)) return "EQ Stop";
                 bool bDone = true;
                 foreach (Axis axis in aAxis)
                 {
@@ -601,16 +619,19 @@ namespace RootTools.Module
 
             void Recieve(Protocol protocol)
             {
-                for (int n = 0; n < m_aProtocol.Count; n++)
+                int nCount = m_aProtocol.Count;
+                for (int n = nCount-1; n >= 0; n--)
                 {
                     if (m_aProtocol[n].IsSame(protocol))
-                    {
+                    {            
                         m_aProtocol[n].p_sRun = protocol.p_sRun; 
                         m_aProtocol[n].m_bDone = true;
                         m_aProtocol.RemoveAt(n);
-                        return; 
+                        // return; 
+                      //  break;
                     }
                 }
+              
             }
             #endregion
 
