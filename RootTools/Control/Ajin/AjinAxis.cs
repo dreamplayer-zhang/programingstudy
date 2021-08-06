@@ -266,7 +266,8 @@ namespace RootTools.Control.Ajin
             StopAxis(); 
             if (bOn && m_bAbsoluteEncoder) AXM("AxmM3ServoSensOn", CAXM.AxmM3ServoSensOn(m_nAxis));
             uint uOn = (uint)(bOn ? 1 : 0);
-            if (AXM("AxmSignalServoOn", CAXM.AxmSignalServoOn(m_nAxis, uOn)) != 0) return;
+            if (AXM("AxmSignalServoOn", CAXM.AxmSignalServoOn(m_nAxis, uOn)) != 0) 
+                return;
             if (m_nBrakeSignalBit >= 0)
             {
                 if (AXM("AxmSignalWriteOutputBit", CAXM.AxmSignalWriteOutputBit(m_nAxis, m_nBrakeSignalBit, uOn)) != 0) return;

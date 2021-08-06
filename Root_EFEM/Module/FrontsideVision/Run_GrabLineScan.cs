@@ -53,6 +53,22 @@ namespace Root_EFEM.Module.FrontsideVision
             //if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
         }
 
+        string StartRADS()
+        {
+            if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
+                return m_module.StartRADS(0/*m_grabMode.pRADSOffset*/);
+
+            return "OK";
+        }
+
+        string StopRADS()
+        {
+            if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == true)
+                return m_module.StopRADS();
+            return "OK";
+        }
+
+
         public override string Run()
         {
             if (m_grabMode == null) return "Grab Mode == null";
@@ -62,8 +78,11 @@ namespace Root_EFEM.Module.FrontsideVision
 
             try
             {
+                m_module.RADSControl.ResetController();
                 m_grabMode.SetLens();
                 m_grabMode.SetLight(true);
+                if (m_module.Run(StartRADS()))
+                    return p_sInfo;
 
                 AxisXY axisXY = m_module.AxisXY;
                 Axis axisZ = m_module.AxisZ;
@@ -76,8 +95,8 @@ namespace Root_EFEM.Module.FrontsideVision
                 cpMemoryOffset.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize;
                 m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dTargetResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                 int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dTargetResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
-                int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
-                int nScanOffset_pulse = 400000;
+                int nTotalTriggerCount = Convert.ToInt32(nWaferSizeY_px * 10);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
+                int nScanOffset_pulse = 200000;
 
                 int startOffsetX = cpMemoryOffset.X;
                 //int startOffsetY = 0;
@@ -138,7 +157,7 @@ namespace Root_EFEM.Module.FrontsideVision
                     double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - nTotalTriggerCount / 2;
                     double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + nTotalTriggerCount / 2 ;
 
-                    axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
+                    axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, 5,true);
 
                     string strPool = m_grabMode.m_memoryPool.p_id;
                     string strGroup = m_grabMode.m_memoryGroup.p_id;
@@ -248,6 +267,7 @@ namespace Root_EFEM.Module.FrontsideVision
             finally
             {
                 m_grabMode.SetLight(false);
+                StopRADS();
             }
         }
     }

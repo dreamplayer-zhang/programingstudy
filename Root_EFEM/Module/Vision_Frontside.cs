@@ -28,10 +28,9 @@ namespace Root_EFEM
         #region ToolBox
         Axis m_axisRotate;
         Axis m_axisZ;
+        Axis m_axisOptZ2;
         AxisXY m_axisXY;
         Axis m_axisPusherZ;
-        Axis m_axisOptZ1;
-        Axis m_axisOptZ2;
         DIO_O m_doVac;
         DIO_O m_doVac2;
         DIO_O m_doVac3;
@@ -47,6 +46,7 @@ namespace Root_EFEM
         LightSet m_lightSet;
 
         Camera_Dalsa m_CamMain;
+        Camera_Dalsa m_CamIR;
         Camera_Basler m_CamAlign;
         Camera_Basler m_CamVRS;
         Camera_Basler m_CamRADS;
@@ -76,6 +76,18 @@ namespace Root_EFEM
                 m_CamAlign = value;
             }
         }
+        public Camera_Basler p_CamRADS
+        {
+            get
+            {
+                return m_CamRADS;
+            }
+            set
+            {
+                m_CamRADS = value;
+            }
+        }
+
 
         KlarfData_Lot m_KlarfData_Lot;
         LensLinearTurret m_LensLinearTurret;
@@ -84,7 +96,6 @@ namespace Root_EFEM
         public Axis AxisZ { get => m_axisZ; private set => m_axisZ = value; }
         public AxisXY AxisXY { get => m_axisXY; private set => m_axisXY = value; }
         public Axis AxisPusherZ { get => m_axisPusherZ; private set => m_axisPusherZ = value; }
-        public Axis AxisOptZ1 { get => m_axisOptZ1; private set => m_axisOptZ1 = value; }
         public Axis AxisOptZ2 { get => m_axisOptZ2; private set => m_axisOptZ2 = value; }
         public DIO_O DoVac { get => m_doVac; private set => m_doVac = value; }
         public DIO_O DoVac2 { get => m_doVac2; private set => m_doVac3 = value; }
@@ -96,6 +107,7 @@ namespace Root_EFEM
         public MemoryData MemoryLayer { get => m_memoryLayer; private set => m_memoryLayer = value; }
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
+        public Camera_Dalsa CamIR { get => m_CamIR; private set => m_CamIR = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         public Camera_Basler CamVRS { get => m_CamVRS; private set => m_CamVRS = value; }
         public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
@@ -110,7 +122,6 @@ namespace Root_EFEM
                 p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "Axis Z");
                 p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis ");
                 p_sInfo = m_toolBox.GetAxis(ref m_axisPusherZ, this, "Axis PusherZ");
-                p_sInfo = m_toolBox.GetAxis(ref m_axisOptZ1, this, "Axis OptZ1");
                 p_sInfo = m_toolBox.GetAxis(ref m_axisOptZ2, this, "Axis OptZ2");
                 p_sInfo = m_toolBox.GetDIO(ref m_doVac, this, "Stage Vacuum");
                 p_sInfo = m_toolBox.GetDIO(ref m_doVac2, this, "Stage Vacuum2");
@@ -122,6 +133,7 @@ namespace Root_EFEM
                 p_sInfo = m_toolBox.GetDIO(ref m_diWaferExistLoad, this, "Wafer Exist On Load Position");
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
+                p_sInfo = m_toolBox.GetCamera(ref m_CamIR, this, "IRCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRSCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamRADS, this, "RADS");
@@ -467,6 +479,9 @@ namespace Root_EFEM
                 if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
                     m_CamMain.Connect();
 
+                if (m_CamRADS != null)
+                    m_CamRADS.Connect();
+
                 //if (m_CamAlign != null)
                 //    m_CamAlign.Connect();
 
@@ -488,6 +503,46 @@ namespace Root_EFEM
             base.RunTree(tree);
             RunTreeAxis(tree.GetTree("Axis", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
+        }
+        #endregion
+
+        #region RADS
+        public string StartRADS(int nOffset = 0)
+        {
+            if (p_CamRADS == null) return "RADS Cam is null";
+
+            RADSControl.StartRADS();
+
+            StopWatch sw = new StopWatch();
+            if (p_CamRADS.p_CamInfo._OpenStatus == false) p_CamRADS.Connect();
+            while (p_CamRADS.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 15000)
+                {
+                    sw.Stop();
+                    return "RADS Camera Not Connected";
+                }
+            }
+            sw.Stop();
+
+            // Offset 설정
+            RADSControl.p_connect.SetADSOffset(nOffset);
+
+            // RADS 카메라 설정
+            p_CamRADS.SetMulticast();
+            p_CamRADS.GrabContinuousShot();
+
+            return "OK";
+        }
+
+        public string StopRADS()
+        {
+            if (p_CamRADS == null) return "RADS Cam is null";
+
+            RADSControl.StopRADS();
+            if (p_CamRADS.p_CamInfo._IsGrabbing == true) p_CamRADS.StopGrab();
+
+            return "OK";
         }
         #endregion
 
