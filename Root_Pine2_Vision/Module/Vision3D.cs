@@ -1070,6 +1070,7 @@ namespace Root_Pine2_Vision.Module
             InitBase(id, engineer, eRemote);
             InitVision_Snap_UI();
             InitThreadCheck();
+            p_eState = eState.Ready;
         }
 
         public override void ThreadStop()

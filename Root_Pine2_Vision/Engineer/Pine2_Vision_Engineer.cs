@@ -158,6 +158,8 @@ namespace Root_Pine2_Vision.Engineer
             InitXGem();
             m_handler.Init(id, this);
             m_gaf.Init(id, this);
+            EQ.p_bStop = false;
+            EQ.p_eState = EQ.eState.Ready;
         }
 
         public void ThreadStop()
