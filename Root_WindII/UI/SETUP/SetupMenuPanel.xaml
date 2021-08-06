@@ -96,7 +96,7 @@
                     <RadioButton Content="Product" Command="{Binding btnRACProduct}"  IsChecked="True" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Setup" Command="{Binding btnRACSetup}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Align Key" Command="{Binding btnRACAlignKey}" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <RadioButton Content="Create" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Create" Command="{Binding btnRACCreate}" Style="{StaticResource sidetap_child_radiobutton}"/>
                 </StackPanel>
             </Border>
         </ControlTemplate>

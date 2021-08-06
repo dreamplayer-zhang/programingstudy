@@ -1,4 +1,5 @@
 ﻿using Emgu.CV;
+using Microsoft.Win32;
 using RootTools;
 using RootTools_Vision;
 using System;
@@ -9,11 +10,63 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace Root_WindII
 {
+    public class EnumBindingSourceExtension : MarkupExtension
+    {
+        private Type _enumType;
+        public Type EnumType
+        {
+            get { return this._enumType; }
+            set
+            {
+                if (value != this._enumType)
+                {
+                    if (null != value)
+                    {
+                        Type enumType = Nullable.GetUnderlyingType(value) ?? value;
+                        if (!enumType.IsEnum)
+                            throw new ArgumentException("Type must be for an Enum.");
+                    }
+
+                    this._enumType = value;
+                }
+            }
+        }
+
+        public EnumBindingSourceExtension() { }
+
+        public EnumBindingSourceExtension(Type enumType)
+        {
+            this.EnumType = enumType;
+        }
+
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            if (null == this._enumType)
+                throw new InvalidOperationException("The EnumType must be specified.");
+
+            Type actualEnumType = Nullable.GetUnderlyingType(this._enumType) ?? this._enumType;
+            Array enumValues = Enum.GetValues(actualEnumType);
+
+            if (actualEnumType == this._enumType)
+                return enumValues;
+
+            Array tempArray = Array.CreateInstance(actualEnumType, enumValues.Length + 1);
+            enumValues.CopyTo(tempArray, 1);
+            return tempArray;
+        }
+    }
+    public enum EVEN_ODD
+    {
+        EVEN,
+        ODD,
+    }
+
     public class RACSetup_ImageViewer_ViewModel : RootViewer_ViewModel
     {
         public enum SETUP_VIEWER_STATE
@@ -313,6 +366,15 @@ namespace Root_WindII
                 SetProperty(ref deviceID, value);
             }
         }
+        string description = "";
+        public string Description
+        {
+            get => description;
+            set
+            {
+                SetProperty(ref description, value);
+            }
+        }
         int unitX = 0;
         public int UnitX
         {
@@ -471,6 +533,26 @@ namespace Root_WindII
                     return;
                 SetProperty(ref shotSizeY, value);
                 //RedrawShot();
+            }
+        }
+
+        int rotation = 0;
+        public int Rotation
+        {
+            get => rotation;
+            set
+            {
+                SetProperty(ref rotation, value);
+            }
+        }
+
+        EVEN_ODD evenOdd = EVEN_ODD.EVEN;
+        public EVEN_ODD EvenOdd
+        {
+            get => evenOdd;
+            set
+            {
+                SetProperty(ref evenOdd, value);
             }
         }
 
@@ -714,7 +796,15 @@ namespace Root_WindII
         Grid CenterRBPoint_UI = null;
         CPoint CenterRBPoint = new CPoint();
 
-        CPoint centerLeftTop = new CPoint();
+        CPoint test = new CPoint();
+        public CPoint centerLeftTop
+        {
+            get => test;
+            set
+            {
+                test = value;
+            }
+        }
         CPoint centerRightBottom = new CPoint();
         CRect centerBoxLT = new CRect();
         CRect centerBoxRT = new CRect();
@@ -819,6 +909,10 @@ namespace Root_WindII
             CenterLTBox_UI.Children.Add(new Line());
             CenterLTBox_UI.Children.Add(new Line());
             CenterLTBox_UI.Children.Add(new Line());
+            CenterLTBox_UI.Children.Add(new Line());
+            CenterLTBox_UI.Children.Add(new Line());
+            CenterLTBox_UI.Children.Add(new Line());
+            CenterLTBox_UI.Children.Add(new Line());
 
             CenterLTPoint_UI = new Grid();
             CenterLTPoint_UI.Tag = "Centering";
@@ -831,6 +925,10 @@ namespace Root_WindII
             CenterRTBox_UI.Children.Add(new Line());
             CenterRTBox_UI.Children.Add(new Line());
             CenterRTBox_UI.Children.Add(new Line());
+            CenterRTBox_UI.Children.Add(new Line());
+            CenterRTBox_UI.Children.Add(new Line());
+            CenterRTBox_UI.Children.Add(new Line());
+            CenterRTBox_UI.Children.Add(new Line());
 
             CenterRTPoint_UI = new Grid(); 
             CenterRTPoint_UI.Tag = "Centering";
@@ -839,6 +937,10 @@ namespace Root_WindII
 
             CenterRBBox_UI = new Grid();
             CenterRBBox_UI.Tag = "CenteringRB";
+            CenterRBBox_UI.Children.Add(new Line());
+            CenterRBBox_UI.Children.Add(new Line());
+            CenterRBBox_UI.Children.Add(new Line());
+            CenterRBBox_UI.Children.Add(new Line());
             CenterRBBox_UI.Children.Add(new Line());
             CenterRBBox_UI.Children.Add(new Line());
             CenterRBBox_UI.Children.Add(new Line());
@@ -908,7 +1010,7 @@ namespace Root_WindII
                     {
                         centerLeftTop.X = p_MouseMemX;
                         centerLeftTop.Y = p_MouseMemY;
-                        DrawCenterLeftTopPoint(centerLeftTop);
+                        DrawCenterLeftTopPoint(centerLeftTop, true);
                     }
                     else if (centerState == PROCESS_CENTER_STATE.CenterRightBottom)
                     {
@@ -1022,7 +1124,10 @@ namespace Root_WindII
                     centerRightBottom.Y = memPt.Y;
 
                     centerState = PROCESS_CENTER_STATE.CenterLeftTop;
+                    DrawCenterRightBottomPoint(centerRightBottom);
 
+                    centerRightBottom.X = centerLeftTop.X + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
+                    centerRightBottom.Y = centerLeftTop.Y + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
                     switch (centerPos)
                     {
                         case CENTERING_POS.LT:
@@ -1050,6 +1155,23 @@ namespace Root_WindII
                                 centerBoxLT.Right = centerRightBottom.X;
                                 centerBoxLT.Top = centerLeftTop.Y;
                                 centerBoxLT.Bottom = centerRightBottom.Y;
+
+                                if (p_UIElement.Contains(CenterRTBox_UI))
+                                    p_UIElement.Remove(CenterRTBox_UI);
+
+                                if (p_UIElement.Contains(CenterRTPoint_UI))
+                                    p_UIElement.Remove(CenterRTPoint_UI);
+
+                                if (p_UIElement.Contains(CenterRBBox_UI))
+                                    p_UIElement.Remove(CenterRBBox_UI);
+
+                                if (p_UIElement.Contains(CenterRBPoint_UI))
+                                    p_UIElement.Remove(CenterRBPoint_UI);
+
+                                if (p_UIElement.Contains(CenterPoint_UI))
+                                    p_UIElement.Remove(CenterPoint_UI);
+
+                                centerPos = CENTERING_POS.LT;
                             }
                             else if (nearGrid.Tag.ToString().Contains("RT"))
                             {
@@ -1057,6 +1179,18 @@ namespace Root_WindII
                                 centerBoxRT.Right = centerRightBottom.X;
                                 centerBoxRT.Top = centerLeftTop.Y;
                                 centerBoxRT.Bottom = centerRightBottom.Y;
+
+
+                                if (p_UIElement.Contains(CenterRBBox_UI))
+                                    p_UIElement.Remove(CenterRBBox_UI);
+
+                                if (p_UIElement.Contains(CenterRBPoint_UI))
+                                    p_UIElement.Remove(CenterRBPoint_UI);
+
+                                if (p_UIElement.Contains(CenterPoint_UI))
+                                    p_UIElement.Remove(CenterPoint_UI);
+
+                                centerPos = CENTERING_POS.RT;
                             }
                             else
                             {
@@ -1068,7 +1202,7 @@ namespace Root_WindII
                             break;
                     }
 
-                    DrawCenterRightBottomPoint(centerRightBottom);
+                    
                     //DrawingPitchPoint();
                     DrawCenterBox(pos : centerPos);
                     CalcCenterPoint();
@@ -1279,6 +1413,8 @@ namespace Root_WindII
 
                     SetPitch();
 
+                    MapOffsetX = (centerPoint.X - originBox.Left) * 4;
+                    MapOffsetY = (originBox.Bottom - centerPoint.Y) * 4;
                     ViewerState = SETUP_VIEWER_STATE.Normal;
                     pitchState = PROCESS_PITCH_STATE.None;
                     break;
@@ -1416,6 +1552,35 @@ namespace Root_WindII
             //}
             CenterLeftTop_UI.Width = 40;
             CenterLeftTop_UI.Height = 40;
+            if(centerPos == CENTERING_POS.LT || Grid.TagProperty.ToString() == "CenteringLT")
+            {
+                //if (p_UIElement.Contains(CenterRTBox_UI))
+                //{
+                //    p_UIElement.Remove(CenterRTBox_UI);
+                //}
+                //if (p_UIElement.Contains(CenterRBBox_UI))
+                //{
+                //    p_UIElement.Remove(CenterRBBox_UI);
+                //}
+                //centerPos = CENTERING_POS.RT;
+            }
+            else if (centerPos == CENTERING_POS.RT || grid.Tag.ToString() == "CenteringRT")
+            {
+                viewPt.Y = centerBoxLT.Top;
+                //if (p_UIElement.Contains(CenterRBBox_UI))
+                //{
+                //    p_UIElement.Remove(CenterRBBox_UI);
+                //}
+                //centerPos = CENTERING_POS.RT;
+            }
+            else if (centerPos == CENTERING_POS.RB || grid.Tag.ToString() == "CenteringRB")
+            {
+                viewPt.X = centerBoxRT.Left;
+            }
+            centerLeftTop = viewPt;
+            canvasPt = GetCanvasPoint(viewPt);
+
+
 
             Line line1 = CenterLeftTop_UI.Children[0] as Line;
             line1.X1 = 0;
@@ -1503,8 +1668,39 @@ namespace Root_WindII
             CPoint viewPt = memPt;
             CPoint canvasPt = GetCanvasPoint(viewPt);
 
+            //int longAxis = viewPt.Y;
+            //if(viewPt.X > viewPt.Y)
+            //{
+            //    longAxis = viewPt.X;
+            //}
+            int longAxis = memPt.Y;
+            if(memPt.X > memPt.Y)
+            {
+                longAxis = memPt.X;
+            }
+            viewPt.X = centerLeftTop.X + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
+            viewPt.Y = centerLeftTop.Y + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
+
+            //centerRightBottom.X = viewPt.X;
+            //centerRightBottom.Y = viewPt.Y;
+            //viewPt.X += longAxis;
+            //viewPt.Y += longAxis;
+
             CenterRightBottom_UI.Width = 40;
             CenterRightBottom_UI.Height = 40;
+
+            //if (centerPos == CENTERING_POS.RT || nearGrid.Tag.ToString() == "CenteringRT")
+            //{
+            //    //viewPt.X = Math.Abs(viewPt.X - centerLeftTop.X) > centerBoxLT.Width ? centerLeftTop.X + centerBoxLT.Width : viewPt.X;
+            //    //viewPt.X = centerLeftTop.X + centerBoxLT.Width;
+            //}
+            //else if (centerPos == CENTERING_POS.RB || nearGrid.Tag.ToString() == "CenteringRB")
+            //{
+            //    //viewPt.X = Math.Abs(viewPt.X - centerLeftTop.X) > centerBoxRT.Width ? centerLeftTop.X + centerBoxRT.Width : viewPt.X;
+            //    //viewPt.X = centerLeftTop.X + centerBoxRT.Width;
+            //}
+
+            canvasPt = GetCanvasPoint(viewPt);
 
             Line line1 = CenterRightBottom_UI.Children[0] as Line;
             line1.X1 = 0;
@@ -1714,27 +1910,31 @@ namespace Root_WindII
             Grid grid = new Grid();
             CPoint pt = new CPoint();
             CPoint startPT = new CPoint();
+
+            int xx = (int)(box.Width * 0.25);
             switch (centerPos)
             {
                 case CENTERING_POS.LT:  
                     box = centerBoxLT;
                     byteRect = p_ImageData.GetRectByteArray(centerBoxLT);
                     grid = CenterLTPoint_UI;
-                    pt = new CPoint(0, 1);
+                    pt = new CPoint(1, -1);
                     startPT = new CPoint(centerBoxLT.Width / 2, 0);
+                    xx = (int)(box.Width * 0.25);
                     break;
                 case CENTERING_POS.RT:
                     box = centerBoxRT;
                     byteRect = p_ImageData.GetRectByteArray(centerBoxRT);
                     grid = CenterRTPoint_UI;
-                    pt = new CPoint(0, 1);
+                    pt = new CPoint(-1, -1);
                     startPT = new CPoint(centerBoxRT.Width / 2, 0);
+                    xx = (int)(box.Width * 0.75);
                     break;
                 case CENTERING_POS.RB:
                     box = centerBoxRB;
                     byteRect = p_ImageData.GetRectByteArray(centerBoxRB);
                     grid = CenterRBPoint_UI;
-                    pt = new CPoint(0, -1);
+                    pt = new CPoint(-1, 1);
                     startPT = new CPoint(centerBoxRB.Width / 2, centerBoxRB.Height);
                     break;
                 case CENTERING_POS.None:
@@ -1743,7 +1943,7 @@ namespace Root_WindII
                         box = centerBoxLT;
                         byteRect = p_ImageData.GetRectByteArray(centerBoxLT);
                         grid = CenterLTPoint_UI;
-                        pt = new CPoint(0, 1);
+                        pt = new CPoint(1, -1);
                         startPT = new CPoint(centerBoxLT.Width / 2, 0);
                     }
                     else if (nearGrid.Tag.ToString().Contains("RT"))
@@ -1751,7 +1951,7 @@ namespace Root_WindII
                         box = centerBoxRT;
                         byteRect = p_ImageData.GetRectByteArray(centerBoxRT);
                         grid = CenterRTPoint_UI;
-                        pt = new CPoint(0, 1);
+                        pt = new CPoint(-1, -1);
                         startPT = new CPoint(centerBoxRT.Width / 2, 0);
                     }
                     else
@@ -1759,144 +1959,226 @@ namespace Root_WindII
                         box = centerBoxRB;
                         byteRect = p_ImageData.GetRectByteArray(centerBoxRB);
                         grid = CenterRBPoint_UI;
-                        pt = new CPoint(0, -1);
+                        pt = new CPoint(-1, 1);
                         startPT = new CPoint(centerBoxRB.Width / 2, centerBoxRB.Height);
                     }
                     break;
             }
-            
 
-            //Mat mat = new Mat(,);
-            byte minValue = Byte.MaxValue;
-            byte maxValue = Byte.MinValue;
+            //box.Height = box.Width;
+            //box.Bottom += 4 - box.Height % 4;
 
-            byte min = 0, max = 0;
-            double vectorX = 0;
-            double vectorY = 0;
-
-           Parallel.For(0, box.Height, x =>
-           {
-               int LineSum = 0;
-               for (int j = 0; j < box.Width; j++)
-               {
-                   //int x = (int)(j + 0.5);
-                   //int y = (int)(vectorX + 0.5);
-                   //CheckPointRange(Image, ref x, ref y);
-                   LineSum += byteRect[x * box.Width + j];
-               }
-
-               byte LineAvg = (byte)(LineSum / box.Width);
-               if (LineAvg < minValue)
-               {
-                   minValue = LineAvg;
-               }
-               if (LineAvg > maxValue)
-               {
-                   maxValue = LineAvg;
-               }
-               //vectorX++;
-               vectorY++;
-               min = minValue;
-               max = maxValue;
-
-           });
-
-
-            double dProx = 0;
-            if (max - min < 50)
+            int shortLength = box.Width;
+            if(box.Width > box.Height)
             {
-                dProx = 0;
-            }
-            else
-            {
-                dProx = (double)(min + (max - min) * 30 * 0.01);
+                shortLength = box.Height;
             }
 
-
-            byte prev = 0;
-            byte current = 0;
-
-            int x = 0, y = 0;
-            double positionX = 0, positionY = 0;
-            Point result = new Point();
-            for (int i = 0; i < box.Height; i++)
+            try
             {
+                byte minValue = Byte.MaxValue;
+                byte maxValue = Byte.MinValue;
 
-                x = (int)(startPT.X + positionX + 0.5);
-                y = (int)(startPT.Y + positionY + 0.5);
-                CheckPointRange(box, ref x, ref y);
-               current = byteRect[y * box.Width + x];
-                if ((current >= dProx && dProx > prev) ||
-                   (current <= dProx && dProx < prev))
+                byte min = 0, max = 0;
+                double vectorX = 0;
+                double vectorY = 0;
+
+                
+                for (int yy = (int)(box.Height * 0.25); yy < box.Height * 0.75; yy++, xx+= pt.X)
                 {
-                    result.X = x;
-                    result.Y = y;
-                    break;
+                    int lineSum = 0;
+                    int lineSumNum = shortLength / 2;
+                    int moveY = yy + lineSumNum / 2;
+                    int moveX = xx - lineSumNum / 2 * pt.X > shortLength ? shortLength : xx - lineSumNum / 2 * pt.X;
+
+                    for (int iter = 0; iter < lineSumNum; iter++, moveX += pt.X, moveY--)
+                    {
+                        lineSum += byteRect[moveY * box.Width + moveX];
+                    }
+                    byte LineAvg = (byte)(lineSum / lineSumNum);
+
+                    if (LineAvg < minValue)
+                    {
+                        minValue = LineAvg;
+                    }
+                    if (LineAvg > maxValue)
+                    {
+                        maxValue = LineAvg;
+                    }
+
+                    min = minValue;
+                    max = maxValue;
                 }
 
-                prev = current;
 
-                positionX += pt.X;
-                positionY += pt.Y;
-            }
+                double TTTTT = 0;
+                if (max - min < 50)
+                {
+                    TTTTT = 0;
+                }
+                else
+                {
+                    TTTTT = (double)(min + (max - min) * 30 * 0.01);
+                }
 
-            if (p_UIElement.Contains(grid))
-                p_UIElement.Remove(grid);
-            Line line1 = grid.Children[0] as Line;
-            line1.X1 = -10;
-            line1.Y1 = 10;
-            line1.X2 = 10;
-            line1.Y2 = -10;
-            line1.Stroke = DefineColors.CenteringPointColor;
-            line1.StrokeThickness = 3;
-            line1.Opacity = 1;
 
-            Line line2 = grid.Children[1] as Line;
-            line2.X1 = 10;
-            line2.Y1 = 10;
-            line2.X2 = -10;
-            line2.Y2 = -10;
-            line2.Stroke = DefineColors.CenteringPointColor;
-            line2.StrokeThickness = 3;
-            line2.Opacity = 1;
-            CPoint memPt = new CPoint((int)(box.Left + result.X), (int)(box.Top + result.Y));
-            CPoint canvasPt = GetCanvasPoint(new CPoint((int)(box.Left + result.X), (int)(box.Top + result.Y)));
-            Canvas.SetLeft(grid, canvasPt.X);
-            Canvas.SetTop(grid, canvasPt.Y);
-            p_UIElement.Add(grid);
+                xx = (int)(box.Width * 0.25);
+                switch (centerPos)
+                {
+                    case CENTERING_POS.LT:
+                        xx = (int)(box.Width * 0.25);
+                        break;
+                    case CENTERING_POS.RT:
+                        xx = (int)(box.Width * 0.75);
+                        break;
+                    case CENTERING_POS.RB:
+                        break;
+                    case CENTERING_POS.None:
+                        if (nearGrid.Tag.ToString().Contains("LT"))
+                        {
+                            box = centerBoxLT;
+                            byteRect = p_ImageData.GetRectByteArray(centerBoxLT);
+                            grid = CenterLTPoint_UI;
+                            pt = new CPoint(1, -1);
+                            startPT = new CPoint(centerBoxLT.Width / 2, 0);
+                        }
+                        else if (nearGrid.Tag.ToString().Contains("RT"))
+                        {
+                            xx = (int)(box.Width * 0.75);
+                        }
+                        else
+                        {
+                            box = centerBoxRB;
+                            byteRect = p_ImageData.GetRectByteArray(centerBoxRB);
+                            grid = CenterRBPoint_UI;
+                            pt = new CPoint(-1, 1);
+                            startPT = new CPoint(centerBoxRB.Width / 2, centerBoxRB.Height);
+                        }
+                        break;
+                }
 
-            switch (centerPos)
-            {
-                case CENTERING_POS.LT:
-                    CenterLTPoint.X = memPt.X;
-                    CenterLTPoint.Y = memPt.Y;
-                    break;
-                case CENTERING_POS.RT:
-                    CenterRTPoint.X = memPt.X;
-                    CenterRTPoint.Y = memPt.Y;
-                    break;
-                case CENTERING_POS.RB:
-                    CenterRBPoint.X = memPt.X;
-                    CenterRBPoint.Y = memPt.Y;
-                    break;
-                case CENTERING_POS.None:
-                    if (nearGrid.Tag.ToString().Contains("LT"))
+
+
+
+                byte prevs = 0;
+                byte currents = 0;
+                CPoint ress = new CPoint();
+                for (int yy = (int)(box.Height * 0.25); yy < box.Height * 0.75; yy++, xx+= pt.X)
+                {
+                    int lineSum = 0;
+                    int lineSumNum = shortLength / 2;
+                    int moveY = yy + lineSumNum / 2;
+                    int moveX = xx - lineSumNum / 2 * pt.X > shortLength ? shortLength : xx - lineSumNum / 2 * pt.X;
+
+                    for (int iter = 0; iter < lineSumNum; iter++, moveX += pt.X, moveY--)
                     {
+                        lineSum += byteRect[moveY * box.Width + moveX];
+                    }
+
+                    byte LineAvg = (byte)(lineSum / lineSumNum);
+
+                    if ((LineAvg >= TTTTT && TTTTT > prevs) ||
+                       (LineAvg <= TTTTT && TTTTT < prevs))
+                    {
+                        ress.X = xx;
+                        ress.Y = yy;
+                        break;
+                    }
+
+                    prevs = LineAvg;
+                }
+
+                if (p_UIElement.Contains(grid))
+                    p_UIElement.Remove(grid);
+                Line line1 = grid.Children[0] as Line;
+                line1.X1 = -10;
+                line1.Y1 = 10;
+                line1.X2 = 10;
+                line1.Y2 = -10;
+                line1.Stroke = DefineColors.CenteringPointColor;
+                line1.StrokeThickness = 3;
+                line1.Opacity = 1;
+
+                Line line2 = grid.Children[1] as Line;
+                line2.X1 = 10;
+                line2.Y1 = 10;
+                line2.X2 = -10;
+                line2.Y2 = -10;
+                line2.Stroke = DefineColors.CenteringPointColor;
+                line2.StrokeThickness = 3;
+                line2.Opacity = 1;
+                CPoint memPt = new CPoint((int)(box.Left + ress.X), (int)(box.Top + ress.Y));
+                CPoint canvasPt = GetCanvasPoint(new CPoint((int)(box.Left + ress.X), (int)(box.Top + ress.Y)));
+                Canvas.SetLeft(grid, canvasPt.X);
+                Canvas.SetTop(grid, canvasPt.Y);
+                p_UIElement.Add(grid);
+
+                switch (centerPos)
+                {
+                    case CENTERING_POS.LT:
                         CenterLTPoint.X = memPt.X;
                         CenterLTPoint.Y = memPt.Y;
-                    }
-                    else if (nearGrid.Tag.ToString().Contains("RT"))
-                    {
+                        break;
+                    case CENTERING_POS.RT:
                         CenterRTPoint.X = memPt.X;
                         CenterRTPoint.Y = memPt.Y;
-                    }
-                    else
-                    {
+                        break;
+                    case CENTERING_POS.RB:
                         CenterRBPoint.X = memPt.X;
                         CenterRBPoint.Y = memPt.Y;
-                    }
-                    break;
+                        break;
+                    case CENTERING_POS.None:
+                        if (nearGrid.Tag.ToString().Contains("LT"))
+                        {
+                            CenterLTPoint.X = memPt.X;
+                            CenterLTPoint.Y = memPt.Y;
+                        }
+                        else if (nearGrid.Tag.ToString().Contains("RT"))
+                        {
+                            CenterRTPoint.X = memPt.X;
+                            CenterRTPoint.Y = memPt.Y;
+                        }
+                        else
+                        {
+                            CenterRBPoint.X = memPt.X;
+                            CenterRBPoint.Y = memPt.Y;
+                        }
+                        break;
+                }
             }
+            catch(Exception e)
+            {
+                return;
+            }
+        
+
+
+           //Parallel.For(0, box.Height, x =>
+           //{
+           //    int LineSum = 0;
+           //    for (int j = box.Width / 2 - 15; j < box.Width / 2 + 15; j++)
+           //    {
+           //        //int x = (int)(j + 0.5);
+           //        //int y = (int)(vectorX + 0.5);
+           //        //CheckPointRange(Image, ref x, ref y);
+           //        LineSum += byteRect[x * box.Width + j];
+           //    }
+
+           //    byte LineAvg = (byte)(LineSum / 30);
+           //    if (LineAvg < minValue)
+           //    {
+           //        minValue = LineAvg;
+           //    }
+           //    if (LineAvg > maxValue)
+           //    {
+           //        maxValue = LineAvg;
+           //    }
+           //    //vectorX++;
+           //    vectorY++;
+           //    min = minValue;
+           //    max = maxValue;
+
+           //});
                     //pt = canvasPt;
         }
 
@@ -1949,9 +2231,19 @@ namespace Root_WindII
             redrawGrid.Width = Math.Abs(canvasRightTop.X - canvasLeftTop.X);
             redrawGrid.Height = Math.Abs(canvasLeftBottom.Y - canvasLeftTop.Y);
 
-            
+
+            // LeftTop
+            Line leftTopLine = redrawGrid.Children[0] as Line;
+            leftTopLine.X1 = 0;
+            leftTopLine.Y1 = redrawGrid.Height / 2;
+            leftTopLine.X2 = redrawGrid.Width / 2;
+            leftTopLine.Y2 = 0;
+            leftTopLine.Stroke = DefineColors.OriginBoxColor;
+            leftTopLine.StrokeThickness = 2;
+            leftTopLine.Opacity = 0.75;
+
             // Left
-            Line leftLine = redrawGrid.Children[0] as Line;
+            Line leftLine = redrawGrid.Children[1] as Line;
             leftLine.X1 = 0;
             leftLine.Y1 = 0;
             leftLine.X2 = 0;
@@ -1961,8 +2253,18 @@ namespace Root_WindII
             leftLine.Opacity = 0.75;
             //leftLine.StrokeDashArray = new DoubleCollection() { 6, 2 };
 
+            // LeftBottom
+            Line leftBottomLine = redrawGrid.Children[2] as Line;
+            leftBottomLine.X1 = 0;
+            leftBottomLine.Y1 = redrawGrid.Height / 2;
+            leftBottomLine.X2 = redrawGrid.Width / 2;
+            leftBottomLine.Y2 = redrawGrid.Height;
+            leftBottomLine.Stroke = DefineColors.OriginBoxColor;
+            leftBottomLine.StrokeThickness = 2;
+            leftBottomLine.Opacity = 0.75;
+
             // Top
-            Line topLine = redrawGrid.Children[1] as Line;
+            Line topLine = redrawGrid.Children[3] as Line;
             topLine.X1 = 0;
             topLine.Y1 = 0;
             topLine.X2 = redrawGrid.Width;
@@ -1972,8 +2274,18 @@ namespace Root_WindII
             topLine.Opacity = 0.75;
             //topLine.StrokeDashArray = new DoubleCollection() { 6, 2 };
 
+            // BottomRight
+            Line BottomRightLine = redrawGrid.Children[4] as Line;
+            BottomRightLine.X1 = redrawGrid.Width / 2;
+            BottomRightLine.Y1 = redrawGrid.Height;
+            BottomRightLine.X2 = redrawGrid.Width;
+            BottomRightLine.Y2 = redrawGrid.Height / 2;
+            BottomRightLine.Stroke = DefineColors.OriginBoxColor;
+            BottomRightLine.StrokeThickness = 2;
+            BottomRightLine.Opacity = 0.75;
+
             // Right
-            Line rightLine = redrawGrid.Children[2] as Line;
+            Line rightLine = redrawGrid.Children[5] as Line;
             rightLine.X1 = redrawGrid.Width;
             rightLine.Y1 = 0;
             rightLine.X2 = redrawGrid.Width;
@@ -1983,8 +2295,18 @@ namespace Root_WindII
             rightLine.Opacity = 0.75;
             //rightLine.StrokeDashArray = new DoubleCollection() { 6, 2 };
 
+            // RightTop
+            Line RightTopLine = redrawGrid.Children[6] as Line;
+            RightTopLine.X1 = redrawGrid.Width;
+            RightTopLine.Y1 = redrawGrid.Height / 2;
+            RightTopLine.X2 = redrawGrid.Width / 2;
+            RightTopLine.Y2 = 0;
+            RightTopLine.Stroke = DefineColors.OriginBoxColor;
+            RightTopLine.StrokeThickness = 2;
+            RightTopLine.Opacity = 0.75;
+
             // bottom
-            Line bottomLine = redrawGrid.Children[3] as Line;
+            Line bottomLine = redrawGrid.Children[7] as Line;
             bottomLine.X1 = 0;
             bottomLine.Y1 = redrawGrid.Height;
             bottomLine.X2 = redrawGrid.Width;
@@ -2178,15 +2500,15 @@ namespace Root_WindII
                 DrawPitchBox();
             }
 
-            //if (p_UIElement.Contains(CenterLeftTop_UI))
-            //{
-            //    DrawCenterLeftTopPoint(centerLeftTop);
-            //}
+            if (p_UIElement.Contains(CenterLeftTop_UI))
+            {
+                DrawCenterLeftTopPoint(centerLeftTop, true);
+            }
 
-            //if (p_UIElement.Contains(CenterRightBottom_UI))
-            //{
-            //    DrawCenterLeftTopPoint(centerRightBottom);
-            //}
+            if (p_UIElement.Contains(CenterRightBottom_UI))
+            {
+                DrawCenterRightBottomPoint(centerRightBottom, true);
+            }
 
             if (p_UIElement.Contains(CenterLTBox_UI))
             {
@@ -2377,11 +2699,11 @@ namespace Root_WindII
         }
         void SetData()
         {
-            if (!IsLoad)
-            {
-                MapOffsetX = (centerPoint.X - originBox.Left) * 4;
-                MapOffsetY = (originBox.Bottom - centerPoint.Y) * 4;
-            }
+            //if (!IsLoad)
+            //{
+            //MapOffsetX = (centerPoint.X - originBox.Left) * 4;
+            //MapOffsetY = (originBox.Bottom - centerPoint.Y) * 4;
+            //}
             //CPoint canvasPt = new CPoint(centerPoint.X - , p_MouseY);
             CPoint memPt = new CPoint((int)(centerPoint.X - MapOffsetX / 4), (int)(centerPoint.Y + MapOffsetY/ 4));
 
@@ -2961,17 +3283,42 @@ namespace Root_WindII
 
         public void CreateXMLData()
         {
-            
-            XMLParser.CreateXMLData();
+            XMLData data = UpdateXMLData();
+            var dialog = new SaveFileDialog();
+            dialog.Filter = "XML Files|*.xml";
+            dialog.InitialDirectory = Constants.RootPath.RootSetupRACPath;
+            if (dialog.ShowDialog() == true)
+            {
+                XMLParser.CreateXMLData(dialog.FileName, data);
+            }
+           
         }
 
-        void UpdateXMLData()
+        XMLData UpdateXMLData()
         {
-            XMLData xmlData = GlobalObjects.Instance.Get<XMLData>();
+            XMLData xmlData = new XMLData();
             xmlData.Device = DeviceID;
+            xmlData.Description = Description;
             xmlData.DiePitchX = DiePitchX;
             xmlData.DiePitchY = DiePitchY;
-           
+            xmlData.ScribeLineX = ScribeLaneX;
+            xmlData.ScribeLineY = ScribeLaneY;
+            xmlData.ShotX = ShotSizeX;
+            xmlData.ShotY = ShotSizeY;
+            xmlData.MapOffsetX = MapOffsetX;
+            xmlData.MapOffsetY = MapOffsetY;
+            xmlData.ShotOffsetX = ShotOffsetX;
+            xmlData.ShotOffsetY = ShotOffsetY;
+            xmlData.SMIOffsetX = SmiOffsetX;
+            xmlData.SMIOffsetY = SmiOffsetY;
+            xmlData.Rotation = Rotation;
+            xmlData.OriginDieX = (int)OriginDieX;
+            xmlData.OriginDieY = (int)OriginDieY;
+            xmlData.EvenOdd = EvenOdd.ToString();
+            xmlData.MapSizeX = UnitX;
+            xmlData.MapSizeY = UnitY;
+            xmlData.MapData = GlobalObjects.Instance.Get<XMLData>().GetWaferMap();
+            return xmlData;
         }
 
         #endregion

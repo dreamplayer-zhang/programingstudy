@@ -350,17 +350,20 @@ namespace Root_WindII
         //    return map;
         //}
 
-        public double[] GetWaferMap()
+        public int[] GetWaferMap()
         {
             Size unitSize = GetUnitSize();
 
-            double[] map = new double[(int)(unitSize.Width * unitSize.Height)];
+            int[] map = new int[(int)(unitSize.Width * unitSize.Height)];
             List<Point> dieList = GetUnitDieList();
 
             foreach (Point pt in dieList)
             {
                 map[(int)(pt.Y * unitSize.Width + pt.X)] = 1;
             }
+            MapSizeX = (int)unitSize.Width;
+            MapSizeY = (int)unitSize.Height;
+            MapData = map;
             return map;
         }
     }
