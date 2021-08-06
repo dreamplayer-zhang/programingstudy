@@ -18,10 +18,14 @@ Raw3DManager::Raw3DManager()
 	m_ppBuffFG = NULL;
 	m_pThreadCalc = NULL;
 
-	m_szRawImage = CSize(0, 0);
-	m_szImageBuffer = CSize(0, 0);
-
+	m_szRawImage = CCSize(0, 0);
+	m_szImageBuffer = CCSize(0, 0);
+	m_nMaxOverlapSize = 100;
+	m_nSnapFrameNum = 0;
+	m_nThreadNum = 4; 
+	m_nCurrFrameNum=0;
 	RAWDATA = Raw3D_RawData::GetInstance();
+	m_ppImageMain = NULL;
 }
 
 
@@ -30,15 +34,28 @@ Raw3DManager::~Raw3DManager()
 	//ClearBuffImageAddress();
 }
 
-void Raw3DManager::Initialize(LPBYTE* ppMainImage, int n3DImageWidth, int n3DImageHeight, CSize szRawImage, int nMaxOverlapSize)
+void Raw3DManager::Initialize(LPBYTE ppMainImage, int n3DImageWidth, int n3DImageHeight, CCSize szRawImage, int nMaxOverlapSize)
 {
 
-	m_ppImageMain = ppMainImage;
+	if (m_ppImageMain == NULL)
+	{
+		m_ppImageMain = new LPBYTE[n3DImageHeight];
+	}
+	else if(m_ppImageMain != NULL && (m_szImageBuffer.cy != n3DImageHeight|| m_szImageBuffer.cx != n3DImageHeight))
+	{
+		delete[] m_ppImageMain;
+		m_ppImageMain = new LPBYTE[n3DImageHeight];
+	}
+	
+	for (int i = 0; i < n3DImageHeight; i++)
+	{
+		m_ppImageMain[i] = &ppMainImage[i* n3DImageWidth];
+	}
 
 	m_szRawImage = szRawImage;
 	m_nMaxOverlapSize = nMaxOverlapSize;
 
-	m_szImageBuffer.cx = n3DImageWidth + roundf((float)n3DImageWidth / (float)m_szRawImage.cx + 0.5) * m_nMaxOverlapSize;	//Overlap크기를 포함한 Width
+	m_szImageBuffer.cx = n3DImageWidth;//이게 왜 필요하지 여기서 YB 210730// + roundf((float)n3DImageWidth / (float)m_szRawImage.cx + 0.5) * m_nMaxOverlapSize;	//Overlap크기를 포함한 Width
 	m_szImageBuffer.cy = n3DImageHeight;
 
 	if (RAWDATA->GetHeightBuffer() == NULL || RAWDATA->GetBrightBuffer() == NULL)
@@ -91,10 +108,18 @@ UINT CheckThread(LPVOID lParam)
 
 	return 0;
 }
-
-void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CPoint ptDataPos
+void Raw3DManager::SetFrameNum(int fn)
+{
+	m_nCurrFrameNum = fn;
+	for (int n = 0; n < m_nThreadNum; n++)
+	{
+		m_pThreadCalc[n].SetFrameNum(m_nCurrFrameNum);
+	}
+}
+thread* th;
+void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CCPoint ptDataPos
 	, int nMinGV1, int nMinGV2, int nThreadNum, int nSnapFrameNum, int nOverlapStartPos, int nOverlapSize
-	, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, int* pnCurrFrameNum, Parameter3D param)
+	, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, Parameter3D param)
 {
 	if (m_pThreadCalc != NULL)
 	{
@@ -118,7 +143,6 @@ void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, Displ
 	m_nThreadNum = nThreadNum;
 	m_nSnapFrameNum = nSnapFrameNum;
 	CreateRawBuffer(m_nSnapFrameNum);
-	m_pnCurrFrameNum = pnCurrFrameNum;
 
 	if (nOverlapSize > m_nMaxOverlapSize)
 		nOverlapSize = m_nMaxOverlapSize;
@@ -128,11 +152,10 @@ void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, Displ
 	{
 		m_pThreadCalc[n].Initialize(n, m_nThreadNum, m_szImageBuffer, m_szRawImage, m_ppImageMain, m_ppBuffHeight, m_ppBuffBright, m_ppBuffFG, m_nSnapFrameNum);
 		//m_pThreadCalc[n].SetLogFormHandle(m_hLogForm);
-		m_pThreadCalc[n].StartCalculation(convertMode, calcMode, displayMode, ptDataPos, nMinGV1, nMinGV2, nOverlapStartPos, nOverlapSize, nDisplayOffsetX, nDisplayOffsetY, bRevScan, bUseMinGV2, m_pnCurrFrameNum, param);
+		m_pThreadCalc[n].StartCalculation(convertMode, calcMode, displayMode, ptDataPos, nMinGV1, nMinGV2, nOverlapStartPos, nOverlapSize, nDisplayOffsetX, nDisplayOffsetY, bRevScan, bUseMinGV2, &m_nCurrFrameNum, param);
 	}	
-	thread t1(CheckThread,this);
+	th= new thread(CheckThread,this);
 	//AfxBeginThread(CheckThread, this);
-	
 }
 
 void Raw3DManager::CheckSnapCalcDone()
@@ -157,6 +180,8 @@ void Raw3DManager::CheckSnapCalcDone()
 			//	CString s = "";
 			//	s.Format("Snap Error Thread[%d]", n);
 			//	SendLog(s);
+
+				::OutputDebugString(L"Snap Error Threa");
 				bError = true;
 			}
 		}
@@ -179,25 +204,7 @@ void Raw3DManager::CheckSnapCalcDone()
 			break;
 		}
 
-		/*if(m_nSnapFrameNum > 58000 && m_nSnapFrameNum < 60000)	//snap error 테스트용
-		{
-			for (int n = 0; n < m_nThreadNum; n++)
-			{
-				m_pThreadCalc[n].StopCalc();
-			}
-
-			CString s = "";
-			s.Format("[Error] Test Cannot snap next frames / Curr Frame Num = %d / Need Snap Frame Num = %d", *m_pnCurrFrameNum, m_nSnapFrameNum);
-			SendLog(s);
-
-			if (m_pDlgGrabber != NULL)
-			{
-				::SendMessage(m_pDlgGrabber, WM_MESSAGE_FRAMEGRABBER_SNAP_DONE, 0, -1);
-			}
-			break;
-		}*/
-
-		if (*m_pnCurrFrameNum == nPrevFrameNum)
+		if (m_nCurrFrameNum == nPrevFrameNum)
 		{
 			nSameFrameCount++;
 			if (MAX_SAME_FRAME_COUNT < nSameFrameCount)
@@ -206,7 +213,7 @@ void Raw3DManager::CheckSnapCalcDone()
 				{
 					m_pThreadCalc[n].StopCalc();
 				}
-
+				::OutputDebugString(L" Cannot snap next frames ");
 				//CString s = "";
 				//s.Format("[Error] Cannot snap next frames / Curr Frame Num = %d / Need Snap Frame Num = %d", *m_pnCurrFrameNum, m_nSnapFrameNum);
 				//SendLog(s);
@@ -220,7 +227,7 @@ void Raw3DManager::CheckSnapCalcDone()
 		}
 		else
 		{
-			nPrevFrameNum = *m_pnCurrFrameNum;
+			nPrevFrameNum = m_nCurrFrameNum;
 		}
 
 		Sleep(1);
@@ -247,7 +254,7 @@ void Raw3DManager::SendLog(CString strMsg)
 	}
 }*/
 
-CSize Raw3DManager::GetImageBufferSize()
+CCSize Raw3DManager::GetImageBufferSize()
 {
 	if (m_szImageBuffer.cx == 0 || m_szImageBuffer.cy == 0)
 		//AfxMessageBox("[Warning] 3D Grabber is not initialized. - GetImageBufferSize()");
@@ -255,7 +262,7 @@ CSize Raw3DManager::GetImageBufferSize()
 	return m_szImageBuffer;
 }
 
-CSize Raw3DManager::GetRawImageSize()
+CCSize Raw3DManager::GetRawImageSize()
 {
 	if (m_szRawImage.cx == 0 || m_szRawImage.cy == 0)
 		//AfxMessageBox("[Warning] 3D Grabber is not initialized. - GetRawImageSize()");

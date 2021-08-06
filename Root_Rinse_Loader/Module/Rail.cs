@@ -26,9 +26,11 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region GAF
+        ALID m_alidHome;
         ALID m_alidAxis;
         void InitALID()
         {
+            m_alidHome = m_gaf.GetALID(this, "Home Error", "Home Error");
             m_alidAxis = m_gaf.GetALID(this, "Rotate Axis Alarm", "Rotate Axis Alarm");
         }
         #endregion
@@ -71,7 +73,6 @@ namespace Root_Rinse_Loader.Module
             {
                 string sSend = "";
                 foreach (Line line in m_aLine) sSend += line.m_bExist ? 'O' : '.';
-                m_rinse.AddStripSend(sSend);
             }
             foreach (Line line in m_aLine) line.m_bExist = false;
         }
@@ -133,6 +134,7 @@ namespace Root_Rinse_Loader.Module
             m_axisRotate.ServoOn(true); 
             p_sInfo = base.StateHome(m_axisWidth);
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            m_alidHome.Run(p_sInfo != "OK", p_sInfo);
             return p_sInfo;
         }
 

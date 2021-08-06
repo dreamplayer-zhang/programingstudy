@@ -107,6 +107,8 @@ namespace RootTools.Control.Ajin
                     AjinAxis axis = m_qSetAxis.Dequeue();
                     axis.GetAxisStatus();
                     axis.RunTreeSetting(Tree.eMode.Init); 
+                    axis.RunTreeSetting(Tree.eMode.RegWrite);
+                    axis.RunTreeSetting(Tree.eMode.Update);
                 }
             }
         }
