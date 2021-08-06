@@ -355,9 +355,10 @@ namespace Root_Pine2.Module
                 if (bCheckEnable && (gripper.p_bEnable == false)) return "OK";
                 ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
                 double xOffset = m_transfer.m_buffer.m_xOffset;
-                m_transfer.m_buffer.RunAlign(true);
+                //m_transfer.m_buffer.RunAlign(true);
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveTransfer(ePos, -xOffset))) return p_sInfo;
+                m_transfer.m_buffer.RunAlign(true);
                 if (Run(RunMoveZ(ePos))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(true))) return p_sInfo;
                 Thread.Sleep(300);

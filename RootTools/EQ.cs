@@ -113,12 +113,14 @@ namespace RootTools
         #endregion
 
         EQ.eState _eState = EQ.eState.Init;
+        public EQ.eState m_eStateOld = EQ.eState.Init;
         public EQ.eState p_eState
         {
             get { return _eState; }
             set
             {
                 if (_eState == value) return;
+                m_eStateOld = _eState; 
                 _eState = value;
                 OnPropertyChanged();
                 if (OnChanged != null) OnChanged(eEQ.State, value); 

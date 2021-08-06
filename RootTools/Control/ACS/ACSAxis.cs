@@ -15,7 +15,20 @@ namespace RootTools.Control.ACS
 
         #region Property
         int m_nAxis = -1;
+        public int p_nAxis
+        {
+            get => m_nAxis;
+            set => m_nAxis = value;
+        }
         bool m_bAbsoluteEncoder = false;
+
+        int _nMotorError = 0;
+        public int p_nMotorError
+        {
+            get => _nMotorError;
+            set => _nMotorError = value;
+        }
+
         void RunTreeSettingProperty(Tree tree)
         {
             int nAxis = m_nAxis;
@@ -354,6 +367,12 @@ namespace RootTools.Control.ACS
             m_threadRun.Start();
         }
 
+        void InitAcsAxis()
+        {
+            int nMask = p_channel.GetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END);
+            p_channel.SetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END, nMask | m_nAxis);
+        }
+
         void RunThread()
         {
             Thread.Sleep(2000);
@@ -449,6 +468,20 @@ namespace RootTools.Control.ACS
                 int nLimit = p_channel.GetFault(m_nAxis);
                 p_sensorMinusLimit = (nLimit & p_channel.ACSC_SAFETY_LL) != 0;
                 p_sensorPlusLimit = (nLimit & p_channel.ACSC_SAFETY_RL) != 0;
+
+                int nMotorError = p_channel.GetMotorError(m_nAxis);
+                if (nMotorError != p_nMotorError)
+                {
+                    p_nMotorError = nMotorError;
+
+                    // 5000~5008 is not error code (by Manual ACSPL+ Programmer's Guide p335)
+                    if (p_nMotorError != 0 && (p_nMotorError < 5000 || p_nMotorError > 5008))
+                    {
+                        EQ.p_bStop = true;
+                        EQ.p_eState = EQ.eState.Error;
+                        throw new Exception(p_channel.GetErrorString(p_nMotorError));
+                    }
+                }
             }
             catch (Exception e) { LogErrorSensor(p_id + " Thread Check Sensor Error : " + e.Message); }
             //AXM("AxmHomeReadSignal", CAXM.AxmHomeReadSignal(m_nAxis, ref uRead));
@@ -484,6 +517,7 @@ namespace RootTools.Control.ACS
             m_acs = acs;
             InitBase(id, acs.m_log);
             InitThread();
+            InitAcsAxis();
         }
 
         public void ThreadStop()

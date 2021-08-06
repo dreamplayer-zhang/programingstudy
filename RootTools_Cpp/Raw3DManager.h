@@ -8,14 +8,14 @@ public:
 	Raw3DManager();
 	~Raw3DManager();
 
-	void Initialize(LPBYTE* ppMainImage, int n3DImageWidth, int n3DImageHeight, CSize szRawImage, int nMaxOverlapSize);
+	void Initialize(LPBYTE ppMainImage, int n3DImageWidth, int n3DImageHeight, CCSize szRawImage, int nMaxOverlapSize);
 
-	void MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CPoint ptDataPos
+	void MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CCPoint ptDataPos
 		, int nMinGV1, int nMinGV2, int nThreadNum, int nSnapFrameNum, int nOverlapStartPos, int nOverlapSize
-		, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, int* pnCurrFrameNum, Parameter3D param);
-
-	CSize GetImageBufferSize();
-	CSize GetRawImageSize();
+		, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, Parameter3D param);
+	void SetFrameNum(int fn);
+	CCSize GetImageBufferSize();
+	CCSize GetRawImageSize();
 	WORD** GetHeightBuffer();
 	short** GetBrightBuffer();
 
@@ -35,20 +35,20 @@ private:
 
 	LPBYTE* m_ppImageMain;
 
-	bool m_bUseExistBuffer;
+
 
 	WORD** m_ppBuffHeight;
 	short** m_ppBuffBright;
 
-	CSize m_szImageBuffer;
-	CSize m_szRawImage;
+	CCSize m_szImageBuffer;
+	CCSize m_szRawImage;
 
 	int m_nMaxOverlapSize;
 
 	//volatile LPBYTE* m_ppBuffFG;	//이거 한번 써보고 안되면 지워야함. 아니야 얘 안써
 	LPBYTE* m_ppBuffFG;
 
-	int* m_pnCurrFrameNum;
+	int m_nCurrFrameNum;
 
 
 	int m_nSnapFrameNum;

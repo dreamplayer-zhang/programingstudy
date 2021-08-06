@@ -263,8 +263,7 @@ namespace RootTools.Control.Ajin
         public override void ServoOn(bool bOn)
         {
             if (EQ.p_bSimulate) return;
-            StopAxis(); 
-            if (bOn && m_bAbsoluteEncoder) AXM("AxmM3ServoSensOn", CAXM.AxmM3ServoSensOn(m_nAxis));
+            if (bOn && m_bAbsoluteEncoder) CAXM.AxmM3ServoSensOn(m_nAxis);
             uint uOn = (uint)(bOn ? 1 : 0);
             if (AXM("AxmSignalServoOn", CAXM.AxmSignalServoOn(m_nAxis, uOn)) != 0) 
                 return;

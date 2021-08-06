@@ -1,4 +1,5 @@
-﻿using Root_Rinse_Loader.Module;
+﻿using Root_Rinse_Loader.Engineer;
+using Root_Rinse_Loader.Module;
 using System.Windows.Controls;
 
 namespace Root_Rinse_Loader.MainUI
@@ -14,12 +15,11 @@ namespace Root_Rinse_Loader.MainUI
         }
 
         RinseL m_rinse; 
-        public void Init(RinseL rinse)
+        public void Init(RinseL rinse, RinseL_Engineer engineer)
         {
             m_rinse = rinse;
             DataContext = rinse;
-            listViewSend.ItemsSource = rinse.p_aSend;
-            listViewReceive.ItemsSource = rinse.p_aReceive; 
+            alidUI.Init(engineer.ClassGAF().m_listALID, engineer);
         }
     }
 }

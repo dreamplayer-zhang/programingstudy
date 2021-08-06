@@ -630,7 +630,7 @@ namespace Root_Pine2.Module
                     if (m_aMagazine[pos] == null)
                     {
                         if (Run(RunLoad(pos))) return p_sInfo;
-                        if (Run(m_elevator.MoveElevator(Elevator.ePos.TransferUp))) return p_sInfo;
+                        //if (Run(m_elevator.MoveElevator(Elevator.ePos.TransferUp))) return p_sInfo;
                         m_aMagazine[pos] = new Magazine(this, pos, m_pine2.p_iBundle++);
                         return "OK";
                     }
@@ -676,7 +676,7 @@ namespace Root_Pine2.Module
 
                 if (Run(m_elevator.MoveToConveyor(eMagazinePos, (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 7 : 0))) return p_sInfo;
                 if (Run(m_elevator.RunAlign(true))) return p_sInfo;
-                if (Run(m_elevator.MoveElevator(eMagazinePos))) return p_sInfo; 
+                //if (Run(m_elevator.MoveElevator(eMagazinePos))) return p_sInfo; 
                 m_magazineSet.MagazineLoaded(p_eMagazine, eMagazinePos); 
             }
             finally

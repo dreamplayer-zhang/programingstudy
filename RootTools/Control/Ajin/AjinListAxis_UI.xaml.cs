@@ -32,7 +32,9 @@ namespace RootTools.Control.Ajin
 
         void InitTabControl()
         {
+            tabControlAxis.Items.Clear();
             comboAxis.ItemsSource = null;
+            m_asAxis.Clear(); 
             foreach (AjinAxis axis in m_listAxis.m_aAxis)
             {
                 if (IsNewAxis(axis))

@@ -89,6 +89,18 @@ namespace Root_EFEM
         }
 
 
+        public Camera_Basler p_CamRADS
+        {
+            get
+            {
+                return m_CamRADS;
+            }
+            set
+            {
+                m_CamRADS = value;
+            }
+        }
+
         KlarfData_Lot m_KlarfData_Lot;
         LensLinearTurret m_LensLinearTurret;
         #region [Getter Setter]
