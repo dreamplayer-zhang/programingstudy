@@ -958,6 +958,7 @@ namespace Root_Pine2_Vision.Module
             InitBase(id, engineer, eRemote);
             InitVision_Snap_UI();
             InitThreadCheck();
+            p_eState = eState.Ready;
         }
 
         public override void ThreadStop()
@@ -1180,10 +1181,6 @@ namespace Root_Pine2_Vision.Module
                 if (m_module.m_aWorks[m_eWorks].IsProcessRun())
                 {
                     m_module.m_aWorks[m_eWorks].SendRecipe(m_sRecipe);                  // 2. VisionWorks2 Recipe Open 
-                    int nSnapCount = m_module.m_RunningRecipe[m_eWorks].p_lSnap;               // 총 Snap 횟수
-                    int nSnapMode = (int)m_module.m_RunningRecipe[m_eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
-                    SnapInfo snapInfo = new SnapInfo(m_eWorks, nSnapMode, "0000", nSnapCount, false);
-                    m_module.SendSnapInfo(snapInfo);
                 }
                 return m_module.ReqSnap(m_sRecipe, m_eWorks);
 

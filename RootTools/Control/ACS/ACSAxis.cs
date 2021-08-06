@@ -15,6 +15,11 @@ namespace RootTools.Control.ACS
 
         #region Property
         int m_nAxis = -1;
+        public int p_nAxis
+        {
+            get => m_nAxis;
+            set => m_nAxis = value;
+        }
         bool m_bAbsoluteEncoder = false;
 
         int _nMotorError = 0;
@@ -362,6 +367,12 @@ namespace RootTools.Control.ACS
             m_threadRun.Start();
         }
 
+        void InitAcsAxis()
+        {
+            int nMask = p_channel.GetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END);
+            p_channel.SetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END, nMask | m_nAxis);
+        }
+
         void RunThread()
         {
             Thread.Sleep(2000);
@@ -506,6 +517,7 @@ namespace RootTools.Control.ACS
             m_acs = acs;
             InitBase(id, acs.m_log);
             InitThread();
+            InitAcsAxis();
         }
 
         public void ThreadStop()
