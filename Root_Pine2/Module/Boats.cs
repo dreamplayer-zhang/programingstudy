@@ -52,7 +52,12 @@ namespace Root_Pine2.Module
             m_axisCam.StartMove(eWorks, new RPoint(xp, yp));
             int yOffset = (m_aCamOffset != null) ? (int)(10 * m_aCamOffset[xLine].Y) : 0;
             if (Run(m_aBoat[eWorks].RunMoveSnapStart(snapData, yOffset, bWait))) return p_sInfo;
-            return bWait ? m_axisCam.p_axisX.WaitReady() : "OK";
+            if (bWait)
+            {
+                if (m_axisCam.p_axisX.WaitReady() != "OK") return "Camera Move Ready Error";
+                if (m_axisCam.p_axisY.WaitReady() != "OK") return "Camera Move Ready Error";
+            }
+            return "OK";
         }
 
         public string RunMoveSnapStart(eWorks eWorks, Vision3D.Recipe.Snap snapData, int xLine, bool bWait = true)
@@ -62,7 +67,12 @@ namespace Root_Pine2.Module
             m_axisCam.StartMove(eWorks, new RPoint(xp, yp));
             int yOffset = (m_aCamOffset != null) ? (int)(10 * m_aCamOffset[xLine].Y) : 0;
             if (Run(m_aBoat[eWorks].RunMoveSnapStart(snapData, yOffset, bWait))) return p_sInfo;
-            return bWait ? m_axisCam.p_axisX.WaitReady() : "OK";
+            if (bWait)
+            {
+                if (m_axisCam.p_axisX.WaitReady() != "OK") return "Camera Move Ready Error";
+                if (m_axisCam.p_axisY.WaitReady() != "OK") return "Camera Move Ready Error";
+            }
+            return "OK";
         }
 
         double m_xCamScale = 10000; 
