@@ -400,6 +400,30 @@ namespace Root_VEGA_D.Module
 
         public string BeforeGet(int nID)
         {
+            // 레티클 유무 체크
+            p_sInfo = StageReticleCheck(false);//shutter Sensor check
+            if (p_sInfo != "OK")
+            {
+                m_alidReticleLocateInfoError.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
+            else
+            {
+                if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
+                if (Run(m_axisRotate.StartMove(eAxisPosRotate.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisX.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisXY.p_axisY.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisRotate.WaitReady()))
+					return p_sInfo;
+				if (Run(m_axisZ.WaitReady()))
+					return p_sInfo;
+			}
             //shutter 
             p_sInfo = ShutterSafety();
             if (p_sInfo != "OK")
@@ -421,64 +445,13 @@ namespace Root_VEGA_D.Module
             }
             //
 
-            // 레티클 유무 체크
-            p_sInfo = StageReticleCheck(false);//shutter Sensor check
-            if (p_sInfo != "OK")
-            {
-                m_alidReticleLocateInfoError.Run(true, p_sInfo);
-                return p_sInfo;
-            }
+            ClearData();
 
-            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
-            else
-            {
-                if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
-                if (Run(m_axisRotate.StartMove(eAxisPosRotate.Ready))) return p_sInfo;
-                if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
-                if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
-                if (Run(m_axisXY.p_axisX.WaitReady()))
-                    return p_sInfo;
-                if (Run(m_axisXY.p_axisY.WaitReady()))
-                    return p_sInfo;
-                if (Run(m_axisRotate.WaitReady()))
-                    return p_sInfo;
-                if (Run(m_axisZ.WaitReady()))
-                    return p_sInfo;
-                //m_axisXY.StartMove("Position_0");
-                //m_axisRotate.StartMove("Position_0");
-                //m_axisZ.StartMove("Position_0");
-
-                //m_axisXY.WaitReady();
-                //m_axisRotate.WaitReady();
-                //m_axisZ.WaitReady();
-
-                ClearData();
-
-                return "OK";
-            }
+            return "OK";
         }
 
         public string BeforePut(int nID)
         {
-            //shutter
-            p_sInfo = ShutterSafety();
-            if (p_sInfo != "OK")
-            {
-                m_alidShutterSensor.Run(true, p_sInfo);
-                return p_sInfo;
-            }
-            m_doShutterUp.Write(false);
-            Thread.Sleep(100);
-            m_doShutterDown.Write(true);
-            StopWatch sw = new StopWatch();
-            sw.Start();
-            while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
-            {
-                if (sw.ElapsedMilliseconds > 5000)
-                {
-                    m_alidShutterDownError.Run(true, "Shutter error in Beforeput");
-                }
-            }
             // 레티클 유무 체크
             p_sInfo = StageReticleCheck(true);//shutter Sensor check
             if (p_sInfo != "OK")
@@ -503,16 +476,29 @@ namespace Root_VEGA_D.Module
                     return p_sInfo;
                 if (Run(m_axisZ.WaitReady()))
                     return p_sInfo;
-                //m_axisXY.StartMove("Position_0");
-                //m_axisRotate.StartMove("Position_0");
-                //m_axisZ.StartMove("Position_0");
-
-                //m_axisXY.WaitReady();
-                //m_axisRotate.WaitReady();
-                //m_axisZ.WaitReady();
-
-                return "OK";
+               
             }
+            //shutter
+            p_sInfo = ShutterSafety();
+            if (p_sInfo != "OK")
+            {
+                m_alidShutterSensor.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+            m_doShutterUp.Write(false);
+            Thread.Sleep(100);
+            m_doShutterDown.Write(true);
+            StopWatch sw = new StopWatch();
+            sw.Start();
+            while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
+            {
+                if (sw.ElapsedMilliseconds > 5000)
+                {
+                    m_alidShutterDownError.Run(true, "Shutter error in Beforeput");
+                }
+            }
+
+            return "OK";
         }
 
         public string AfterGet(int nID)
@@ -906,6 +892,19 @@ namespace Root_VEGA_D.Module
             }
         }
 
+        bool _bWaitIPULineEnd = false;
+        public bool p_bWaitIPULineEnd
+        {
+            get => _bWaitIPULineEnd;
+            set
+            {
+                if (_bWaitIPULineEnd == value) return;
+
+                m_log.Info(string.Format("{0}.p_bWaitIPULineEnd {1} -> {2}", p_id, _bWaitIPULineEnd, !_bWaitIPULineEnd));
+                _bWaitIPULineEnd = value;
+            }
+        }
+
         DispatcherTimer m_timerWaitReconnect = new DispatcherTimer();
         private void WaitReconnectTimerTick(object sender, EventArgs e)
         {
@@ -1010,6 +1009,11 @@ namespace Root_VEGA_D.Module
                                     if (LineScanStatusChanged != null)
                                         LineScanStatusChanged(this, runGrabLineScan, LineScanStatus.LineInspCompleted, new int[2] { runGrabLineScan.m_grabMode.m_ScanLineNum, nEndLine });
                                 }
+                            }
+                            break;
+                        case TCPIPComm_VEGA_D.Command.LineEndAck:
+                            {
+                                p_bWaitIPULineEnd = false;
                             }
                             break;
                         default:

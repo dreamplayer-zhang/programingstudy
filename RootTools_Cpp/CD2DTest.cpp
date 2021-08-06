@@ -51,7 +51,7 @@ void MyClrTest::SSE_MakeABS_Proto(D2DPtrStruc* target, D2DPtrStruc* reference, D
 	int ResultWidth = ResultABS->nWidth;
 	int ResultHeight = ResultABS->nHeight;
 
-	int blockEndWidth = ceil(nRefWidth / 32);
+	int blockEndWidth = ceil(float(nRefWidth / 32));
 	int blockEndHeight = nRefHeight;
 
 	ULONGLONG TotalSum = 0;
@@ -125,7 +125,7 @@ ULONGLONG MyClrTest::SSE_GetDiffSum4DoubleSize_256(D2DPtrStruc* Target , D2DPtrS
 	int nTargetWidth = Target->nWidth;
 	int nTargetHeight = Target->nHeight;
 
-	int blockEndWidth = ceil(nRefWidth / 32);
+	int blockEndWidth = ceil(float(nRefWidth / 32));
 	int blockEndHeight = nRefHeight;
 
 	ULONGLONG TotalSum = 0;
@@ -189,7 +189,7 @@ ULONGLONG MyClrTest::SSE_GetDiffSum4DoubleSize_256_threshold(D2DPtrStruc* Target
 	int nTargetWidth = Target->nWidth;
 	int nTargetHeight = Target->nHeight;
 
-	int blockEndWidth = ceil(nRefWidth / 32);
+	int blockEndWidth = ceil(float(nRefWidth / 32));
 	int blockEndHeight = nRefHeight;
 
 	ULONGLONG TotalSum = 0;

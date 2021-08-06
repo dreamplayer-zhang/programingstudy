@@ -356,6 +356,7 @@ namespace RootTools_Vision
             byte[] diffImg = new byte[chipW * chipH];
 
             RefImageUpdateFreq refUpdateFreq = parameterD2D.RefImageUpdate;
+            CreateDiffMethod diffMethod = parameterD2D.CreateDiffMethod;
 
             if (refUpdateFreq == RefImageUpdateFreq.Chip_Trigger) // D2D 4.0 Algorithm 
             {
@@ -370,10 +371,27 @@ namespace RootTools_Vision
                     }
                     else
                     {
-                        CLR_IP.Cpp_SelectMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
+                        if (diffMethod == CreateDiffMethod.Absolute)
+                        { 
+                            CLR_IP.Cpp_SelectAbsMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
                                             this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
                                             wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
                                             , 1, this.currentWorkplace.Width, this.currentWorkplace.Height);
+                        }
+                        else if(diffMethod == CreateDiffMethod.Bright)
+                        {
+                            CLR_IP.Cpp_SelectMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
+                                            this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
+                                            wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
+                                            , 1, this.currentWorkplace.Width, this.currentWorkplace.Height, false);
+                        }
+                        else
+                        {
+                            CLR_IP.Cpp_SelectMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
+                                            this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
+                                            wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
+                                            , 1, this.currentWorkplace.Width, this.currentWorkplace.Height, true);
+                        }
 
                         if (parameterD2D.ScaleMap) // ScaleMap Option
                         { 
@@ -392,7 +410,12 @@ namespace RootTools_Vision
                     SetGoldenImage();
                 }
                 // Diff Image 계산
-                CLR_IP.Cpp_SubtractAbs(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
+                if(diffMethod == CreateDiffMethod.Absolute)
+                    CLR_IP.Cpp_SubtractAbs(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
+                else if(diffMethod == CreateDiffMethod.Bright)
+                    CLR_IP.Cpp_Subtract(inspectionWorkBuffer, GoldenImage, diffImg, chipW, chipH);
+                else
+                    CLR_IP.Cpp_Subtract(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
 
                 if (parameterD2D.ScaleMap) // ScaleMap Option
                 {

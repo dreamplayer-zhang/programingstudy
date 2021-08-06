@@ -30,10 +30,12 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region GAF
+        ALID m_alidHome; 
         ALID m_alidPusherOverload;
         ALID m_alidProtrusion;
         void InitALID()
         {
+            m_alidHome = m_gaf.GetALID(this, "Home Error", "Home Error");
             m_alidPusherOverload = m_gaf.GetALID(this, "PusherOverload", "Pusher Overload Error");
             m_alidProtrusion = m_gaf.GetALID(this, "Protrusion", "Protrusion");
         }
@@ -418,12 +420,14 @@ namespace Root_Rinse_Loader.Module
             }
             if (IsProtrusion())
             {
-                p_eState = eState.Error; 
+                p_eState = eState.Error;
+                m_alidHome.Run(true, "Protrusion Error");
                 return "Protrusion Error";
             }
             foreach (Magazine magazine in m_aMagazine) magazine.RunClamp(magazine.p_bCheck);
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            m_alidHome.Run(p_sInfo != "OK", p_sInfo);
             return p_sInfo;
         }
 

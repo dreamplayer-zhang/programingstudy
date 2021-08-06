@@ -747,7 +747,7 @@ namespace Root_Pine2_Vision.Module
                 m_logSnap.Info("Send Snap Ready Done to Handler");
 
                 // Wait for Grab
-                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+                while (m_camera.p_CamInfo.p_eState != RootTools.Camera.Dalsa.eCamState.Ready)
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
@@ -936,9 +936,9 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public string ReqSnap(string sRecipe, eWorks eWorks, bool bBiDirectionalScan = true)
+        public string ReqSnap(string sRecipe, eWorks eWorks, bool bBiDirectionalScan = true, bool bNeedInsp = false)
         {
-            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString() + "," + bBiDirectionalScan.ToString();
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString() + "," + bBiDirectionalScan.ToString() + "," + bNeedInsp.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             while (sSend != m_sReceive)
@@ -1125,7 +1125,7 @@ namespace Root_Pine2_Vision.Module
             InitBase(id, engineer, eRemote);
             InitVision_Snap_UI();
             InitThreadCheck();
-            p_eState = eState.Ready;
+            p_eState = eState.Ready; 
         }
 
         public override void ThreadStop()
@@ -1171,6 +1171,7 @@ namespace Root_Pine2_Vision.Module
         string RemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
         {
             if (m_remote.p_bEnable == false) return "OK";
+            if (m_remote.m_client.p_bConnect == false) return "Remote TCPIP not Connected";
             Run_Remote run = GetRemoteRun(eRemoteRun, eRemote, value);
             StartRun(run);
             while (run.p_eRunState != ModuleRunBase.eRunState.Done)
@@ -1347,12 +1348,8 @@ namespace Root_Pine2_Vision.Module
                 if (m_module.m_aWorks[m_eWorks].IsProcessRun())
                 {
                     m_module.m_aWorks[m_eWorks].SendRecipe(m_sRecipe);                  // 2. VisionWorks2 Recipe Open 
-                    //int nSnapCount = m_module.m_RunningRecipe[m_eWorks].p_lSnap;               // 총 Snap 횟수
-                    //int nSnapMode = (int)m_module.m_RunningRecipe[m_eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
-                    //SnapInfo snapInfo = new SnapInfo(m_eWorks, nSnapMode, "0000", nSnapCount, false); 
-                    //m_module.SendSnapInfo(snapInfo); 
                 }
-                return m_module.ReqSnap(m_sRecipe, m_eWorks, m_module.m_bUseBiDirectional);
+                return m_module.ReqSnap(m_sRecipe, m_eWorks, m_module.m_bUseBiDirectional, false);
 
                 //m_module.m_recipe[m_eWorks].RecipeOpen(m_sRecipe);                  // 1. Root Vision Recipe Open
 

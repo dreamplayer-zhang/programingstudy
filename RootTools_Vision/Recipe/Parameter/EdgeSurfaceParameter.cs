@@ -81,9 +81,11 @@ namespace RootTools_Vision
 		
 		// parameter
 		private int threshold = 10;
-		private int defectSizeMin = 1;
-		private int defectSizeMax = 100;
-		
+		private int defectSizeMinX = 1;
+		private int defectSizeMaxX = 100;
+		private int defectSizeMinY = 1;
+		private int defectSizeMaxY = 100;
+
 		// search edge
 		private bool useEdgeSearch = true;
 		private int edgeSearchLevel = 20;
@@ -92,6 +94,12 @@ namespace RootTools_Vision
 		private bool chR = false;
 		private bool chG = false;
 		private bool chB = false;
+		private double notchOffsetDegree = 5;
+
+		// probability method
+		private bool useProbabilityMethod = false;
+		private double proportionThreshold = 20;
+		private double proportionLimit = 20;
 		#endregion
 
 		#region [Property]
@@ -118,46 +126,86 @@ namespace RootTools_Vision
 		}
 
 		[Category("Parameter")]
+		[DisplayName("1. Threshold")]
 		public int Threshold
 		{
 			get => this.threshold;
 			set => SetProperty(ref threshold, value);
 		}
 		[Category("Parameter")]
-		[DisplayName("Size Min")]
-		public int DefectSizeMin
+		[DisplayName("2. Proportion Threshold")]
+		public double ProportionThreshold
 		{
-			get => this.defectSizeMin;
-			set => SetProperty(ref defectSizeMin, value);
+			get => this.proportionThreshold;
+			set => SetProperty(ref proportionThreshold, value);
 		}
 		[Category("Parameter")]
-		[DisplayName("Size Max")]
-		public int DefectSizeMax
+		[DisplayName("3. Proportion Limit")]
+		public double ProportionLimit
 		{
-			get => this.defectSizeMax;
-			set => SetProperty(ref defectSizeMax, value);
+			get => this.proportionLimit;
+			set => SetProperty(ref proportionLimit, value);
+		}
+		[Category("Parameter")]
+		[DisplayName("4. Width Size Min")]
+		public int DefectSizeMinX
+		{
+			get => this.defectSizeMinX;
+			set => SetProperty(ref defectSizeMinX, value);
+		}
+		[Category("Parameter")]
+		[DisplayName("5. Width Size Max")]
+		public int DefectSizeMaxX
+		{
+			get => this.defectSizeMaxX;
+			set => SetProperty(ref defectSizeMaxX, value);
+		}
+
+		[Category("Parameter")]
+		[DisplayName("6. Height Size Min")]
+		public int DefectSizeMinY
+		{
+			get => this.defectSizeMinY;
+			set => SetProperty(ref defectSizeMinY, value);
+		}
+		[Category("Parameter")]
+		[DisplayName("7. Height Size Max")]
+		public int DefectSizeMaxY
+		{
+			get => this.defectSizeMaxY;
+			set => SetProperty(ref defectSizeMaxY, value);
 		}
 
 		[Category("ROI")]
-		[DisplayName("Start Y Position")]
+		[DisplayName("1. Start Y Position")]
 		public int StartPosition
 		{
 			get => this.startPosition;
 			set => SetProperty(ref startPosition, value);
 		}
 		[Category("ROI")]
-		[DisplayName("End Y Position")]
+		[DisplayName("2. End Y Position")]
 		public int EndPosition
 		{
 			get => this.endPosition;
 			set => SetProperty(ref endPosition, value);
 		}
 		[Category("ROI")]
-		[DisplayName("Step Height")]
+		[DisplayName("3. Step Height")]
 		public int ROIHeight
 		{
 			get => this.roiHeight;
 			set => SetProperty(ref roiHeight, value);
+		}
+		[Category("ROI")]
+		[DisplayName("4. Notch Offset Degree")]
+		public double NotchOffsetDegree
+		{
+			get => this.notchOffsetDegree;
+			set
+			{
+				SetProperty(ref this.notchOffsetDegree, value);
+			}
 		}
 
 		[Browsable(false)]
@@ -174,6 +222,14 @@ namespace RootTools_Vision
 		{
 			get => this.edgeSearchLevel;
 			set => SetProperty(ref edgeSearchLevel, value);
+		}
+
+		[Category("Method")]
+		[DisplayName("Use Probability Method")]
+		public bool UseProbabilityMethod
+		{
+			get => this.useProbabilityMethod;
+			set => SetProperty(ref useProbabilityMethod, value);
 		}
 		#endregion
 	}

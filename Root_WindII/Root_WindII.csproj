@@ -314,6 +314,9 @@
     <Compile Include="UI\SETUP\CAMERA\CameraAlign.xaml.cs">
       <DependentUpon>CameraAlign.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SETUP\CAMERA\CameraRADS.xaml.cs">
+      <DependentUpon>CameraRADS.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SETUP\CAMERA\CameraVRS.xaml.cs">
       <DependentUpon>CameraVRS.xaml</DependentUpon>
     </Compile>
@@ -323,7 +326,9 @@
     <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionController_ViewModel.cs" />
     <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraAlign_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraAlign_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraRADS_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraVRS_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraRADS_ViewModel.cs" />
     <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraVRS_ViewModel.cs" />
     <Compile Include="UI\SETUP\EBR\EBRSetup.xaml.cs">
       <DependentUpon>EBRSetup.xaml</DependentUpon>
@@ -523,6 +528,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\SETUP\CAMERA\CameraAlign.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\CAMERA\CameraRADS.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

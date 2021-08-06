@@ -51,6 +51,9 @@
     <ClInclude Include="CDefectDataWrapper.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="CLR_3D.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -81,6 +84,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CDefectDataWrapper.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CLR_3D.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

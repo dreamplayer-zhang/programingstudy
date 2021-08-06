@@ -5,18 +5,22 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace RootTools_Vision
 {
     public class D2DRecipe : RecipeItemBase
     {
         #region [Parameter]
+
         private byte[][] _preGolden = new byte[3][];
         private int _preGoldenW = -1;
         private int _preGoldenH = -1;
         #endregion
 
         #region [Getter Setter]
+
+        [XmlIgnore]
         public byte[][] PreGolden { get => _preGolden; set => _preGolden = value; }
         public int PreGoldenW { get => _preGoldenW; set => _preGoldenW = value; }
         public int PreGoldenH { get => _preGoldenH; set => _preGoldenH = value; }

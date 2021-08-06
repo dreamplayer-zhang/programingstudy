@@ -1,8 +1,11 @@
-﻿using RootTools;
+﻿using Root_JEDI_Sorter.Module;
+using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -25,15 +28,75 @@ namespace Root_JEDI_Sorter.Engineer
         }
         #endregion
 
+        #region Lot
+        public void NewLot()
+        {
+            //m_summary.ClearCount();
+        }
+        #endregion
+
+        #region Recipe
+        public string _sRecipe = "";
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_JEDI.RecipeOpen(value);
+            }
+        }
+
+        public List<string> p_asRecipe
+        {
+            get
+            {
+                List<string> asRecipe = new List<string>();
+                DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
+                foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
+                return asRecipe;
+            }
+            set { }
+        }
+        #endregion
+
         #region Module
         public ModuleList p_moduleList { get; set; }
-        //public Vision2D m_vision;
-
+        public JEDI_Sorter m_JEDI; 
+        public Dictionary<In.eIn, In> m_in = new Dictionary<In.eIn, In>();
+        public Dictionary<Good.eGood, Good> m_good = new Dictionary<Good.eGood, Good>();
+        public Dictionary<Bad.eBad, Bad> m_bad = new Dictionary<Bad.eBad, Bad>();
+        public Transfer m_transfer; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            //m_vision = new Vision2D("Vision", m_engineer, ModuleBase.eRemote.Server);
-            //InitModule(m_vision);
+            InitModule(m_JEDI = new JEDI_Sorter("JEDI", m_engineer)); 
+            InitIn(In.eIn.InA);
+            InitIn(In.eIn.InB);
+            InitGood(Good.eGood.GoodA);
+            InitGood(Good.eGood.GoodB);
+            InitBad(Bad.eBad.Reject);
+            InitBad(Bad.eBad.Rework);
+            InitModule(m_transfer = new Transfer("Transfer", m_engineer));
+        }
+
+        void InitIn(In.eIn eIn)
+        {
+            m_in.Add(eIn, new In(eIn, m_engineer));
+            InitModule(m_in[eIn]); 
+        }
+
+        void InitGood(Good.eGood eGood)
+        {
+            m_good.Add(eGood, new Good(eGood, m_engineer));
+            InitModule(m_good[eGood]); 
+        }
+
+        void InitBad(Bad.eBad eBad)
+        {
+            m_bad.Add(eBad, new Bad(eBad, m_engineer));
+            InitModule(m_bad[eBad]); 
         }
 
         void InitModule(ModuleBase module)

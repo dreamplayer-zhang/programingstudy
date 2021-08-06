@@ -669,12 +669,34 @@ namespace RootTools.Control
         #endregion
 
         #region Trigger
-        public class Trigger
+        public class Trigger : ObservableObject
         {
             public double[] m_aPos = new double[2] { 0, 0 };
             public double m_dPos = 10;
+            public double p_dPos
+            {
+                get
+                {
+                    return m_dPos;
+                }
+                set
+                {
+                    SetProperty(ref m_dPos, value);
+                }
+            }
             public bool m_bCmd = true;
             public double m_dUpTime = -1;
+            public double p_dUptime
+            {
+                get
+                {
+                    return m_dUpTime;
+                }
+                set
+                {
+                    SetProperty(ref m_dUpTime, value);
+                }
+            }
 
             public Trigger Clone()
             {
@@ -710,6 +732,18 @@ namespace RootTools.Control
             }
         }
         public Trigger m_trigger = new Trigger();
+        public Trigger p_Trigger
+        {
+            get
+            {
+                return m_trigger;
+            }
+            set
+            {
+                m_trigger = value;
+                OnPropertyChanged();
+            }
+        }
         public string m_sUnit = "unit";
 
         public void SetTrigger(double fPos0, double fPos1, double dPos, bool bCmd)

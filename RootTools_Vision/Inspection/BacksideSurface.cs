@@ -67,10 +67,16 @@ namespace RootTools_Vision
 
             if(bAdaptiveIntensity)
             { 
-                nGrayLevel = CLR_IP.Cpp_CalcAdaptiveThresholdParam(workplaceBuffer, arrBinImg, chipW, chipH, nAdaptiveOffset);
-            
-                if(nGrayLevel == -1)
-                    nGrayLevel = parameterBackside.Intensity;
+                nGrayLevel = CLR_IP.Cpp_FindDominantIntensity(workplaceBuffer, arrBinImg, chipW, chipH);
+
+                if (isDarkInsp)
+                {  
+                    nGrayLevel = (nGrayLevel - nAdaptiveOffset <= 0) ? 1 : nGrayLevel - nAdaptiveOffset;
+                }
+                else
+                { 
+                    nGrayLevel = (nGrayLevel + nAdaptiveOffset >= 255) ? 254 : nGrayLevel + nAdaptiveOffset;
+                }
             }
 
             if (isDarkInsp)

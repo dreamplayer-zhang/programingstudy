@@ -32,6 +32,16 @@ namespace Root_WIND2
 {
     class Review_ViewModel : ObservableObject
     {
+        public Review_ViewModel(Review review)
+        {
+            init();
+
+           
+            _selectedStartDate = DateTime.Now.Date;
+            _selectedEndDate = DateTime.Now.Date;
+        }
+
+
         RecipeBase recipe;
         List<Defect> m_ReviewDefectlist;
 
@@ -53,13 +63,7 @@ namespace Root_WIND2
 
         public DefectView m_DefectView = new DefectView();
 
-        public Review_ViewModel(Review review)
-        {
-            init();
 
-            _selectedStartDate = DateTime.Now.Date;
-            _selectedEndDate = DateTime.Now.Date;
-        }
         public void init()
         {
             p_Element.Add(m_DefectView);

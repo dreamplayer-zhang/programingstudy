@@ -18,6 +18,10 @@ namespace Root_VEGA_D
 	{
 		public static string MainFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
 		public static VEGA_D_Engineer m_engineer = new VEGA_D_Engineer();
+		public static string ServerIP;
+		public static string ServerWebPort;
+		public static bool IsServerEnabled;
+
 		static App()
         {
             AppDomain.CurrentDomain.UnhandledException += (sender, arg) => ReportException(sender, arg.ExceptionObject as Exception);

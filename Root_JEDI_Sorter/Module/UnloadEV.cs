@@ -2,7 +2,9 @@
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
+using RootTools.Trees;
 using System;
+using System.Threading;
 
 namespace Root_JEDI_Sorter.Module
 {
@@ -15,10 +17,10 @@ namespace Root_JEDI_Sorter.Module
         public DIO_I m_diProtrude;
         public void GetTools(ToolBox toolBox, ModuleBase module, bool bInit)
         {
-            toolBox.GetAxis(ref m_axis, module, p_id + ".Snap");
-            toolBox.GetDIO(ref m_diCheck, module, p_id + ".Check", new string[2] { "0", "1" });
-            toolBox.GetDIO(ref m_diFull, module, p_id + ".Full");
-            toolBox.GetDIO(ref m_diProtrude, module, p_id + ".Protrude");
+            toolBox.GetAxis(ref m_axis, module, "Elevator");
+            toolBox.GetDIO(ref m_diCheck, module, "Check", new string[2] { "0", "1" });
+            toolBox.GetDIO(ref m_diFull, module, "Full");
+            toolBox.GetDIO(ref m_diProtrude, module, "Protrude");
             if (bInit) InitPosition();
         }
         #endregion
@@ -26,13 +28,14 @@ namespace Root_JEDI_Sorter.Module
         #region Axis
         public enum ePos
         {
-            Down,
             Up,
+            Elevator,
+            Stage,
+            Down,
         }
         void InitPosition()
         {
             m_axis.AddPos(Enum.GetNames(typeof(ePos)));
-            m_axis.AddSpeed("Snap");
         }
 
         public string RunMove(ePos ePos, bool bWait = true)
@@ -60,6 +63,34 @@ namespace Root_JEDI_Sorter.Module
         public bool IsProtrude()
         {
             return m_diProtrude.p_bIn;
+        }
+        #endregion
+
+        #region Run
+        double m_secUp = 1; 
+        public string RunUnload()
+        {
+            try
+            {
+                if (Run(RunMove(ePos.Elevator))) return m_sInfo;
+                if (Run(RunMove(ePos.Up))) return m_sInfo;
+                Thread.Sleep((int)(1000 * m_secUp));
+                if (Run(RunMove(ePos.Elevator))) return m_sInfo;
+            }
+            finally { RunMove(ePos.Elevator); }
+            return "OK"; 
+        }
+
+        string m_sInfo = "OK";
+        bool Run(string sRun)
+        {
+            m_sInfo = sRun;
+            return (sRun == "OK");
+        }
+
+        public void RunTree(Tree tree)
+        {
+            m_secUp = tree.Set(m_secUp, m_secUp, "Up Delay", "Up Delay Time (sec)"); 
         }
         #endregion
 

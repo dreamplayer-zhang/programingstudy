@@ -263,10 +263,10 @@ namespace RootTools.Control.Ajin
         public override void ServoOn(bool bOn)
         {
             if (EQ.p_bSimulate) return;
-            StopAxis(); 
-            if (bOn && m_bAbsoluteEncoder) AXM("AxmM3ServoSensOn", CAXM.AxmM3ServoSensOn(m_nAxis));
+            if (bOn && m_bAbsoluteEncoder) CAXM.AxmM3ServoSensOn(m_nAxis);
             uint uOn = (uint)(bOn ? 1 : 0);
-            if (AXM("AxmSignalServoOn", CAXM.AxmSignalServoOn(m_nAxis, uOn)) != 0) return;
+            if (AXM("AxmSignalServoOn", CAXM.AxmSignalServoOn(m_nAxis, uOn)) != 0) 
+                return;
             if (m_nBrakeSignalBit >= 0)
             {
                 if (AXM("AxmSignalWriteOutputBit", CAXM.AxmSignalWriteOutputBit(m_nAxis, m_nBrakeSignalBit, uOn)) != 0) return;
@@ -386,11 +386,9 @@ namespace RootTools.Control.Ajin
         void GetAxisStatusMode()
         {
             uint u = 0;
-            AXM("AxmMotGetPulseOutMethod", CAXM.AxmMotGetPulseOutMethod(m_nAxis, ref u));
-            m_ePulse = (ePulseOutMethod)u;
-            AXM("AxmMotGetEncInputMethod", CAXM.AxmMotGetEncInputMethod(m_nAxis, ref u));
-            m_eEncoder = (eEncoderMethod)u;
-            AXM("", CAXM.AxmMotGetProfileMode(m_nAxis, ref u));
+            if (CAXM.AxmMotGetPulseOutMethod(m_nAxis, ref u) == 0) m_ePulse = (ePulseOutMethod)u;
+            if (CAXM.AxmMotGetEncInputMethod(m_nAxis, ref u) == 0) m_eEncoder = (eEncoderMethod)u;
+            AXM("AxmMotGetProfileMode", CAXM.AxmMotGetProfileMode(m_nAxis, ref u));
             m_eProfile = (eProfile)u;
             AXM("AxmMotGetMaxVel", CAXM.AxmMotGetMaxVel(m_nAxis, ref m_maxV));
         }

@@ -651,17 +651,18 @@ namespace Root_WIND2.UI_User
                 return;
             }
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
-            
+            int originDieX = GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieX;
+            int originDieY = GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieY;
             int absFeatureX, absFeatureY;
             int absChipX, absChipY;
 
             int outX = 0, outY = 0;
             foreach(CPoint chipPos in _validChip)
             {
-                absChipX = originRecipe.OriginX + chipPos.X * originRecipe.DiePitchX;
-                absChipY = originRecipe.OriginY + chipPos.Y * originRecipe.DiePitchY - originRecipe.OriginHeight; // 기준 좌표가 좌하단인듯
-                absFeatureX = originRecipe.OriginX + feature[0].PositionX + chipPos.X * originRecipe.DiePitchX;
-                absFeatureY = originRecipe.OriginY + feature[0].PositionY + chipPos.Y * originRecipe.DiePitchY;
+                absChipX = originRecipe.OriginX + (chipPos.X - originDieX) * originRecipe.DiePitchX;
+                absChipY = originRecipe.OriginY + (chipPos.Y - originDieY) * originRecipe.DiePitchY - originRecipe.OriginHeight; // 기준 좌표가 좌하단인듯
+                absFeatureX = absChipX + feature[0].PositionX;
+                absFeatureY = absChipY + feature[0].PositionY + originRecipe.OriginHeight;
                 
                 unsafe
                 { 
@@ -753,7 +754,7 @@ namespace Root_WIND2.UI_User
                 IsEnabledSave = true;
                 p_ImageData = null;
                 p_ImageData = new ImageData(originRecipe.OriginWidth, originRecipe.OriginHeight, 1);
-                
+
                 IntPtr ptrMem = p_ImageData.GetPtr();
 
                 unsafe { 

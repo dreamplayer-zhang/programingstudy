@@ -26,16 +26,66 @@ namespace Root_VEGA_D.Module
         DIO_I m_diEFEMLeft_Door;
         DIO_I m_diEFEMRight_Door;
         DIO_I m_diActiveIsolator_Alarm;
-        public DIO_I m_diFP_Isolator;
-        public DIO_I m_diIsolator_VPre;
-        public DIO_I m_diFactory_Air_PadPre;
-        public DIO_I m_diAir_TankPre;
-        public DIO_I m_diX_BottomPre;
-        public DIO_I m_diX_SideMasterPre;
-        public DIO_I m_diX_SideSlavePre;
-        public DIO_I m_diY_BottomPre;
-        public DIO_I m_diY_SideMasterPre;
-        public DIO_I m_diY_SideSlavePre;
+        DIO_I m_diFP_Isolator;
+        public DIO_I p_diFP_Isolator
+        {
+            get => m_diFP_Isolator;
+            set => m_diFP_Isolator = value;
+        }
+        DIO_I m_diIsolator_VPre;
+        public DIO_I p_diIsolator_VPre
+        {
+            get => m_diIsolator_VPre;
+            set => m_diIsolator_VPre = value;
+        }
+        DIO_I m_diFactory_Air_PadPre;
+        public DIO_I p_diFactory_Air_PadPre
+        {
+            get => m_diFactory_Air_PadPre;
+            set => m_diFactory_Air_PadPre = value;
+        }
+        DIO_I m_diAir_TankPre;
+        public DIO_I p_diAir_TankPre
+        {
+            get => m_diAir_TankPre;
+            set => m_diAir_TankPre = value;
+        }
+        DIO_I m_diX_BottomPre;
+        public DIO_I p_diX_BottomPre
+        {
+            get => m_diX_BottomPre;
+            set => m_diX_BottomPre = value;
+        }
+        DIO_I m_diX_SideMasterPre;
+        public DIO_I p_diX_SideMasterPre
+        {
+            get => m_diX_SideMasterPre;
+            set => m_diX_SideMasterPre = value;
+        }
+        DIO_I m_diX_SideSlavePre;
+        public DIO_I p_diX_SideSlavePre
+        {
+            get => m_diX_SideSlavePre;
+            set => m_diX_SideSlavePre = value;
+        }
+        DIO_I m_diY_BottomPre;
+        public DIO_I p_diY_BottomPre
+        {
+            get => m_diY_BottomPre;
+            set => m_diY_BottomPre = value;
+        }
+        DIO_I m_diY_SideMasterPre;
+        public DIO_I p_diY_SideMasterPre
+        {
+            get => m_diY_SideMasterPre;
+            set => m_diY_SideMasterPre = value;
+        }
+        DIO_I m_diY_SideSlavePre;
+        public DIO_I p_diY_SideSlavePre
+        {
+            get => m_diY_SideSlavePre;
+            set => m_diY_SideSlavePre = value;
+        }
         DIO_I m_diVisionFFU_Door;
         DIO_I m_diVisionTop_Door;
         DIO_I m_diVisionBtm_Door;
@@ -322,8 +372,8 @@ namespace Root_VEGA_D.Module
         void RunTreeFDC(Tree tree)
         {
             m_bDoorlock_Use = tree.Set(m_bDoorlock_Use, m_bDoorlock_Use, "Doorlock Use", "Doorlock Use");
-            m_mmLimitCDA1 = tree.Set(m_mmLimitCDA1, m_mmLimitCDA1, "Limit", "FDC CDA1 Lower & Upper Limit");
-            m_mmLimitCDA2 = tree.Set(m_mmLimitCDA2, m_mmLimitCDA2, "Limit", "FDC CDA2 Lower & Upper Limit");
+            m_mmLimitCDA1 = tree.Set(m_mmLimitCDA1, m_mmLimitCDA1, "CDA 1 Limit", "FDC CDA1 Lower & Upper Limit");
+            m_mmLimitCDA2 = tree.Set(m_mmLimitCDA2, m_mmLimitCDA2, "CDA 2 Limit", "FDC CDA2 Lower & Upper Limit");
         }
 
         void RunTreeInterLock(Tree tree)

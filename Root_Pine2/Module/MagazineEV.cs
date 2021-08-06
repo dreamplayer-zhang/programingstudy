@@ -227,7 +227,7 @@ namespace Root_Pine2.Module
                     if ((m_axis.p_posCommand > fPos) && (fDown > fPos)) return "Can't Move Down cause Down Magazine";
                 }
                 m_axis.StartMove(ePos, fOffset);
-                return "OK";
+                return m_axis.WaitReady();
             }
 
             public string MoveToConveyor(InfoStrip.eMagazinePos eMagazinePos, double mmUp, bool bWait = true)
@@ -299,6 +299,13 @@ namespace Root_Pine2.Module
                     if (!bAlign && IsAlignOff()) return "OK";
                 }
                 return "Align Timeout";
+            }
+
+            public string RunPreAlign(bool bAlign)
+            {
+                m_doAlign.Write("Backward", !bAlign);
+                m_doAlign.Write("Forward", bAlign);
+                return "OK";
             }
 
             bool IsAlignOn()
@@ -623,6 +630,7 @@ namespace Root_Pine2.Module
                     if (m_aMagazine[pos] == null)
                     {
                         if (Run(RunLoad(pos))) return p_sInfo;
+                        //if (Run(m_elevator.MoveElevator(Elevator.ePos.TransferUp))) return p_sInfo;
                         m_aMagazine[pos] = new Magazine(this, pos, m_pine2.p_iBundle++);
                         return "OK";
                     }
@@ -643,7 +651,8 @@ namespace Root_Pine2.Module
             return "OK";
         }
 
-        double m_secProductDelay = 0.2; 
+        double m_secProductDelay = 0.2;
+        int m_msecPreAlignTime = 500;
         string RunLoad(InfoStrip.eMagazinePos eMagazinePos)
         {
             try
@@ -656,9 +665,18 @@ namespace Root_Pine2.Module
                 if (Run(m_elevator.WaitProduct(eMagazinePos))) return p_sInfo;
                 Thread.Sleep((int)m_secProductDelay);
                 m_conveyor.RunMoveStop();
+
+                // Pre Align
+                if (Run(m_elevator.RunPreAlign(true))) return p_sInfo;
+                Thread.Sleep(m_msecPreAlignTime);
+                if (Run(m_elevator.RunPreAlign(false))) return p_sInfo;
+                m_conveyor.RunMove(Conveyor.eMove.Forward);
+                Thread.Sleep(m_msecPreAlignTime);
+                m_conveyor.RunMoveStop();
+
                 if (Run(m_elevator.MoveToConveyor(eMagazinePos, (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 7 : 0))) return p_sInfo;
                 if (Run(m_elevator.RunAlign(true))) return p_sInfo;
-                if (Run(m_elevator.MoveElevator(eMagazinePos))) return p_sInfo; 
+                //if (Run(m_elevator.MoveElevator(eMagazinePos))) return p_sInfo; 
                 m_magazineSet.MagazineLoaded(p_eMagazine, eMagazinePos); 
             }
             finally

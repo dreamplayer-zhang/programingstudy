@@ -246,22 +246,41 @@ namespace Root_WIND2.UI_User
 			{
 				String text = "";
 
-				int index = (defect.m_nDefectCode - 10000) / 100;
-				if (index >= 0 && index < 3)
+				int index = (defect.m_nDefectCode % 10000) / 100;
+				if (index == 0)
 				{
 					rectListTop.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
 					textListTop.Add(text);
 				}
-				if (index >= 3 && index < 6)
-				{
-					rectListBtm.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
-					textListBtm.Add(text);
-				}
-				if (index >= 6 && index < 10)
+				if (index == 1)
 				{
 					rectListSide.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
 					textListSide.Add(text);
 				}
+				if (index == 2)
+				{
+					rectListBtm.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+					textListBtm.Add(text);
+				}
+
+				//String text = "";
+
+				//int index = (defect.m_nDefectCode - 10000) / 100;
+				//if (index >= 0 && index < 3)
+				//{
+				//	rectListTop.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+				//	textListTop.Add(text);
+				//}
+				//if (index >= 3 && index < 6)
+				//{
+				//	rectListBtm.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+				//	textListBtm.Add(text);
+				//}
+				//if (index >= 6 && index < 10)
+				//{
+				//	rectListSide.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+				//	textListSide.Add(text);
+				//}
 			}
 
 			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
