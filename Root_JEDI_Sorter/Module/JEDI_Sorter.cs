@@ -300,7 +300,7 @@ namespace Root_JEDI_Sorter.Module
         public override void RunTree(Tree tree)
         {
             m_buzzer.RunTree(tree.GetTree("Buzzer"));
-            m_tray.RunTree(tree);
+            Tray.RunTree(tree);
         }
         #endregion
 
@@ -355,7 +355,6 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
-        public Tray m_tray = new Tray(); 
         JEDI_Sorter_Handler m_handler;
         public JEDI_Sorter(string id, IEngineer engineer)
         {
