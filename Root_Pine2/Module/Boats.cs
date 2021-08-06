@@ -48,7 +48,7 @@ namespace Root_Pine2.Module
         public string RunMoveSnapStart(eWorks eWorks, Vision2D.Recipe.Snap snapData, int xLine, bool bWait = true)
         {
             double xp = m_xCamScale * snapData.m_dpAxis.X + ((m_aCamOffset != null) ? 10 * m_aCamOffset[xLine].X : 0);
-            double yp = (m_pine2.m_thicknessDefault - m_pine2.p_thickness) * 10; 
+            double yp = (m_pine2.m_thicknessDefault - m_pine2.p_thickness) * 10;
             m_axisCam.StartMove(eWorks, new RPoint(xp, yp));
             int yOffset = (m_aCamOffset != null) ? (int)(10 * m_aCamOffset[xLine].Y) : 0;
             if (Run(m_aBoat[eWorks].RunMoveSnapStart(snapData, yOffset, bWait))) return p_sInfo;
@@ -138,6 +138,15 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region SnapLog
+        public Dictionary<eWorks, Log> m_aSnapLog = new Dictionary<eWorks, Log>();
+        void InitSnapLog()
+        {
+            m_aSnapLog.Add(eWorks.A, LogView.GetLog("Snap " + p_id + ".A"));
+            m_aSnapLog.Add(eWorks.B, LogView.GetLog("Snap " + p_id + ".B"));
+        }
+        #endregion
+
         #region State Home & Reset
         public override string StateHome()
         {
@@ -215,25 +224,26 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Snap
-        public string StartSnap(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan = true)
+        public string StartSnap(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan = true, bool bNeedInsp = true)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
             run.m_eWorks = eWorks;
             run.m_bReadRecipe = bReadRecipe; 
             run.m_bBiDirectionalScan = bBiDirectionalScan;
+            run.m_bNeedInsp = bNeedInsp;
             return StartRun(run);
         }
 
-        public string RunSnap(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan)
+        public string RunSnap(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan, bool bNeedInsp)
         {
             switch (m_vision.p_eVision)
             {
-                case eVision.Top3D: return RunSnap3D(eWorks, bReadRecipe, bBiDirectionalScan);
-                default: return RunSnap2D(eWorks, bReadRecipe, bBiDirectionalScan);
+                case eVision.Top3D: return RunSnap3D(eWorks, bReadRecipe, bBiDirectionalScan, bNeedInsp);
+                default: return RunSnap2D(eWorks, bReadRecipe, bBiDirectionalScan, bNeedInsp);
             }
         }
 
-        public string RunSnap3D(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan)
+        public string RunSnap3D(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan, bool bNeedInsp)
         {
             Vision3D vision = (Vision3D)m_vision;
             StopWatch sw = new StopWatch();
@@ -253,11 +263,10 @@ namespace Root_Pine2.Module
                     m_aBoat[eWorks]._sRecipe = "";
                     m_aBoat[eWorks].p_sRecipe = sRecipe;
                 }
-                vision.SendSnapInfo(m_aBoat[eWorks].GetSnapInfo());
+                vision.SendSnapInfo(m_aBoat[eWorks].GetSnapInfo(bNeedInsp));
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(true);
                 int xLine = m_aBoat[eWorks].m_recipe.m_aSnap.Count;
-                if (m_aBoat[eWorks].m_recipe.p_eSnapMode == Vision3D.Recipe.eSnapMode.ALL) xLine /= 2;
                 switch (xLine)
                 {
                     case 2: m_aCamOffset = m_aBoat[eWorks].m_aCam2Offset; break;
@@ -267,9 +276,10 @@ namespace Root_Pine2.Module
                 int iSnap = 0;
                 for (int i = 0; i < m_aBoat[eWorks].m_recipe.m_aSnap.Count; i++)
                 {
+                    m_aSnapLog[eWorks].Info("Snap Start Idx : " + i.ToString());
                     Vision3D.Recipe.Snap snap = m_aBoat[eWorks].m_recipe.m_aSnap[i];
                     if (bBiDirectionalScan == true) snap.m_eDirection = Vision3D.Recipe.Snap.eDirection.Forward;
-                    vision.RunLight(snap.m_lightPower);
+                    //vision.RunLight(snap.m_lightPower);
                     m_bSnapReady = false;
                     vision.StartSnap(snap, eWorks, iSnap);
                     if (Run(RunMoveSnapStart(eWorks, snap, i % xLine))) return p_sInfo;
@@ -282,14 +292,14 @@ namespace Root_Pine2.Module
                     if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (i < m_aBoat[eWorks].m_recipe.m_aSnap.Count - 1)
                     {
-                        SendChangeUserSet();
+                        //SendChangeUserSet();
                         if (Run(RunMoveSnapStart(eWorks, m_aBoat[eWorks].m_recipe.m_aSnap[i + 1], i % xLine))) return p_sInfo;
                     }
                     if (vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++;
-
+                    m_aSnapLog[eWorks].Info("Snap End Idx : " + i.ToString());
                 }
-                vision.RunLightOff();
+                //vision.RunLightOff();
                 m_bgwDone.RunWorkerAsync(eWorks);
             }
             catch (Exception e) { p_sInfo = e.Message; }
@@ -303,7 +313,7 @@ namespace Root_Pine2.Module
 
         RPoint[] m_aCamOffset = null; 
         bool m_bSnapReady = false; 
-        public string RunSnap2D(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan)
+        public string RunSnap2D(eWorks eWorks, bool bReadRecipe, bool bBiDirectionalScan, bool bNeedInsp)
         {
             Vision2D vision = (Vision2D)m_vision; 
             StopWatch sw = new StopWatch();
@@ -323,7 +333,7 @@ namespace Root_Pine2.Module
                     m_aBoat[eWorks]._sRecipe = "";
                     m_aBoat[eWorks].p_sRecipe = sRecipe; 
                 }
-                vision.SendSnapInfo(m_aBoat[eWorks].GetSnapInfo());
+                vision.SendSnapInfo(m_aBoat[eWorks].GetSnapInfo(bNeedInsp));
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(true);
                 int xLine = m_aBoat[eWorks].m_recipe.m_aSnap.Count;
@@ -343,6 +353,7 @@ namespace Root_Pine2.Module
 
                 for (int i = 0; i < m_aBoat[eWorks].m_recipe.m_aSnap.Count; i++)
                 {
+                    m_aSnapLog[eWorks].Info("Snap Start Idx : " + i.ToString());
                     Vision2D.Recipe.Snap snap = m_aBoat[eWorks].m_recipe.m_aSnap[i];
                     vision.RunLight(snap.m_lightPower);
                     m_bSnapReady = false;
@@ -362,7 +373,7 @@ namespace Root_Pine2.Module
                     }
                     if (vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++;
-
+                    m_aSnapLog[eWorks].Info("Snap End Idx : " + i.ToString());
                 }
                 vision.RunLightOff();
                 m_bgwDone.RunWorkerAsync(eWorks);
@@ -421,7 +432,8 @@ namespace Root_Pine2.Module
                 m_aBoat[eWorks].p_sRecipe = ""; 
                 m_aBoat[eWorks].p_sRecipe = sRecipe;
                 bool bBiDirectionalScan = (asRead[4] == "True") ? true : false;
-                StartSnap(eWorks, true, bBiDirectionalScan);
+                bool bNeedInsp = (asRead[5] == "True") ? true : false;
+                StartSnap(eWorks, true, bBiDirectionalScan, bNeedInsp);
                 m_tcpRequest.Send(sRead);
             }
             if (asRead[1] == eProtocol.SnapReady.ToString())
@@ -479,6 +491,7 @@ namespace Root_Pine2.Module
             p_id = "Boats " + vision.p_eVision.ToString();
             m_pine2 = pine2;
             InitBoat();
+            InitSnapLog();
             InitBase(p_id, engineer);
         }
 
@@ -516,6 +529,7 @@ namespace Root_Pine2.Module
 
             public bool m_bBiDirectionalScan = true; 
             public bool m_bReadRecipe = true;
+            public bool m_bNeedInsp = true;
             public eWorks m_eWorks; 
             public override ModuleRunBase Clone()
             {
@@ -523,6 +537,7 @@ namespace Root_Pine2.Module
                 run.m_eWorks = m_eWorks;
                 run.m_bReadRecipe = m_bReadRecipe; 
                 run.m_bBiDirectionalScan = m_bBiDirectionalScan;
+                run.m_bNeedInsp = m_bNeedInsp;
                 return run;
             }
 
@@ -533,7 +548,7 @@ namespace Root_Pine2.Module
 
             public override string Run()
             {
-                return m_module.RunSnap(m_eWorks, m_bReadRecipe, m_bBiDirectionalScan); 
+                return m_module.RunSnap(m_eWorks, m_bReadRecipe, m_bBiDirectionalScan, m_bNeedInsp); 
             }
         }
 

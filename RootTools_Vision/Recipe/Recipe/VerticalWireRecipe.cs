@@ -1,7 +1,6 @@
 ﻿using RootTools;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,53 +10,31 @@ using System.Xml.Serialization;
 
 namespace RootTools_Vision
 {
-    public struct VerticalWire_InspROI_Info
-    {
-        public List<TRect> _wirePoint;
-        public int _refCoordNum;
-
-        public VerticalWire_InspROI_Info(List<TRect> wirePoint, int refCoordNum)
-        {
-            this._wirePoint = wirePoint;
-            this._refCoordNum = refCoordNum;
-        }
-    }
-
-    public struct VerticalWire_RefCoord_Info
-    {
-        public int x;
-        public int y;
-        public int w;
-        public int h;
-
-        public VerticalWire_RefCoord_Info(int x, int y, int w, int h)
-        {
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
-        }
-    }
-
     public class VerticalWireRecipe : RecipeItemBase
     {
 
-        //#region [Parameter]
-        //private List<byte[]> _rawData = new List<byte[]>();
-        //private List<VerticalWire_InspROI_Info> _inspROI = new List<VerticalWire_InspROI_Info>();
-        //private List<VerticalWire_RefCoord_Info> _refCoord = new List<VerticalWire_RefCoord_Info>();
+        #region [Parameter]
+        private List<byte[]> _rawData = new List<byte[]>();
+        
+        private List<Rect> _refCoord = new List<Rect>();
+        private List<int> _refCoordArrange = new List<int>();
 
-        //#endregion
+        private List<List<Point>> _inspPoint = new List<List<Point>>();
+        private List<int> _inspROISelectedCoord = new List<int>();
+        private List<int> _inspROIArrange = new List<int>();
+        #endregion
 
-        //#region [Getter Setter]
-        //[XmlIgnore]
-        //public List<byte[]> RawData { get => _rawData; set => _rawData = value; }
+        #region [Getter Setter]
+        [XmlIgnore]
+        public List<byte[]> RawData { get => _rawData; set => _rawData = value; }
 
-        //public List<VerticalWire_InspROI_Info> InspROI { get => _inspROI; set => _inspROI = value; }
+        public List<List<Point>> InspPoint { get => _inspPoint; set => _inspPoint = value; }
+        public List<int> InspROISelectedCoord { get => _inspROISelectedCoord; set => _inspROISelectedCoord = value; }
+        public List<int> InspROIArrageMethod { get => _inspROIArrange; set => _inspROIArrange = value; }
 
-        //public List<VerticalWire_RefCoord_Info> RefCoord { get => _refCoord; set => _refCoord = value; }
-
-        //#endregion
+        public List<Rect> RefCoord { get => _refCoord; set => _refCoord = value; }
+        public List<int> RefCoordArrageMethod { get => _refCoordArrange; set => _refCoordArrange = value; }
+        #endregion
 
         public VerticalWireRecipe()
         {
@@ -66,37 +43,48 @@ namespace RootTools_Vision
 
         public override void Clear()
         {
-            //RawData.Clear();
-            //InspROI.Clear();
-            //RefCoord.Clear();
+            RawData.Clear();
 
+            InspPoint.Clear();
+            InspROISelectedCoord.Clear();
+            InspROIArrageMethod.Clear();
+
+            RefCoord.Clear();
+            RefCoordArrageMethod.Clear();
         }
 
         public override bool Save(string recipePath)
         {
+            for(int i = 0; i < RawData.Count; i++)
+            {
+                string path = recipePath + "VerticalWire_Feature_" + i.ToString() + ".bmp";
+                Tools.SaveRawdataToBitmap(path, RawData[i], (int)RefCoord[i].Width, (int)RefCoord[i].Height, 3);
+            }
+
             return true;
         }
 
         public override bool Read(string recipePath)
         {
-            //for(int i = 0; i < RefCoord.Count; i++)
-            //{
-            //    string rawDataPath = recipePath + "VerticalWire_RefFeature_" + i.ToString() +".bmp";
-            //    if (File.Exists(rawDataPath))
-            //    {
-            //        Bitmap bmp = new Bitmap(rawDataPath);
+            int idx = 0;
+            foreach(Rect rt in this.RefCoord)
+            {
+                string rawDataPath = recipePath + "VerticalWire_Feature_" + idx.ToString() + ".bmp";
+                if (File.Exists(rawDataPath))
+                {
+                    System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(rawDataPath);
 
-            //        if(bmp.Width != this.RefCoord[i].w || bmp.Height != this.RefCoord[i].h)
-            //            return false;
+                    if (bmp.Width != rt.Width || bmp.Height != rt.Height)
+                        return false;
 
-            //        byte[] rawColorData = new byte[this.RefCoord[i].w * this.RefCoord[i].h * 3];
+                    byte[] rawColorData = new byte[(int)rt.Width * (int)rt.Height * 3];
 
-            //        Tools.LoadBitmapToRawdata(rawDataPath, rawColorData, this.RefCoord[i].w, this.RefCoord[i].h, 3);
+                    Tools.LoadBitmapToRawdata(rawDataPath, rawColorData, (int)rt.Width, (int)rt.Height, 3);
 
-            //        RawData.Add(rawColorData);
-            //    }
-            //}
-            
+                    RawData.Add(rawColorData);
+                }
+                idx++;
+            }    
 
             return true;
         }

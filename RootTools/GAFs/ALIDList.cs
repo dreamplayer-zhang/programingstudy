@@ -13,6 +13,7 @@ namespace RootTools.GAFs
         #region List ALID
         public ObservableCollection<ALID> p_aALID { get; set; }
 
+
         public void SaveFile(string sFile)
         {
             try
@@ -26,7 +27,6 @@ namespace RootTools.GAFs
             }
             catch (Exception) { }
         }
-
         public void ClearALID()
         {
             foreach (ALID alid in p_aSetALID)
@@ -35,6 +35,7 @@ namespace RootTools.GAFs
                 alid.p_bSet = false;
             }
             p_alarmBlink = false;
+            RemoveALID(); 
             p_sInfo = "OK";
         }
         #endregion
@@ -104,6 +105,7 @@ namespace RootTools.GAFs
             }
             alidPopup = new ALIDList_PopupUI();
             alidPopup.Init(this, m_engineer);
+            alidPopup.m_CallbackClear = RemoveALID;
             alidPopup.Show();
         }
         #endregion 
@@ -119,19 +121,31 @@ namespace RootTools.GAFs
             p_alarmBlink = true;
         }
 
+        private void RemoveALID()
+		{
+			for (int n = p_aSetALID.Count - 1; n >= 0; n--)
+			{
+				if (p_aSetALID[n].p_bSet == false)
+				{
+					p_aSetALID.RemoveAt(n);
+					isShow = true;
+				}
+			}
+		}
+        bool isShow = false;
         private void M_timerSetALID_Tick(object sender, EventArgs e)
         {
-            bool isShow = false;
-            for (int n = p_aSetALID.Count - 1; n >= 0; n--)
-            {
-                if (p_aSetALID[n].p_bSet == false)
-                {
-                    p_aSetALID.RemoveAt(n);
-                    isShow = true;
-                }
-            }
+			isShow = false;
+			//for (int n = p_aSetALID.Count - 1; n >= 0; n--)
+			//{
+			//    if (p_aSetALID[n].p_bSet == false)
+			//    {
+			//        p_aSetALID.RemoveAt(n);
+			//        isShow = true;
+			//    }
+			//}
 
-            foreach (ALID alid in p_aALID)
+			foreach (ALID alid in p_aALID)
             {   
                 if (alid.p_bSet && (IsExistSetALID(alid) == false))
                 {
@@ -156,10 +170,10 @@ namespace RootTools.GAFs
                 p_alarmBlink = true;
             else if(!isEQError)
                 p_alarmBlink = false;
-
-            if (isShow && p_aALID.Count != 0)
+            if ((isShow && p_aALID.Count != 0) || m_bPopUpUI)
             {
                 ShowPopup();
+                m_bPopUpUI = false; 
             }     
         }
 
@@ -203,6 +217,7 @@ namespace RootTools.GAFs
         IEngineer m_engineer; 
         List<GAF.Group> m_aGroup;
         public TreeRoot m_treeRoot;
+        public static bool m_bPopUpUI = false;
         public void Init(string id, GAF gaf)
         {
             m_id = id;

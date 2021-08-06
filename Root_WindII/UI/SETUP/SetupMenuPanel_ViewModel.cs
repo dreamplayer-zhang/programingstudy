@@ -97,6 +97,7 @@ namespace Root_WindII
         // Camera
         public readonly CameraVRS cameraVrs = new CameraVRS();
         public readonly CameraAlign cameraAlign = new CameraAlign();
+        public readonly CameraRADS cameraRads = new CameraRADS();
 
         // RAC
         public readonly RACProduct racProduct = new RACProduct();
@@ -171,7 +172,6 @@ namespace Root_WindII
         {
             get => cameraVrsVM;
         }
-        #endregion
 
         //#region [Back ViewModels]
         //private .BacksideSetup_ViewModel backsideSetupVM = new .BacksideSetup_ViewModel();
@@ -208,11 +208,16 @@ namespace Root_WindII
         //}
         //#endregion
 
-        #region [Camera ViewModels]
         private CameraAlign_ViewModel cameraAlignVM = new CameraAlign_ViewModel();
         public CameraAlign_ViewModel CameraAlignVM
         {
             get => cameraAlignVM;
+        }
+
+        private CameraRADS_ViewModel cameraRadsVM = new CameraRADS_ViewModel();
+        public CameraRADS_ViewModel CameraRadsVM
+        {
+            get => cameraRadsVM;
         }
         #endregion
 
@@ -790,6 +795,18 @@ namespace Root_WindII
                 {
                     SetPage(cameraAlign);
                     cameraAlign.DataContext = CameraAlignVM;
+                });
+            }
+        }
+
+        public ICommand btnCameraRADS
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(cameraRads);
+                    cameraRads.DataContext = CameraRadsVM;
                 });
             }
         }

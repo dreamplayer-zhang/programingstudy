@@ -13,6 +13,9 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
         </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding UnloadedCommand}" />
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <UserControl.Resources>
         <Style x:Key="mask_tools_listboxItem" TargetType="ListBoxItem">
@@ -60,10 +63,10 @@
             <Grid Grid.Row="1">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonUp">
-                        <i:InvokeCommandAction Command="{Binding RefCoordItemClickedCommand}" />
+                        <i:InvokeCommandAction Command="{Binding ControlClickedCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-                <vision:VericalWire_RecipeTeacing DataContext="{Binding VericalWireVM}"/>
+                <ContentControl Content="{Binding CurrentPanel}"/>
             </Grid>
         </Grid>
     </Grid>

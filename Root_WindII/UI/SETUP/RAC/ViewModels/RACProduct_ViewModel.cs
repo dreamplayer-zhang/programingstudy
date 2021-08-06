@@ -421,55 +421,58 @@ namespace Root_WindII
                         bool isDuplicatedName = false;
                         bool isCopied = false;
 
-                        DirectoryInfo di = new DirectoryInfo(this.MapFileListViewerVM.MapFileRootPath);
-                        di.Create();
-
-                        foreach (FileInfo file in di.GetFiles())
+                        if (sFileName.Contains(".xml") == true)
                         {
-                            string fileName = file.Name.ToLower();
-                            if (fileName.Contains(sFileName.ToLower()) && file.FullName.ToLower() != sFullPath.ToLower())
-                            {
-                                while (true)
-                                {
-                                    sFileNameNoExtCopy = sFileNameNoExtCopy + "_Copy";
-                                    sFileNameCopy = sFileNameNoExtCopy + System.IO.Path.GetExtension(dlg.FileName);
+                            DirectoryInfo di = new DirectoryInfo(this.MapFileListViewerVM.MapFileRootPath);
+                            di.Create();
 
-                                    foreach (FileInfo file2 in di.GetFiles())
+                            foreach (FileInfo file in di.GetFiles())
+                            {
+                                string fileName = file.Name.ToLower();
+                                if (fileName.Contains(sFileName.ToLower()) && file.FullName.ToLower() != sFullPath.ToLower())
+                                {
+                                    while (true)
                                     {
-                                        fileName = file2.Name.ToLower();
-                                        if (fileName.Contains(sFileNameCopy.ToLower()) == false)
+                                        sFileNameNoExtCopy = sFileNameNoExtCopy + "_Copy";
+                                        sFileNameCopy = sFileNameNoExtCopy + System.IO.Path.GetExtension(dlg.FileName);
+
+                                        foreach (FileInfo file2 in di.GetFiles())
                                         {
-                                            isDuplicatedName = false;
+                                            fileName = file2.Name.ToLower();
+                                            if (fileName.Contains(sFileNameCopy.ToLower()) == false)
+                                            {
+                                                isDuplicatedName = false;
+                                            }
+                                            else
+                                            {
+                                                isDuplicatedName = true;
+                                                break;
+                                            }
                                         }
-                                        else
+                                        if (isDuplicatedName == false)
                                         {
-                                            isDuplicatedName = true;
+                                            sFullPathCopy = di.FullName + "\\" + sFileNameCopy;
+                                            System.IO.File.Copy(sFullPath, sFullPathCopy, true);
+                                            Application.Current.Dispatcher.Invoke((Action)delegate
+                                            {
+                                                this.MapFileListViewerVM.MapFileListViewerItems.Add(new MapFileListViewerItem() { MapFileName = sFileNameCopy, MapFilePath = sFullPathCopy });
+                                            });
+                                            isCopied = true;
                                             break;
                                         }
                                     }
-                                    if (isDuplicatedName == false)
-                                    {
-                                        sFullPathCopy = di.FullName + "\\" + sFileNameCopy;
-                                        System.IO.File.Copy(sFullPath, sFullPathCopy, true);
-                                        Application.Current.Dispatcher.Invoke((Action)delegate
-                                        {
-                                            this.MapFileListViewerVM.MapFileListViewerItems.Add(new MapFileListViewerItem() { MapFileName = sFileNameCopy, MapFilePath = sFullPathCopy });
-                                        });
-                                        isCopied = true;
-                                        break;
-                                    }
                                 }
                             }
-                        }
 
-                        if (isCopied == false)
-                        {
-                            sFullPathCopy = di.FullName + "\\" + sFileName;
-                            System.IO.File.Copy(sFullPath, sFullPathCopy, true);
-                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            if (isCopied == false)
                             {
-                                this.MapFileListViewerVM.MapFileListViewerItems.Add(new MapFileListViewerItem() { MapFileName = sFileName, MapFilePath = sFullPathCopy });
-                            });
+                                sFullPathCopy = di.FullName + "\\" + sFileName;
+                                System.IO.File.Copy(sFullPath, sFullPathCopy, true);
+                                Application.Current.Dispatcher.Invoke((Action)delegate
+                                {
+                                    this.MapFileListViewerVM.MapFileListViewerItems.Add(new MapFileListViewerItem() { MapFileName = sFileName, MapFilePath = sFullPathCopy });
+                                });
+                            }
                         }
                         this.CurrentFilePath = sFullPath;
                         UpdateProductInfo(this.CurrentFilePath);

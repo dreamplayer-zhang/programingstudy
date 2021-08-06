@@ -290,12 +290,12 @@ namespace Root_Pine2.Module
         }
         public dynamic m_recipe;
 
-        public SnapInfo GetSnapInfo()
+        public SnapInfo GetSnapInfo(bool bNeedInsp)
         {
             if (p_infoStrip == null)
-                return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, "", m_recipe.p_lSnap, true);
+                return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, "", m_recipe.p_lSnap, bNeedInsp);
 
-            return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, p_infoStrip.p_id, m_recipe.p_lSnap, true);
+            return new SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, p_infoStrip.p_id, m_recipe.p_lSnap, bNeedInsp);
         }
         #endregion
 

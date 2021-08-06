@@ -34,6 +34,18 @@
                 </StackPanel>
                 <Button x:Name="buttonRun" Content="{Binding p_sRun}" Height="22" Margin="2,12,2,2" Click="ButtonRun_Click"/>
                 <Button x:Name="buttonHome" Content="Home" Height="22" IsEnabled="{Binding p_bEnableHome}" Margin="2,12,2,2"  Click="ButtonHome_Click"/>
+                <TextBlock Text="Snap"></TextBlock>
+                <Grid      DataContext="{Binding p_GrabCam}"
+                           Height="20">
+                <ProgressBar Height="{PriorityBinding}"
+                             Value="{Binding p_nGrabProgress}" />
+                    <TextBlock VerticalAlignment="Center"
+                           HorizontalAlignment="Center" >
+                        <Run Text="{Binding p_nGrabProgress}"></Run>
+                        <Run Text=" / "></Run>
+                        <Run Text="{Binding p_iBlock}"></Run>
+                    </TextBlock>
+                </Grid>
             </StackPanel>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
             <Grid Grid.Column="2">

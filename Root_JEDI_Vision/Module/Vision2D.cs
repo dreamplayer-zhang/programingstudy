@@ -27,7 +27,7 @@ namespace Root_JEDI_Vision.Module
         {
             if (p_eRemote == eRemote.Server)
             {
-                //p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera");
+                p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera");
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
                 p_sInfo = m_toolBox.GetComm(ref m_rs232RGBW, this, "RGBW");
@@ -1096,6 +1096,7 @@ namespace Root_JEDI_Vision.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_bReadRecipe = tree.Set(m_bReadRecipe, m_bReadRecipe, "Read Recipe", "Read Recipe Again", bVisible); 
             }
 
             public override string Run()

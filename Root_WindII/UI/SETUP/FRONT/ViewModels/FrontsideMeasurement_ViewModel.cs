@@ -22,14 +22,18 @@ namespace Root_WindII
     {
         ObservableCollection<ParameterBase> MeasurementClass;
 
+        // Measurement
+        public readonly RootTools_Vision.VerticalWire_RecipeTeaching verticalWire = new RootTools_Vision.VerticalWire_RecipeTeaching();
+        public readonly RootTools_Vision.PBI_RecipeTeaching pbi = new RootTools_Vision.PBI_RecipeTeaching();
+
         private class DefineColors
         {
             public static SolidColorBrush OriginBoxColor = Brushes.Blue;
             public static SolidColorBrush RefCoordBoxColor = Brushes.Yellow;
             public static SolidColorBrush RefCoordCrossColor = Brushes.Magenta;
 
-            public static SolidColorBrush InspROIBoxColor = Brushes.Cyan;
-            public static SolidColorBrush FirstInspROIBoxColor = Brushes.Red;
+            public static SolidColorBrush InspROIPointColor = Brushes.Cyan;
+            public static SolidColorBrush FirstInspROIPointColor = Brushes.Red;
         }
         /// <summary>
         /// 전체 Memory의 좌표와 ROI Memory 좌표의 Offset
@@ -44,14 +48,22 @@ namespace Root_WindII
         ToolProcess eToolProcess;
         ToolType eToolType;
         VerticalWireTeaching eSelectedTeaching;
+        PBITeaching ePBITeaching;
 
         private readonly VerticalWire_RecipeTeaching_ViewModel vericalWireVM;
         public VerticalWire_RecipeTeaching_ViewModel VericalWireVM
         {
             get => this.vericalWireVM;
         }
+
+        private readonly PBI_RecipeTeaching_ViewModel pbiVM;
+        public PBI_RecipeTeaching_ViewModel PBIVM
+        {
+            get => this.pbiVM;
+        }
+
         public FrontsideMeasurement_ViewModel()
-        { 
+        {
             if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode != ImageData.eMode.OtherPCMem)
                 return;
 
@@ -65,8 +77,12 @@ namespace Root_WindII
                 MeasurementList.Add(pb.Name);
 
             this.vericalWireVM = new VerticalWire_RecipeTeaching_ViewModel();
-            this.vericalWireVM.CollectionChanged += InspROIItem_CollectionChanged;
+            this.vericalWireVM.InspCollectionChanged += InspROIItem_CollectionChanged;
+            this.vericalWireVM.RefCollectionChanged += RefCoordItem_CollectionChanged;
             this.vericalWireVM.RecipeSave += VerticalWire_RecipeSave;
+           
+            this.pbiVM = new PBI_RecipeTeaching_ViewModel();
+            this.pbiVM.RecipeSave += PBI_RecipeSave;
 
             BufferInspROI.CollectionChanged += BufferInspROI_CollectionChanged;
 
@@ -88,115 +104,59 @@ namespace Root_WindII
 
         public void LoadRecipe()
         {
-
+            this.SelectedItem = 0;
+            VerticalWire_RecipeLoad();
+            PBI_RecipeLoad();
         }
 
+        public void ChangePage()
+        {
+            if (MeasurementList[SelectedMode] == "VerticalWire")
+            {
+                SetPage(verticalWire);
+                verticalWire.DataContext = VericalWireVM;
+            }
+            else if (MeasurementList[SelectedMode] == "PBI")
+            {
+                {
+                    SetPage(pbi);
+                    pbi.DataContext = PBIVM;
+                }
+            }
+        }
+
+        public void SetPage(UserControl page)
+        {
+            CurrentPanel = page;
+        }
 
         #region Property
-        /// <summary>
-        /// ROI List
-        /// </summary>
-        public ObservableCollection<ItemMask> p_cInspROI
+        private UserControl currentPanel;
+        public UserControl CurrentPanel
         {
             get
             {
-                return m_cInspROI;
+                return currentPanel;
             }
             set
             {
-                m_cInspROI = value;
-            }
-        }
-        private ObservableCollection<ItemMask> m_cInspROI = new ObservableCollection<ItemMask>();
-
-        /// <summary>
-        /// Enable Draw Tool
-        /// </summary>
-        public bool p_ToolEnable
-        {
-            get
-            {
-                return m_ToolEnable;
-            }
-            set
-            {
-                SetProperty(ref m_ToolEnable, value);
-            }
-        }
-        private bool m_ToolEnable = false;
-
-        /// <summary>
-        /// ROI Page Opacity
-        /// </summary>
-        public double p_PageOpacity
-        {
-            get
-            {
-                return m_PageOpacity;
-            }
-            set
-            {
-                SetProperty(ref m_PageOpacity, value);
-            }
-        }
-        private double m_PageOpacity = 1;
-        /// <summary>
-        /// ROI Page Enable
-        /// </summary>
-        public bool p_PageEnable
-        {
-            get
-            {
-                return m_PageEnable;
-            }
-            set
-            {
-                SetProperty(ref m_PageEnable, value);
-            }
-        }
-        private bool m_PageEnable = true;
-        /// <summary>
-        /// Loading Control Opacity
-        /// </summary>
-        public double p_LoadingOpacity
-        {
-            get
-            {
-                return m_LoadingOpacity;
-            }
-            set
-            {
-                SetProperty(ref m_LoadingOpacity, value);
-            }
-        }
-        private double m_LoadingOpacity = 0;
-
-        private int selectedRefCoordItem;
-        public int SelectedRefCoordItem
-        {
-            get
-            {
-                return selectedRefCoordItem;
-            }
-            set
-            {
-                SetProperty(ref selectedRefCoordItem, value);
+                SetProperty(ref currentPanel, value);
             }
         }
 
-        private int selectedROIItem;
-        public int SelectedROIItem
+        private int selectedItem;
+        public int SelectedItem
         {
             get
             {
-                return selectedROIItem;
+                return selectedItem;
             }
             set
             {
-                SetProperty(ref selectedROIItem, value);
+                SetProperty(ref selectedItem, value);
             }
         }
-        
+
         private int selectedMode = 0;
         public int SelectedMode
         {
@@ -207,6 +167,7 @@ namespace Root_WindII
             set
             {
                 SetProperty(ref selectedMode, value);
+                ChangePage();
             }
         }
 
@@ -219,7 +180,6 @@ namespace Root_WindII
                 mrrangeMethod = value;
             }
         }
-        
         #endregion
 
         #region [Viewer Method]
@@ -302,14 +262,7 @@ namespace Root_WindII
 
             History.Push(Work);
         }
-        void InspROIItem_CollectionChanged()
-        {
-            BufferInspROI.Clear();
 
-            VerticalWire_ROIItem roiItem = (vericalWireVM.ROIListItem[this.SelectedROIItem]) as VerticalWire_ROIItem;
-            VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
-            DrawInspROIElement(roiItemItem_ViewModel.WireRectList);
-        }
         #endregion
 
         #region Override
@@ -543,6 +496,8 @@ namespace Root_WindII
 
             if (MeasurementList[SelectedMode] == "VerticalWire")
                 DrawDoneRect_VerticalWire(currentMemPt, currentCanvasPt);
+            else if (MeasurementList[SelectedMode] == "PBI")
+                DrawDoneRect_PBI(currentMemPt, currentCanvasPt);
 
         }
         #endregion
@@ -604,7 +559,7 @@ namespace Root_WindII
             Canvas.SetRight(rect.CanvasRect, canvasRB.X);
             Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
         }
-  
+         
         private void RedrawOriginBox()
         {
 
@@ -695,8 +650,19 @@ namespace Root_WindII
                     OriginOffset.Y = originRecipe.OriginY - originRecipe.OriginHeight;
 
                     this.DisplayBox();
-
+                    ChangePage();
                     LoadRecipe();
+                });
+            }
+        }
+        public ICommand UnloadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    VerticalWire_RecipeSave();
+                    PBI_RecipeSave();
                 });
             }
         }
@@ -722,6 +688,20 @@ namespace Root_WindII
             }
         }
 
+        public ICommand ControlClickedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                if (MeasurementList[SelectedMode] == "VerticalWire")
+                {
+                    VerticalWire_ControlClicked();
+                }
+                else if (MeasurementList[SelectedMode] == "PBI")
+                {
+                    PBI_ControlClicked();
+                }
+            });
+        }
         #endregion
 
         #region Enum
@@ -757,17 +737,15 @@ namespace Root_WindII
         }
         #endregion
 
+        // Measurement Teaching Method
         #region[Vertical Wire Teaching]
-
-        #region [Draw Teaching UI Element]
-
         private void DrawDoneRect_VerticalWire(CPoint currentMemPt, CPoint currentCanvasPt)
         {
             TRect rect = CurrentShape as TRect;
 
             if (eSelectedTeaching == VerticalWireTeaching.RefCoord)
             {
-                VerticalWire_RefCoordItem refCoordItem = (vericalWireVM.RefCoordListItem[this.SelectedRefCoordItem]) as VerticalWire_RefCoordItem;
+                VerticalWire_RefCoordItem refCoordItem = (vericalWireVM.RefCoordListItem[this.SelectedItem]) as VerticalWire_RefCoordItem;
                 VerticalWire_RefCoordItem_ViewModel refCoordItem_ViewModel = refCoordItem.DataContext as VerticalWire_RefCoordItem_ViewModel;
 
                 refCoordItem_ViewModel.RefX = rect.MemoryRect.Left;
@@ -798,13 +776,13 @@ namespace Root_WindII
 
             else if (eSelectedTeaching == VerticalWireTeaching.InspROI)
             {
-                VerticalWire_ROIItem roiItem = (vericalWireVM.ROIListItem[this.SelectedROIItem]) as VerticalWire_ROIItem;
-                VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+                VerticalWire_ROIItem roiItem = (vericalWireVM.ROIListItem[this.SelectedItem]) as VerticalWire_ROIItem;
+                VerticalWire_ROIItem_ViewModel roiItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
 
                 int roiW = rect.MemoryRect.Right - rect.MemoryRect.Left;
                 int roiH = rect.MemoryRect.Bottom - rect.MemoryRect.Top;
 
-                IntPtr imgPtr = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr(roiItemItem_ViewModel.SelectedChannel);
+                IntPtr imgPtr = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr(roiItem_ViewModel.SelectedChannel);
                 long stride = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").p_Stride;
 
                 byte[] roiBuffer = new byte[roiW * roiH];
@@ -821,43 +799,39 @@ namespace Root_WindII
                         }
                     }
 
-                    CLR_IP.Cpp_Threshold(roiBuffer, roiBuffer, roiW, roiH, true, roiItemItem_ViewModel.Threshold);
+                    CLR_IP.Cpp_Threshold(roiBuffer, roiBuffer, roiW, roiH, true, roiItem_ViewModel.Threshold);
                     var detectList = CLR_IP.Cpp_Labeling(roiBuffer, roiBuffer, roiW, roiH);
 
-                    roiItemItem_ViewModel.WireRectList.Clear();
+                    roiItem_ViewModel.WirePointList.Clear();
 
                     foreach (Cpp_LabelParam list in detectList)
                     {
-                        //if ((list.area > roiItemItem_ViewModel.WireSize - 10) && (list.area < roiItemItem_ViewModel.WireSize + 10))
-                        if(list.area > 5)
-                        { 
-                            TRect tmpRect = new TRect();
-                            tmpRect.MemoryRect.Left = list.boundLeft + rect.MemoryRect.Left;
-                            tmpRect.MemoryRect.Right = list.boundRight + rect.MemoryRect.Left;
-                            tmpRect.MemoryRect.Top = list.boundTop + rect.MemoryRect.Top;
-                            tmpRect.MemoryRect.Bottom = list.boundBottom + rect.MemoryRect.Top;
-                            tmpRect.MemoryRect.Width = (int)list.width;
-                            tmpRect.MemoryRect.Height = (int)list.height;
+                        //if ((list.area > roiItem_ViewModel.WireSize - 10) && (list.area < roiItem_ViewModel.WireSize + 10))
+                        if (list.area > 5)
+                        {
+                            Point tmpPoint = new Point();
+                            tmpPoint.X = rect.MemoryRect.Left + list.centerX;
+                            tmpPoint.Y = rect.MemoryRect.Top + list.centerY;
 
-                            roiItemItem_ViewModel.WireRectList.Add(tmpRect);
+                            roiItem_ViewModel.WirePointList.Add(tmpPoint);
                         }
                     }
 
-                    if (roiItemItem_ViewModel.WireRectList.Count > 50)
+                    if (roiItem_ViewModel.WirePointList.Count > 50)
                     {
                         MessageBox.Show("비정상적으로 많은 Vertical Wire가  검출 되었습니다.", "Error");
                     }
                     else
                     {
-                        roiItemItem_ViewModel.ArrangeDetectPoint();
-                        DrawInspROIElement(roiItemItem_ViewModel.WireRectList);
+                        roiItem_ViewModel.ArrangeDetectPoint();
+                        DrawInspROIElement(roiItem_ViewModel.WirePointList);
                     }
                 }
             }
         }
         void DrawRefCoordElement()
         {
-            VerticalWire_RefCoordItem refCoordItem = (vericalWireVM.RefCoordListItem[this.SelectedRefCoordItem]) as VerticalWire_RefCoordItem;
+            VerticalWire_RefCoordItem refCoordItem = (vericalWireVM.RefCoordListItem[this.SelectedItem]) as VerticalWire_RefCoordItem;
             VerticalWire_RefCoordItem_ViewModel refCoordItem_ViewModel = refCoordItem.DataContext as VerticalWire_RefCoordItem_ViewModel;
 
             TShape rectRefCoordBox = new TRect(DefineColors.RefCoordBoxColor, 2, 0.5);
@@ -891,90 +865,192 @@ namespace Root_WindII
             }
         }
 
-        void DrawInspROIElement(List<TRect> detectList)
+        void DrawInspROIElement(List<Point> detectList)
         {
             bool isFirst = true;
-            foreach (TRect rt in detectList)
+            foreach (Point pt in detectList)
             {
-                if (rt.MemoryRect.Width < 5 || rt.MemoryRect.Height < 5)
-                    continue;
-
-                TShape rectROIBox;
+                TShape rectRefCoordCross1, rectRefCoordCross2;
                 if (isFirst)
                 {
-                    rectROIBox = new TRect(DefineColors.FirstInspROIBoxColor, 2, 0.5);
+                    rectRefCoordCross1 = new TLine(DefineColors.FirstInspROIPointColor, 3, 1);
+                    rectRefCoordCross2 = new TLine(DefineColors.FirstInspROIPointColor, 3, 1);
                     isFirst = false;
                 }
                 else
-                    rectROIBox = new TRect(DefineColors.InspROIBoxColor, 2, 0.5);
+                {
+                    rectRefCoordCross1 = new TLine(DefineColors.InspROIPointColor, 3, 1);
+                    rectRefCoordCross2 = new TLine(DefineColors.InspROIPointColor, 3, 1);
+                }
 
-                TRect rect = rectROIBox as TRect;
-                rect.MemoryRect.Left = rt.MemoryRect.Left;
-                rect.MemoryRect.Top = rt.MemoryRect.Top;
-                rect.MemoryRect.Right = rt.MemoryRect.Right;
-                rect.MemoryRect.Bottom = rt.MemoryRect.Bottom;
+                TLine line1 = rectRefCoordCross1 as TLine;
+                line1.MemoryStartPoint = new CPoint((int)pt.X - 10, (int)pt.Y - 10);
+                line1.MemoryEndPoint = new CPoint((int)pt.X + 10, (int)pt.Y + 10);
 
-                BufferInspROI.Add(rectROIBox);
-                RedrawRect(rect);
+                BufferInspROI.Add(rectRefCoordCross1);
+                RedrawLine(line1);
+
+                TLine line2 = rectRefCoordCross2 as TLine;
+                line2.MemoryStartPoint = new CPoint((int)pt.X + 10, (int)pt.Y - 10);
+                line2.MemoryEndPoint = new CPoint((int)pt.X - 10, (int)pt.Y + 10);
+
+                BufferInspROI.Add(rectRefCoordCross2);
+                RedrawLine(line2);
+            }
+        }
+        void InspROIItem_CollectionChanged()
+        {
+            BufferInspROI.Clear();
+
+            VerticalWire_ROIItem roiItem = (vericalWireVM.ROIListItem[this.SelectedItem]) as VerticalWire_ROIItem;
+            VerticalWire_ROIItem_ViewModel roiItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+            DrawInspROIElement(roiItem_ViewModel.WirePointList);
+        }
+        void RefCoordItem_CollectionChanged()
+        {
+            BufferInspROI.Clear();
+            DrawRefCoordElement();
+        }
+        void VerticalWire_RecipeSave()
+        {
+            VerticalWireRecipe recipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<VerticalWireRecipe>();
+            recipe.Clear(); 
+
+            IntPtr imgPtrR = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr(0);
+            IntPtr imgPtrG = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr(1);
+            IntPtr imgPtrB = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr(2);
+            long stride = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").p_Stride;
+
+            foreach (UIElement item in vericalWireVM.RefCoordListItem)
+            {
+                VerticalWire_RefCoordItem refItem = item as VerticalWire_RefCoordItem;
+                VerticalWire_RefCoordItem_ViewModel refItem_ViewModel = refItem.DataContext as VerticalWire_RefCoordItem_ViewModel;
+
+                Rect rt = new Rect();
+                rt.X = refItem_ViewModel.RefX;
+                rt.Y = refItem_ViewModel.RefY;
+                rt.Width = refItem_ViewModel.RefW;
+                rt.Height = refItem_ViewModel.RefH;
+
+                recipe.RefCoordArrageMethod.Add(refItem_ViewModel.SelectedArrageMethod);
+                recipe.RefCoord.Add(rt);
+
+                byte[] roiBuffer = new byte[(int)rt.Width * (int)rt.Height * 3];
+
+                unsafe
+                {
+                    byte* r = (byte*)imgPtrR.ToPointer();
+                    byte* g = (byte*)imgPtrG.ToPointer();
+                    byte* b = (byte*)imgPtrB.ToPointer();
+
+                    Parallel.For((int)rt.Y, ((int)rt.Y + (int)rt.Height), row =>
+                    //for(int row = (int)rt.Y; row < (int)rt.Y + rt.Height; row++)
+                    {
+                        int idx = (row - (int)rt.Y) * (int)(rt.Width * 3);
+                        for (int col = (int)rt.X; col < rt.X + rt.Width; col++)
+                        {
+                            roiBuffer[idx++] = r[(Int64)row * stride + col];
+                            roiBuffer[idx++] = g[(Int64)row * stride + col];
+                            roiBuffer[idx++] = b[(Int64)row * stride + col];
+                        }
+                    });
+
+                    recipe.RawData.Add(roiBuffer);
+                }
+            }
+
+            foreach (UIElement item in vericalWireVM.ROIListItem)
+            {
+                VerticalWire_ROIItem roiItem = item as VerticalWire_ROIItem;
+                VerticalWire_ROIItem_ViewModel roiItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+
+                recipe.InspPoint.Add(roiItem_ViewModel.WirePointList);
+                recipe.InspROISelectedCoord.Add(roiItem_ViewModel.SelectedRefCoord);
+                recipe.InspROIArrageMethod.Add(roiItem_ViewModel.SelectedArrageMethod);
             }
         }
 
-        void VerticalWire_RecipeSave()
+        void VerticalWire_RecipeLoad()
         {
-            //GlobalObjects.Instance.Get<RecipeFront>().GetItem<VerticalWireRecipe>();
-            //VerticalWireRecipe recipe = GlobalObjects.Instance.Get<VerticalWireRecipe>();
-            //recipe.Clear();
+            VerticalWireRecipe recipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<VerticalWireRecipe>();
 
-            //foreach (UIElement item in vericalWireVM.ROIListItem)
-            //{
-            //    VerticalWire_ROIItem roiItem = item as VerticalWire_ROIItem;
-            //    VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
-
-            //    recipe.InspROI.Add(new VerticalWire_InspROI_Info(roiItemItem_ViewModel.WireRectList, roiItemItem_ViewModel.SelectedRefCoord));
-            //}
-
-            //foreach (UIElement item in vericalWireVM.RefCoordListItem)
-            //{
-            //    VerticalWire_RefCoordItem refItem = item as VerticalWire_RefCoordItem;
-            //    VerticalWire_RefCoordItem_ViewModel refItem_ViewModel = refItem.DataContext as VerticalWire_RefCoordItem_ViewModel;
-
-            //    recipe.RefCoord.Add(new VerticalWire_RefCoord_Info(refItem_ViewModel.RefX, refItem_ViewModel.RefY, refItem_ViewModel.RefW, refItem_ViewModel.RefH));
-            //}
-
-        }
-        #endregion
-
-        public ICommand RefCoordItemClickedCommand
-        {
-            get => new RelayCommand(() =>
+            if (recipe.RefCoord.Count == 0)
             {
-                int selectedItem = this.VericalWireVM.SelectedItemIdx;
+                vericalWireVM.ChipNuminOrigin = 1;
+                vericalWireVM.AddRefItem();
+                vericalWireVM.AddROIItem();
+                return;
+            }
 
-                if (selectedItem < this.VericalWireVM.ROIItemOffset)
-                {
-                    this.SelectedRefCoordItem = selectedItem;
-                    eToolProcess = ToolProcess.None;
-                    eToolType = ToolType.Rect;
-                    eSelectedTeaching = VerticalWireTeaching.RefCoord;
+            vericalWireVM.RefCoordListItem.Clear();
+            vericalWireVM.ChipNuminOrigin = 0;
 
-                    BufferInspROI.Clear();
-                    DrawRefCoordElement();
-                }
-                else
-                {
-                    this.SelectedROIItem = selectedItem - this.VericalWireVM.ROIItemOffset;
-                    eToolProcess = ToolProcess.None;
-                    eToolType = ToolType.Rect;
-                    eSelectedTeaching = VerticalWireTeaching.InspROI;
+            for (int i = 0; i < recipe.RefCoord.Count; i++)
+            {
+                vericalWireVM.ChipNuminOrigin++;
+                vericalWireVM.AddRefItem();
 
-                    BufferInspROI.Clear();
+                VerticalWire_RefCoordItem refItem = vericalWireVM.RefCoordListItem[i] as VerticalWire_RefCoordItem;
+                VerticalWire_RefCoordItem_ViewModel refItem_ViewModel = refItem.DataContext as VerticalWire_RefCoordItem_ViewModel;
 
-                    VerticalWire_ROIItem roiItem = (vericalWireVM.ROIListItem[this.SelectedROIItem]) as VerticalWire_ROIItem;
-                    VerticalWire_ROIItem_ViewModel roiItemItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
-                    DrawInspROIElement(roiItemItem_ViewModel.WireRectList);
-                }
-            });
+                refItem_ViewModel.RefX = (int)recipe.RefCoord[i].X;
+                refItem_ViewModel.RefY = (int)recipe.RefCoord[i].Y;
+                refItem_ViewModel.RefW = (int)recipe.RefCoord[i].Width;
+                refItem_ViewModel.RefH = (int)recipe.RefCoord[i].Height;
+
+                refItem_ViewModel.SelectedArrageMethod = recipe.RefCoordArrageMethod[i];
+            }
+             
+            vericalWireVM.ROIListItem.Clear();
+            for (int i = 0; i < recipe.InspROISelectedCoord.Count; i++)
+            {
+                vericalWireVM.AddROIItem();
+
+                VerticalWire_ROIItem roiItem = vericalWireVM.ROIListItem[i] as VerticalWire_ROIItem;
+                VerticalWire_ROIItem_ViewModel roiItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+
+                roiItem_ViewModel.RefCoordNum = vericalWireVM.ChipNuminOrigin;
+                roiItem_ViewModel.WirePointList = recipe.InspPoint[i];
+                roiItem_ViewModel.SelectedRefCoord = recipe.InspROISelectedCoord[i];
+                roiItem_ViewModel.SelectedArrageMethod = recipe.InspROIArrageMethod[i];
+            }
+
+            this.VericalWireVM.RefItemIdx = 0;
+            this.VericalWireVM.ROIItemIdx = 0;
         }
+
+        public void VerticalWire_ControlClicked()
+        {
+            int selectedItem = this.VericalWireVM.SelectedItemIdx;
+
+            if (selectedItem < this.VericalWireVM.ROIItemOffset)
+            {
+                this.SelectedItem = selectedItem;
+                eToolProcess = ToolProcess.None;
+                eToolType = ToolType.Rect;
+                eSelectedTeaching = VerticalWireTeaching.RefCoord;
+
+                BufferInspROI.Clear();
+                if (this.SelectedItem >= 0)
+                    DrawRefCoordElement();
+            }
+            else
+            {
+                this.SelectedItem = selectedItem - this.VericalWireVM.ROIItemOffset;
+                eToolProcess = ToolProcess.None;
+                eToolType = ToolType.Rect;
+                eSelectedTeaching = VerticalWireTeaching.InspROI;
+
+                BufferInspROI.Clear();
+
+                VerticalWire_ROIItem roiItem = (vericalWireVM.ROIListItem[this.SelectedItem]) as VerticalWire_ROIItem;
+                VerticalWire_ROIItem_ViewModel roiItem_ViewModel = roiItem.DataContext as VerticalWire_ROIItem_ViewModel;
+
+                if (this.SelectedItem >= 0)
+                    DrawInspROIElement(roiItem_ViewModel.WirePointList);
+            }
+        }
+
         public enum VerticalWireTeaching
         {
             None,
@@ -983,5 +1059,138 @@ namespace Root_WindII
         }
         #endregion
 
+        #region [PBI Teaching]
+
+        private void DrawDoneRect_PBI(CPoint currentMemPt, CPoint currentCanvasPt)
+        {
+            TRect rect = CurrentShape as TRect;
+
+            if (ePBITeaching == PBITeaching.Feature)
+            {
+                PBI_FeatureItem featureItem = (PBIVM.FeatureListItem[this.SelectedItem]) as PBI_FeatureItem;
+                PBI_FeatureItem_ViewModel featureItem_ViewModel = featureItem.DataContext as PBI_FeatureItem_ViewModel;
+
+                int roiW = rect.MemoryRect.Right - rect.MemoryRect.Left;
+                int roiH = rect.MemoryRect.Bottom - rect.MemoryRect.Top;
+
+                featureItem_ViewModel.RefX = rect.MemoryRect.Left;
+                featureItem_ViewModel.RefY = rect.MemoryRect.Top;
+                featureItem_ViewModel.RefW = rect.MemoryRect.Width;
+                featureItem_ViewModel.RefH = rect.MemoryRect.Height;
+
+                DrawPBIFeatureElement();
+            }
+        }
+
+        void DrawPBIFeatureElement()
+        {
+            PBI_FeatureItem featureItem = (PBIVM.FeatureListItem[this.SelectedItem]) as PBI_FeatureItem;
+            PBI_FeatureItem_ViewModel featureItem_ViewModel = featureItem.DataContext as PBI_FeatureItem_ViewModel;
+
+            TShape rectRefCoordBox = new TRect(DefineColors.RefCoordBoxColor, 2, 0.5);
+            TRect rect = rectRefCoordBox as TRect;
+
+            rect.MemoryRect.Left = featureItem_ViewModel.RefX;
+            rect.MemoryRect.Top = featureItem_ViewModel.RefY;
+            rect.MemoryRect.Right = featureItem_ViewModel.RefX + featureItem_ViewModel.RefW;
+            rect.MemoryRect.Bottom = featureItem_ViewModel.RefY + featureItem_ViewModel.RefH;
+
+            BufferInspROI.Add(rectRefCoordBox);
+            RedrawRect(rect);         
+        }
+        public void PBI_ControlClicked()
+        {
+            eToolProcess = ToolProcess.None;
+            eToolType = ToolType.Rect;
+            ePBITeaching = PBITeaching.Feature;
+
+            this.SelectedItem = PBIVM.SelectedItemIdx;
+
+            BufferInspROI.Clear();
+            if (this.PBIVM.SelectedItemIdx >= 0)
+                DrawPBIFeatureElement();
+
+        }
+
+        public void PBI_RecipeSave()
+        {
+            PBIRecipe recipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PBIRecipe>();
+            recipe.Clear();
+
+            IntPtr imgPtrR = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr(0);
+            IntPtr imgPtrG = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr(1);
+            IntPtr imgPtrB = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr(2);
+            long stride = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").p_Stride;
+
+            foreach (UIElement item in PBIVM.FeatureListItem)
+            {
+                PBI_FeatureItem featureItem = item as PBI_FeatureItem;
+                PBI_FeatureItem_ViewModel featureItem_ViewModel = featureItem.DataContext as PBI_FeatureItem_ViewModel;
+
+                Rect rt = new Rect();
+                rt.X = featureItem_ViewModel.RefX;
+                rt.Y = featureItem_ViewModel.RefY;
+                rt.Width = featureItem_ViewModel.RefW;
+                rt.Height = featureItem_ViewModel.RefH;
+
+                recipe.FeatureInfo.Add(rt);
+
+                byte[] roiBuffer = new byte[(int)rt.Width * (int)rt.Height * 3];
+
+                unsafe
+                {
+                    byte* r = (byte*)imgPtrR.ToPointer();
+                    byte* g = (byte*)imgPtrG.ToPointer();
+                    byte* b = (byte*)imgPtrB.ToPointer();
+
+                    Parallel.For((int)rt.Y, ((int)rt.Y + (int)rt.Height), row =>
+                    {
+                        int idx = (row - (int)rt.Y) * (int)(rt.Width * 3);
+                        for (int col = (int)rt.X; col < rt.X + rt.Width; col++)
+                        {
+                            roiBuffer[idx++] = r[(Int64)row * stride + col];
+                            roiBuffer[idx++] = g[(Int64)row * stride + col];
+                            roiBuffer[idx++] = b[(Int64)row * stride + col];
+                        }
+                    });
+
+                    recipe.RawData.Add(roiBuffer);
+                }
+            }
+        }
+
+        public void PBI_RecipeLoad()
+        {
+            PBIRecipe recipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PBIRecipe>();
+
+            if (recipe.FeatureInfo.Count == 0)
+            {
+                PBIVM.AddFeatureItem();
+                return;
+            }
+
+            PBIVM.FeatureListItem.Clear();
+            vericalWireVM.ChipNuminOrigin = 0;
+
+            for (int i = 0; i < recipe.FeatureInfo.Count; i++)
+            {
+                PBIVM.AddFeatureItem();
+
+                PBI_FeatureItem featureItem = (PBIVM.FeatureListItem[i]) as PBI_FeatureItem;
+                PBI_FeatureItem_ViewModel featureItem_ViewModel = featureItem.DataContext as PBI_FeatureItem_ViewModel;
+
+                featureItem_ViewModel.RefX = (int)recipe.FeatureInfo[i].X;
+                featureItem_ViewModel.RefY = (int)recipe.FeatureInfo[i].Y;
+                featureItem_ViewModel.RefW = (int)recipe.FeatureInfo[i].Width;
+                featureItem_ViewModel.RefH = (int)recipe.FeatureInfo[i].Height;
+            }
+        }
+
+        public enum PBITeaching
+        {
+            None,
+            Feature,
+        }
+        #endregion
     }
 }
