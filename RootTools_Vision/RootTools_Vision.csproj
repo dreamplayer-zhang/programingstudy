@@ -241,6 +241,13 @@
     <Compile Include="Settings\DefectCodeManager.cs" />
     <Compile Include="Settings\IniFile.cs" />
     <Compile Include="Settings\ISettingItem.cs" />
+    <Compile Include="Settings\KlarfSetting\KlarfSetting.cs" />
+    <Compile Include="Settings\KlarfSetting\KlarfSettingDialog.xaml.cs">
+      <DependentUpon>KlarfSettingDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\KlarfSetting\KlarfSettingItem.cs" />
+    <Compile Include="Settings\KlarfSetting\KlarfSettingItem_Edgeside.cs" />
+    <Compile Include="Settings\KlarfSetting\KlarfSettingDialog_ViewModel.cs" />
     <Compile Include="Settings\SettingDialog.xaml.cs">
       <DependentUpon>SettingDialog.xaml</DependentUpon>
     </Compile>
@@ -359,6 +366,10 @@
     <Page Include="Measurement\UI_RecipeSetting\VerticalWire\VerticalWire_ROIItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Settings\KlarfSetting\KlarfSettingDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
     <Page Include="Settings\SettingDialog.xaml">
       <SubType>Designer</SubType>

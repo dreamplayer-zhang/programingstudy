@@ -105,6 +105,30 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        public ICommand btnPopUpKlarfSetting
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    var viewModel = UIManager.Instance.KlarfSettingDialogViewModel;
+                    Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+                    if (result.HasValue)
+                    {
+                        if (result.Value)
+                        {
+
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                });
+            }
+        }
+        
+
         #endregion
     }
 }
