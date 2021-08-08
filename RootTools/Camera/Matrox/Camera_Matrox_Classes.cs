@@ -50,6 +50,19 @@ namespace RootTools.Camera.Matrox
             }
         }
 
+        int _nSystemNum = 0;
+        public int p_nSystemNum
+        {
+            get
+            {
+                return _nSystemNum;
+            }
+            set
+            {
+                SetValueProperty(ref _nSystemNum, value);
+            }
+        }
+        
         public MatroxCamInfo(Log log)
         {
             m_log = log;
