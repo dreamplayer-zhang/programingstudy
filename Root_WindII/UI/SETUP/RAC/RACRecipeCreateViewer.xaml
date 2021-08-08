@@ -44,11 +44,11 @@
                     <packicon:PackIconBootstrapIcons Kind="Folder2Open" Foreground="Black" DockPanel.Dock="Left"  Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 </Button.Content>
             </Button>
-            <TextBlock Margin="4,0,0,0" Grid.Row="1" Text="Recipe Name" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" TextWrapping="WrapWithOverflow"></TextBlock>
-            <Border Grid.Row="1" Grid.ColumnSpan="4" Grid.Column="1" Background="White" Margin="4">
+            <TextBlock Margin="4,0,0,0" Grid.Row="1" Text="Step Name" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" TextWrapping="WrapWithOverflow"></TextBlock>
+            <Border Grid.Row="1" Grid.ColumnSpan="4" Grid.Column="1" Background="White" Margin="4" PreviewMouseDown="TextBlock_MouseDown" PreviewMouseMove="TextBlock_GotFocus" MouseLeave="TextBlock_MouseLeave">
                 <DockPanel>
-                    <TextBox x:Name="AddBox" BorderThickness="0" TextAlignment="Left" VerticalContentAlignment="Center" FontSize="15" Text="{Binding CreateRecipeName, UpdateSourceTrigger=PropertyChanged}" Background="Transparent"></TextBox>
-                    <TextBlock IsHitTestVisible="True" Text="Enter Recipe Name" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,0,0" Foreground="DarkGray" PreviewMouseLeftButtonDown="TextBlock_MouseDown" PreviewMouseMove="TextBlock_GotFocus" MouseLeave="TextBlock_MouseLeave">
+                    <TextBox x:Name="AddBox" BorderThickness="0" TextAlignment="Left" VerticalContentAlignment="Center" FontSize="15" Text="{Binding CreateStepName, UpdateSourceTrigger=PropertyChanged}" Background="White"></TextBox>
+                    <TextBlock IsHitTestVisible="True" Text="Enter Step Name" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,0,0" Foreground="DarkGray" PreviewMouseLeftButtonDown="TextBlock_MouseDown" PreviewMouseMove="TextBlock_GotFocus" MouseLeave="TextBlock_MouseLeave">
                         <TextBlock.Style>
                             <Style TargetType="{x:Type TextBlock}">
                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -111,12 +111,71 @@
             </Border>
         </Grid>-->
         <Grid Grid.Row="2">
-            <DataGrid Margin="4">
+            <DataGrid Margin="4" IsReadOnly="True" AutoGenerateColumns="False" CanUserSortColumns="False" SelectedIndex="{Binding SelectStepIndex}" ItemsSource="{Binding StepList}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Master"/>
-                    <DataGridTextColumn Header="Slave"/>
-                    <DataGridTextColumn Header=""/>
+                    <DataGridTextColumn Header="Step" Width="*" Binding="{Binding Step}" >
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                 </DataGrid.Columns>
+                <!--<DataGrid.Columns>
+                    <DataGridTextColumn Header="Master" Width="*" Binding="{Binding Master}" >
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Slave" Width="*" Binding="{Binding Slave}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="ROI" Width="*" Binding="{Binding ROI}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="SIDE" Width="*" Binding="{Binding Side}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>-->
             </DataGrid>
         </Grid>
         <!--<Grid Grid.Column="3">

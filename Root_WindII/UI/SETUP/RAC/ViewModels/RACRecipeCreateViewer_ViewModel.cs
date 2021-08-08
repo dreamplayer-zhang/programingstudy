@@ -38,20 +38,50 @@ namespace Root_WindII
             }
         }
 
-
-        string createRecipeName = "";
-        public string CreateRecipeName
+        string xmlFilePath = "";
+        public string XMLFilePath
         {
-            get => createRecipeName;
+            get => xmlFilePath;
             set
             {
-                SetProperty(ref createRecipeName, value);
-                Refresh();
+                SetProperty(ref xmlFilePath, value);
             }
         }
 
-        ObservableCollection<string> stepList = new ObservableCollection<string>();
-        public ObservableCollection<string> StepList
+
+        string createStepName = "";
+        public string CreateStepName
+        {
+            get => createStepName;
+            set
+            {
+                SetProperty(ref createStepName, value);
+                //Refresh();
+            }
+        }
+
+        object selectItem;
+        public object SelectItem
+        {
+            get => selectItem;
+            set
+            {
+                SetProperty(ref selectItem, value);
+            }
+        }
+
+        int selectStepIndex = -1;
+        public int SelectStepIndex
+        {
+            get => selectStepIndex;
+            set
+            {
+                SetProperty(ref selectStepIndex, value);
+            }
+        }
+
+        ObservableCollection<StepInfoList> stepList = new ObservableCollection<StepInfoList>();
+        public ObservableCollection<StepInfoList> StepList
         {
             get => stepList;
             set
@@ -102,7 +132,15 @@ namespace Root_WindII
             {
                 return new RelayCommand(() =>
                 {
-                    int t = 10;
+                    if(SelectStepIndex != -1)
+                    {
+                        StepList.RemoveAt(selectStepIndex);
+                        SelectStepIndex = -1;
+                    }
+                    //for(int i = 0; i < StepList.Count; i++)
+                    //{
+                    //    StepList[i].
+                    //}
                 });
             }
         }
@@ -113,13 +151,74 @@ namespace Root_WindII
             {
                 return new RelayCommand(() =>
                 {
-                    int t = 10;
+                    CreateRecipe();
+                });
+            }
+        }
+        
+        public ICommand CmdAdd
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (CreateStepName == "")
+                        return;
+                    StepList.Add(new StepInfoList(CreateStepName)); 
                 });
             }
         }
         #endregion
 
         #region [FUNCTION]
+
+        void CreateRecipe()
+        {
+            if (BaseRecipeName == "")
+            {
+                MessageBox.Show("Select Base Recipe","Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (XMLFilePath == "")
+            {
+                MessageBox.Show("Select XML Data", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            List<RecipeType_Mask> maskList = recipeFront.GetItem<MaskRecipe>().MaskList;
+            XMLData data = GlobalObjects.Instance.Get<XMLData>();
+
+            XMLParser.ParseMapInfo(XMLFilePath, data);
+            for (int i = 0; i < stepList.Count; i++)
+            {
+                RecipeFront recipe = new RecipeFront();
+                foreach (RecipeType_Mask mask in maskList)
+                {
+                    recipe.GetItem<MaskRecipe>().AddMask(mask);
+                }
+                recipe.GetItem<MaskRecipe>().OriginPoint = recipeFront.GetItem<MaskRecipe>().OriginPoint;
+
+                recipe.GetItem<OriginRecipe>().DiePitchX = recipeFront.GetItem<OriginRecipe>().DiePitchX;
+                recipe.GetItem<OriginRecipe>().DiePitchY = recipeFront.GetItem<OriginRecipe>().DiePitchY;
+
+                recipe.GetItem<OriginRecipe>().OriginWidth = recipeFront.GetItem<OriginRecipe>().OriginWidth;
+                recipe.GetItem<OriginRecipe>().OriginHeight = recipeFront.GetItem<OriginRecipe>().OriginHeight;
+
+                recipe.GetItem<OriginRecipe>().OriginX = recipeFront.GetItem<OriginRecipe>().OriginX;
+                recipe.GetItem<OriginRecipe>().OriginY = recipeFront.GetItem<OriginRecipe>().OriginY;
+                //recipe.GetItem<OriginRecipe>().OriginX = recipeFront.GetItem<MaskRecipe>().;
+
+                recipe.WaferMap = new RecipeType_WaferMap(data.MapSizeX, data.MapSizeY, data.GetWaferMap());
+
+                string path = RecipeRootPath + XMLFileName + "\\" + XMLFileName + "." + stepList[i].Step + "\\";
+
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+
+                recipe.Save(path + XMLFileName + "." + stepList[i].Step + ".rcp");
+            }
+
+        }
         bool OpenBaseRecipe()
         {
             OpenFileDialog dlg = new OpenFileDialog();
@@ -127,9 +226,17 @@ namespace Root_WindII
             dlg.InitialDirectory = RecipeRootPath;
             if (dlg.ShowDialog() == true)
             {
-                BaseRecipeName = Path.GetFileNameWithoutExtension(dlg.FileName);
-                recipeFront.Read(dlg.FileName);
-                recipeFront.CloneBase();
+                try
+                {
+                    BaseRecipeName = Path.GetFileNameWithoutExtension(dlg.FileName);
+                    recipeFront.Read(dlg.FileName);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+                //recipeFront.GetItem<MaskRecipe>().MaskList;
             }
             return true;
         }
@@ -147,15 +254,18 @@ namespace Root_WindII
 
             Application.Current.Dispatcher.Invoke(() =>
             {
-                foreach (FileInfo file in di.GetFiles())
+                foreach (DirectoryInfo dir in di.GetDirectories())
                 {
-                    if (!Path.GetExtension(file.Name).Contains(".rcp"))
-                        continue;
-                    string fileName = file.Name.ToLower();
-                    if (fileName.Contains(this.CreateRecipeName.ToLower()))
+                    foreach (FileInfo file in dir.GetFiles())
                     {
-                        StepList.Add("tettt");
-                        //FileInfoList.Add(new ListFileInfo(Path.GetFileNameWithoutExtension(file.Name), file.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"), file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")));
+                        if (!Path.GetExtension(file.Name).Contains(".rcp"))
+                            continue;
+                        string fileName = file.Name.ToLower();
+                        if (fileName.Contains(this.CreateStepName.ToLower()))
+                        {
+                            //StepList.Add("tettt");
+                            //FileInfoList.Add(new ListFileInfo(Path.GetFileNameWithoutExtension(file.Name), file.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"), file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")));
+                        }
                     }
                 }
             });
@@ -165,7 +275,22 @@ namespace Root_WindII
         #region StepListInfoClass
         public class StepInfoList
         {
-
+            public string Step { get; private set; }
+            //public string Master { get; private set; }
+            //public string Slave { get; private set; }
+            //public string ROI { get; private set; }
+            //public string Side { get; private set; }
+            //public StepInfoList(string master, string slave, string roi, string side)
+            //{
+            //    this.Master = master;
+            //    this.Slave = slave;
+            //    this.ROI = roi;
+            //    this.Side = side;
+            //}
+            public StepInfoList(string step)
+            {
+                this.Step = step;
+            }
         }
         #endregion
     }

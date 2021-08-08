@@ -111,9 +111,8 @@ namespace Root_WindII
                 {
                     string fileName = file.Name.ToLower();
                     if (fileName.Contains(this.SearchFileName.ToLower()))
-                    {
-                        
-                        FileInfoList.Add(new ListFileInfo(Path.GetFileNameWithoutExtension(file.Name), file.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"), file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")));
+                    { 
+                        FileInfoList.Add(new ListFileInfo(Path.GetFileNameWithoutExtension(file.Name), file.FullName, file.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"), file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")));
                     }
                 }
             });
@@ -124,11 +123,13 @@ namespace Root_WindII
         public class ListFileInfo 
         {
             public string FileName { get; private set; }
+            public string FilePath { get; private set; }
             public string CreationTime { get; private set; }
             public string LastWriteTime { get; private set; }
-            public ListFileInfo(string fileName, string creationTime, string lastWriteTime)
+            public ListFileInfo(string fileName, string filePath, string creationTime, string lastWriteTime)
             {
                 FileName = fileName;
+                FilePath = filePath;
                 CreationTime = creationTime;
                 LastWriteTime = lastWriteTime;
             }

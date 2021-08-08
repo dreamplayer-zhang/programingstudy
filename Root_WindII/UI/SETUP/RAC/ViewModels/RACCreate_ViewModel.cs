@@ -40,8 +40,9 @@ namespace Root_WindII
         {
             if (obj == null)
                 return;
-            string name = ((ListFileInfo)obj).FileName;
-            RACRecipeCreate_VM.XMLFileName = name;
+
+            RACRecipeCreate_VM.XMLFileName = ((ListFileInfo)obj).FileName;
+            RACRecipeCreate_VM.XMLFilePath = ((ListFileInfo)obj).FilePath;
             RACRecipeCreate_VM.Refresh();
         }
 

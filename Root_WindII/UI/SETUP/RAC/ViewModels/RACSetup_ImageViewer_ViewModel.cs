@@ -142,7 +142,7 @@ namespace Root_WindII
                     case SETUP_VIEWER_STATE.Normal:
                         break;
                     case SETUP_VIEWER_STATE.Center:
-                        centerState = PROCESS_CENTER_STATE.CenterLeftTop;
+                        centerState = PROCESS_CENTER_STATE.Point;
                         break;
                     case SETUP_VIEWER_STATE.Origin:
                         originState = PROCESS_ORIGIN_STATE.OriginLeftBottom;
@@ -189,17 +189,27 @@ namespace Root_WindII
                     IsPitchChecked = false;
                     IsShotKeyChecked = false;
                     isRularChecked = false;
+                    p_Cursor = Cursors.Pen;
                 }
                 else
                 {
-                    if (p_UIElement.Contains(CenterLeftTop_UI))
+                    p_Cursor = Cursors.Arrow;
+                    if (p_UIElement.Contains(VerticalLine_UI))
                     {
-                        p_UIElement.Remove(CenterLeftTop_UI);
+                        p_UIElement.Remove(VerticalLine_UI);
                     }
-                    if (p_UIElement.Contains(CenterRightBottom_UI))
+                    if (p_UIElement.Contains(horizontalLine_UI))
                     {
-                        p_UIElement.Remove(CenterRightBottom_UI);
+                        p_UIElement.Remove(horizontalLine_UI);
                     }
+                    //if (p_UIElement.Contains(CenterLeftTop_UI))
+                    //{
+                    //    p_UIElement.Remove(CenterLeftTop_UI);
+                    //}
+                    //if (p_UIElement.Contains(CenterRightBottom_UI))
+                    //{
+                    //    p_UIElement.Remove(CenterRightBottom_UI);
+                    //}
                     //else
                     //{
                     //this.originLeftBottom.X = this.originBox.Left;
@@ -783,16 +793,20 @@ namespace Root_WindII
         List<Grid> ShotList_UI = new List<Grid>();
         List<CRect> ShotList = new List<CRect>();
 
-        Grid CenterLeftTop_UI = null;
-        Grid CenterRightBottom_UI = null;
-        Grid CenterLTBox_UI = null;
+        //Grid CenterLeftTop_UI = null;
+        //Grid CenterRightBottom_UI = null;
+        //Grid CenterLTBox_UI = null;
+
+        Grid horizontalLine_UI = null;
+        Grid VerticalLine_UI = null;
+
         Grid CenterLTPoint_UI = null;
         CPoint CenterLTPoint = new CPoint();
-        Grid CenterRTBox_UI = null;
+        //Grid CenterRTBox_UI = null;
         Grid CenterRTPoint_UI = null;
         CPoint CenterRTPoint = new CPoint();
 
-        Grid CenterRBBox_UI = null;
+        //Grid CenterRBBox_UI = null;
         Grid CenterRBPoint_UI = null;
         CPoint CenterRBPoint = new CPoint();
 
@@ -887,68 +901,31 @@ namespace Root_WindII
             ShotKeyPoint_UI.Children.Add(new Line());
             ShotKeyPoint_UI.Children.Add(new Line());
 
-            CenterLeftTop_UI = new Grid();
-            CenterLeftTop_UI.Tag = "Centering";
-            CenterLeftTop_UI.Children.Add(new Line());
-            CenterLeftTop_UI.Children.Add(new Line());
-
             CenterPoint_UI = new Grid();
             CenterPoint_UI.Tag = "Centering";
             CenterPoint_UI.Children.Add(new Line());
             CenterPoint_UI.Children.Add(new Line());
 
+            horizontalLine_UI = new Grid();
+            horizontalLine_UI.Children.Add(new Line());
 
-            CenterRightBottom_UI = new Grid();
-            CenterRightBottom_UI.Tag = "Centering";
-            CenterRightBottom_UI.Children.Add(new Line());
-            CenterRightBottom_UI.Children.Add(new Line());
+            VerticalLine_UI = new Grid();
+            VerticalLine_UI.Children.Add(new Line());
 
-            CenterLTBox_UI = new Grid();
-            CenterLTBox_UI.Tag = "CenteringLT";
-            CenterLTBox_UI.Children.Add(new Line());
-            CenterLTBox_UI.Children.Add(new Line());
-            CenterLTBox_UI.Children.Add(new Line());
-            CenterLTBox_UI.Children.Add(new Line());
-            CenterLTBox_UI.Children.Add(new Line());
-            CenterLTBox_UI.Children.Add(new Line());
-            CenterLTBox_UI.Children.Add(new Line());
-            CenterLTBox_UI.Children.Add(new Line());
+
 
             CenterLTPoint_UI = new Grid();
-            CenterLTPoint_UI.Tag = "Centering";
+            CenterLTPoint_UI.Tag = "CenteringLT";
             CenterLTPoint_UI.Children.Add(new Line());
             CenterLTPoint_UI.Children.Add(new Line());
-
-            CenterRTBox_UI = new Grid();
-            CenterRTBox_UI.Tag = "CenteringRT";
-            CenterRTBox_UI.Children.Add(new Line());
-            CenterRTBox_UI.Children.Add(new Line());
-            CenterRTBox_UI.Children.Add(new Line());
-            CenterRTBox_UI.Children.Add(new Line());
-            CenterRTBox_UI.Children.Add(new Line());
-            CenterRTBox_UI.Children.Add(new Line());
-            CenterRTBox_UI.Children.Add(new Line());
-            CenterRTBox_UI.Children.Add(new Line());
 
             CenterRTPoint_UI = new Grid(); 
-            CenterRTPoint_UI.Tag = "Centering";
+            CenterRTPoint_UI.Tag = "CenteringRT";
             CenterRTPoint_UI.Children.Add(new Line());
             CenterRTPoint_UI.Children.Add(new Line());
-
-            CenterRBBox_UI = new Grid();
-            CenterRBBox_UI.Tag = "CenteringRB";
-            CenterRBBox_UI.Children.Add(new Line());
-            CenterRBBox_UI.Children.Add(new Line());
-            CenterRBBox_UI.Children.Add(new Line());
-            CenterRBBox_UI.Children.Add(new Line());
-            CenterRBBox_UI.Children.Add(new Line());
-            CenterRBBox_UI.Children.Add(new Line());
-            CenterRBBox_UI.Children.Add(new Line());
-            CenterRBBox_UI.Children.Add(new Line());
-
 
             CenterRBPoint_UI = new Grid();
-            CenterRBPoint_UI.Tag = "Centering";
+            CenterRBPoint_UI.Tag = "CenteringRB";
             CenterRBPoint_UI.Children.Add(new Line());
             CenterRBPoint_UI.Children.Add(new Line());
 
@@ -997,6 +974,79 @@ namespace Root_WindII
                     break;
             }
         }
+
+        void DrawVerticalLine()
+        {
+            if (p_UIElement.Contains(horizontalLine_UI))
+            {
+                p_UIElement.Remove(horizontalLine_UI);
+            }
+            CPoint viewPt = new CPoint(p_MouseMemX, p_MouseMemY);
+
+            if (CenterRTPoint.Y > viewPt.Y)
+                viewPt.Y = CenterRTPoint.Y;
+
+            viewPt.X = CenterRTPoint.X;
+
+            CPoint canvasPt = GetCanvasPoint(viewPt);
+
+            Line line = VerticalLine_UI.Children[0] as Line;
+
+            CPoint canvasPt2 = GetCanvasPoint(CenterRTPoint);
+
+            line.X1 = canvasPt2.X;
+            line.Y1 = canvasPt2.Y;
+            line.X2 = canvasPt.X;
+            line.Y2 = canvasPt.Y;
+            line.StrokeThickness = 4;
+            line.Stroke = Brushes.Blue;
+            line.Opacity = 0.5;
+
+            Canvas.SetLeft(VerticalLine_UI, 0);
+            Canvas.SetTop(VerticalLine_UI, 0);
+
+            if (!p_UIElement.Contains(VerticalLine_UI))
+            {
+                p_UIElement.Add(VerticalLine_UI);
+            }
+        }
+
+        void DrawHorizontalLine()
+        {
+            if (p_UIElement.Contains(VerticalLine_UI))
+            {
+                p_UIElement.Remove(VerticalLine_UI);
+            }
+            CPoint viewPt = new CPoint(p_MouseMemX, p_MouseMemY);
+
+            if (CenterLTPoint.X > viewPt.X)
+                viewPt.X = CenterLTPoint.X;
+
+            viewPt.Y = CenterLTPoint.Y;
+
+            CPoint canvasPt = GetCanvasPoint(viewPt);
+
+            Line line = horizontalLine_UI.Children[0] as Line;
+
+            CPoint canvasPt2 = GetCanvasPoint(CenterLTPoint);
+
+            line.X1 = canvasPt2.X;
+            line.Y1 = canvasPt2.Y;
+            line.X2 = canvasPt.X;
+            line.Y2 = canvasPt.Y;
+            line.StrokeThickness = 4;
+            line.Stroke = Brushes.Blue;
+            line.Opacity = 0.5;
+
+            Canvas.SetLeft(horizontalLine_UI, 0);
+            Canvas.SetTop(horizontalLine_UI, 0);
+
+            if (!p_UIElement.Contains(horizontalLine_UI))
+            {
+                p_UIElement.Add(horizontalLine_UI);
+            }
+        }
+
         public override void MouseMove(object sender, MouseEventArgs e)
         {
             base.MouseMove(sender, e);
@@ -1006,18 +1056,43 @@ namespace Root_WindII
                 case SETUP_VIEWER_STATE.Normal:
                     break;
                 case SETUP_VIEWER_STATE.Center:
-                    if (centerState == PROCESS_CENTER_STATE.CenterLeftTop)
+
+                    if (centerPos == CENTERING_POS.RT)
                     {
-                        centerLeftTop.X = p_MouseMemX;
-                        centerLeftTop.Y = p_MouseMemY;
-                        DrawCenterLeftTopPoint(centerLeftTop, true);
+                        DrawHorizontalLine();
                     }
-                    else if (centerState == PROCESS_CENTER_STATE.CenterRightBottom)
+                    if(centerPos == CENTERING_POS.RB)
                     {
-                        centerRightBottom.X = p_MouseMemX;
-                        centerRightBottom.Y = p_MouseMemY;
-                        DrawCenterRightBottomPoint(centerRightBottom);
+                        DrawVerticalLine();
                     }
+                    if(centerPos == CENTERING_POS.None)
+                    {
+                        CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
+                        //CPoint memPt = GetMemPoint(canvasPt);
+                        nearGrid = GetCenterNearlestUI(memPt);
+                        if (nearGrid.Tag.ToString().Contains("RT"))
+                        {
+                            DrawHorizontalLine();
+                        }
+                        else if (nearGrid.Tag.ToString().Contains("RB"))
+                        {
+                            DrawVerticalLine();
+                        }
+                    }
+                  
+                   
+                    //if (centerState == PROCESS_CENTER_STATE.CenterLeftTop)
+                    //{
+                    //    centerLeftTop.X = p_MouseMemX;
+                    //    centerLeftTop.Y = p_MouseMemY;
+                    //    DrawCenterLeftTopPoint(centerLeftTop, true);
+                    //}
+                    //else if (centerState == PROCESS_CENTER_STATE.CenterRightBottom)
+                    //{
+                    //    centerRightBottom.X = p_MouseMemX;
+                    //    centerRightBottom.Y = p_MouseMemY;
+                    //    DrawCenterRightBottomPoint(centerRightBottom);
+                    //}
                     break;
                 case SETUP_VIEWER_STATE.Origin:
                     if (this.originState == PROCESS_ORIGIN_STATE.OriginLeftBottom)
@@ -1049,7 +1124,17 @@ namespace Root_WindII
         }
         public override void PreviewMouseUp(object sender, MouseEventArgs e)
         {
-
+            //if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
+            //{
+            //    return;
+            //}
+            //if (centerPos == CENTERING_POS.RT)
+            //{
+            //    CPoint pt = GetMemPoint(new CPoint(p_CanvasWidth, p_CanvasHeight));
+            //    CPoint movePT = new CPoint(300000 / 16 - CenterLTPoint.X, CenterLTPoint.Y);
+            //    CanvasMovePoint_Ref(movePT, 0, 0);
+            //}
+            
         }
         public override void SetRoiRect()
         {
@@ -1083,8 +1168,9 @@ namespace Root_WindII
         private enum PROCESS_CENTER_STATE
         {
             None,
-            CenterLeftTop,
-            CenterRightBottom
+            Point,
+            //CenterLeftTop,
+            //CenterRightBottom
         }
         PROCESS_CENTER_STATE centerState = PROCESS_CENTER_STATE.None;
 
@@ -1096,6 +1182,140 @@ namespace Root_WindII
             RB
         }
         CENTERING_POS centerPos = CENTERING_POS.LT;
+
+        public void DrawEdgePoint(CPoint memPt)
+        {
+            if (memPt.X == 0 || memPt.Y == 0)
+                return;
+
+            CPoint viewPt = memPt;
+            CPoint canvasPt = GetCanvasPoint(viewPt);
+
+            Grid grid = null;
+            switch (centerPos)
+            {
+                case CENTERING_POS.None:
+                    grid = GetCenterNearlestUI(memPt);
+                    break;
+                case CENTERING_POS.LT:
+                    grid = CenterLTPoint_UI;
+                    
+                    break;
+                case CENTERING_POS.RT:
+                    grid = CenterRTPoint_UI;
+                   
+                    break;
+                case CENTERING_POS.RB:
+                    grid = CenterRBPoint_UI;
+                   
+                    break;
+            }
+            nearGrid = grid;
+            //if(centerPos != CENTERING_POS.None)
+            //    nearGrid = grid;
+            //else
+            //{
+            //    nearGrid == 
+            //}
+            //CenterLeftTop_UI.Width = 40;
+            //CenterLeftTop_UI.Height = 40;
+            if (centerPos == CENTERING_POS.LT || grid.Tag.ToString() == "CenteringLT")
+            {
+                CenterLTPoint = memPt;
+                if(centerPos == CENTERING_POS.None)
+                {
+                    //CanvasMovePoint_Ref(new CPoint(p_View_Rect.X, p_View_Rect.Y), 30, 0);
+                    //CanvasMovePoint_Ref(,);
+                    CenterRTPoint.Y = CenterLTPoint.Y;
+                    RedrawPoint(CenterRTPoint, CenterRTPoint_UI);
+
+                    CenterRBPoint.X = CenterRTPoint.X;
+                    RedrawPoint(CenterRBPoint, CenterRBPoint_UI);
+                }
+                //if (p_UIElement.Contains(CenterRTBox_UI))
+                //{
+                //    p_UIElement.Remove(CenterRTBox_UI);
+                //}
+                //if (p_UIElement.Contains(CenterRBBox_UI))
+                //{
+                //    p_UIElement.Remove(CenterRBBox_UI);
+                //}
+                //centerPos = CENTERING_POS.RT;
+            }
+            else if (centerPos == CENTERING_POS.RT || grid.Tag.ToString() == "CenteringRT")
+            {
+                CenterRTPoint = memPt;
+
+                viewPt.Y = CenterLTPoint.Y;
+                CenterRTPoint.Y = viewPt.Y;
+                if (centerPos == CENTERING_POS.None)
+                {
+                    CenterRBPoint.X = CenterRTPoint.X;
+                    RedrawPoint(CenterRBPoint, CenterRBPoint_UI);
+                }
+            }
+            else if (centerPos == CENTERING_POS.RB || grid.Tag.ToString() == "CenteringRB")
+            {
+                CenterRBPoint = memPt;
+                //viewPt.X = centerBoxRT.Left;
+                viewPt.X = CenterRTPoint.X;
+                CenterRBPoint.X = viewPt.X;
+            }
+            //centerLeftTop = viewPt;
+
+            canvasPt = GetCanvasPoint(viewPt);
+
+
+
+            Line line1 = nearGrid.Children[0] as Line;
+            line1.X1 = -10;
+            line1.Y1 = 10;
+            line1.X2 = 10;
+            line1.Y2 = -10;
+            line1.Stroke = DefineColors.CenteringPointColor;
+            line1.StrokeThickness = 3;
+            line1.Opacity = 1;
+
+            Line line2 = nearGrid.Children[1] as Line;
+            line2.X1 = 10;
+            line2.Y1 = 10;
+            line2.X2 = -10;
+            line2.Y2 = -10;
+            line2.Stroke = DefineColors.CenteringPointColor;
+            line2.StrokeThickness = 3;
+            line2.Opacity = 1;
+       
+            Canvas.SetLeft(nearGrid, canvasPt.X);
+            Canvas.SetTop(nearGrid, canvasPt.Y);
+            if (!p_UIElement.Contains(nearGrid))
+            {
+                p_UIElement.Add(nearGrid);
+            }
+            //Line line1 = CenterLeftTop_UI.Children[0] as Line;
+            //line1.X1 = 0;
+            //line1.Y1 = 40;
+            //line1.X2 = 0;
+            //line1.Y2 = -10;
+            //line1.Stroke = DefineColors.CenteringColor;
+            //line1.StrokeThickness = 3;
+            //line1.Opacity = 1;
+
+            //Line line2 = CenterLeftTop_UI.Children[1] as Line;
+            //line2.X1 = -10;
+            //line2.Y1 = 0;
+            //line2.X2 = 40;
+            //line2.Y2 = 0;
+            //line2.Stroke = DefineColors.CenteringColor;
+            //line2.StrokeThickness = 3;
+            //line2.Opacity = 1;
+
+            //Canvas.SetLeft(CenterLeftTop_UI, canvasPt.X);
+            //Canvas.SetTop(CenterLeftTop_UI, canvasPt.Y);
+            //if (!p_UIElement.Contains(CenterLeftTop_UI))
+            //{
+            //    p_UIElement.Add(CenterLeftTop_UI);
+            //}
+        }
         public void ProcessCenter(MouseEventArgs e)
         {
             CPoint canvasPt = new CPoint(p_MouseX, p_MouseY);
@@ -1105,111 +1325,12 @@ namespace Root_WindII
             {
                 case PROCESS_CENTER_STATE.None:
                     break;
-                case PROCESS_CENTER_STATE.CenterLeftTop:
+                case PROCESS_CENTER_STATE.Point:
                     ClearObjects();
-                    p_Cursor = Cursors.Arrow;
-                    centerLeftTop = memPt;
+                    p_Cursor = Cursors.Pen;
                     //if (centerPos == CENTERING_POS.None)
                     //    centerPos = CENTERING_POS.LT;
-                    DrawCenterLeftTopPoint(centerLeftTop);
-
-                    centerState = PROCESS_CENTER_STATE.CenterRightBottom;
-                    break;
-                case PROCESS_CENTER_STATE.CenterRightBottom:
-                    
-
-                    p_Cursor = Cursors.Arrow;
-                    
-                    centerRightBottom.X = memPt.X;
-                    centerRightBottom.Y = memPt.Y;
-
-                    centerState = PROCESS_CENTER_STATE.CenterLeftTop;
-                    DrawCenterRightBottomPoint(centerRightBottom);
-
-                    centerRightBottom.X = centerLeftTop.X + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
-                    centerRightBottom.Y = centerLeftTop.Y + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
-                    switch (centerPos)
-                    {
-                        case CENTERING_POS.LT:
-                            centerBoxLT.Left = centerLeftTop.X;
-                            centerBoxLT.Right = centerRightBottom.X;
-                            centerBoxLT.Top = centerLeftTop.Y;
-                            centerBoxLT.Bottom = centerRightBottom.Y;
-                            break;
-                        case CENTERING_POS.RT:
-                            centerBoxRT.Left = centerLeftTop.X;
-                            centerBoxRT.Right = centerRightBottom.X;
-                            centerBoxRT.Top = centerLeftTop.Y;
-                            centerBoxRT.Bottom = centerRightBottom.Y;
-                            break;
-                        case CENTERING_POS.RB:
-                            centerBoxRB.Left = centerLeftTop.X;
-                            centerBoxRB.Right = centerRightBottom.X;
-                            centerBoxRB.Top = centerLeftTop.Y;
-                            centerBoxRB.Bottom = centerRightBottom.Y;
-                            break;
-                        case CENTERING_POS.None:
-                            if (nearGrid.Tag.ToString().Contains("LT"))
-                            {
-                                centerBoxLT.Left = centerLeftTop.X;
-                                centerBoxLT.Right = centerRightBottom.X;
-                                centerBoxLT.Top = centerLeftTop.Y;
-                                centerBoxLT.Bottom = centerRightBottom.Y;
-
-                                if (p_UIElement.Contains(CenterRTBox_UI))
-                                    p_UIElement.Remove(CenterRTBox_UI);
-
-                                if (p_UIElement.Contains(CenterRTPoint_UI))
-                                    p_UIElement.Remove(CenterRTPoint_UI);
-
-                                if (p_UIElement.Contains(CenterRBBox_UI))
-                                    p_UIElement.Remove(CenterRBBox_UI);
-
-                                if (p_UIElement.Contains(CenterRBPoint_UI))
-                                    p_UIElement.Remove(CenterRBPoint_UI);
-
-                                if (p_UIElement.Contains(CenterPoint_UI))
-                                    p_UIElement.Remove(CenterPoint_UI);
-
-                                centerPos = CENTERING_POS.LT;
-                            }
-                            else if (nearGrid.Tag.ToString().Contains("RT"))
-                            {
-                                centerBoxRT.Left = centerLeftTop.X;
-                                centerBoxRT.Right = centerRightBottom.X;
-                                centerBoxRT.Top = centerLeftTop.Y;
-                                centerBoxRT.Bottom = centerRightBottom.Y;
-
-
-                                if (p_UIElement.Contains(CenterRBBox_UI))
-                                    p_UIElement.Remove(CenterRBBox_UI);
-
-                                if (p_UIElement.Contains(CenterRBPoint_UI))
-                                    p_UIElement.Remove(CenterRBPoint_UI);
-
-                                if (p_UIElement.Contains(CenterPoint_UI))
-                                    p_UIElement.Remove(CenterPoint_UI);
-
-                                centerPos = CENTERING_POS.RT;
-                            }
-                            else
-                            {
-                                centerBoxRB.Left = centerLeftTop.X;
-                                centerBoxRB.Right = centerRightBottom.X;
-                                centerBoxRB.Top = centerLeftTop.Y;
-                                centerBoxRB.Bottom = centerRightBottom.Y;
-                            }
-                            break;
-                    }
-
-                    
-                    //DrawingPitchPoint();
-                    DrawCenterBox(pos : centerPos);
-                    CalcCenterPoint();
-                    if (p_UIElement.Contains(CenterRightBottom_UI))
-                    {
-                        p_UIElement.Remove(CenterRightBottom_UI);
-                    }
+                    DrawEdgePoint(memPt);
 
                     if (centerPos == CENTERING_POS.RB)
                         centerPos = CENTERING_POS.None;
@@ -1217,19 +1338,138 @@ namespace Root_WindII
                     if (centerPos != CENTERING_POS.None)
                         centerPos++;
 
-                    if(centerPos == CENTERING_POS.None)
+                    if (centerPos == CENTERING_POS.None)
                     {
                         ViewerState = SETUP_VIEWER_STATE.Normal;
                         SetCenter();
                         CalcCenter();
                     }
+                    break;
+                //case PROCESS_CENTER_STATE.CenterLeftTop:
+                //    ClearObjects();
+                //    p_Cursor = Cursors.Arrow;
+                //    centerLeftTop = memPt;
+                //    //if (centerPos == CENTERING_POS.None)
+                //    //    centerPos = CENTERING_POS.LT;
+                //    DrawCenterLeftTopPoint(centerLeftTop);
+
+                //    centerState = PROCESS_CENTER_STATE.CenterRightBottom;
+                //    break;
+                //case PROCESS_CENTER_STATE.CenterRightBottom:
+                    
+
+                //    p_Cursor = Cursors.Arrow;
+                    
+                //    centerRightBottom.X = memPt.X;
+                //    centerRightBottom.Y = memPt.Y;
+
+                //    centerState = PROCESS_CENTER_STATE.CenterLeftTop;
+                //    DrawCenterRightBottomPoint(centerRightBottom);
+
+                //    centerRightBottom.X = centerLeftTop.X + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
+                //    centerRightBottom.Y = centerLeftTop.Y + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
+                //    switch (centerPos)
+                //    {
+                //        case CENTERING_POS.LT:
+                //            centerBoxLT.Left = centerLeftTop.X;
+                //            centerBoxLT.Right = centerRightBottom.X;
+                //            centerBoxLT.Top = centerLeftTop.Y;
+                //            centerBoxLT.Bottom = centerRightBottom.Y;
+                //            break;
+                //        case CENTERING_POS.RT:
+                //            centerBoxRT.Left = centerLeftTop.X;
+                //            centerBoxRT.Right = centerRightBottom.X;
+                //            centerBoxRT.Top = centerLeftTop.Y;
+                //            centerBoxRT.Bottom = centerRightBottom.Y;
+                //            break;
+                //        case CENTERING_POS.RB:
+                //            centerBoxRB.Left = centerLeftTop.X;
+                //            centerBoxRB.Right = centerRightBottom.X;
+                //            centerBoxRB.Top = centerLeftTop.Y;
+                //            centerBoxRB.Bottom = centerRightBottom.Y;
+                //            break;
+                //        case CENTERING_POS.None:
+                //            if (nearGrid.Tag.ToString().Contains("LT"))
+                //            {
+                //                centerBoxLT.Left = centerLeftTop.X;
+                //                centerBoxLT.Right = centerRightBottom.X;
+                //                centerBoxLT.Top = centerLeftTop.Y;
+                //                centerBoxLT.Bottom = centerRightBottom.Y;
+
+                //                if (p_UIElement.Contains(CenterRTBox_UI))
+                //                    p_UIElement.Remove(CenterRTBox_UI);
+
+                //                if (p_UIElement.Contains(CenterRTPoint_UI))
+                //                    p_UIElement.Remove(CenterRTPoint_UI);
+
+                //                if (p_UIElement.Contains(CenterRBBox_UI))
+                //                    p_UIElement.Remove(CenterRBBox_UI);
+
+                //                if (p_UIElement.Contains(CenterRBPoint_UI))
+                //                    p_UIElement.Remove(CenterRBPoint_UI);
+
+                //                if (p_UIElement.Contains(CenterPoint_UI))
+                //                    p_UIElement.Remove(CenterPoint_UI);
+
+                //                centerPos = CENTERING_POS.LT;
+                //            }
+                //            else if (nearGrid.Tag.ToString().Contains("RT"))
+                //            {
+                //                centerBoxRT.Left = centerLeftTop.X;
+                //                centerBoxRT.Right = centerRightBottom.X;
+                //                centerBoxRT.Top = centerLeftTop.Y;
+                //                centerBoxRT.Bottom = centerRightBottom.Y;
+
+
+                //                if (p_UIElement.Contains(CenterRBBox_UI))
+                //                    p_UIElement.Remove(CenterRBBox_UI);
+
+                //                if (p_UIElement.Contains(CenterRBPoint_UI))
+                //                    p_UIElement.Remove(CenterRBPoint_UI);
+
+                //                if (p_UIElement.Contains(CenterPoint_UI))
+                //                    p_UIElement.Remove(CenterPoint_UI);
+
+                //                centerPos = CENTERING_POS.RT;
+                //            }
+                //            else
+                //            {
+                //                centerBoxRB.Left = centerLeftTop.X;
+                //                centerBoxRB.Right = centerRightBottom.X;
+                //                centerBoxRB.Top = centerLeftTop.Y;
+                //                centerBoxRB.Bottom = centerRightBottom.Y;
+                //            }
+                //            break;
+                //    }
+
+                    
+                //    //DrawingPitchPoint();
+                //    DrawCenterBox(pos : centerPos);
+                //    CalcCenterPoint();
+                //    if (p_UIElement.Contains(CenterRightBottom_UI))
+                //    {
+                //        p_UIElement.Remove(CenterRightBottom_UI);
+                //    }
+
+                //    if (centerPos == CENTERING_POS.RB)
+                //        centerPos = CENTERING_POS.None;
+
+                //    if (centerPos != CENTERING_POS.None)
+                //        centerPos++;
+
+                //    if(centerPos == CENTERING_POS.None)
+                //    {
+                //        ViewerState = SETUP_VIEWER_STATE.Normal;
+                //        SetCenter();
+                //        CalcCenter();
+                //    }
 
 
                     //SetOrigin();
 
                     //originState = PROCESS_ORIGIN_STATE.None;
                     
-                    break;
+                  //  break;
             }
         }
 
@@ -1473,11 +1713,11 @@ namespace Root_WindII
 
         Grid GetCenterNearlestUI(CPoint canvasPt)
         {
-            Line near = CenterLTBox_UI.Children[0] as Line;
+            Line near = CenterLTPoint_UI.Children[0] as Line;
 
             double leftPt = Math.Abs(near.X1 - canvasPt.X);
             double topPt = Math.Abs(near.Y1 -canvasPt.Y);
-            Grid grid = CenterLTBox_UI;
+            Grid grid = CenterLTPoint_UI;
             double minDistance = double.MaxValue;
             //double top = double.MaxValue;
 
@@ -1491,15 +1731,15 @@ namespace Root_WindII
                     CPoint pt;
                     if (((Grid)p_UIElement[i]).Tag.ToString().Contains("LT"))
                     {
-                        pt = GetCanvasPoint(new CPoint(centerBoxLT.Left, centerBoxLT.Top));
+                        pt = new CPoint(CenterLTPoint.X, CenterLTPoint.Y);
                     }
                     else if (((Grid)p_UIElement[i]).Tag.ToString().Contains("RT"))
                     {
-                        pt = GetCanvasPoint(new CPoint(centerBoxRT.Left, centerBoxRT.Top));
+                        pt = new CPoint(CenterRTPoint.X, CenterRTPoint.Y);
                     }
                     else if (((Grid)p_UIElement[i]).Tag.ToString().Contains("RB"))
                     {
-                        pt = GetCanvasPoint(new CPoint(centerBoxRB.Left, centerBoxRB.Top));
+                        pt = new CPoint(CenterRBPoint.X, CenterRBPoint.Y);
                     }
                     else
                     {
@@ -1519,97 +1759,97 @@ namespace Root_WindII
         }
 
         Grid nearGrid = null;
-        private void DrawCenterLeftTopPoint(CPoint memPt, bool bRecipeLoaded = false)
-        {
-            if (memPt.X == 0 || memPt.Y == 0)
-                return;
+        //private void DrawCenterLeftTopPoint(CPoint memPt, bool bRecipeLoaded = false)
+        //{
+        //    if (memPt.X == 0 || memPt.Y == 0)
+        //        return;
 
-            CPoint viewPt = memPt;
-            CPoint canvasPt = GetCanvasPoint(viewPt);
+        //    CPoint viewPt = memPt;
+        //    CPoint canvasPt = GetCanvasPoint(viewPt);
 
-            Grid grid = null;
-            switch (centerPos)
-            {
-                case CENTERING_POS.None:
-                    grid = GetCenterNearlestUI(canvasPt);
-                    break;
-                case CENTERING_POS.LT:
-                    grid = CenterLTBox_UI;
-                    break;
-                case CENTERING_POS.RT:
-                    grid = CenterRTBox_UI;
-                    break;
-                case CENTERING_POS.RB:
-                    grid = CenterRBBox_UI;
-                    break;
-            }
-            nearGrid = grid;
-            //if(centerPos != CENTERING_POS.None)
-            //    nearGrid = grid;
-            //else
-            //{
-            //    nearGrid == 
-            //}
-            CenterLeftTop_UI.Width = 40;
-            CenterLeftTop_UI.Height = 40;
-            if(centerPos == CENTERING_POS.LT || Grid.TagProperty.ToString() == "CenteringLT")
-            {
-                //if (p_UIElement.Contains(CenterRTBox_UI))
-                //{
-                //    p_UIElement.Remove(CenterRTBox_UI);
-                //}
-                //if (p_UIElement.Contains(CenterRBBox_UI))
-                //{
-                //    p_UIElement.Remove(CenterRBBox_UI);
-                //}
-                //centerPos = CENTERING_POS.RT;
-            }
-            else if (centerPos == CENTERING_POS.RT || grid.Tag.ToString() == "CenteringRT")
-            {
-                viewPt.Y = centerBoxLT.Top;
-                //if (p_UIElement.Contains(CenterRBBox_UI))
-                //{
-                //    p_UIElement.Remove(CenterRBBox_UI);
-                //}
-                //centerPos = CENTERING_POS.RT;
-            }
-            else if (centerPos == CENTERING_POS.RB || grid.Tag.ToString() == "CenteringRB")
-            {
-                viewPt.X = centerBoxRT.Left;
-            }
-            centerLeftTop = viewPt;
-            canvasPt = GetCanvasPoint(viewPt);
-
-
-
-            Line line1 = CenterLeftTop_UI.Children[0] as Line;
-            line1.X1 = 0;
-            line1.Y1 = 40;
-            line1.X2 = 0;
-            line1.Y2 = -10;
-            line1.Stroke = DefineColors.CenteringColor;
-            line1.StrokeThickness = 3;
-            line1.Opacity = 1;
-
-            Line line2 = CenterLeftTop_UI.Children[1] as Line;
-            line2.X1 = -10;
-            line2.Y1 = 0;
-            line2.X2 = 40;
-            line2.Y2 = 0;
-            line2.Stroke = DefineColors.CenteringColor;
-            line2.StrokeThickness = 3;
-            line2.Opacity = 1;
-
-            Canvas.SetLeft(CenterLeftTop_UI, canvasPt.X);
-            Canvas.SetTop(CenterLeftTop_UI, canvasPt.Y);
-            if (!p_UIElement.Contains(CenterLeftTop_UI))
-            {
-                p_UIElement.Add(CenterLeftTop_UI);
-            }
+        //    Grid grid = null;
+        //    switch (centerPos)
+        //    {
+        //        case CENTERING_POS.None:
+        //            grid = GetCenterNearlestUI(canvasPt);
+        //            break;
+        //        case CENTERING_POS.LT:
+        //            grid = CenterLTBox_UI;
+        //            break;
+        //        case CENTERING_POS.RT:
+        //            grid = CenterRTBox_UI;
+        //            break;
+        //        case CENTERING_POS.RB:
+        //            grid = CenterRBBox_UI;
+        //            break;
+        //    }
+        //    nearGrid = grid;
+        //    //if(centerPos != CENTERING_POS.None)
+        //    //    nearGrid = grid;
+        //    //else
+        //    //{
+        //    //    nearGrid == 
+        //    //}
+        //    CenterLeftTop_UI.Width = 40;
+        //    CenterLeftTop_UI.Height = 40;
+        //    if(centerPos == CENTERING_POS.LT || Grid.TagProperty.ToString() == "CenteringLT")
+        //    {
+        //        //if (p_UIElement.Contains(CenterRTBox_UI))
+        //        //{
+        //        //    p_UIElement.Remove(CenterRTBox_UI);
+        //        //}
+        //        //if (p_UIElement.Contains(CenterRBBox_UI))
+        //        //{
+        //        //    p_UIElement.Remove(CenterRBBox_UI);
+        //        //}
+        //        //centerPos = CENTERING_POS.RT;
+        //    }
+        //    else if (centerPos == CENTERING_POS.RT || grid.Tag.ToString() == "CenteringRT")
+        //    {
+        //        viewPt.Y = centerBoxLT.Top;
+        //        //if (p_UIElement.Contains(CenterRBBox_UI))
+        //        //{
+        //        //    p_UIElement.Remove(CenterRBBox_UI);
+        //        //}
+        //        //centerPos = CENTERING_POS.RT;
+        //    }
+        //    else if (centerPos == CENTERING_POS.RB || grid.Tag.ToString() == "CenteringRB")
+        //    {
+        //        viewPt.X = centerBoxRT.Left;
+        //    }
+        //    centerLeftTop = viewPt;
+        //    canvasPt = GetCanvasPoint(viewPt);
 
 
 
-        }
+        //    Line line1 = CenterLeftTop_UI.Children[0] as Line;
+        //    line1.X1 = 0;
+        //    line1.Y1 = 40;
+        //    line1.X2 = 0;
+        //    line1.Y2 = -10;
+        //    line1.Stroke = DefineColors.CenteringColor;
+        //    line1.StrokeThickness = 3;
+        //    line1.Opacity = 1;
+
+        //    Line line2 = CenterLeftTop_UI.Children[1] as Line;
+        //    line2.X1 = -10;
+        //    line2.Y1 = 0;
+        //    line2.X2 = 40;
+        //    line2.Y2 = 0;
+        //    line2.Stroke = DefineColors.CenteringColor;
+        //    line2.StrokeThickness = 3;
+        //    line2.Opacity = 1;
+
+        //    Canvas.SetLeft(CenterLeftTop_UI, canvasPt.X);
+        //    Canvas.SetTop(CenterLeftTop_UI, canvasPt.Y);
+        //    if (!p_UIElement.Contains(CenterLeftTop_UI))
+        //    {
+        //        p_UIElement.Add(CenterLeftTop_UI);
+        //    }
+
+
+
+        //}
 
         private void DrawOriginLeftBottomPoint(CPoint memPt, bool bRecipeLoaded = false)
         {
@@ -1660,76 +1900,76 @@ namespace Root_WindII
             //}
         }
 
-        private void DrawCenterRightBottomPoint(CPoint memPt, bool brecipeLoaded = false)
-        {
-            if (memPt.X == 0 || memPt.Y == 0)
-                return;
+        //private void DrawCenterRightBottomPoint(CPoint memPt, bool brecipeLoaded = false)
+        //{
+        //    if (memPt.X == 0 || memPt.Y == 0)
+        //        return;
 
-            CPoint viewPt = memPt;
-            CPoint canvasPt = GetCanvasPoint(viewPt);
+        //    CPoint viewPt = memPt;
+        //    CPoint canvasPt = GetCanvasPoint(viewPt);
 
-            //int longAxis = viewPt.Y;
-            //if(viewPt.X > viewPt.Y)
-            //{
-            //    longAxis = viewPt.X;
-            //}
-            int longAxis = memPt.Y;
-            if(memPt.X > memPt.Y)
-            {
-                longAxis = memPt.X;
-            }
-            viewPt.X = centerLeftTop.X + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
-            viewPt.Y = centerLeftTop.Y + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
+        //    //int longAxis = viewPt.Y;
+        //    //if(viewPt.X > viewPt.Y)
+        //    //{
+        //    //    longAxis = viewPt.X;
+        //    //}
+        //    int longAxis = memPt.Y;
+        //    if(memPt.X > memPt.Y)
+        //    {
+        //        longAxis = memPt.X;
+        //    }
+        //    viewPt.X = centerLeftTop.X + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
+        //    viewPt.Y = centerLeftTop.Y + ((memPt.X - centerLeftTop.X) < 0 ? 0 : Math.Abs(centerLeftTop.X - memPt.X));
 
-            //centerRightBottom.X = viewPt.X;
-            //centerRightBottom.Y = viewPt.Y;
-            //viewPt.X += longAxis;
-            //viewPt.Y += longAxis;
+        //    //centerRightBottom.X = viewPt.X;
+        //    //centerRightBottom.Y = viewPt.Y;
+        //    //viewPt.X += longAxis;
+        //    //viewPt.Y += longAxis;
 
-            CenterRightBottom_UI.Width = 40;
-            CenterRightBottom_UI.Height = 40;
+        //    CenterRightBottom_UI.Width = 40;
+        //    CenterRightBottom_UI.Height = 40;
 
-            //if (centerPos == CENTERING_POS.RT || nearGrid.Tag.ToString() == "CenteringRT")
-            //{
-            //    //viewPt.X = Math.Abs(viewPt.X - centerLeftTop.X) > centerBoxLT.Width ? centerLeftTop.X + centerBoxLT.Width : viewPt.X;
-            //    //viewPt.X = centerLeftTop.X + centerBoxLT.Width;
-            //}
-            //else if (centerPos == CENTERING_POS.RB || nearGrid.Tag.ToString() == "CenteringRB")
-            //{
-            //    //viewPt.X = Math.Abs(viewPt.X - centerLeftTop.X) > centerBoxRT.Width ? centerLeftTop.X + centerBoxRT.Width : viewPt.X;
-            //    //viewPt.X = centerLeftTop.X + centerBoxRT.Width;
-            //}
+        //    //if (centerPos == CENTERING_POS.RT || nearGrid.Tag.ToString() == "CenteringRT")
+        //    //{
+        //    //    //viewPt.X = Math.Abs(viewPt.X - centerLeftTop.X) > centerBoxLT.Width ? centerLeftTop.X + centerBoxLT.Width : viewPt.X;
+        //    //    //viewPt.X = centerLeftTop.X + centerBoxLT.Width;
+        //    //}
+        //    //else if (centerPos == CENTERING_POS.RB || nearGrid.Tag.ToString() == "CenteringRB")
+        //    //{
+        //    //    //viewPt.X = Math.Abs(viewPt.X - centerLeftTop.X) > centerBoxRT.Width ? centerLeftTop.X + centerBoxRT.Width : viewPt.X;
+        //    //    //viewPt.X = centerLeftTop.X + centerBoxRT.Width;
+        //    //}
 
-            canvasPt = GetCanvasPoint(viewPt);
+        //    canvasPt = GetCanvasPoint(viewPt);
 
-            Line line1 = CenterRightBottom_UI.Children[0] as Line;
-            line1.X1 = 0;
-            line1.Y1 = 10;
-            line1.X2 = 0;
-            line1.Y2 = -40;
-            line1.Stroke = DefineColors.CenteringColor;
-            line1.StrokeThickness = 3;
-            line1.Opacity = 1;
+        //    Line line1 = CenterRightBottom_UI.Children[0] as Line;
+        //    line1.X1 = 0;
+        //    line1.Y1 = 10;
+        //    line1.X2 = 0;
+        //    line1.Y2 = -40;
+        //    line1.Stroke = DefineColors.CenteringColor;
+        //    line1.StrokeThickness = 3;
+        //    line1.Opacity = 1;
 
-            Line line2 = CenterRightBottom_UI.Children[1] as Line;
-            line2.X1 = -40;
-            line2.Y1 = 0;
-            line2.X2 = 10;
-            line2.Y2 = 0;
-            line2.Stroke = DefineColors.CenteringColor;
-            line2.StrokeThickness = 3;
-            line2.Opacity = 1;
+        //    Line line2 = CenterRightBottom_UI.Children[1] as Line;
+        //    line2.X1 = -40;
+        //    line2.Y1 = 0;
+        //    line2.X2 = 10;
+        //    line2.Y2 = 0;
+        //    line2.Stroke = DefineColors.CenteringColor;
+        //    line2.StrokeThickness = 3;
+        //    line2.Opacity = 1;
 
-            Canvas.SetLeft(CenterRightBottom_UI, canvasPt.X);
-            Canvas.SetTop(CenterRightBottom_UI, canvasPt.Y);
+        //    Canvas.SetLeft(CenterRightBottom_UI, canvasPt.X);
+        //    Canvas.SetTop(CenterRightBottom_UI, canvasPt.Y);
 
-            if (!p_UIElement.Contains(CenterRightBottom_UI))
-            {
-                p_UIElement.Add(CenterRightBottom_UI);
-            }
+        //    if (!p_UIElement.Contains(CenterRightBottom_UI))
+        //    {
+        //        p_UIElement.Add(CenterRightBottom_UI);
+        //    }
 
 
-        }
+        //}
 
         private void DrawOriginRightTopPoint(CPoint memPt, bool bRecipeLoaded = false)
         {
@@ -1868,8 +2108,8 @@ namespace Root_WindII
             CPoint viewPt = memPt;
             CPoint canvasPt = GetCanvasPoint(viewPt);
 
-            OriginLeftBottom_UI.Width = 40;
-            OriginLeftBottom_UI.Height = 40;
+            //OriginLeftBottom_UI.Width = 40;
+            //OriginLeftBottom_UI.Height = 40;
 
             Line line1 = grid.Children[0] as Line;
             line1.X1 = -10;
@@ -2500,30 +2740,30 @@ namespace Root_WindII
                 DrawPitchBox();
             }
 
-            if (p_UIElement.Contains(CenterLeftTop_UI))
-            {
-                DrawCenterLeftTopPoint(centerLeftTop, true);
-            }
+            //if (p_UIElement.Contains(CenterLeftTop_UI))
+            //{
+            //    DrawCenterLeftTopPoint(centerLeftTop, true);
+            //}
 
-            if (p_UIElement.Contains(CenterRightBottom_UI))
-            {
-                DrawCenterRightBottomPoint(centerRightBottom, true);
-            }
+            //if (p_UIElement.Contains(CenterRightBottom_UI))
+            //{
+            //    DrawCenterRightBottomPoint(centerRightBottom, true);
+            //}
 
-            if (p_UIElement.Contains(CenterLTBox_UI))
-            {
-                DrawCenterBox(CenterLTBox_UI, CENTERING_POS.LT);
-            }
+            //if (p_UIElement.Contains(CenterLTBox_UI))
+            //{
+            //    DrawCenterBox(CenterLTBox_UI, CENTERING_POS.LT);
+            //}
 
-            if (p_UIElement.Contains(CenterRTBox_UI))
-            {
-                DrawCenterBox(CenterRTBox_UI, CENTERING_POS.RT);
-            }
+            //if (p_UIElement.Contains(CenterRTBox_UI))
+            //{
+            //    DrawCenterBox(CenterRTBox_UI, CENTERING_POS.RT);
+            //}
 
-            if (p_UIElement.Contains(CenterRBBox_UI))
-            {
-                DrawCenterBox(CenterRBBox_UI, CENTERING_POS.RB);
-            }
+            //if (p_UIElement.Contains(CenterRBBox_UI))
+            //{
+            //    DrawCenterBox(CenterRBBox_UI, CENTERING_POS.RB);
+            //}
 
             if (p_UIElement.Contains(CenterLTPoint_UI))
             {

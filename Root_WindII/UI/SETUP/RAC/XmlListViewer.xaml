@@ -22,7 +22,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid>
-            <Border Background="White" Margin="4">
+            <Border Background="White" Margin="4" PreviewMouseLeftButtonDown="TextBlock_MouseDown" PreviewMouseMove="TextBlock_GotFocus" MouseLeave="TextBlock_MouseLeave">
                 <DockPanel>
                     <packicon:PackIconEntypo Kind="MagnifyingGlass" Foreground="Black" DockPanel.Dock="Left" Margin="5,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                     <TextBox x:Name="SearchBox" BorderThickness="0" TextAlignment="Left" VerticalContentAlignment="Center" FontSize="15" Text="{Binding SearchFileName, UpdateSourceTrigger=PropertyChanged}" Background="Transparent"/>
@@ -44,9 +44,42 @@
         <Grid Grid.Row="1" Margin="4">
             <DataGrid ItemsSource="{Binding FileInfoList}" IsReadOnly="True" AutoGenerateColumns="False" SelectionMode="Single" SelectedItem="{Binding SelectedItem}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" FontSize="15" Width="2*" Binding="{Binding FileName}"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Creation Time" FontSize="15" Foreground="Green" Width="*" Binding="{Binding CreationTime}"></DataGridTextColumn>
-                    <DataGridTextColumn Header="LastWrite Time" FontSize="15" Foreground="Red" Width="*" Binding="{Binding LastWriteTime}"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Name" FontSize="15" Width="2*" Binding="{Binding FileName}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Creation Time" FontSize="15" Foreground="Green" Width="*" Binding="{Binding CreationTime}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="LastWrite Time" FontSize="15" Foreground="Red" Width="*" Binding="{Binding LastWriteTime}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                 </DataGrid.Columns>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedCellsChanged">
