@@ -773,9 +773,9 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public string ReqSnap(string sRecipe, eWorks eWorks)
+        public string ReqSnap(string sRecipe, eWorks eWorks, bool bBiDirectionalScan = false, bool bNeedInsp = false)
         {
-            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString() + "," + m_bUseBiDirectional.ToString();
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString() + "," + bBiDirectionalScan.ToString() + "," + bNeedInsp.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             while (sSend != m_sReceive)
