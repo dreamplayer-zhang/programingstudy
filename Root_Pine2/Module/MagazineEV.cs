@@ -630,7 +630,7 @@ namespace Root_Pine2.Module
                     if (m_aMagazine[pos] == null)
                     {
                         if (Run(RunLoad(pos))) return p_sInfo;
-                        if (Run(m_elevator.MoveElevator(Elevator.ePos.TransferUp))) return p_sInfo;
+                        //if (Run(m_elevator.MoveElevator(Elevator.ePos.TransferUp))) return p_sInfo;
                         m_aMagazine[pos] = new Magazine(this, pos, m_pine2.p_iBundle++);
                         return "OK";
                     }

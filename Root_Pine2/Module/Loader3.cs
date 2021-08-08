@@ -307,9 +307,10 @@ namespace Root_Pine2.Module
                 if (m_transfer.m_pusher.p_bEnable == false) return "OK";
                 ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
                 double xOffset = m_transfer.m_buffer.m_xOffset;
-                m_transfer.m_buffer.RunAlign(false); 
+                //m_transfer.m_buffer.RunAlign(false); 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveTransfer(ePos, xOffset))) return p_sInfo;
+                m_transfer.m_buffer.RunAlign(false); 
                 if (Run(RunMoveZ(ePos))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 if (Run(RunMoveUp())) return p_sInfo;

@@ -282,9 +282,9 @@ namespace Root_Pine2_Vision.Module
             {
                 RunTreeImage(tree.GetTree("Image"));
                 RunTreeFOV(tree.GetTree("FOV"));
-                RunTreeColor(tree.GetTree("Red"), 0);
-                RunTreeColor(tree.GetTree("Green"), 1);
-                RunTreeColor(tree.GetTree("Blue"), 2);
+                //RunTreeColor(tree.GetTree("Red"), 0);
+                //RunTreeColor(tree.GetTree("Green"), 1);
+                //RunTreeColor(tree.GetTree("Blue"), 2);
             }
 
             void RunTreeImage(Tree tree)
@@ -618,15 +618,16 @@ namespace Root_Pine2_Vision.Module
             int nFOVpx = m_aGrabData[eWorks].m_nFovSize;
             int nReverseOffset = m_aGrabData[eWorks].m_nReverseOffset;
             int nOverlap = m_aGrabData[eWorks].m_nOverlap;
+            nFOVpx -= nOverlap;
             int nYOffset = m_aGrabData[eWorks].m_nYOffset;
             Recipe.eSnapMode nSnapMode = m_RunningRecipe[eWorks].p_eSnapMode;
             int nTotalSnap = m_RunningRecipe[eWorks].p_lSnap;
            if (nTotalSnap < 2) 
                  nTotalSnap = 2;
-            int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.MATROX) ? iSnap % (nTotalSnap / 2) : iSnap;
+            int nSnapLineIndex = iSnap;// (nSnapMode == Recipe.eSnapMode.MATROX) ? iSnap % (nTotalSnap / 2) : iSnap;
 
             // 이미지 시작점 설정
-            CPoint cpOffset =new CPoint(0, 0);// CalcOffset(nSnapLineIndex, nFOVpx, nReverseOffset, recipe);
+            CPoint cpOffset = CalcOffset(nSnapLineIndex, nFOVpx, nReverseOffset, recipe);
             MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
 
             MemoryData memConv = m_aWorks[eWorks].m_memoryGroup.GetMemory(Works3D.Mem3DViewH);
@@ -772,9 +773,9 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public string ReqSnap(string sRecipe, eWorks eWorks)
+        public string ReqSnap(string sRecipe, eWorks eWorks, bool bBiDirectionalScan = false, bool bNeedInsp = false)
         {
-            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString() + "," + m_bUseBiDirectional.ToString();
+            string sSend = m_nReq.ToString("000") + "," + eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString() + "," + bBiDirectionalScan.ToString() + "," + bNeedInsp.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             while (sSend != m_sReceive)
@@ -918,8 +919,8 @@ namespace Root_Pine2_Vision.Module
 
         void RunGrabDataTree(Tree tree)
         {
-            //m_aGrabData[eWorks.A].RunTree(tree.GetTree("GrabData A"));
-            //m_aGrabData[eWorks.B].RunTree(tree.GetTree("GrabData B"));
+            m_aGrabData[eWorks.A].RunTree(tree.GetTree("GrabData A"));
+            m_aGrabData[eWorks.B].RunTree(tree.GetTree("GrabData B"));
         }
         #endregion
 

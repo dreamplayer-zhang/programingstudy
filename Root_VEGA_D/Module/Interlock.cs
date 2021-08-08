@@ -372,8 +372,8 @@ namespace Root_VEGA_D.Module
         void RunTreeFDC(Tree tree)
         {
             m_bDoorlock_Use = tree.Set(m_bDoorlock_Use, m_bDoorlock_Use, "Doorlock Use", "Doorlock Use");
-            m_mmLimitCDA1 = tree.Set(m_mmLimitCDA1, m_mmLimitCDA1, "Limit", "FDC CDA1 Lower & Upper Limit");
-            m_mmLimitCDA2 = tree.Set(m_mmLimitCDA2, m_mmLimitCDA2, "Limit", "FDC CDA2 Lower & Upper Limit");
+            m_mmLimitCDA1 = tree.Set(m_mmLimitCDA1, m_mmLimitCDA1, "CDA 1 Limit", "FDC CDA1 Lower & Upper Limit");
+            m_mmLimitCDA2 = tree.Set(m_mmLimitCDA2, m_mmLimitCDA2, "CDA 2 Limit", "FDC CDA2 Lower & Upper Limit");
         }
 
         void RunTreeInterLock(Tree tree)

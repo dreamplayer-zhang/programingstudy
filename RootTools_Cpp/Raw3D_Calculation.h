@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Raw3D_RawData.h"
-
+#define MAX_OVERLAP 200
 #define MAX_RAW_Y 256
 static enum ConvertMode
 {
@@ -126,7 +126,7 @@ private:
 		else
 			return false;
 	}
-
+	double m_pdOverlap[MAX_OVERLAP];
 	int m_SumX[MAX_RAW_Y];
 	int m_SumX2[MAX_RAW_Y];
 };

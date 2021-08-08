@@ -1,0 +1,315 @@
+﻿<Window x:Class="RootTools_Vision.KlarfSettingDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:PackIcon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:j="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
+        xmlns:wpg="clr-namespace:RootTools_Vision"
+        xmlns:local="clr-namespace:RootTools_Vision"
+        mc:Ignorable="d"
+        Height="500"
+        Width="600"
+        Padding="0"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        d:DesignHeight="450" d:DesignWidth="800"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+        
+    <Window.Resources>
+        <!-- #region [Color Dedines] -->
+        <SolidColorBrush x:Key="SelectedColor" Color="LightCyan"/>
+        <SolidColorBrush x:Key="SelectionActiveColor" Color="LightGray"/>
+
+        <!-- #endregion -->
+
+        <Style TargetType="TreeView">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="0, 5, 0, 0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
+        </Style>
+
+        <Style x:Key="ExpanderToggleButton" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Focusable" Value="True"/>
+            <Setter Property="IsChecked" Value="{Binding Path=IsExpanded, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid x:Name="ExpanderGrid" Background="Transparent">
+                            <PackIcon:PackIconMaterial x:Name ="Collapsed"
+                                                       Focusable="True"
+                                                       Kind="ArrowRightDropCircleOutline"
+                                                       HorizontalAlignment="Center"
+                                                       Foreground="DarkSlateGray"/>
+                            <PackIcon:PackIconMaterial x:Name ="CollapsedMouseOver"
+                                                       Focusable="True"
+                                                       Kind="ArrowRightDropCircle"
+                                                       HorizontalAlignment="Center"
+                                                       Foreground="DarkSlateGray"
+                                                       Visibility="Hidden"/>
+                            <PackIcon:PackIconMaterial x:Name ="Expanded"
+                                                       Focusable="True"
+                                                       Kind="ArrowDownDropCircleOutline" 
+                                                       HorizontalAlignment="Center"
+                                                       Foreground="DarkSlateGray"
+                                                       Visibility="Hidden"/>
+                            <PackIcon:PackIconMaterial x:Name ="ExpandedMouseOver"
+                                                       Focusable="True"
+                                                       Kind="ArrowDownDropCircle" 
+                                                       HorizontalAlignment="Center"
+                                                       Foreground="DarkSlateGray"
+                                                       Visibility="Hidden"/>
+                            <!--<PackIcon:PackIconMaterial x:Name ="None"
+                                                       Kind="MinusCircleOutline" 
+                                                       HorizontalAlignment="Center"
+                                                       Foreground="LightGray"
+                                                       Visibility="Hidden"/>-->
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <!--<DataTrigger Binding="{Binding Path=HasItems, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}"
+                                         Value="False">
+                                <Setter TargetName="None" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="Collapsed" Property="Visibility" Value="Hidden"/>
+                            </DataTrigger>-->
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Collapsed" Property="Visibility" Value="Hidden"/>
+                                <Setter TargetName="Expanded" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="False"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Collapsed" Property="Visibility" Value="Hidden"/>
+                                <Setter TargetName="CollapsedMouseOver" Property="Visibility" Value="Visible"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="True"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Expanded" Property="Visibility" Value="Hidden"/>
+                                <Setter TargetName="ExpandedMouseOver" Property="Visibility" Value="Visible"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="True"/>
+            <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}"/>
+            <Setter Property="HorizontalContentAlignment"
+                    Value="{Binding Path=HorizontalContentAlignment,
+                    RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment"
+                    Value="{Binding Path=VerticalContentAlignment,
+                    RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TreeViewItem">
+                        <ControlTemplate.Resources>
+                            <local:IndentConverter  Length="19" x:Key="IndentConverter"/>
+                        </ControlTemplate.Resources>
+                        <StackPanel Orientation="Vertical" Background="Transparent">
+                            <Border x:Name="Bd"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Padding="{TemplateBinding Padding}">
+                                <Grid Margin="{Binding Converter={StaticResource IndentConverter}, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" MinWidth="19"/>
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <ToggleButton x:Name="Expander"
+                                                  ClickMode="Press"
+                                                  Style="{StaticResource ExpanderToggleButton}"
+                                                  IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                    <ContentPresenter x:Name="PART_Header"
+                                                      Grid.Column="1"
+                                                      ContentSource="Header"/>
+                                </Grid>
+                            </Border>
+                            <ItemsPresenter x:Name="ItemsHost"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded"
+                                     Value="false">
+                                <Setter TargetName="ItemsHost" 
+                                        Property="Visibility"
+                                        Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="HasItems"
+                                     Value="False">
+                                <Setter TargetName="Expander"
+                                        Property="Visibility"
+                                        Value="Hidden"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="HasHeader" Value="false" />
+                                    <Condition Property="Width" Value="Auto" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="PART_Header" 
+                                        Property="MinWidth" Value="19" />
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="HasHeader" Value="false" />
+                                    <Condition Property="Height" Value="Auto" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="PART_Header"
+                                        Property="MinHeight"
+                                        Value="19" />
+                            </MultiTrigger>
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter TargetName="Bd"
+                                        Property="Panel.Background"
+                                        Value="{StaticResource SelectedColor}"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="True" />
+                                    <Condition Property="IsSelectionActive" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd"
+                                        Property="Panel.Background"
+                                        Value="{StaticResource SelectionActiveColor}" />
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <GroupBox Header="Settings" Style="{StaticResource main_view_groupbox}" >
+        <Grid Background="#808080">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200*"/>
+                    <RowDefinition Height="50*"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                </Grid.ColumnDefinitions>
+                <!--<Border Grid.Column="0">
+                    <TextBlock Text="Menu" FontSize="15" VerticalAlignment="Center" Margin="9"/>
+                </Border>
+                <Border Grid.Row="0"
+                        Grid.RowSpan="2">
+                    <wpg:WpfPropertyGrid SelectedObject="{Binding SelectedSettingData, Mode=TwoWay, FallbackValue=null}"
+                                     TitleVisible="True"
+                                     HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Stretch"
+                                     HelpVisible="True"
+                                     ToolbarVisible="False"
+                                     PropertySort="Categorized"/>
+                </Border>-->
+                
+                <Grid Grid.Row="0" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="80"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="60*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <ScrollViewer Grid.Row="0" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                        <Border Grid.RowSpan="2">
+                            <wpg:WpfPropertyGrid SelectedObject="{Binding Item_Edgeside, Mode=TwoWay, FallbackValue=null}"
+                                     TitleVisible="True"
+                                     HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Stretch"
+                                     HelpVisible="True"
+                                     ToolbarVisible="False"
+                                     PropertySort="Categorized"/>
+                        </Border>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="1" Grid.Column="0">
+                        <TextBlock Text="Specification Limit" FontSize="12" VerticalAlignment="Center" Margin="9"/>
+                    </Border>
+                    
+                    <ScrollViewer Grid.Row="2" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                        <DataGrid ItemsSource="{Binding Item_Edgeside.SLList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                                  CanUserAddRows="True"
+                                  SelectionMode="Single"
+                                  IsReadOnly="False"
+                                  AutoGenerateColumns="False">
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                                <Style x:Key="TextInCellLeft" TargetType="{x:Type TextBlock}" >
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                    <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="Height" Value="24"/>
+                                    <Setter Property="Margin" Value="12,6,0,0"/>
+                                </Style>
+                                <Style x:Key="TextInCellCenter" TargetType="{x:Type TextBlock}" >
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="Height" Value="24"/>
+                                    <Setter Property="Margin" Value="0,6,0,0"/>
+                                </Style>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                                                             Color="Gainsboro"/>
+                            </DataGrid.Resources>
+
+                            <DataGrid.InputBindings>
+                                <MouseBinding Gesture="RightDoubleClick" Command="{Binding ClickRightCommand}"></MouseBinding>
+                            </DataGrid.InputBindings>
+                            
+                            <DataGrid.Columns>
+                              <DataGridTextColumn Header="Number" Width="1*"
+                                                  ElementStyle="{StaticResource TextInCellCenter}"
+                                                  Binding="{Binding Number, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="LSL" Width="1*"
+                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                    Binding="{Binding LSL, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="USL" Width="1*"
+                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                    Binding="{Binding USL, UpdateSourceTrigger=PropertyChanged}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        
+                        <!--<ListView ItemsSource="{Binding Item_Edgeside.SLList}" FontSize="14">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Number" DisplayMemberBinding="{Binding Number}" Width="200"/>
+                                    <GridViewColumn Header="USL" DisplayMemberBinding="{Binding USL}" Width="200"/>
+                                    <GridViewColumn Header="LSL" DisplayMemberBinding="{Binding LSL}" Width="200"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>-->
+                    </ScrollViewer>
+                </Grid>
+                
+                <StackPanel Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                    <Button Width="100" Content="확인" Margin="4" Command="{Binding btnOKCommand}"/>
+                    <Button Width="100" Content="취소" Margin="4" Command="{Binding btnCancelCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </GroupBox>
+</Window>
