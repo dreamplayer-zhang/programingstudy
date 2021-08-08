@@ -35,7 +35,8 @@ namespace Root_WIND2
         internal Run_ViewModel RunViewModel { get => runViewModel; set => runViewModel = value; }
         public SettingDialog SettingDialog { get => settingDialog; set => settingDialog = value; }
         public SettingDialog_ViewModel SettingDialogViewModel { get => settingDialogViewModel; set => settingDialogViewModel = value; }
-
+        public KlarfSettingDialog KlarfSettingDialog { get => klarfSettingDialog; set => klarfSettingDialog = value; }
+        public KlarfSettingDialog_ViewModel KlarfSettingDialogViewModel { get => klarfSettingDialogViewModel; set => klarfSettingDialogViewModel = value; }
 
 
         #region WPF member
@@ -52,6 +53,7 @@ namespace Root_WIND2
         private Run runWindow;
 
         private SettingDialog settingDialog;
+        private KlarfSettingDialog klarfSettingDialog;
         #endregion
 
         #region ViewModel
@@ -63,6 +65,7 @@ namespace Root_WIND2
         private Run_ViewModel runViewModel;
 
         private SettingDialog_ViewModel settingDialogViewModel;
+        private KlarfSettingDialog_ViewModel klarfSettingDialogViewModel;
         #endregion
 
         public bool Initialize()
@@ -113,6 +116,10 @@ namespace Root_WIND2
             settingDialog = new SettingDialog();
             settingDialogViewModel = new SettingDialog_ViewModel(GlobalObjects.Instance.Get<Settings>());
             settingDialog.DataContext = settingDialogViewModel;
+
+            klarfSettingDialog = new KlarfSettingDialog();
+            klarfSettingDialogViewModel = new KlarfSettingDialog_ViewModel(GlobalObjects.Instance.Get<KlarfSetting>().SettingEdgeKlarf);    // 우선 Edge만
+            klarfSettingDialog.DataContext = klarfSettingDialogViewModel;
         }
 
         public void ChangeMainUI(UIElement window)

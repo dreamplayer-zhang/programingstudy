@@ -14,6 +14,12 @@ namespace RootTools_Vision
 
         }
 
+        public enum AngleDirection
+		{
+            Clockwise,
+            CounterClockwise
+		}
+
         [Category("Klarf")]
         [DisplayName("Use Klarf")]
         public bool UseKlarf
@@ -37,6 +43,15 @@ namespace RootTools_Vision
             }
         }
         private string klarfSavePath = "D:\\Klarf";
+
+        [Category("Klarf")]
+        [DisplayName("Use Save Circle Image")]
+        public bool UseSaveCircleImage
+        {
+            get => this.useSaveCircleImage;
+            set => this.useSaveCircleImage = value;
+        }
+        private bool useSaveCircleImage = true;
 
         [Category("Klarf")]
         [DisplayName("Whole Circle Image Size Width")]
@@ -128,20 +143,50 @@ namespace RootTools_Vision
         }
         private int defectSizeIntervalCnt = 5;
 
+        //[Category("Klarf")]
+        //[DisplayName("Defect Size Standard Width (um)")]   // Find bin 올리는 Defect Size 기준(um) ex) 100um 보다 크면? 1:0
+        //public int DefectSizeStandardWidth
+        //{
+        //    get
+        //    {
+        //        return defectSizeStandardWidth;
+        //    }
+        //    set
+        //    {
+        //        defectSizeStandardWidth = value;
+        //    }
+        //}
+        //private int defectSizeStandardWidth = 100;
+
+        //[Category("Klarf")]
+        //[DisplayName("Defect Size Standard Height (um)")]   // Find bin 올리는 Defect Size 기준(um) ex) 100um 보다 크면? 1:0
+        //public int DefectSizeStandardHeight
+        //{
+        //    get
+        //    {
+        //        return defectSizeStandardHeight;
+        //    }
+        //    set
+        //    {
+        //        defectSizeStandardHeight = value;
+        //    }
+        //}
+        //private int defectSizeStandardHeight = 100;
+
         [Category("Klarf")]
-        [DisplayName("Defect Size Standard (um)")]   // Find bin 올리는 Defect Size 기준(um) ex) 100um 보다 크면? 1:0
-        public int DefectSizeStandard
+        [DisplayName("Angle Direction")]  // Notch(6시방향) 기준 각도 표시
+        public AngleDirection Angle
         {
             get
             {
-                return defectSizeStandard;
+                return angle;
             }
             set
             {
-                defectSizeStandard = value;
+                angle = value;
             }
         }
-        private int defectSizeStandard = 100;
+        private AngleDirection angle = AngleDirection.Clockwise;
 
         [Category("Common")]
         [DisplayName("Defect Image Path")]

@@ -29,6 +29,7 @@ namespace RootTools_Vision
         {
             public const string SettingFilePath = @"C:\Root\Setting.ini";
             public const string DefectCodeFilePath = @"C:\Root\DefectCode.ini";
+            public const string KlarfSettingFilePath = @"C:\Root\KlarfSetting.xml";
         }
 
         public static class ASCWaferMap
