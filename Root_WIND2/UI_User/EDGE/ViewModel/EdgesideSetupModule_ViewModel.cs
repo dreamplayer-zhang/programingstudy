@@ -54,35 +54,8 @@ namespace Root_WIND2.UI_User
 			}
 		}
 
-		//private ObservableCollection<OptionDefect> optionDefectList;
-		//public ObservableCollection<OptionDefect> OptionDefectList
-		//{
-		//	get
-		//	{
-		//		return optionDefectList;
-		//	}
-		//	set
-		//	{
-		//		SetParameter();
-		//		SetProperty(ref optionDefectList, value);
-		//	}
-		//}
-
-		//private OptionDefect selectedOptionDefect;
-		//public OptionDefect SelectedOptionDefect
-		//{
-		//	get
-		//	{
-		//		return selectedOptionDefect;
-		//	}
-		//	set
-		//	{
-		//		SetProperty(ref selectedOptionDefect, value);
-		//	}
-		//}
-
-		private ObservableCollection<OptionDefect2> optionDefectList;
-		public ObservableCollection<OptionDefect2> OptionDefectList
+		private ObservableCollection<OptionDefect> optionDefectList;
+		public ObservableCollection<OptionDefect> OptionDefectList
 		{
 			get
 			{
@@ -95,8 +68,8 @@ namespace Root_WIND2.UI_User
 			}
 		}
 
-		private OptionDefect2 selectedOptionDefect;
-		public OptionDefect2 SelectedOptionDefect
+		private OptionDefect selectedOptionDefect;
+		public OptionDefect SelectedOptionDefect
 		{
 			get
 			{
@@ -224,7 +197,7 @@ namespace Root_WIND2.UI_User
 			Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop;
 			Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 			ProcessDefectParameter = recipe.GetItem<ProcessDefectEdgeParameter>();
-			OptionDefectList = new ObservableCollection<OptionDefect2>();
+			OptionDefectList = new ObservableCollection<OptionDefect>();
 
 			this.camInfoDataListVM = new DataListView_ViewModel();
 			SetOriginInfo();
@@ -282,12 +255,12 @@ namespace Root_WIND2.UI_User
 			int count = recipe.GetItem<ProcessDefectEdgeParameter>().MinAngles.Count;
 
 			if (OptionDefectList == null)
-				OptionDefectList = new ObservableCollection<OptionDefect2>();
+				OptionDefectList = new ObservableCollection<OptionDefect>();
 
 			OptionDefectList.Clear();
 			for (int i = 0; i < count; i++)
 			{
-				OptionDefectList.Add(new OptionDefect2(recipe.GetItem<ProcessDefectEdgeParameter>().MinAngles[i], recipe.GetItem<ProcessDefectEdgeParameter>().MaxAngles[i], recipe.GetItem<ProcessDefectEdgeParameter>().DefectCodes[i]));
+				OptionDefectList.Add(new OptionDefect(recipe.GetItem<ProcessDefectEdgeParameter>().MinAngles[i], recipe.GetItem<ProcessDefectEdgeParameter>().MaxAngles[i], recipe.GetItem<ProcessDefectEdgeParameter>().DefectCodes[i]));
 			}
 		}
 
@@ -300,7 +273,7 @@ namespace Root_WIND2.UI_User
 			List<double> maxAngleList = new List<double>();
 			List<int> defectCodeList = new List<int>();
 
-			foreach (OptionDefect2 item in OptionDefectList)
+			foreach (OptionDefect item in OptionDefectList)
 			{
 				minAngleList.Add(item.MinAngle);
 				maxAngleList.Add(item.MaxAngle);
@@ -320,7 +293,7 @@ namespace Root_WIND2.UI_User
 			{
 				return new RelayCommand(() =>
 				{
-					OptionDefect2 item = new OptionDefect2(0, 0, 0);
+					OptionDefect item = new OptionDefect(0, 0, 0);
 					OptionDefectList.Add(item);
 				});
 			}
@@ -352,24 +325,12 @@ namespace Root_WIND2.UI_User
 	
 	public class OptionDefect
 	{
-		public double Angle { get; set; }
-		public int Code { get; set; }
-
-		public OptionDefect(double angle, int code)
-		{
-			this.Angle = angle;
-			this.Code = code;
-		}
-	}
-
-	public class OptionDefect2
-	{
 		public double MinAngle { get; set; }
 		public double MaxAngle { get; set; }
 
 		public int Code { get; set; }
 
-		public OptionDefect2(double minAngle, double maxAngle, int code)
+		public OptionDefect(double minAngle, double maxAngle, int code)
 		{
 			this.MinAngle = minAngle;
 			this.MaxAngle = maxAngle;

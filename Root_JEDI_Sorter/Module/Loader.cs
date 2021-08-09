@@ -296,6 +296,27 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
+        #region Run Pick
+        public string StartPick(Good.eGood eGood, Good.eStage eStage, eResult eResult)
+        {
+            Run_Pick run = (Run_Pick)m_runPick.Clone();
+            run.m_eGood = eGood;
+            run.m_eStage = eStage;
+            run.m_eResult = eResult;
+            return StartRun(run); 
+        }
+
+        public string RunPick(Good.eGood eGood, Good.eStage eStage, eResult eResult)
+        {
+            Good good = m_handler.m_good[eGood];
+            InfoTray infoTray = good.m_stage[eStage].p_infoTray;
+            CPoint cpTray = infoTray.FindChip(eResult); 
+            if (cpTray.Y < 0) return "Can not Found " + eResult.ToString() + " in InfoTray";
+            //forget
+            return "OK";
+        }
+        #endregion
+
         #region override
         public override void RunTree(Tree tree)
         {
@@ -318,7 +339,75 @@ namespace Root_JEDI_Sorter.Module
         }
 
         #region ModuleRun
+        ModuleRunBase m_runPick;
+        protected override void InitModuleRuns()
+        {
+            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+            m_runPick = AddModuleRunList(new Run_Pick(this), true, "Run Pick Chip from Tray");
+        }
 
+        public class Run_Delay : ModuleRunBase
+        {
+            Loader m_module;
+            public Run_Delay(Loader module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            double m_secDelay = 2;
+            public override ModuleRunBase Clone()
+            {
+                Run_Delay run = new Run_Delay(m_module);
+                run.m_secDelay = m_secDelay;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
+            }
+
+            public override string Run()
+            {
+                Thread.Sleep((int)(1000 * m_secDelay / 2));
+                return "OK";
+            }
+        }
+
+        public class Run_Pick : ModuleRunBase
+        {
+            Loader m_module;
+            public Run_Pick(Loader module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public Good.eGood m_eGood = Good.eGood.GoodA;
+            public Good.eStage m_eStage = Good.eStage.Giver;
+            public eResult m_eResult = eResult.Good; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Pick run = new Run_Pick(m_module);
+                run.m_eGood = m_eGood;
+                run.m_eStage = m_eStage;
+                run.m_eResult = m_eResult; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eGood = (Good.eGood)tree.Set(m_eGood, m_eGood, "Boat", "Select Boat", bVisible);
+                m_eStage = (Good.eStage)tree.Set(m_eStage, m_eStage, "Stage", "Select Boat", bVisible);
+                m_eResult = (eResult)tree.Set(m_eResult, m_eResult, "Result", "Select Result", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunPick(m_eGood, m_eStage, m_eResult);
+            }
+        }
         #endregion
     }
 }

@@ -172,6 +172,8 @@
                                            HorizontalAlignment="Center" />
                             </Grid>
                         </MenuItem.Header>
+                        <MenuItem Header="Setting" Foreground="Black" Command="{Binding btnPopUpSetting}"/>
+                        <MenuItem Header="Edge Klarf" Foreground="Black" Command="{Binding btnPopUpKlarfSetting}"/>
                     </MenuItem>
                 </Menu>
             </StackPanel>

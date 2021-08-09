@@ -28,7 +28,7 @@ namespace RootTools.Camera.Matrox
         private MIL_ID m_MilSystem;                          // 프레임그래버
         private MIL_ID m_MilDigitizer;                       // 카메라
         private MIL_ID m_MilDisplay;                         // 디스플레이
-        private MIL_ID m_MilImage = MIL.M_NULL;              // MIL Image buffer identifier.
+    //    private MIL_ID m_MilImage = MIL.M_NULL;              // MIL Image buffer identifier.
         private MIL_ID[] m_MilBuffers = new MIL_ID[c_nBuf];  // 버퍼
 
         static int m_nTest = 0;
@@ -143,8 +143,8 @@ namespace RootTools.Camera.Matrox
                 SetProperty(ref m_CamInfo, value);
             }
         }
-        const int c_nBuf = 4000;
-        int _nBuf = 4000;
+        const int c_nBuf = 10000;
+        int _nBuf = c_nBuf;
         public int p_nBuf
         {
             get
@@ -213,6 +213,7 @@ namespace RootTools.Camera.Matrox
         void RunSetTree(Tree tree)
         {
             p_CamInfo.p_sFile = tree.SetFile(p_CamInfo.p_sFile, p_CamInfo.p_sFile, "dcf", "CamFile", "Cam File");
+            p_CamInfo.p_nSystemNum = tree.Set(p_CamInfo.p_nSystemNum, p_CamInfo.p_nSystemNum, "System Number", "System Number");
         }
 
         void RunImageRoiTree(Tree tree)
@@ -281,8 +282,8 @@ namespace RootTools.Camera.Matrox
                 MIL.MappAlloc(MIL.M_NULL, MIL.M_DEFAULT, ref m_MilApplication);
             // System
             if (m_MilSystem == MIL.M_NULL)
-                MIL.MsysAlloc(MIL.M_DEFAULT, "M_SYSTEM_RAPIXOCXP", MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입
-
+                MIL.MsysAlloc(MIL.M_DEFAULT, "M_SYSTEM_RAPIXOCXP", p_CamInfo.p_nSystemNum, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입
+            //MIL.MsysAlloc(MIL.M_DEFAULT, "M_SYSTEM_RAPIXOCXP", MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입
 
             //MIL.MsysAlloc(MIL.M_DEFAULT, MIL.M_SYSTEM_SOLIOS, MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입
             //MIL.MsysAlloc(MIL.M_DEFAULT, MIL.M_SYSTEM_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입
@@ -292,6 +293,7 @@ namespace RootTools.Camera.Matrox
 
             // Set dafault values for the image buffer in case no digitizer can be allocated
             long lImgAttributes = MIL.M_IMAGE + MIL.M_DISP;
+            int FRAMEBURST_SIZE = 1;
             // Inquire the number of digitizers for the system
             if (m_MilSystem != MIL.M_NULL)
             {
@@ -302,9 +304,7 @@ namespace RootTools.Camera.Matrox
                     if (m_MilDigitizer == MIL.M_NULL)  
                     {
                         MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_DEFAULT, ref m_MilDigitizer);
-                        //MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, MIL.M_SYSTEM_DEFAULT, MIL.M_DEFAULT, ref m_MilDigitizer);
-                        //MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_EMULATED, ref m_MilDigitizer);
-
+  
                         p_nImgBand = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_BAND, MIL.M_NULL);
                         p_nWidth = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_X, MIL.M_NULL);
                         p_nHeight = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_Y, MIL.M_NULL);
@@ -313,32 +313,46 @@ namespace RootTools.Camera.Matrox
                     //    offsetY = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SOURCE_OFFSET_Y, MIL.M_NULL);
                         // Add M_GRAB attribute if a digitizer is allocated.
                         lImgAttributes |= MIL.M_GRAB;
+
+                        if (FRAMEBURST_SIZE != 1)
+                        {
+                            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_FRAME_BURST_SIZE, FRAMEBURST_SIZE);
+                            /////* Sets the maximum amount of time to wait for all the frames to be grabbed. */
+                            /////* The value, in seconds, is set to 100ms. */
+                            double dFrameBurstMaxTime = 1.00;//0.100;
+                            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_FRAME_BURST_MAX_TIME, dFrameBurstMaxTime); 
+                            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_FRAME_BURST_END_TRIGGER_STATE, MIL.M_ENABLE);
+                            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_FRAME_BURST_END_TRIGGER_SOURCE, MIL.M_AUX_IO0);
+                            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_ACTIVATION, MIL.M_DEFAULT);
+                            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_SOURCE, MIL.M_DEFAULT);
+                            MIL.MsysControl(m_MilSystem, MIL.M_ALLOCATION_OVERSCAN, MIL.M_DISABLE);
+                        }                    
                     }
                 }
             }
-            MIL.MbufAllocColor(m_MilSystem, p_nImgBand, p_nWidth, p_nHeight, 8 + MIL.M_UNSIGNED, lImgAttributes, ref m_MilImage);
-            MIL.MbufClear(m_MilImage, 0);
+       //     MIL.MbufAllocColor(m_MilSystem, p_nImgBand, p_nWidth, p_nHeight, 8 + MIL.M_UNSIGNED, lImgAttributes, ref m_MilImage);
+         //   MIL.MbufClear(m_MilImage, 0);
 
             //MIL.MappControl(MIL.M_DEFAULT, MIL.M_ERROR, MIL.M_PRINT_DISABLE);
             // Allocate the grab buffers and clear them.
             for (int i = 0; i < p_nBuf; i++)
             {
 
-                MIL.MbufAlloc2d(m_MilSystem, (MIL_INT)p_nWidth, (MIL_INT)p_nHeight, 8 + MIL.M_UNSIGNED, lImgAttributes, ref m_MilBuffers[i]);
+                MIL.MbufAlloc2d(m_MilSystem, (MIL_INT)p_nWidth, (MIL_INT)p_nHeight * FRAMEBURST_SIZE, 8 + MIL.M_UNSIGNED, MIL.M_IMAGE + MIL.M_GRAB + MIL.M_HOST_MEMORY , ref m_MilBuffers[i]);
 
                 if (m_MilBuffers[i] != MIL.M_NULL)
                 {
-                    MIL.MbufClear(m_MilBuffers[i], 0xFF);
+                    MIL.MbufClear(m_MilBuffers[i], 0);
                 }
             }
             MIL.MappControl(MIL.M_DEFAULT, MIL.M_ERROR, MIL.M_PRINT_DISABLE);
 
             // Free buffers to leave space for possible temporary buffers.
-            for (int n = 0; n < 2 && p_nBuf > 0; n++)
-            {
-                p_nBuf--;
-                MIL.MbufFree(m_MilBuffers[p_nBuf]);
-            }
+        //    for (int n = 0; n < 2 && p_nBuf > 0; n++)
+       //     {
+        //        p_nBuf--;
+        //        MIL.MbufFree(m_MilBuffers[p_nBuf]);
+        //    }
             p_CamInfo.p_eState = eCamState.Ready;
             //m_ImageLive.ReAllocate(new CPoint(p_nWidth, p_nHeight), 1);
             return;
@@ -561,7 +575,7 @@ namespace RootTools.Camera.Matrox
         {
             MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_STOP, MIL.M_DEFAULT, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
             m_GrabData = GrabData;
-            m_nGrabCount = (int)Math.Truncate(1.0 * nLine / p_nHeight);
+            m_nGrabCount = nLine;// (int)Math.Truncate(1.0 * nLine / p_nHeight);
             m_nGrabTrigger = 0;
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
@@ -595,22 +609,26 @@ namespace RootTools.Camera.Matrox
             userObjectHandle = GCHandle.Alloc(this);
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, MIL.M_INFINITE); // Grab 대기 시간
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
-            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_SEQUENCE + MIL.M_COUNT(m_nGrabCount), MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
-            //MdigProcess(MilDigitizer, MilGrabBuf, GRAB_NUM, M_SEQUENCE + M_COUNT(TOTAL_FRAME_NUM), M_ASYNCHRONOUS + M_TRIGGER_FOR_FIRST_GRAB, ProcessingFunction, &UserHookData);
+            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, c_nBuf, MIL.M_START, MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+
+            if (m_GrabData != null)
+                m_clr3D.MakeImageSimple(m_cpScanOffset.X, m_cpScanOffset.Y, 30, 30, 32, m_nGrabCount, 0, m_GrabData.m_nOverlap, 0, 0, false, false, 0, 0);
+
 
             m_GrabThread = new Thread(new ThreadStart(RunGrab3DScanThread));
             m_GrabThread.Start();
             return;
         }
       //  byte[][] m_srcarray = null;
-
+        static void CopyToMem(byte[] s, IntPtr d, int sz)
+        {
+            Marshal.Copy(s, 0, d,sz);
+        }
         unsafe void RunGrab3DScanThread()
         {
             try
             {
-                if (m_GrabData != null)
-                    m_clr3D.MakeImageSimple(0, 0, 30, 30, 4, m_nGrabCount, 0, m_GrabData.m_nOverlap, 0, 0, false, false, 0, 0);
-
+              
                 StopWatch swGrab = new StopWatch();
                 int DelayGrab = (int)(1000 * m_nGrabCount);
                 byte[] srcarray = new byte[p_nWidth * p_nHeight];
@@ -630,7 +648,7 @@ namespace RootTools.Camera.Matrox
                         Thread.Sleep(nTimeOutInterval);
                         if (--nScanAxisTimeOut <= 0)
                         {
-                            m_log.Info("TimeOut - RunGrabLineColorScanThread");
+                            m_log.Info("TimeOut - RunGrabLineColorScanThread" + iBlock.ToString()+" / "+ m_nGrabCount.ToString());
                            
                             break;
                         }
@@ -642,26 +660,44 @@ namespace RootTools.Camera.Matrox
                         nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
                     }
 
-                    if (iBlock < m_nGrabTrigger)
+                    if(iBlock < m_nGrabTrigger)
                     {
-                        MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarray);
+                        
+                     //   MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight,srcarray);
+                     //   int yp = (iBlock) * p_nHeight;
+                     //   IntPtr dstPtr = (IntPtr)((long)m_MemPtr + 0 + (yp + 0) * (long)m_Memory.W);
+                      //  Task.Run(() => CopyToMem(srcarray, dstPtr, p_nWidth * p_nHeight));
+                     //   Marshal.Copy(srcarray, 0, dstPtr, p_nWidth * p_nHeight);
+                       
+                       /* fixed (byte* p = srcarray)
+                        {
+                           
+                            IntPtr srcPtr = (IntPtr)(p);
+                            IntPtr dstPtr = (IntPtr)((long)m_MemPtr + 0 + (yp + 0) * (long)m_Memory.W);
 
-                   //     Parallel.For(0, p_nHeight, (y) =>
-                          for(int y = 0;y< p_nHeight;y++)
+                            Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth* p_nHeight, p_nWidth * p_nHeight);
+                        }
+                       
+                      
+                        
+                        Parallel.For(0, p_nHeight, (y) =>
+                        //  for(int y = 0;y< p_nHeight;y++)
                         {
                             int yp = y + (iBlock) * p_nHeight;
                             fixed (byte* p = srcarray)
                             {
                                 IntPtr srcPtr = (IntPtr)(p + p_nWidth * y);
-                                IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
+                                IntPtr dstPtr = (IntPtr)((long)m_MemPtr + 0+ (yp +0) * (long)m_Memory.W);
                          
                                  Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
                             }
                         }
-                     //  );
+                      );
+
                         int ypp = (iBlock) * p_nHeight;
-                        ppDst[iBlock] = (byte*)((long)m_MemPtr + m_cpScanOffset.X + (ypp + m_cpScanOffset.Y) * (long)m_Memory.W);
+                        ppDst[iBlock] = (byte*)((long)m_MemPtr + 0 + (ypp + 0) * (long)m_Memory.W);
                         m_clr3D.SetFrameNum(iBlock);
+                       */
                         iBlock++;
 
                         //GrabEvent();
@@ -677,6 +713,7 @@ namespace RootTools.Camera.Matrox
             }
             finally
             {
+                MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, c_nBuf, MIL.M_STOP, MIL.M_DEFAULT, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
                 p_CamInfo.p_eState = eCamState.Ready;
            //     userObjectHandle.Free();
             }
@@ -770,12 +807,28 @@ namespace RootTools.Camera.Matrox
             {
                 GCHandle handle = (GCHandle)(UserDataPtr);
                 Camera_Matrox cam = handle.Target as Camera_Matrox;
-                
                 if (cam != null)
                 {
-                  //  Debug.WriteLine("Trigger : " + cam.m_nGrabTrigger);
-                    cam.m_nGrabTrigger++;
-                }   
+                    if (cam.m_nGrabTrigger < cam.m_nGrabCount)
+                    {
+                        MIL_ID nCurrBufferId = new MIL_ID();
+                        MIL.MdigGetHookInfo(EventId, MIL.M_MODIFIED_BUFFER + MIL.M_BUFFER_ID, ref nCurrBufferId);
+
+                        MIL_INT pBufferAddress = new MIL_INT();
+                        MIL.MbufInquire(nCurrBufferId, MIL.M_HOST_ADDRESS, ref pBufferAddress);
+                        unsafe
+                        {
+                            byte** ppDst = cam.m_clr3D.GetFGBuffer();
+                            ppDst[cam.m_nGrabTrigger] = (byte*)((long)pBufferAddress);// + cam.m_nHeight * cam.p_nWidth * );
+                            cam.m_clr3D.SetFrameNum(cam.m_nGrabTrigger);
+
+                        }
+
+                        //  Debug.WriteLine("Trigger : " + cam.m_nGrabTrigger);
+                        cam.m_nGrabTrigger++;
+                    }
+                }
+
             }
             return 0;
         }

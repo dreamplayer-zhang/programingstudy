@@ -1,0 +1,203 @@
+﻿<UserControl x:Class="Root_WindII.RACRecipeCreateViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:local="clr-namespace:Root_WindII"
+             xmlns:packicon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="450">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding CmdLoaded}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding CmdUnloaded}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid Background="{StaticResource main_background}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.05*"/>
+            <RowDefinition Height="0.05*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Margin="4,0,0,0" Text="Base Recipe" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" TextWrapping="WrapWithOverflow"></TextBlock>
+            <Label Grid.Column="1" Grid.ColumnSpan="5" Background="White" Margin="4" Content="{Binding BaseRecipeName}"  Foreground="Red" VerticalContentAlignment="Center"></Label>
+            <Button Grid.Column="6" Margin="4,4,4,4" Command="{Binding CmdOpenBaseRecipe}" Style="{StaticResource groupbox_griditem_button}">
+                <Button.Content>
+                    <packicon:PackIconBootstrapIcons Kind="Folder2Open" Foreground="Black" DockPanel.Dock="Left"  Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>
+            <TextBlock Margin="4,0,0,0" Grid.Row="1" Text="Step Name" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" TextWrapping="WrapWithOverflow"></TextBlock>
+            <Border Grid.Row="1" Grid.ColumnSpan="4" Grid.Column="1" Background="White" Margin="4" PreviewMouseDown="TextBlock_MouseDown" PreviewMouseMove="TextBlock_GotFocus" MouseLeave="TextBlock_MouseLeave">
+                <DockPanel>
+                    <TextBox x:Name="AddBox" BorderThickness="0" TextAlignment="Left" VerticalContentAlignment="Center" FontSize="15" Text="{Binding CreateStepName, UpdateSourceTrigger=PropertyChanged}" Background="White"></TextBox>
+                    <TextBlock IsHitTestVisible="True" Text="Enter Step Name" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,0,0" Foreground="DarkGray" PreviewMouseLeftButtonDown="TextBlock_MouseDown" PreviewMouseMove="TextBlock_GotFocus" MouseLeave="TextBlock_MouseLeave">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=AddBox}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </DockPanel>
+            </Border>
+            <Button Grid.Row="1" Grid.Column="5" Margin="3" Style="{StaticResource groupbox_griditem_button}" Command="{Binding CmdAdd}">
+                <Button.Content>
+                    <packicon:PackIconMaterial Kind="Plus" Foreground="Black" DockPanel.Dock="Left" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>
+            <Button Grid.Row="1" Grid.Column="6" Margin="3" Style="{StaticResource groupbox_griditem_button}" Command="{Binding CmdDelete}">
+                <Button.Content>
+                    <packicon:PackIconMaterial Kind="Minus" Foreground="Black" DockPanel.Dock="Left" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>
+            <Button Grid.Column="7" Grid.RowSpan="2" Content="Create" Margin="4" Style="{StaticResource groupbox_griditem_button2}" Command="{Binding CmdCreate}"/>
+            <!--<Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="50"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Margin="4,0,0,0" Text="Base Recipe" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" TextWrapping="WrapWithOverflow"></TextBlock>
+            <Label Grid.Column="1" Background="White" Margin="4" Content="{Binding BaseRecipeName}"  Foreground="Red" VerticalContentAlignment="Center"></Label>
+            <Button Grid.Column="2" Margin="0,4,4,4" Command="{Binding CmdOpenBaseRecipe}" Style="{StaticResource groupbox_griditem_button}">
+                <Button.Content>
+                    <packicon:PackIconBootstrapIcons Kind="Folder2Open" Foreground="Black" DockPanel.Dock="Left"  Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>-->
+        </Grid>
+        <!--<Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.236*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Margin="4,0,0,0" Text="Recipe Name" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" TextWrapping="WrapWithOverflow"></TextBlock>
+            <Border Grid.Column="1" Background="White" Margin="4">
+                <DockPanel>
+                    <TextBox x:Name="AddBox" BorderThickness="0" TextAlignment="Left" VerticalContentAlignment="Center" FontSize="15" Text="{Binding CreateRecipeName, UpdateSourceTrigger=PropertyChanged}" Background="Transparent"></TextBox>
+                    <TextBlock IsHitTestVisible="True" Text="Enter Recipe Name" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,0,0" Foreground="DarkGray" PreviewMouseLeftButtonDown="TextBlock_MouseDown" PreviewMouseMove="TextBlock_GotFocus" MouseLeave="TextBlock_MouseLeave">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=AddBox}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </DockPanel>
+            </Border>
+        </Grid>-->
+        <Grid Grid.Row="2">
+            <DataGrid Margin="4" IsReadOnly="True" AutoGenerateColumns="False" CanUserSortColumns="False" SelectedIndex="{Binding SelectStepIndex}" ItemsSource="{Binding StepList}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Step" Width="*" Binding="{Binding Step}" >
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+                <!--<DataGrid.Columns>
+                    <DataGridTextColumn Header="Master" Width="*" Binding="{Binding Master}" >
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Slave" Width="*" Binding="{Binding Slave}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="ROI" Width="*" Binding="{Binding ROI}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="SIDE" Width="*" Binding="{Binding Side}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>-->
+            </DataGrid>
+        </Grid>
+        <!--<Grid Grid.Column="3">
+            <Button Content="Create" Margin="4" Style="{StaticResource groupbox_griditem_button2}" Command="{Binding CmdCreate}"/>
+        </Grid>
+        <UniformGrid Grid.Row="1" Grid.Column="1" Columns="2">
+            <Button Margin="3" Style="{StaticResource groupbox_griditem_button}" Command="{Binding CmdAdd}">
+                <Button.Content>
+                    <packicon:PackIconMaterial Kind="Plus" Foreground="Black" DockPanel.Dock="Left" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>
+            <Button Margin="3" Style="{StaticResource groupbox_griditem_button}" Command="{Binding CmdDelete}">
+                <Button.Content>
+                    <packicon:PackIconMaterial Kind="Minus" Foreground="Black" DockPanel.Dock="Left" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>
+        </UniformGrid>-->
+        <!--<Grid Grid.Row="3">
+            <UniformGrid Columns="2">
+                <Button Content="Delete" Margin="4" Style="{StaticResource groupbox_griditem_button}" Command="{Binding CmdDelete}" />
+                <Button Content="Create" Margin="4" Style="{StaticResource groupbox_griditem_button2}" Command="{Binding CmdCreate}"/>
+            </UniformGrid>
+        </Grid>-->
+    </Grid>
+</UserControl>

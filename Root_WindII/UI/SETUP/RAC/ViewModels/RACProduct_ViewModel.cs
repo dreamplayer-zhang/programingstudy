@@ -316,7 +316,7 @@ namespace Root_WindII
                 KlarfFileReader.OpenKlarfMapData(sr, ref data);
             }
 
-            double[] tempMap = data.GetWaferMap();
+            int[] tempMap = data.GetWaferMap();
             this.MapViewerVM.CreateMap((int)data.GetUnitSize().Width, (int)data.GetUnitSize().Height, tempMap.Select(d => (int)d).ToArray());
 
             this.DataGrossDie = XMLData.MakeWaferMap(data.GetUnitDieList(), data.GetUnitSize()).Length.ToString();

@@ -22,9 +22,10 @@ namespace Root_EFEM.Module
         Axis m_axisCamOCRTopZ;
         Axis m_axisCamOCRBotZ;
         DIO_IO m_dioVac;
-        DIO_O m_doBlow;
-        DIO_O m_doLightCoaxial;
-        DIO_O m_doLightSide;
+        DIO_O m_doOCRTopLED;
+        DIO_O m_doOCRBotLED;
+        DIO_O m_doAlignerSideLED;
+        DIO_O m_doAlignerBFLED;
         DIO_I2O2 m_dioLift;
         DIO_I m_diWaferExist;
         MemoryPool m_memoryPool;
@@ -48,9 +49,10 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCRTopZ, this, "AxisOCRTopZ");
             p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCRBotZ, this, "AxisOCRBotZ");
             p_sInfo = m_toolBox.GetDIO(ref m_dioVac, this, "Vacuum");
-            p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Blow");
-            p_sInfo = m_toolBox.GetDIO(ref m_doLightCoaxial, this, "LightCoaxial");
-            p_sInfo = m_toolBox.GetDIO(ref m_doLightSide, this, "LightSide");
+            p_sInfo = m_toolBox.GetDIO(ref m_doOCRTopLED, this, "OCR Top LED");
+            p_sInfo = m_toolBox.GetDIO(ref m_doOCRBotLED, this, "OCR Bot LED");
+            p_sInfo = m_toolBox.GetDIO(ref m_doAlignerSideLED, this, "Aligner Side LED");
+            p_sInfo = m_toolBox.GetDIO(ref m_doAlignerBFLED, this, "Aligner BF LED");
             p_sInfo = m_toolBox.GetDIO(ref m_dioLift, this, "Lift", "Down", "Up");
             p_sInfo = m_toolBox.GetDIO(ref m_diWaferExist, this, "WaferExist");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
@@ -81,12 +83,10 @@ namespace Root_EFEM.Module
             Axis m_axisZ;
             Axis m_axisRotate;
             DIO_IO m_dioVacuum;
-            DIO_O m_doBlow;
             DIO_I2O2 m_dioGuide;
             public void GetTools(ToolBox toolBox, Aligner_ATI module, bool bInit)
             {
                 module.p_sInfo = toolBox.GetDIO(ref m_dioVacuum, module, p_id + "Vacuum");
-                module.p_sInfo = toolBox.GetDIO(ref m_doBlow, module, p_id + "Blow");
                 module.p_sInfo = toolBox.GetDIO(ref m_dioGuide, module, p_id + "Guide", "Back", "Push");
                 module.p_sInfo = toolBox.GetAxis(ref m_axisX, module, p_id + "AxisX");
                 module.p_sInfo = toolBox.GetAxis(ref m_axisZ, module, p_id + "AxisZ");
@@ -100,16 +100,12 @@ namespace Root_EFEM.Module
             }
 
             #region Vacuum
-            double m_secBlow = 0.5;
             double m_secVac = 1;
             public string RunVacuum(bool bOn)
             {
                 m_dioVacuum.Write(bOn);
                 if (bOn == false)
                 {
-                    m_doBlow.Write(true);
-                    Thread.Sleep((int)(500 * m_secBlow));
-                    m_doBlow.Write(false);
                     return "OK";
                 }
                 int msVac = (int)(1000 * m_secVac);
@@ -195,7 +191,6 @@ namespace Root_EFEM.Module
             #region Tree
             public void RunTree(Tree tree)
             {
-                m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Vaccum Blow Time (sec)");
                 m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Timeout (sec)");
                 m_xOffset = tree.Set(m_xOffset, m_xOffset, "X Offset", "Axis X Moving Offset");
             }
@@ -396,32 +391,28 @@ namespace Root_EFEM.Module
         #region DIO Function
         public void LightOff()
         {
-            m_doLightCoaxial.Write(false);
-            m_doLightSide.Write(false);
+            m_doAlignerSideLED.Write(false);
+            m_doAlignerBFLED.Write(false);
         }
 
-        public bool p_bLightCoaxial
+        public bool p_bAlignerSideLED
         {
-            get { return m_doLightCoaxial.p_bOut; }
-            set { m_doLightCoaxial.Write(value); }
+            get { return m_doAlignerSideLED.p_bOut; }
+            set { m_doAlignerSideLED.Write(value); }
         }
 
-        public bool p_bLightSide
+        public bool p_bAlignerBFLED
         {
-            get { return m_doLightSide.p_bOut; }
-            set { m_doLightSide.Write(value); }
+            get { return m_doAlignerBFLED.p_bOut; }
+            set { m_doAlignerBFLED.Write(value); }
         }
 
-        double m_secBlow = 0.5;
         double m_secVac = 1;
         public string RunVacuum(bool bOn)
         {
             m_dioVac.Write(bOn);
             if (bOn == false)
             {
-                m_doBlow.Write(true);
-                Thread.Sleep((int)(500 * m_secBlow));
-                m_doBlow.Write(false);
                 return "OK";
             }
             int msVac = (int)(1000 * m_secVac);
@@ -612,7 +603,6 @@ namespace Root_EFEM.Module
             m_lRotate = tree.Set(m_lRotate, m_lRotate, "PpR", "Pulse per Round (pulse)");
             m_nRotateBack = tree.Set(m_nRotateBack, m_nRotateBack, "Rotate Back", "Rotate Back Pulse (pulse)");
             m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Stage Vacuum On Timeout (sec)");
-            m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Stage Vacuum Blow Time (sec)");
             RunTreeAlign(tree.GetTree("Grab"));
         }
         #endregion
@@ -796,8 +786,8 @@ namespace Root_EFEM.Module
             m_aoiMax = null;
 
             RunVacuum(true);
-            p_bLightCoaxial = true;
-            p_bLightSide = false;
+            p_bAlignerSideLED = true;
+            p_bAlignerBFLED = false;
 
             double vGrabPulse = m_lRotate / m_secGrab;
             double pulseAcc = vGrabPulse * (m_secGrabAcc + 0.1) / 2;
@@ -812,7 +802,7 @@ namespace Root_EFEM.Module
             for (int n = 0; n < c_lGrab;)
             {
                 double dp = m_axisRotate.p_posCommand - posTrigger;
-                if (dp > dpMax) return "Run Align Grab Time Error";
+                //if (dp > dpMax) return "Run Align Grab Time Error";
                 if (dp >= 0)
                 {
                     m_aGrabAOI[n].m_posGrab = m_axisRotate.p_posCommand;
@@ -825,7 +815,7 @@ namespace Root_EFEM.Module
             }
             m_log.Info("Align Grab Done " + (stopWatch.ElapsedMilliseconds / 1000.0).ToString(".0") + " sec");
             if (Run(m_axisRotate.WaitReady())) return p_sInfo;
-            p_bLightCoaxial = false;
+            p_bAlignerBFLED = false;
             return "OK";
         }
 
@@ -887,7 +877,8 @@ namespace Root_EFEM.Module
         #region OCR Grab
         public string RunOCR(double dTheta, double dR)
         {
-            m_doLightCoaxial.Write(true);
+            m_doOCRTopLED.Write(true);
+            m_doOCRBotLED.Write(true);
             AxisMoveOCRX(ePosOCR.OCR, dR, true);
             AxisMoveOCRTopZ(ePosOCR.OCR, true);
             AxisMoveOCRBotZ(ePosOCR.OCR, true);

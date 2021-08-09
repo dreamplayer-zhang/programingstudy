@@ -46,6 +46,11 @@
         <SolidColorBrush x:Key="groupbox_button_text" Color="White"/>
         <SolidColorBrush x:Key="groupbox_button_press_text" Color="#888888"/>
 
+        <SolidColorBrush x:Key="groupbox_button2_normal" Color="#86ff75"/>
+        <SolidColorBrush x:Key="groupbox_button2_mouseover" Color="#99dd33"/>
+        <SolidColorBrush x:Key="groupbox_button2_press" Color="#66ff56"/>
+        <SolidColorBrush x:Key="groupbox_button2_text" Color="Black"/>
+        <SolidColorBrush x:Key="groupbox_button2_press_text" Color="#888888"/>
         <!--#endregion-->
 
         <!--#region [Button Style] -->
@@ -225,6 +230,41 @@
                             <Trigger  Property="IsPressed" Value="True">
                                 <Setter Property="Background" Value="{StaticResource groupbox_button_press}"/>
                                 <Setter Property="Foreground" Value="{StaticResource groupbox_button_press_text}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="groupbox_griditem_button2" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource groupbox_button2_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource groupbox_button2_text}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                CornerRadius="12"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button2_mouseover}"/>
+                            </Trigger>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button2_press}"/>
+                                <Setter Property="Foreground" Value="{StaticResource groupbox_button2_press_text}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

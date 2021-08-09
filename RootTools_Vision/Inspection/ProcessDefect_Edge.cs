@@ -88,17 +88,10 @@ namespace RootTools_Vision
 			if (processDefectParam.UseOptionDefect)
 				mergeDefectList = AddOptionDefectData(mergeDefectList);
 
-			// Top/Side/Btm 별 Defect Merge 후 Index 재정렬
+			// Defect Merge 후 Index 재정렬
 			mergeDefectList = RearrangeDefectIndex(mergeDefectList);
 
-			foreach (Defect defect in mergeDefectList)
-				this.currentWorkplace.DefectList.Add(defect);
-
-			if (mergeDefectList.Count > 0)
-				DatabaseManager.Instance.AddDefectDataListNoAutoCount(mergeDefectList, TableName);
-
-			#region Klarf / Defect Image 저장
-
+			#region Defect Image 저장
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 			Settings settings = new Settings();
 			SettingItem_SetupEdgeside settings_edgeside = settings.GetItem<SettingItem_SetupEdgeside>();
@@ -118,15 +111,42 @@ namespace RootTools_Vision
 				if (mergeImage != null)
 					mergeImage.Save(Path.Combine(path, mergeDefectList[i].m_nDefectIndex.ToString() + ".bmp"));
 			});
-
-			// EDGE 전체 원형 이미지 저장
-			EdgeSurfaceParameter surfaceParam = this.recipe.GetItem<EdgeSurfaceParameter>();
-			Tools.SaveEdgeCircleImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID, (mergeDefectList.Count + 1).ToString()), settings_edgeside.OutputImageSizeWidth, settings_edgeside.OutputImageSizeHeight, settings_edgeside.Thickness
-								  , topSharedBufferInfo, surfaceParam.EdgeParamBaseTop.StartPosition, surfaceParam.EdgeParamBaseTop.EndPosition
-								  , sideSharedBufferInfo, surfaceParam.EdgeParamBaseSide.StartPosition, surfaceParam.EdgeParamBaseSide.EndPosition
-								  , btmSharedBufferInfo, surfaceParam.EdgeParamBaseBtm.StartPosition, surfaceParam.EdgeParamBaseBtm.EndPosition);
-
 			#endregion
+
+			#region Edge 전체 원형 이미지 저장
+			if (settings_edgeside.UseSaveCircleImage)
+			{
+				Defect edgeCircleDefect = new Defect(sInspectionID,
+												0,
+												0,
+												0,
+												0,
+												0,
+												0,
+												0,
+												0,
+												0,
+												0,
+												0);
+
+				edgeCircleDefect.SetDefectIndex(mergeDefectList.Count + 1);
+				mergeDefectList.Add(edgeCircleDefect);
+
+				// EDGE 전체 원형 이미지 저장
+				EdgeSurfaceParameter surfaceParam = this.recipe.GetItem<EdgeSurfaceParameter>();
+				Tools.SaveEdgeCircleImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID, edgeCircleDefect.m_nDefectIndex.ToString()), settings_edgeside.OutputImageSizeWidth, settings_edgeside.OutputImageSizeHeight, settings_edgeside.Thickness
+									  , topSharedBufferInfo, surfaceParam.EdgeParamBaseTop.StartPosition, surfaceParam.EdgeParamBaseTop.EndPosition
+									  , sideSharedBufferInfo, surfaceParam.EdgeParamBaseSide.StartPosition, surfaceParam.EdgeParamBaseSide.EndPosition
+									  , btmSharedBufferInfo, surfaceParam.EdgeParamBaseBtm.StartPosition, surfaceParam.EdgeParamBaseBtm.EndPosition);
+			}
+			#endregion
+
+			// Defect 저장
+			foreach (Defect defect in mergeDefectList)
+				this.currentWorkplace.DefectList.Add(defect);
+
+			if (mergeDefectList.Count > 0)
+				DatabaseManager.Instance.AddDefectDataListNoAutoCount(mergeDefectList, TableName);
 
 			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
 			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
@@ -232,8 +252,14 @@ namespace RootTools_Vision
 					startPosition = param.StartPosition;
 					endPosition = param.EndPosition;
 				}
-
+				
 				double degree = (double)360 / (endPosition - startPosition) * (defect.m_fAbsY + (defect.m_fHeight / 2) - startPosition);
+
+				Settings settings = new Settings();
+				SettingItem_SetupEdgeside settings_edgeside = settings.GetItem<SettingItem_SetupEdgeside>();
+				if (settings_edgeside.Angle == SettingItem_SetupEdgeside.AngleDirection.CounterClockwise)
+					degree = 360 - degree;
+
 				defect.m_fRelY = (float)degree;
 				calAngleDefect.Add(defect);
 			}
@@ -260,8 +286,21 @@ namespace RootTools_Vision
 
 			for (int i = 0; i < minAngle.Count; i++)
 			{
-				float minImageTop = startPosition + (((endPosition - startPosition) / 360) * (float)minAngle[i]);
-				float maxImageTop = startPosition + (((endPosition - startPosition) / 360) * (float)maxAngle[i]);
+				// 기존
+				//float minImageTop = startPosition + (((endPosition - startPosition) / 360) * (float)minAngle[i]);
+				//float maxImageTop = startPosition + (((endPosition - startPosition) / 360) * (float)maxAngle[i]);
+
+				double calMinAngle = minAngle[i];
+				double calMaxAngle = maxAngle[i];
+
+				if (settings_edgeside.Angle == SettingItem_SetupEdgeside.AngleDirection.CounterClockwise)
+				{
+					calMinAngle = 360 - maxAngle[i];
+					calMaxAngle = 360 - minAngle[i];
+				}
+
+				float minImageTop = startPosition + (((endPosition - startPosition) / 360) * (float)calMinAngle);
+				float maxImageTop = startPosition + (((endPosition - startPosition) / 360) * (float)calMaxAngle);
 
 				for (float j = minImageTop, k = 0; j <= maxImageTop; j += imageHeight, k++)
 				{
@@ -272,7 +311,7 @@ namespace RootTools_Vision
 											1,
 											1,
 											0,
-											(float)minAngle[i] + (angle * k),
+											(float)calMinAngle + (angle * k),
 											1,
 											j,
 											0,
