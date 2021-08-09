@@ -350,9 +350,37 @@ namespace RootTools_Vision.Utility
 
 				builder.Append(roughBin + " "); // Rough Bin Number
 
-				int findBin = 0;
-				if (_defectdata[i].m_fSize * resolutionX > settings_edgeside.DefectSizeStandard)
-					findBin = 1;
+				KlarfSetting klarfSetting = new KlarfSetting();
+				KlarfSettingItem_Edgeside klarfSettingItem_edge = klarfSetting.SettingEdgeKlarf;
+				double size = 0;
+				switch(klarfSettingItem_edge.Size)
+				{
+					case KlarfSettingItem_Edgeside.FineBinSize.X:
+						size = _defectdata[i].m_fWidth * resolutionX;
+						break;
+					case KlarfSettingItem_Edgeside.FineBinSize.Y:
+						size = _defectdata[i].m_fHeight * resolutionY;
+						break;
+					case KlarfSettingItem_Edgeside.FineBinSize.LongAxis:
+						size = _defectdata[i].m_fWidth > _defectdata[i].m_fHeight ? _defectdata[i].m_fWidth * resolutionX : _defectdata[i].m_fHeight * resolutionY;
+						break;
+				}
+
+				int findBin = klarfSettingItem_edge.SLList.Last().Number + 1;
+				for (int j = 0; j < klarfSettingItem_edge.SLList.Count; j++)
+				{
+					if (size >= klarfSettingItem_edge.SLList[j].LSL
+						&& size < klarfSettingItem_edge.SLList[j].USL)
+					{
+						findBin = klarfSettingItem_edge.SLList[j].Number;
+						break;
+					}
+				}
+
+				//int findBin = 0;
+				//if (_defectdata[i].m_fWidth * resolutionX > settings_edgeside.DefectSizeStandardWidth
+				//	&& _defectdata[i].m_fHeight * resolutionY > settings_edgeside.DefectSizeStandardHeight)
+				//	findBin = 1;
 
 				builder.Append(findBin + " "); // Find Bin Number
 

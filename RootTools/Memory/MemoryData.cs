@@ -72,6 +72,10 @@ namespace RootTools.Memory
         {
             get { return (long)p_nByte * p_sz.X; }
         }
+        public long H
+        {
+            get { return (long)p_sz.Y; }
+        }
 
         public string p_sSize
         {

@@ -302,7 +302,7 @@ namespace RootTools.Database
 			catch (Exception ex)
 			{
 				string sMessage = ex.Message;
-				return -1;
+				return null;
 			}
 
 #endif

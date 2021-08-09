@@ -175,7 +175,8 @@ namespace Root_Pine2_Vision.Module
                 string[] asSend = sSend.Split(',');
                 if (asSend[1] == eProtocol.Snap.ToString())
                 {
-                    string sRecipe = asSend[2];
+                    string sRecipe = asSend[2].Substring(0, asSend[2].Length - 5);
+                    m_vision.m_RunningRecipe[p_eWorks].RecipeOpen(m_sRecipe);
                     string sInfo = m_vision.ReqSnap(sRecipe, p_eWorks);
                     m_tcpip.Send(sSend.Substring(0, sSend.Length - 1) + "," + sInfo + "]"); 
                 }

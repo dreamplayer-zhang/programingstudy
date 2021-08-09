@@ -4,6 +4,7 @@ using RootTools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -219,6 +220,12 @@ namespace Root_Pine2.Engineer
 
         private void buttonReset_Click(object sender, RoutedEventArgs e)
         {
+            if (EQ.p_bStop == false)
+            {
+                EQ.p_bStop = true;
+                Thread.Sleep(10);
+                EQ.p_bStop = false;
+            }
             switch (EQ.p_eState)
             {
                 case EQ.eState.Ready:

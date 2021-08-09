@@ -88,6 +88,8 @@ namespace Root_Rinse_Loader.Module
         {
             AddProtocol(p_id, RinseU.eCmd.NewMagazine, 0);
         }
+
+        bool m_bLinkUnload = true; 
         #endregion
 
         #region Rinse
@@ -132,9 +134,11 @@ namespace Root_Rinse_Loader.Module
         public bool IsEnableStart()
         {
             if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (m_bLinkUnload == false) return true;
+            if (p_eStateRinse != eRinseRun.Run) return false;
             if (p_eStateUnloader == EQ.eState.Ready) return true;
             if (p_eStateUnloader == EQ.eState.Run) return true;
-            return false; 
+            return false;
         }
         #endregion
 
@@ -384,8 +388,8 @@ namespace Root_Rinse_Loader.Module
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
-                p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
-                if ((EQ.p_eState == EQ.eState.Run) && ( m_diRinseUnloader.p_bIn == false)) p_eStateUnloader = EQ.eState.Error;
+                p_eStateRinse = (m_diRinseRun.p_bIn && (m_bLinkUnload == false)) ? eRinseRun.Run : eRinseRun.Ready;
+                if (m_bLinkUnload && (EQ.p_eState == EQ.eState.Run) && (m_diRinseUnloader.p_bIn == false)) p_eStateUnloader = EQ.eState.Error;
                 RunThreadDIO();
                 if (m_qProtocolReply.Count > 0)
                 {
@@ -404,6 +408,7 @@ namespace Root_Rinse_Loader.Module
 
         public RinseU.Protocol AddProtocol(string id, RinseU.eCmd eCmd, dynamic value)
         {
+            if (m_bLinkUnload == false) return null; 
             RinseU.Protocol protocol = new RinseU.Protocol(id, eCmd, value);
             if (id == p_id) m_qProtocolSend.Enqueue(protocol);
             else m_qProtocolReply.Enqueue(protocol); 
@@ -527,7 +532,8 @@ namespace Root_Rinse_Loader.Module
             base.RunTree(tree);
             p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
             p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
-            m_secBuzzerOff = tree.Set(m_secBuzzerOff, m_secBuzzerOff, "Buzzer Off", "Buzzer Off Delay (sec)"); 
+            m_secBuzzerOff = tree.Set(m_secBuzzerOff, m_secBuzzerOff, "Buzzer Off", "Buzzer Off Delay (sec)");
+            m_bLinkUnload = tree.Set(m_bLinkUnload, m_bLinkUnload, "Link Unload", "Link Unload"); 
         }
         #endregion
 

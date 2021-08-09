@@ -40,7 +40,6 @@ namespace Root_JEDI_Sorter.Module
         void InitPosition()
         {
             m_axis.AddPos(Enum.GetNames(typeof(ePos)));
-            m_axis.AddSpeed("Snap");
         }
 
         public string RunMove(ePos ePos, bool bWait = true)

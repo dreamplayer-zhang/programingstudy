@@ -16,28 +16,67 @@ Raw3D_RawData::Raw3D_RawData()
 	m_ppBuffBright = NULL;
 
 	m_ppBuffRaw = NULL;
-
 	m_nCurrFrameNum = 0;
+	m_nMaxOverlapSize = 100;
+	m_nMaxSnapFrameNum = 0;
 }
 
 Raw3D_RawData::~Raw3D_RawData()
 {
-	DeleteBuffer();
+	//DeleteBuffer();
 	//PurgeInstance();//이게 여기서 되는지 모르겠네
 }
 
-void Raw3D_RawData::Initialize(CSize szImageBuffer, CSize szMaxRawImage, int nMaxOverlapSize, int nMaxFrameNum)
+void Raw3D_RawData::Initialize(WORD* ppBuffHeight, short* ppBuffBright, CCSize szImageBuffer,LPBYTE ppBuffRaw, CCSize szMaxRawImage, int nMaxOverlapSize, int nMaxFrameNum)
 {
+	if (m_ppBuffBright == NULL)
+	{
+		m_ppBuffBright = new short* [szImageBuffer.cy];
+	}
+	else if (m_ppBuffBright != NULL && (m_szImageBuffer.cy != szImageBuffer.cy || m_szImageBuffer.cx != szImageBuffer.cx))
+	{
+		delete[] m_ppBuffBright;
+		m_ppBuffBright = new short* [szImageBuffer.cy];
+	}
+
+	if (m_ppBuffHeight == NULL)
+	{
+		m_ppBuffHeight = new WORD * [szImageBuffer.cy];
+	}
+	else if (m_ppBuffHeight != NULL && (m_szImageBuffer.cy != szImageBuffer.cy || m_szImageBuffer.cx != szImageBuffer.cx))
+	{
+		delete[] m_ppBuffHeight;
+		m_ppBuffHeight = new WORD * [szImageBuffer.cy];
+	}
+
+	if (m_ppBuffRaw == NULL)
+	{
+		m_ppBuffRaw = new LPBYTE[szMaxRawImage.cy];
+	}
+	else if (m_ppBuffRaw != NULL && (m_szMaxRawImage.cy != szMaxRawImage.cy || m_szMaxRawImage.cx != szMaxRawImage.cx))
+	{
+		delete[] m_ppBuffRaw;
+		m_ppBuffRaw = new LPBYTE[szMaxRawImage.cy];
+	}
+	
+
+	for (int i = 0; i < szImageBuffer.cy; i++)
+	{
+		m_ppBuffBright[i] = &ppBuffBright[i * szImageBuffer.cx];
+		m_ppBuffHeight[i] = &ppBuffHeight[i * szImageBuffer.cx];
+	}
+	for (int i = 0; i < szMaxRawImage.cy; i++)
+	{
+		m_ppBuffRaw[i] = &ppBuffRaw[i * szMaxRawImage.cx];
+	
+	}
 	m_szMaxRawImage = szMaxRawImage;
 	m_nMaxOverlapSize = nMaxOverlapSize;
 
-	m_szImageBuffer.cx = szImageBuffer.cx + roundf((float)szImageBuffer.cx / (float)m_szRawImage.cx + 0.5) * m_nMaxOverlapSize;
+	m_szImageBuffer.cx = szImageBuffer.cx;//이게 왜필요하지YB 210730// + roundf((float)szImageBuffer.cx / (float)m_szRawImage.cx + 0.5) * m_nMaxOverlapSize;;
 	m_szImageBuffer.cy = szImageBuffer.cy;
-
-	CreateBuffer(m_szImageBuffer.cx, m_szImageBuffer.cy);
-	CreateRawBuffer(nMaxFrameNum);
 }
-
+/*
 void Raw3D_RawData::DeleteBuffer()
 {
 	if (m_ppBuffHeight != NULL)
@@ -62,8 +101,8 @@ void Raw3D_RawData::DeleteBuffer()
 	m_ppBuffHeight = NULL;
 	m_ppBuffBright = NULL;
 }
-
-
+*/
+/*
 void Raw3D_RawData::CreateBuffer(int n3DImageWidth, int n3DImageHeight)
 {
 	DeleteBuffer();
@@ -117,7 +156,7 @@ void Raw3D_RawData::DeleteRawBuffer()
 		m_ppBuffRaw = NULL;
 	}
 }
-
+*/
 /*
 void Raw3D_RawData::SaveRawImage(CString sFileName, CPoint ptLT, CPoint ptRB, int nFoV, int nOverlapSize)
 {
@@ -297,12 +336,12 @@ BOOL Raw3D_RawData::ReadRawImageCSV(CString sFileName)
 	return FALSE;
 }
 */
-CSize Raw3D_RawData::GetMaxRawImageSize()
+CCSize Raw3D_RawData::GetMaxRawImageSize()
 {
 	return m_szMaxRawImage;
 }
 
-CSize Raw3D_RawData::GetRawDataBufferSize()
+CCSize Raw3D_RawData::GetRawDataBufferSize()
 {
 	return m_szImageBuffer;
 }

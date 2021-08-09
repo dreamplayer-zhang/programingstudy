@@ -662,7 +662,7 @@ namespace Root_EFEM.Module
 
         string CmdGoto(int nStation, int nSlot, eArm eArm, bool bExtend, bool bUp) 
         {
-            string sEX = bExtend ? " R EX" : " R RX";
+            string sEX = bExtend ? " R EX" : " R RE";
             string sZ = bUp ? " Z UP" : " Z DN"; 
             string sCmd = "GOTO N " + nStation.ToString() + sEX + sZ + " SLOT " + nSlot.ToString() + " ARM " + eArm.ToString();
             return Cmd(eCmd.GOTO, sCmd, m_secMotion);
@@ -1033,10 +1033,6 @@ namespace Root_EFEM.Module
                 }
                 int posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
-                //if (child.p_eState != eState.Ready)
-                //{
-                //    if (m_module.Run(m_module.CmdGoto(posWTR, m_nChildID + 1, m_eArm, false, false))) return p_sInfo;
-                //}
                 while (child.p_eState != eState.Ready)
                 {
                     if (EQ.IsStop()) return "Stop";
@@ -1044,10 +1040,11 @@ namespace Root_EFEM.Module
                 }
                 if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "Reticle is already exist.";
                 if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
-                if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
                 try
                 {
                     child.p_bLock = true;
+					if (m_module.Run(m_module.CmdGoto(posWTR, m_nChildID + 1, m_eArm, false, false))) return p_sInfo;
+                    if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
                     if (m_module.Run(m_module.CmdPick(posWTR, m_nChildID + 1, m_eArm))) return p_sInfo;
                     child.p_bLock = false;
                     m_log.Info("Material Location change : " + child.p_id + " -> " + "Robot");
@@ -1130,10 +1127,11 @@ namespace Root_EFEM.Module
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (!m_module.m_dicArm[m_eArm].IsWaferExist()) return "Reticle is not exist in Robot-Arm.";
                 if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
-                if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
                 try
                 {
                     child.p_bLock = true;
+                    if (m_module.Run(m_module.CmdGoto(posWTR, m_nChildID + 1, m_eArm, false, true))) return p_sInfo;
+                    if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;//check 필요
                     if (m_module.Run(m_module.CmdPlace(posWTR, m_nChildID + 1, m_eArm))) return p_sInfo;
                     child.p_bLock = false;
                     m_log.Info("Material Location change : " + "Robot" + " -> " + child.p_id);

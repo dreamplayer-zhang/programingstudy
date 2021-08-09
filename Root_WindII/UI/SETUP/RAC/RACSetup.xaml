@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:local="clr-namespace:Root_WindII"
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="790" d:DesignWidth="1200">
@@ -48,92 +49,106 @@
         </GroupBox>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="5.4*"/>
+                <RowDefinition Height="344"/>
                 <RowDefinition Height="6*"/>
             </Grid.RowDefinitions>
             <GroupBox Header="XML Data Viewer"
                       Margin="4"
                       Style="{StaticResource main_view_groupbox}">
                 <StackPanel Orientation="Vertical" Margin="12, 0, 12, 12" >
-                    <Grid  Margin="12, 0, 12, 12" DataContext="{Binding RACSetupImageViewer_VM}">
+                    <Grid  Margin="12, 0, 12, 0" DataContext="{Binding RACSetupImageViewer_VM}">
                         <!-- StackPanel로 수정하자 카메라 레졸루션도 넣어야함 -->
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="24"/>
                             <!-- 0 -->
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="24"/>
                             <!-- 4 -->
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <!-- 9 -->
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="24"/>
+
+                            <RowDefinition Height="24"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="30"/>
                             <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition  Width="30"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Row="0"  Grid.Column="0"  Text="Device ID" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding DeviceID, UpdateSourceTrigger=PropertyChanged}"  Grid.ColumnSpan="4" Height="20"/>
 
+                        <TextBlock Grid.Row="1"  Grid.Column="0"  Text="Description" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"  Grid.ColumnSpan="4" Height="20"/>
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Unit Size" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="1" Grid.Column="2" Height="20" Text="{Binding UnitX, UpdateSourceTrigger=PropertyChanged}"/>
-                        <TextBlock Grid.Row="1" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="1" Grid.Column="4" Height="20" Text="{Binding UnitY, UpdateSourceTrigger=PropertyChanged}"/>
-
-
-
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Die Pitch" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Unit Size" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="2" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="2" Grid.Column="2" Height="20" Text="{Binding DiePitchX, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" Height="20" Text="{Binding UnitX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="2" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="2" Grid.Column="4" Height="20" Text="{Binding DiePitchY, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="2" Grid.Column="4" Height="20" Text="{Binding UnitY, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Scribe Lane" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Die Pitch" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="3" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="3" Grid.Column="2" Height="20" Text="{Binding ScribeLaneX, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="3" Grid.Column="2" Height="20" Text="{Binding DiePitchX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="3" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="3" Grid.Column="4" Height="20" Text="{Binding ScribeLaneY, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="3" Grid.Column="4" Height="20" Text="{Binding DiePitchY, UpdateSourceTrigger=PropertyChanged}"/>
 
-
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Shot Offset" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Scribe Lane" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="4" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="4" Grid.Column="2" Height="20" Text="{Binding ShotOffsetX, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="4" Grid.Column="2" Height="20" Text="{Binding ScribeLaneX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="4" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="4" Grid.Column="4" Height="20" Text="{Binding ShotOffsetY, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="4" Grid.Column="4" Height="20" Text="{Binding ScribeLaneY, UpdateSourceTrigger=PropertyChanged}"/>
 
 
-                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Map Offset" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Shot Offset" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="5" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="5" Grid.Column="2" Height="20" Text="{Binding MapOffsetX, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="5" Grid.Column="2" Height="20" Text="{Binding ShotOffsetX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="5" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="5" Grid.Column="4" Height="20" Text="{Binding MapOffsetY, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="5" Grid.Column="4" Height="20" Text="{Binding ShotOffsetY, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Grid.Row="6" Grid.Column="0" Text="SMI Offset" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Map Offset" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="6" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="6" Grid.Column="2" Height="20" Text="{Binding SmiOffsetX, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="6" Grid.Column="2" Height="20" Text="{Binding MapOffsetX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="6" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="6" Grid.Column="4" Height="20" Text="{Binding SmiOffsetY, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="6" Grid.Column="4" Height="20" Text="{Binding MapOffsetY, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Grid.Row="7" Grid.Column="0" Text="Origin Die" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="SMI Offset" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="7" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="7" Grid.Column="2" Height="20" Text="{Binding OriginDieX, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="7" Grid.Column="2" Height="20" Text="{Binding SmiOffsetX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="7" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="7" Grid.Column="4" Height="20" Text="{Binding OriginDieY, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="7" Grid.Column="4" Height="20" Text="{Binding SmiOffsetY, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Grid.Row="8" Grid.Column="0" Text="Shot Size" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="8" Grid.Column="0" Text="Origin Die" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBlock Grid.Row="8" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="8" Grid.Column="2" Height="20" Text="{Binding ShotSizeX, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="8" Grid.Column="2" Height="20" Text="{Binding OriginDieX, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Grid.Row="8" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <TextBox Grid.Row="8" Grid.Column="4" Height="20" Text="{Binding ShotSizeY, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="8" Grid.Column="4" Height="20" Text="{Binding OriginDieY, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="9" Grid.Column="0" Text="Shot Size" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Row="9" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Row="9" Grid.Column="2" Height="20" Text="{Binding ShotSizeX, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Grid.Row="9" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Row="9" Grid.Column="4" Height="20" Text="{Binding ShotSizeY, UpdateSourceTrigger=PropertyChanged}"/>
+                        
+                        <Grid Grid.Row="10" Grid.ColumnSpan="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="9" Grid.Column="0" Text="EvenOdd" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                            <ComboBox Grid.Row="9" Grid.Column="1" Height="20" ItemsSource="{Binding Source={local:EnumBindingSource {x:Type local:EVEN_ODD}}}" SelectedItem="{Binding EvenOdd}"/>
+                            <TextBlock Grid.Row="9" Grid.Column="2" Text="Rotate" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBox Grid.Row="9" Grid.Column="4" Height="20" Text="{Binding Rotation, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
                     </Grid>
                     <Button Style="{StaticResource groupbox_button}" Content="Create" Command="{Binding CmdCreate}"></Button>
                 </StackPanel>
