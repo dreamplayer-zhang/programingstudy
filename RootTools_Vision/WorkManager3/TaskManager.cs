@@ -73,7 +73,7 @@ namespace RootTools_Vision.WorkManager3
                 return false;
             }
         }
-
+        
         private void Remove(Task<TResult> task)
         {
             try

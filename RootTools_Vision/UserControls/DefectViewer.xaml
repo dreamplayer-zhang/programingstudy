@@ -347,7 +347,7 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <CheckBox Grid.Column="0" IsChecked="{Binding IsCheckedEdge}" Content="Edge" Style="{StaticResource checkbox_type}"/>
-                    <Label Grid.Column="1" Background="YellowGreen" Style="{StaticResource label_type}"/>
+                    <Label Grid.Column="1" Background="Magenta" Style="{StaticResource label_type}"/>
                     <TextBlock Grid.Column="2" Text="{Binding EdgeDefectCount}" Style="{StaticResource textblock_type_defect_count}"/>
                     <TextBlock Grid.Column="3" Text="[EA]" Style="{StaticResource textblock_type_ea}"/>
                 </Grid>

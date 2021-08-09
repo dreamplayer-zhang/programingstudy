@@ -186,7 +186,7 @@ namespace Root_WIND2
                 // Settings
                 Settings settings = GlobalObjects.Instance.Register<Settings>();
                 SettingItem_Setup setupSetting = settings.GetItem<SettingItem_Setup>();
-
+                KlarfSetting klarfSettings = GlobalObjects.Instance.Register<KlarfSetting>();
 
                 // Engineer
                 WIND2_Engineer engineer = GlobalObjects.Instance.Register<WIND2_Engineer>();
@@ -427,6 +427,7 @@ namespace Root_WIND2
 				dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
                 dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
                 dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
+                dialogService.Register<KlarfSettingDialog_ViewModel, KlarfSettingDialog>();
                 dialogService.Register<TK4S, TK4SModuleUI>();
                 dialogService.Register<FFUModule, FFUModuleUI>();
                 dialogService.Register<ManualAlignViewer_ViewModel, ManualAlignViewer>();

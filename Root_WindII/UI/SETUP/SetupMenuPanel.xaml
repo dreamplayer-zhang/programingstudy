@@ -84,6 +84,7 @@
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
                     <RadioButton Content="VRS Camera " Command="{Binding btnCameraVRS}" IsChecked="True" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Align Camera " Command="{Binding btnCameraAlign}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="RADS Camera " Command="{Binding btnCameraRADS}" Style="{StaticResource sidetap_child_radiobutton}"/>
                 </StackPanel>
             </Border>
         </ControlTemplate>
@@ -96,7 +97,7 @@
                     <RadioButton Content="Product" Command="{Binding btnRACProduct}"  IsChecked="True" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Setup" Command="{Binding btnRACSetup}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Align Key" Command="{Binding btnRACAlignKey}" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <RadioButton Content="Create" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Create" Command="{Binding btnRACCreate}" Style="{StaticResource sidetap_child_radiobutton}"/>
                 </StackPanel>
             </Border>
         </ControlTemplate>

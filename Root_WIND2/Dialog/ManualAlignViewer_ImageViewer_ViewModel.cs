@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -271,8 +272,16 @@ namespace Root_WIND2
         {
             get => new RelayCommand(() =>
             {
-                axisRotate.StartMove(this.MeasuredAngle * 1000);
-                axisRotate.WaitReady();
+                axisRotate.StartMove(axisRotate.p_dRelPos + this.MeasuredAngle * 1000);
+                if (axisRotate.WaitReady() == "OK")
+                {
+                    MessageBox.Show("Align Done");
+                    this.MeasuredAngle = 0;
+                }
+                else
+                {
+                    MessageBox.Show("Align Fail");
+                }
             });
         }
 

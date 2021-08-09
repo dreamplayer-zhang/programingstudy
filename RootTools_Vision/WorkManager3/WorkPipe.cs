@@ -281,6 +281,8 @@ namespace RootTools_Vision.WorkManager3
             return null;
         }
 
+        private object lockObj = new object();
+
         private void Loop(object obj)
         {
             this.IsRunning = true;
@@ -306,20 +308,23 @@ namespace RootTools_Vision.WorkManager3
 
                         if (queue.TryDequeue(out workplace) && !token.IsCancellationRequested && !this.IsStopRequest)
                         {
-                            CopyBufferData copyBuffer = null;
-                            if (this.type == WORK_TYPE.INSPECTION && this.bCopyBuffer == true)
+                            //lock(lockObj)
                             {
-                                while ((copyBuffer = GetAvailableCopyBuffer()) == null && !token.IsCancellationRequested)
+                                CopyBufferData copyBuffer = null;
+                                if (this.type == WORK_TYPE.INSPECTION && this.bCopyBuffer == true)
+                                {
+                                    while ((copyBuffer = GetAvailableCopyBuffer()) == null && !token.IsCancellationRequested)
+                                    {
+                                        Thread.Sleep(100);
+                                    };
+                                }
+
+                                while (!this.taskManager.Invoke(DoJob(workplace, this.workList, token, copyBuffer, this.bCopyBuffer)) && !token.IsCancellationRequested)
                                 {
                                     Thread.Sleep(100);
-                                };
+                                }
+                                count++;
                             }
-
-                            while (!this.taskManager.Invoke(DoJob(workplace, this.workList, token, copyBuffer, this.bCopyBuffer)) && !token.IsCancellationRequested)
-                            {
-                                Thread.Sleep(100);
-                            }
-                            count++;
                         }
                     }
 

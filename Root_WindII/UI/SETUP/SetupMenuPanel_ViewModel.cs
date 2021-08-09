@@ -97,11 +97,13 @@ namespace Root_WindII
         // Camera
         public readonly CameraVRS cameraVrs = new CameraVRS();
         public readonly CameraAlign cameraAlign = new CameraAlign();
+        public readonly CameraRADS cameraRads = new CameraRADS();
 
         // RAC
         public readonly RACProduct racProduct = new RACProduct();
         public readonly RACSetup racSetup = new RACSetup();
         public readonly RACAlignKey racAlignKey = new RACAlignKey();
+        public readonly RACCreate racCreate = new RACCreate();
         #endregion
 
         //#region [ViewModels]
@@ -170,7 +172,6 @@ namespace Root_WindII
         {
             get => cameraVrsVM;
         }
-        #endregion
 
         //#region [Back ViewModels]
         //private .BacksideSetup_ViewModel backsideSetupVM = new .BacksideSetup_ViewModel();
@@ -207,11 +208,16 @@ namespace Root_WindII
         //}
         //#endregion
 
-        #region [Camera ViewModels]
         private CameraAlign_ViewModel cameraAlignVM = new CameraAlign_ViewModel();
         public CameraAlign_ViewModel CameraAlignVM
         {
             get => cameraAlignVM;
+        }
+
+        private CameraRADS_ViewModel cameraRadsVM = new CameraRADS_ViewModel();
+        public CameraRADS_ViewModel CameraRadsVM
+        {
+            get => cameraRadsVM;
         }
         #endregion
 
@@ -232,6 +238,12 @@ namespace Root_WindII
         public RACAlignKey_ViewModel RACAlignKeyVM
         {
             get => racAlignKeyVM;
+        }
+
+        private RACCreate_ViewModel racCreateVM = new RACCreate_ViewModel();
+        public RACCreate_ViewModel RACCreateVM
+        {
+            get => racCreateVM;
         }
         #endregion
 
@@ -786,6 +798,18 @@ namespace Root_WindII
                 });
             }
         }
+
+        public ICommand btnCameraRADS
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(cameraRads);
+                    cameraRads.DataContext = CameraRadsVM;
+                });
+            }
+        }
         #endregion
 
         #region [Command RAC]
@@ -808,6 +832,18 @@ namespace Root_WindII
                 {
                     SetPage(racSetup);
                     racSetup.DataContext = RACSetupVM;
+                });
+            }
+        }
+
+        public ICommand btnRACCreate
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(racCreate);
+                    racCreate.DataContext = RACCreateVM;
                 });
             }
         }

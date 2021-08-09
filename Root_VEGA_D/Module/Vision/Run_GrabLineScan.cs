@@ -290,8 +290,12 @@ namespace Root_VEGA_D.Module
 
             try
             {
-                double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5 - (m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5) * m_grabMode.m_dResX_um * 0.001;
-
+                Axis axisZ = m_module.AxisZ;
+                if (m_module.Run(axisZ.StartMove(m_dGrabLineScanPosZ)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
+                
                 Image<Gray, byte> imgTop = new Image<Gray, byte>(m_grabMode.p_sTopTemplateFile);
                 Image<Gray, byte> imgBot = new Image<Gray, byte>(m_grabMode.p_sBottomTemplateFile);
                 Image<Gray, byte> imgTop_div4 = imgTop.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
@@ -301,25 +305,64 @@ namespace Root_VEGA_D.Module
 
                 double dRotateTheta = 0;
 
+                int nSearchAreaSize = m_grabMode.m_nSearchAreaSize;
+                int nScanSwatheCount = (int)Math.Ceiling((double)nSearchAreaSize / m_grabMode.m_GD.m_nFovSize);
+                double dScanLeftPosX_mm = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5;
+                double dDistToCenterX_mm = m_grabMode.m_nCenterX * m_grabMode.m_dResX_um * 0.001;
+                double dFovSize_mm = m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.001;
+                double dFullScanWidth_mm = nScanSwatheCount * dFovSize_mm;
+
+                double dStartPosX = dScanLeftPosX_mm - (dDistToCenterX_mm - dFullScanWidth_mm * 0.5);
+                double dPosX = dStartPosX;
+
+                int nIdx = 0;
+
                 // 1차 Align
-                if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
-                    return p_sInfo;
-                if (m_module.Run(Align(mem, imgTop, imgBot, imgTop_div4, imgBot_div4, ref dRotateTheta)))
+                while (nIdx < nScanSwatheCount)
+                {
+                    dPosX = dStartPosX - nIdx * dFovSize_mm;
+                    memOffset.X += nIdx * m_grabMode.m_GD.m_nFovSize;
+                    if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
+                        return p_sInfo;
+
+                    nIdx++;
+                }
+                if (m_module.Run(Align(mem, imgTop, imgBot, imgTop_div4, imgBot_div4, Math.Max(m_grabMode.m_GD.m_nFovSize, nSearchAreaSize), ref dRotateTheta)))
                     return p_sInfo;
 
                 m_log.Info(string.Format("Align Success (1), theta difference = {0}", dRotateTheta));
 
 
                 // 2차 Align
-                if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
-                    return p_sInfo;
-                if (m_module.Run(Align(mem, imgTop, imgBot, imgTop_div4, imgBot_div4, ref dRotateTheta)))
+                memOffset.X = 0;
+                nSearchAreaSize = (int)(m_grabMode.m_nSearchAreaSize * 0.5);
+                nScanSwatheCount = (int)Math.Ceiling((double)nSearchAreaSize / m_grabMode.m_GD.m_nFovSize);
+                dFullScanWidth_mm = nScanSwatheCount * dFovSize_mm;
+                dStartPosX = dScanLeftPosX_mm - (dDistToCenterX_mm - dFullScanWidth_mm * 0.5);
+                dPosX = dStartPosX;
+                nIdx = 0;
+                while (nIdx < nScanSwatheCount)
+                {
+                    dPosX = dStartPosX - nIdx * dFovSize_mm;
+                    memOffset.X += nIdx * m_grabMode.m_GD.m_nFovSize;
+                    if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
+                        return p_sInfo;
+
+                    nIdx++;
+                }
+                if (m_module.Run(Align(mem, imgTop, imgBot, imgTop_div4, imgBot_div4, Math.Max(m_grabMode.m_GD.m_nFovSize, nSearchAreaSize), ref dRotateTheta)))
                     return p_sInfo;
 
                 m_log.Info(string.Format("Align Success (2), theta difference = {0}", dRotateTheta));
 
 
                 // Align Key 찾기
+                memOffset.X = 0;
+                nScanSwatheCount = 1;
+                dFullScanWidth_mm = nScanSwatheCount * dFovSize_mm;
+                dStartPosX = dScanLeftPosX_mm - (dDistToCenterX_mm - dFullScanWidth_mm * 0.5);
+                dPosX = dStartPosX;
+                nIdx = 0;
                 if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
                     return p_sInfo;
                 if (m_module.Run(FindAlignKey(mem, imgTop, imgTop_div4, m_grabMode.m_nTopCenterY, eFindAlignKeyDir.LeftTop, m_grabMode.p_sTempLeftTopAlignKeyFile, out rectLeftTop)))
@@ -358,12 +401,15 @@ namespace Root_VEGA_D.Module
             return "OK";
         }
 
-        string Align(MemoryData mem, Image<Gray, byte> imgTop, Image<Gray, byte> imgBot, Image<Gray, byte> imgTop_div4, Image<Gray, byte> imgBot_div4, ref double dRotateTheta)
+        string Align(MemoryData mem, Image<Gray, byte> imgTop, Image<Gray, byte> imgBot, Image<Gray, byte> imgTop_div4, Image<Gray, byte> imgBot_div4, int nSearchAreaSize, ref double dRotateTheta)
         {
             try
             {
-                CRect searchTopArea = new CRect(0, (int)(m_grabMode.m_nTopCenterY - m_grabMode.m_nSearchAreaSize * 0.5), m_grabMode.m_GD.m_nFovSize, (int)(m_grabMode.m_nTopCenterY + m_grabMode.m_nSearchAreaSize * 0.5));
-                CRect searchBotArea = new CRect(0, (int)(m_grabMode.m_nBottomCenterY - m_grabMode.m_nSearchAreaSize * 0.5), m_grabMode.m_GD.m_nFovSize, (int)(m_grabMode.m_nBottomCenterY + m_grabMode.m_nSearchAreaSize * 0.5));
+                int nScanCount = (int)Math.Ceiling((double)nSearchAreaSize / m_grabMode.m_GD.m_nFovSize);
+
+                CRect searchTopArea = new CRect((int)(nScanCount * 0.5 * m_grabMode.m_GD.m_nFovSize), m_grabMode.m_nTopCenterY, nSearchAreaSize);
+                CRect searchBotArea = new CRect((int)(nScanCount * 0.5 * m_grabMode.m_GD.m_nFovSize), m_grabMode.m_nBottomCenterY, nSearchAreaSize);
+
                 Image<Gray, byte> imgTopArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchTopArea);
                 Image<Gray, byte> imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
                 Image<Gray, byte> imgTopArea_div4 = imgTopArea.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
@@ -389,7 +435,6 @@ namespace Root_VEGA_D.Module
                 searchTopArea.Top = Math.Max(searchTopArea.Top, 0);
                 searchBotArea.Left = Math.Max(searchBotArea.Left, 0);
                 searchBotArea.Top = Math.Max(searchBotArea.Top, 0);
-
 
                 imgTopArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchTopArea);
                 imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
@@ -437,15 +482,7 @@ namespace Root_VEGA_D.Module
         {
             rectAlignKey = new CRect(0, 0, 0, 0);
 
-            if (m_grabMode.m_GD.m_nFovSize < m_grabMode.m_nSearchAreaSize)
-                return "SearchAreaSize must be shorter than fov size.";
-
-            // Align Key Search Area
-            CRect searchArea = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5 - m_grabMode.m_nSearchAreaSize * 0.5),
-                                            (int)(nCenterY/*m_grabMode.m_nBottomCenterY*/ - m_grabMode.m_nSearchAreaSize * 0.5),
-                                            (int)(m_grabMode.m_GD.m_nFovSize * 0.5 + m_grabMode.m_nSearchAreaSize * 0.5),
-                                            (int)(nCenterY/*m_grabMode.m_nBottomCenterY*/ + m_grabMode.m_nSearchAreaSize * 0.5)
-                                            );
+            CRect searchArea = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nCenterY, m_grabMode.m_GD.m_nFovSize);
 
             // Create Images for Template Match
             Image<Gray, byte> imgArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchArea);

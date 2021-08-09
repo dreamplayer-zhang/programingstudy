@@ -284,7 +284,7 @@ namespace Root_VEGA_D
                         Application.Current.Dispatcher.Invoke(delegate
                         {
                             double val = (double)nCurScanNum / nTotalScanNum;
-                            p_SnapProgressValue = val;
+                            p_SnapProgressValue = val*100;
                             p_SnapDispText = val.ToString("P0");
                         });
                     }
@@ -297,7 +297,7 @@ namespace Root_VEGA_D
                         Application.Current.Dispatcher.Invoke(delegate
                         {
                             double val = (double)nCurInspNum / nTotalInspNum;
-                            p_InspProgressValue = val;
+                            p_InspProgressValue = val*100;
                             p_InspDispText = val.ToString("P0");
                         });
                         if(p_run_ViewModel != null)

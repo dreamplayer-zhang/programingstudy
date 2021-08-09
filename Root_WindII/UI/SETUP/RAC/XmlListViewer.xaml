@@ -1,0 +1,92 @@
+﻿<UserControl x:Class="Root_WindII.XmlListViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_WindII"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:packicon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="450">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding CmdLoaded}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding CmdUnloaded}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid Background="{StaticResource main_background}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.05*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Border Background="White" Margin="4" PreviewMouseLeftButtonDown="TextBlock_MouseDown" PreviewMouseMove="TextBlock_GotFocus" MouseLeave="TextBlock_MouseLeave">
+                <DockPanel>
+                    <packicon:PackIconEntypo Kind="MagnifyingGlass" Foreground="Black" DockPanel.Dock="Left" Margin="5,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    <TextBox x:Name="SearchBox" BorderThickness="0" TextAlignment="Left" VerticalContentAlignment="Center" FontSize="15" Text="{Binding SearchFileName, UpdateSourceTrigger=PropertyChanged}" Background="Transparent"/>
+                    <TextBlock IsHitTestVisible="True" Text="Enter Search Name" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,0,0" Foreground="DarkGray" PreviewMouseLeftButtonDown="TextBlock_MouseDown" PreviewMouseMove="TextBlock_GotFocus" MouseLeave="TextBlock_MouseLeave">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </DockPanel>
+            </Border>
+        </Grid>
+        <Grid Grid.Row="1" Margin="4">
+            <DataGrid ItemsSource="{Binding FileInfoList}" IsReadOnly="True" AutoGenerateColumns="False" SelectionMode="Single" SelectedItem="{Binding SelectedItem}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" FontSize="15" Width="2*" Binding="{Binding FileName}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Creation Time" FontSize="15" Foreground="Green" Width="*" Binding="{Binding CreationTime}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="LastWrite Time" FontSize="15" Foreground="Red" Width="*" Binding="{Binding LastWriteTime}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectedCellsChanged">
+                        <i:InvokeCommandAction Command="{Binding CmdSelectedCellsChanged}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</UserControl>

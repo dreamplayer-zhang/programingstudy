@@ -1,5 +1,5 @@
-﻿using Root_Rinse_Unloader.Module;
-using System.Windows;
+﻿using Root_Rinse_Unloader.Engineer;
+using Root_Rinse_Unloader.Module;
 using System.Windows.Controls;
 
 namespace Root_Rinse_Unloader.MainUI
@@ -15,18 +15,11 @@ namespace Root_Rinse_Unloader.MainUI
         }
 
         RinseU m_rinse;
-        public void Init(RinseU rinse)
+        public void Init(RinseU rinse, RinseU_Engineer engineer)
         {
             m_rinse = rinse;
             DataContext = rinse;
-            listViewSend.ItemsSource = rinse.p_aSend;
-            listViewReceive.ItemsSource = rinse.p_aReceive;
-        }
-
-        private void buttonClear_Click(object sender, RoutedEventArgs e)
-        {
-            m_rinse.p_aSend.Clear();
-            m_rinse.p_aReceive.Clear(); 
+            alidUI.Init(engineer.ClassGAF().m_listALID, engineer);
         }
     }
 }
