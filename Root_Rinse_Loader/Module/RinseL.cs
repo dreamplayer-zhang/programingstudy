@@ -93,8 +93,8 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region Rinse
-        DIO_I m_diRinseRun;
-        DIO_I m_diRinseUnloader; 
+        public DIO_I m_diRinseRun;
+        public DIO_I m_diRinseUnloader; 
         public enum eRinseRun
         {
             Ready,
