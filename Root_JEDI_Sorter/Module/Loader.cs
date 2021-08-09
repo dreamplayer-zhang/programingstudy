@@ -504,7 +504,6 @@ namespace Root_JEDI_Sorter.Module
             Good.eGood eGood = m_eGoodRun;
             Good good = m_handler.m_good[eGood];
             if (m_bBusy == false) return "OK";
-
             InfoTray infoGiver = good.m_stage[Good.eStage.Giver].p_infoTray.CalcCount();
             InfoTray infoTaker = good.m_stage[Good.eStage.Taker].p_infoTray.CalcCount();
             int nTaker = GetChip(infoTaker, eResult.Empty);

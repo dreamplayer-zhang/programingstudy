@@ -123,14 +123,6 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
-        #region Step
-        int GetChip(eStage eStage, eResult eResult)
-        {
-            InfoTray infoTray = m_stage[eStage].p_infoTray;
-            return (infoTray != null) ? infoTray.m_aCount[eResult] : 0;
-        }
-        #endregion
-
         #region override
         public override string StateHome()
         {
