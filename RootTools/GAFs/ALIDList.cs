@@ -35,6 +35,7 @@ namespace RootTools.GAFs
                 alid.p_bSet = false;
             }
             p_alarmBlink = false;
+            RemoveALID(); 
             p_sInfo = "OK";
         }
         #endregion

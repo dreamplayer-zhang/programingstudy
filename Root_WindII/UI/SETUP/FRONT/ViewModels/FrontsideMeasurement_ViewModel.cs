@@ -914,6 +914,8 @@ namespace Root_WindII
         void VerticalWire_RecipeSave()
         {
             VerticalWireRecipe recipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<VerticalWireRecipe>();
+            if (recipe == null)
+                return;
             recipe.Clear(); 
 
             IntPtr imgPtrR = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr(0);
@@ -973,7 +975,8 @@ namespace Root_WindII
         void VerticalWire_RecipeLoad()
         {
             VerticalWireRecipe recipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<VerticalWireRecipe>();
-
+            if (recipe == null)
+                return;
             if (recipe.RefCoord.Count == 0)
             {
                 vericalWireVM.ChipNuminOrigin = 1;
@@ -1115,6 +1118,8 @@ namespace Root_WindII
         public void PBI_RecipeSave()
         {
             PBIRecipe recipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PBIRecipe>();
+            if (recipe == null)
+                return;
             recipe.Clear();
 
             IntPtr imgPtrR = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr(0);
@@ -1162,7 +1167,8 @@ namespace Root_WindII
         public void PBI_RecipeLoad()
         {
             PBIRecipe recipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PBIRecipe>();
-
+            if (recipe == null)
+                return;
             if (recipe.FeatureInfo.Count == 0)
             {
                 PBIVM.AddFeatureItem();

@@ -311,11 +311,11 @@
     <Compile Include="UI\SETUP\BACK\BacksideSetup.xaml.cs">
       <DependentUpon>BacksideSetup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SETUP\CAMERA\CameraAlign.xaml.cs">
-      <DependentUpon>CameraAlign.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\SETUP\CAMERA\CameraRADS.xaml.cs">
       <DependentUpon>CameraRADS.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\CAMERA\CameraAlign.xaml.cs">
+      <DependentUpon>CameraAlign.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\CAMERA\CameraVRS.xaml.cs">
       <DependentUpon>CameraVRS.xaml</DependentUpon>
@@ -327,8 +327,8 @@
     <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraAlign_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraAlign_ViewModel.cs" />
     <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraRADS_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraVRS_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraRADS_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraVRS_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraVRS_ViewModel.cs" />
     <Compile Include="UI\SETUP\EBR\EBRSetup.xaml.cs">
       <DependentUpon>EBRSetup.xaml</DependentUpon>
@@ -403,8 +403,14 @@
     <Compile Include="UI\SETUP\RAC\MapFileListViewer.xaml.cs">
       <DependentUpon>MapFileListViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SETUP\RAC\RACCreate.xaml.cs">
+      <DependentUpon>RACCreate.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SETUP\RAC\RACProduct.xaml.cs">
       <DependentUpon>RACProduct.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\RAC\RACRecipeCreateViewer.xaml.cs">
+      <DependentUpon>RACRecipeCreateViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\RAC\RACSetup.xaml.cs">
       <DependentUpon>RACSetup.xaml</DependentUpon>
@@ -413,9 +419,15 @@
     <Compile Include="UI\SETUP\RAC\ViewModels\RACAlignKey_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\MapFileListViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACAlignKey_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACCreate_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACProduct_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACRecipeCreateViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACSetup_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACSetup_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\XmlListViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\XmlListViewer.xaml.cs">
+      <DependentUpon>XmlListViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SETUP\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -527,11 +539,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\SETUP\CAMERA\CameraAlign.xaml">
+    <Page Include="UI\SETUP\CAMERA\CameraRADS.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\SETUP\CAMERA\CameraRADS.xaml">
+    <Page Include="UI\SETUP\CAMERA\CameraAlign.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -619,11 +631,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI\SETUP\RAC\RACCreate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\SETUP\RAC\RACProduct.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI\SETUP\RAC\RACRecipeCreateViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\SETUP\RAC\RACSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SETUP\RAC\XmlListViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

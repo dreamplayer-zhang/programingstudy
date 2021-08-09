@@ -583,7 +583,7 @@ namespace RootTools_Vision
 							int defectTop = ptTop + label[l].boundTop;
 
 							this.currentWorkplace.AddDefect(sInspectionID,
-								(int)defectCode /*10000 + (channelIndex * 100)*/,
+								(int)defectCode,
 								(float)(label[l].area),
 								label[l].value,
 								0,

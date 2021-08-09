@@ -813,8 +813,8 @@ namespace Root_Pine2.Module
             {
                 if (doc.m_nStrip == 0) return; 
                 string sRecipe = m_handler.p_sRecipe;
-                string sLot = m_handler.m_pine2.p_sLotID; 
-                string sVS = "-S00-C" + doc.m_sBundle; 
+                string sLot = m_handler.m_pine2.p_sLotID;
+                string sVS = "-S" + doc.m_sBundle + "-C00";
                 m_srp350.Start();
                 Write("Machine ID : Pine2 #" + m_iMachine.ToString());
                 Write("--------------------------------");

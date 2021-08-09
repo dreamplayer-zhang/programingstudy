@@ -346,14 +346,14 @@ namespace RootTools.Module
         {
             if (aAxis.Count == 0) return "OK";
             if (p_eState == eState.Run) return "Invalid State : Run";
-            if (EQ.IsStop()) return "Home Stop";
+            if (EQ.IsStop()) return "EQ Stop";
 
             foreach (Axis axis in aAxis)
             {
                 if (axis != null) axis.ServoOn(true); 
             }
             Thread.Sleep(200);
-            if (EQ.IsStop()) return "Home Stop";
+            if (EQ.IsStop()) return "EQ Stop";
             foreach (Axis axis in aAxis)
             {
                 if (axis != null) p_sInfo = axis.StartHome();
@@ -362,7 +362,7 @@ namespace RootTools.Module
             while (true)
             {
                 Thread.Sleep(10);
-                if (EQ.IsStop(1000)) return "Home Stop";
+                if (EQ.IsStop(1000)) return "EQ Stop";
                 bool bDone = true;
                 foreach (Axis axis in aAxis)
                 {

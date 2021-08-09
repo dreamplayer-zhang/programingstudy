@@ -75,6 +75,7 @@ namespace Root_WindII
         void DataUpdate()
         {
             RACSetupImageViewer_VM.DeviceID = XMLData.Device;
+            RACSetupImageViewer_VM.Description = XMLData.Description;
             RACSetupImageViewer_VM.UnitX = XMLData.UnitX;
             RACSetupImageViewer_VM.UnitY = XMLData.UnitY;
             RACSetupImageViewer_VM.DiePitchX = XMLData.DiePitchX;
@@ -89,8 +90,17 @@ namespace Root_WindII
             RACSetupImageViewer_VM.SmiOffsetY = XMLData.SMIOffsetY;
             RACSetupImageViewer_VM.ShotSizeX = XMLData.ShotX;
             RACSetupImageViewer_VM.ShotSizeY = XMLData.ShotY;
+            if(XMLData.EvenOdd.ToLower() == "even")
+            {
+                RACSetupImageViewer_VM.EvenOdd = EVEN_ODD.EVEN;
+            }
+            else
+            {
+                RACSetupImageViewer_VM.EvenOdd = EVEN_ODD.ODD;
+            }
+            RACSetupImageViewer_VM.Rotation = XMLData.Rotation;
 
-            double[] tempMap = XMLData.GetWaferMap();
+            int[] tempMap = XMLData.GetWaferMap();
             RACSetupImageViewer_VM.OriginDieX = XMLData.OriginDieUnit.X;
             RACSetupImageViewer_VM.OriginDieY = XMLData.OriginDieUnit.Y;
 

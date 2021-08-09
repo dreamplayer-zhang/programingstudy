@@ -249,6 +249,19 @@ namespace RootTools.Control.ACS
             RunTree(Tree.eMode.Init);
             p_bConnect = true; 
             InitThread();
+
+            if(p_bConnect)
+            {
+                try
+                {
+                    // 모션 종료 시 이벤트 설정 및 콜백함수 등록
+                    m_channel.LOGICALMOTIONEND += P_channel_LOGICALMOTIONEND;
+                    m_channel.EnableEvent(m_channel.ACSC_INTR_LOGICAL_MOTION_END);
+                }
+                catch(Exception e)
+                {
+                }
+            }
         }
 
         public void ThreadStop()
@@ -262,5 +275,19 @@ namespace RootTools.Control.ACS
             m_dio.ThreadStop();
         }
 
+        private void P_channel_LOGICALMOTIONEND(int Param)
+        {
+            foreach (ACSAxis axis in m_listAxis.m_aAxis)
+            {
+                int nAxisMask = 0x01 << axis.p_nAxis;
+                if ((Param & nAxisMask) != 0)
+                {
+                    // 모션 종료 시에 Actual Position 로그 작성
+                    double fPos = m_channel.GetFPosition(axis.p_nAxis);
+                    m_log.Info(axis.p_id + " LOGICALMOTIONEND (Pos:" + fPos.ToString() + ")");
+
+                }
+            }
+        }
     }
 }

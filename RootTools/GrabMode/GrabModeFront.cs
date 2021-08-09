@@ -32,6 +32,18 @@ namespace RootTools
 
 		public LensLinearTurret m_lens = null;
 		public string m_sLens = "";
+		bool m_bUseRADS = false;
+		public bool pUseRADS
+		{
+			get
+			{
+				return m_bUseRADS;
+			}
+			set
+			{
+				m_bUseRADS = value;
+			}
+		}
 
 		public GrabModeFront(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, LensLinearTurret lensTurret = null) : base(id, cameraSet, lightSet, memoryPool, lensTurret)
 		{
@@ -105,6 +117,7 @@ namespace RootTools
 		private void RunTreeLADS(Tree tree, bool bVisible, bool bReadOnly)
 		{
 			m_bUseLADS = tree.Set(m_bUseLADS, m_bUseLADS, "Use LADS", "LADS 사용 여부");
+			m_bUseRADS = tree.Set(m_bUseRADS, m_bUseRADS, "Use RADS", "RADS 사용 여부");
 		}
 
 		private void RunTreeLens(Tree tree, bool bVisible, bool bReadOnly)
