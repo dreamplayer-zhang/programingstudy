@@ -305,7 +305,8 @@ namespace Root_VEGA_D.Module
 
                 double dRotateTheta = 0;
 
-                int nScanSwatheCount = (int)Math.Ceiling((double)m_grabMode.m_nSearchAreaSize / m_grabMode.m_GD.m_nFovSize);
+                int nSearchAreaSize = m_grabMode.m_nSearchAreaSize;
+                int nScanSwatheCount = (int)Math.Ceiling((double)nSearchAreaSize / m_grabMode.m_GD.m_nFovSize);
                 double dScanLeftPosX_mm = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5;
                 double dDistToCenterX_mm = m_grabMode.m_nCenterX * m_grabMode.m_dResX_um * 0.001;
                 double dFovSize_mm = m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.001;
@@ -326,7 +327,7 @@ namespace Root_VEGA_D.Module
 
                     nIdx++;
                 }
-                if (m_module.Run(Align(mem, imgTop, imgBot, imgTop_div4, imgBot_div4, m_grabMode.m_nSearchAreaSize, ref dRotateTheta)))
+                if (m_module.Run(Align(mem, imgTop, imgBot, imgTop_div4, imgBot_div4, Math.Max(m_grabMode.m_GD.m_nFovSize, nSearchAreaSize), ref dRotateTheta)))
                     return p_sInfo;
 
                 m_log.Info(string.Format("Align Success (1), theta difference = {0}", dRotateTheta));
@@ -334,7 +335,8 @@ namespace Root_VEGA_D.Module
 
                 // 2차 Align
                 memOffset.X = 0;
-                nScanSwatheCount = (int)Math.Ceiling((double)m_grabMode.m_nSearchAreaSize * 0.5 / m_grabMode.m_GD.m_nFovSize);
+                nSearchAreaSize = (int)(m_grabMode.m_nSearchAreaSize * 0.5);
+                nScanSwatheCount = (int)Math.Ceiling((double)nSearchAreaSize / m_grabMode.m_GD.m_nFovSize);
                 dFullScanWidth_mm = nScanSwatheCount * dFovSize_mm;
                 dStartPosX = dScanLeftPosX_mm - (dDistToCenterX_mm - dFullScanWidth_mm * 0.5);
                 dPosX = dStartPosX;
@@ -348,7 +350,7 @@ namespace Root_VEGA_D.Module
 
                     nIdx++;
                 }
-                if (m_module.Run(Align(mem, imgTop, imgBot, imgTop_div4, imgBot_div4, Math.Max(m_grabMode.m_GD.m_nFovSize,(int)(m_grabMode.m_nSearchAreaSize * 0.5)), ref dRotateTheta)))
+                if (m_module.Run(Align(mem, imgTop, imgBot, imgTop_div4, imgBot_div4, Math.Max(m_grabMode.m_GD.m_nFovSize, nSearchAreaSize), ref dRotateTheta)))
                     return p_sInfo;
 
                 m_log.Info(string.Format("Align Success (2), theta difference = {0}", dRotateTheta));
