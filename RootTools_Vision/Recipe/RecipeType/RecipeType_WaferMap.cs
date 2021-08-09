@@ -273,8 +273,6 @@ namespace RootTools_Vision
         {
             this.extraMapSizeX = mapSizeX;
             this.extraMapSizeY = mapSizeY;
-            this.extraDieOffsetX = offsetX;
-            this.extraDieOffsetY = offsetY;
 
             this.extraMapdata = new int[this.extraMapSizeX * this.extraMapSizeY];
             this.extraMapdata = (int[])_mapdata.Clone();
@@ -295,6 +293,9 @@ namespace RootTools_Vision
                 }
                 if (bDone) break;
             }
+
+            this.extraDieOffsetX = this.ExtraMasterDieX - this.MasterDieX - offsetX;
+            this.extraDieOffsetY = this.ExtraMasterDieY - this.MasterDieY - offsetY;
         }
 
         public void Clear()
