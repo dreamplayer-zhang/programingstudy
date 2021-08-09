@@ -21,11 +21,6 @@ namespace Root_JEDI_Sorter.Module
         Empty
     }
 
-    public class InfoChip : NotifyProperty
-    {
-        public eResult m_eResult; 
-    }
-
     public class InfoTray : NotifyProperty
     {
         #region On Inspect
@@ -100,13 +95,14 @@ namespace Root_JEDI_Sorter.Module
             foreach (eResult eResult in Enum.GetValues(typeof(eResult))) m_aCount.Add(eResult, 0); 
         }
 
-        void CalcCount()
+        public InfoTray CalcCount()
         {
             foreach (eResult eResult in Enum.GetValues(typeof(eResult))) m_aCount[eResult] = 0;
             for (int y = 0; y < Tray.m_countChip.Y; y++)
             {
                 foreach (eResult eResult in m_aChip[y]) m_aCount[eResult]++; 
             }
+            return this; 
         }
 
         public int GetChipCount()
@@ -143,7 +139,7 @@ namespace Root_JEDI_Sorter.Module
 
         #region Chip
         public static CPoint m_countChip = new CPoint(2, 3);
-        static RPoint m_distanceChip = new RPoint(1, 1);
+        public static RPoint m_distanceChip = new RPoint(1, 1);
         static RPoint m_offsetChip = new RPoint(0, 0); 
         public static double m_thickChip = 5;
         static void RunTreeChip(Tree tree)
@@ -155,11 +151,14 @@ namespace Root_JEDI_Sorter.Module
             CalcOffset(); 
         }
 
-        public static RPoint GetChipPos(int x, int y)
+        public static double GetChipPosX(int x)
         {
-            double xp = m_fOffset.X + m_offsetChip.X + x * m_distanceChip.X;
-            double yp = m_fOffset.Y + m_offsetChip.Y + y * m_distanceChip.Y;
-            return new RPoint(xp, yp); 
+            return m_fOffset.X + m_offsetChip.X + x * m_distanceChip.X;
+        }
+
+        public static double GetChipPosY(int y)
+        {
+            return m_fOffset.Y + m_offsetChip.Y + y * m_distanceChip.Y;
         }
 
         static RPoint m_fOffset = new RPoint();

@@ -29,6 +29,14 @@ namespace RootTools.Control.ACS
             return axisXY;
         }
 
+        public AxisXZ GetAxisXZ(string id, Log log)
+        {
+            AxisXZ axisXZ = new AxisXZ();
+            axisXZ.p_axisX = GetAxis(id + "X", log);
+            axisXZ.p_axisZ = GetAxis(id + "Z", log);
+            return axisXZ;
+        }
+
         public Axis3D GetAxis3D(string id, Log log)
         {
             Axis3D axis = new Axis3D();

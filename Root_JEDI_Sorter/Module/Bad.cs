@@ -39,7 +39,7 @@ namespace Root_JEDI_Sorter.Module
             m_axis.AddPos(Enum.GetNames(typeof(ePos)));
         }
 
-        public string MoveStage(ePos ePos, double fOffset, bool bWait)
+        public string MoveStage(ePos ePos, double fOffset, bool bWait = true)
         {
             m_axis.StartMove(ePos, fOffset);
             return bWait ? m_axis.WaitReady() : "OK";
