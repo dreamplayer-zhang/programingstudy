@@ -52,6 +52,12 @@ namespace RootTools_Vision
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterBackside.IndexChannel);
             byte[] workplaceBuffer = GetWorkplaceBufferByColorChannel(this.parameterBackside.IndexChannel);
 
+
+            //Tools.SaveRawdataToBitmap(@"D:\test\buffer\workplace_" + string.Format("{0}_{1}.bmp", currentWorkplace.MapIndexY, currentWorkplace.MapIndexX),
+            //    workplaceBuffer,
+            //    currentWorkplace.Width, currentWorkplace.Height, 1);
+            
+
             // Inspection Param
             bool isDarkInsp = !parameterBackside.IsBright; // Option
             int nGrayLevel = parameterBackside.Intensity; // Option
