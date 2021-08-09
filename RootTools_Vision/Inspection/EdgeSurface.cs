@@ -100,7 +100,7 @@ namespace RootTools_Vision
             {
 				#region [Parameter]
 
-				double waferRadius = 150000.0;          // um
+				double waferRadius = 150.0;          // mm
 				double resolutionX = this.currentWorkplace.CameraInfo.TargetResX;       // um
 				int startXOffset = 5;
 
@@ -180,7 +180,7 @@ namespace RootTools_Vision
 
 				Parallel.For(0, roiHeight, i =>
 				{
-					double measuredDistance = waferRadius + (averageEdgeX - measuredEdgeXList[i]) * resolutionX;
+					double measuredDistance = waferRadius + (averageEdgeX - measuredEdgeXList[i]) * resolutionX / 1000.0;
 
 					measuredSquareDistanceList[i] = measuredDistance * measuredDistance;
 				}
@@ -214,7 +214,7 @@ namespace RootTools_Vision
 				Parallel.For(0, roiHeight, i =>
 				{
 					calculatedSquareDistanceList[i] = constant + coefficiantCosine * Math.Cos(frequency * i) + coefficiantSine * Math.Sin(frequency * i);
-					calculatedEdgeXList[i] = (int)(averageEdgeX - (Math.Sqrt(calculatedSquareDistanceList[i]) - waferRadius) / resolutionX + 0.5);
+					calculatedEdgeXList[i] = (int)(averageEdgeX - (Math.Sqrt(calculatedSquareDistanceList[i]) - waferRadius) * 1000.0 / resolutionX + 0.5);
 				}
 				);
 
@@ -422,8 +422,8 @@ namespace RootTools_Vision
 						inspectionImage[i * inspectionWidth + j] = 255;
 					}
 
-                    // Display Inspection Image
-                    Marshal.Copy(inspectionImage, i * inspectionWidth, this.currentWorkplace.SharedBufferInfo.PtrList[1] + bufferWidth * (inspectoinStartY + i) + inspectionStartX, inspectionWidth);
+                    //// Display Inspection Image
+                    //Marshal.Copy(inspectionImage, i * inspectionWidth, this.currentWorkplace.SharedBufferInfo.PtrList[1] + bufferWidth * (inspectoinStartY + i) + inspectionStartX, inspectionWidth);
                 });
 
 				#endregion
@@ -435,12 +435,12 @@ namespace RootTools_Vision
 
 				CLR_IP.Cpp_Threshold(inspectionImage, binaryImage, inspectionWidth, inspectionHeight, true, relativeThreshold);
 
-                // Display Binary Image
-                Parallel.For(0, inspectionHeight, i =>
-                {
-                    Marshal.Copy(binaryImage, i * inspectionWidth, this.currentWorkplace.SharedBufferInfo.PtrList[2] + bufferWidth * (inspectoinStartY + i) + inspectionStartX, inspectionWidth);
-                }
-                );
+                //// Display Binary Image
+                //Parallel.For(0, inspectionHeight, i =>
+                //{
+                //    Marshal.Copy(binaryImage, i * inspectionWidth, this.currentWorkplace.SharedBufferInfo.PtrList[2] + bufferWidth * (inspectoinStartY + i) + inspectionStartX, inspectionWidth);
+                //}
+                //);
 
                 var label = CLR_IP.Cpp_Labeling(inspectionImage, binaryImage, inspectionWidth, inspectionHeight, true);
 
