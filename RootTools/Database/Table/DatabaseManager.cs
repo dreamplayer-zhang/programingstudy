@@ -302,7 +302,8 @@ namespace RootTools.Database
 			catch (Exception ex)
 			{
 				string sMessage = ex.Message;
-				return -1;
+				DataSet ds = new DataSet();
+				return ds;
 			}
 
 #endif

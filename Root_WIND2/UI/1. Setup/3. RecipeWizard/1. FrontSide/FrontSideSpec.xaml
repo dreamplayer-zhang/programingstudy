@@ -364,7 +364,7 @@
                                                      HelpVisible="True"
                                                      ToolbarVisible="False"
                                                      PropertySort="Categorized"/>
-                            </GroupBox>
+                            </GroupBox> 
 
                         </Grid>
                     </Grid>

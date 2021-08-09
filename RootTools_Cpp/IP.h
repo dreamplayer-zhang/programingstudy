@@ -39,8 +39,10 @@ public:
 	// ********* D2D ******** //
 	static void SubtractAbs(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH);
 	static void Subtract(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH);
-	static void SelectMinDiffinArea(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtRefROILT, Point vtCurROILT, int stride, int nChipW, int nChipH, bool isDark);
-	static void SelectAbsMinDiffinArea(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtRefROILT, Point vtCurROILT, int stride, int nChipW, int nChipH);
+	static void SubtractAbs_MotionEstimation(BYTE* pSrc, BYTE* pRef, BYTE* pDst, int nChipW, int nChipH, int nStride);
+	static void SubtractAbs_MotionEstimation(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtRefROILT, Point vtCurROILT, int stride, int nChipW, int nChipH);
+	static void Subtract_MotionEstimation(BYTE* pSrc, BYTE* pRef, BYTE* pDst, int nChipW, int nChipH, int nStride, bool isDark);
+	static void Subtract_MotionEstimation(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtRefROILT, Point vtCurROILT, int stride, int nChipW, int nChipH, bool isDark);
 	static Point FindMinDiffLoc(BYTE* pSrc, BYTE* pInOutTarget, int nTargetW, int nTargetH, int nTrigger);
 
 	// Create Golden Image
