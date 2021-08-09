@@ -512,12 +512,12 @@ namespace Root_WIND2.UI_User
             }
 
 
-            if(mapSizeY == waferMap.MapSizeY && mapSizeX == waferMap.MapSizeX)
-            {
-                waferMap.UseExtraMap = true;
-                waferMap.CreateExtraMap(mapSizeX, mapSizeY, extraMapData, 0, 0);
-            }
-            else
+            //if(mapSizeY == waferMap.MapSizeY && mapSizeX == waferMap.MapSizeX)
+            //{
+            //    waferMap.UseExtraMap = true;
+            //    waferMap.CreateExtraMap(mapSizeX, mapSizeY, extraMapData, 0, 0);
+            //}
+            //else
             {
                 // 비어 있는 행/열 삭제
                 int newSizeX = endX - startX + 1;
@@ -532,6 +532,7 @@ namespace Root_WIND2.UI_User
                         newExtraMapData[xx + yy * newSizeX] = extraMapData[x + y * mapSizeX];
                     }
                 }
+
                 waferMap.UseExtraMap = true;
                 waferMap.CreateExtraMap(newSizeX, newSizeY, newExtraMapData, dieLeftCount, dieTopCount);
             }

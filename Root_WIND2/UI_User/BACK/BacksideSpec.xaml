@@ -222,7 +222,7 @@
                 <GroupBox.Resources>
                     <local:PropertyConverter x:Key="PropertyConverter" />
                 </GroupBox.Resources>
-                <wpg:WpfPropertyGrid SelectedObject="{Binding p_selectedMethodItem, FallbackValue=null,               
+                <wpg:WpfPropertyGrid SelectedObject="{Binding p_selectedMethodItem, FallbackValue=null,  
                                      Converter={StaticResource ResourceKey=PropertyConverter}}"
                                      Margin="4"
                                      HorizontalAlignment="Stretch"

@@ -316,6 +316,12 @@
     <Compile Include="WorkManager3\RecipeToWorkplaceConverter.cs" />
     <Compile Include="WorkManager3\WorkManager.cs" />
     <Compile Include="WorkManager3\WorkPipe.cs" />
+    <Compile Include="WorkManager4\IWorkManager.cs" />
+    <Compile Include="WorkManager4\IWorkPipe.cs" />
+    <Compile Include="WorkManager4\WorkManager.cs" />
+    <Compile Include="WorkManager4\IWorkPipeLine.cs" />
+    <Compile Include="WorkManager4\WorkPipe.cs" />
+    <Compile Include="WorkManager4\WorkPipeLine.cs" />
     <Compile Include="WorkManager\CloneableWorkBase.cs" />
     <Compile Include="WorkManager\DebugOutput.cs" />
     <Compile Include="WorkManager\Interfaces\IWorkplaceBundle.cs" />

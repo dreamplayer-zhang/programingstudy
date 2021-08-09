@@ -35,6 +35,8 @@ namespace RootTools_Vision
         public void Load()
         {
             SettingEdgeKlarf = (KlarfSettingItem_Edgeside)SettingEdgeKlarf.Load();
+            if (SettingEdgeKlarf == null)
+                SettingEdgeKlarf = new KlarfSettingItem_Edgeside();
             //SettingEdgeKlarf.Load();
         }
 
