@@ -61,10 +61,10 @@ namespace Root_VEGA_D.Module
         {
             m_alid_WaferExist.Run(true, "Vision Wafer Exist Error");
         }
-		#endregion
+        #endregion
 
-		#region ToolBox
-		Axis m_axisRotate;
+        #region ToolBox
+        Axis m_axisRotate;
         Axis m_axisZ;
         AxisXY m_axisXY;
         DIO_O m_doVac;
@@ -211,6 +211,30 @@ namespace Root_VEGA_D.Module
         void RunTreeSetup(Tree tree)
         {
             m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer");
+        }
+        DalsaParameterSet.eUserSet[] m_arrUserset = new DalsaParameterSet.eUserSet[3];
+
+        DalsaParameterSet.eUserSet p_eCoaxialUserset
+        {
+            get => m_arrUserset[0];
+            set => m_arrUserset[0] = value;
+        }
+        DalsaParameterSet.eUserSet p_eTransmittedUserset
+        {
+            get => m_arrUserset[1];
+            set => m_arrUserset[1] = value;
+        }
+        DalsaParameterSet.eUserSet p_eCoaxialTransmittedUserset
+        {
+            get => m_arrUserset[2];
+            set => m_arrUserset[2] = value;
+        }
+
+        void RunTreeMainCamUserset(Tree tree)
+        {
+            m_arrUserset[0] = (DalsaParameterSet.eUserSet)tree.Set(m_arrUserset[0], m_arrUserset[0], "동축", "동축");
+            m_arrUserset[1] = (DalsaParameterSet.eUserSet)tree.Set(m_arrUserset[1], m_arrUserset[1], "투과", "투과");
+            m_arrUserset[2] = (DalsaParameterSet.eUserSet)tree.Set(m_arrUserset[2], m_arrUserset[2], "동축+투과", "동축+투과");
         }
         #endregion
 
@@ -645,6 +669,7 @@ namespace Root_VEGA_D.Module
             RunTreeAxis(tree.GetTree("Axis", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
             RunTreeSetup(tree.GetTree("Setup", false));
+            RunTreeMainCamUserset(tree.GetTree("MainCam UserSet", false));
         }
         #endregion
 
