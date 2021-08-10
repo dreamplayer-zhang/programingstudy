@@ -1143,8 +1143,20 @@ namespace Root_Pine2_Vision.Module
                 m_recipe.RunTree(tree, bVisible);
             }
 
+            int n = 1000;
             public override string Run()
             {
+          //      while(n-- !=0)
+          //      {
+          //          if (EQ.IsStop())
+           //         {
+          //              return "OK";
+           //         }
+           //         else
+          //          {
+           //             m_module.RunSnap(m_recipe, m_eWorks, m_iSnap);
+          //          }
+          //      }
                 return m_module.RunSnap(m_recipe, m_eWorks, m_iSnap);
             }
         }

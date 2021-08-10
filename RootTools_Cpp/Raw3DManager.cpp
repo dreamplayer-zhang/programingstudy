@@ -116,11 +116,15 @@ void Raw3DManager::SetFrameNum(int fn)
 		m_pThreadCalc[n].SetFrameNum(m_nCurrFrameNum);
 	}
 }
-thread* th;
+bool m_bCheckThreadRun = true;
+thread* th = NULL;
 void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, DisplayMode displayMode, CCPoint ptDataPos
 	, int nMinGV1, int nMinGV2, int nThreadNum, int nSnapFrameNum, int nOverlapStartPos, int nOverlapSize
 	, int nDisplayOffsetX, int nDisplayOffsetY, bool bRevScan, bool bUseMinGV2, Parameter3D param)
 {
+	m_bCheckThreadRun = false;
+	if(th!=NULL) th->join();
+
 	if (m_pThreadCalc != NULL)
 	{
 		//Thread 비정상종료 안전장치
@@ -157,7 +161,9 @@ void Raw3DManager::MakeImage(ConvertMode convertMode, Calc3DMode calcMode, Displ
 		//m_pThreadCalc[n].SetLogFormHandle(m_hLogForm);
 		m_pThreadCalc[n].StartCalculation(convertMode, calcMode, displayMode, ptDataPos, nMinGV1, nMinGV2, nOverlapStartPos, nOverlapSize, nDisplayOffsetX, nDisplayOffsetY, bRevScan, bUseMinGV2, &m_nCurrFrameNum, param);
 	}	
+	m_bCheckThreadRun = true;
 	th= new thread(CheckThread,this);
+
 	//AfxBeginThread(CheckThread, this);
 }
 
@@ -167,7 +173,7 @@ void Raw3DManager::CheckSnapCalcDone()
 	bool bError = false;
 	int nSameFrameCount = 0;
 	int nPrevFrameNum = 0;
-	while (true)
+	while (m_bCheckThreadRun)
 	{
 		bDone = true;
 		for (int n = 0; n < m_nThreadNum; n++)

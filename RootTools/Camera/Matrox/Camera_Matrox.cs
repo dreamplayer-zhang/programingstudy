@@ -572,7 +572,8 @@ namespace RootTools.Camera.Matrox
 
         public void Grab3DScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData GrabData = null, bool bTest = false)
         {
-            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_STOP, MIL.M_DEFAULT, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            userObjectHandle = GCHandle.Alloc(this);
+            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_STOP, MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
             m_GrabData = GrabData;
             m_nGrabCount = nLine;// (int)Math.Truncate(1.0 * nLine / p_nHeight);
             m_nGrabTrigger = 0;
@@ -605,7 +606,7 @@ namespace RootTools.Camera.Matrox
 
 
              grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(LineScanArchiveFunction);
-            userObjectHandle = GCHandle.Alloc(this);
+           
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, MIL.M_INFINITE); // Grab 대기 시간
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
             MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, c_nBuf, MIL.M_START, MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
