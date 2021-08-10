@@ -369,8 +369,15 @@ namespace RootTools.Control.ACS
 
         void InitAcsAxis()
         {
-            int nMask = p_channel.GetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END);
-            p_channel.SetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END, nMask | m_nAxis);
+            try
+            {
+                int nMask = p_channel.GetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END);
+                p_channel.SetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END, nMask | m_nAxis);
+            }
+            catch(Exception e)
+            {
+                m_acs.m_log.Info(p_id + " -> Failed to initialize acs axis");
+            }
         }
 
         void RunThread()
