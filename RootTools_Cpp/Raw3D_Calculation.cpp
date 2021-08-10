@@ -165,7 +165,7 @@ void Raw3D_Calculation::CalculateImage()
 
 	while (nFrameIndex < m_nSnapFrameNum)
 	{		
-		Sleep(1);
+		//Sleep(1);
 		//DebugTxt("while\n", 7);
 		nFrameIndex = n + m_nThreadIndex;
 		if (m_nCurrFrameNum > nFrameIndex)
