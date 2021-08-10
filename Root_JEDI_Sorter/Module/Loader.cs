@@ -28,14 +28,14 @@ namespace Root_JEDI_Sorter.Module
                 toolBox.GetDIO(ref m_doBlow, module, p_id + ".Blow");
             }
 
-            InfoChip _infoChip = null;
-            public InfoChip p_infoChip
+            eResult _eResult = eResult.Empty; 
+            public eResult p_eResult
             {
-                get { return _infoChip; }
+                get { return _eResult; }
                 set
                 {
-                    _infoChip = value;
-                    OnPropertyChanged();
+                    _eResult = value;
+                    OnPropertyChanged(); 
                 }
             }
 
@@ -78,23 +78,26 @@ namespace Root_JEDI_Sorter.Module
                         return p_id + " Load Fail";
                     case eState.UnloadFail:
                         p_eState = eState.Ready;
-                        p_infoChip = null;
                         return p_id + " Unload Fail";
                 }
                 return "OK";
             }
 
-            public string StartLoad()
+            public string StartLoad(InfoTray infoTray, CPoint cpTray)
             {
-                if (p_infoChip != null) return p_id + " Has InfoChip";
+                m_infoTray = infoTray;
+                m_cpTray = cpTray; 
+                if (p_eResult != eResult.Empty) return p_id + " Has InfoChip";
                 if (p_eState != eState.Ready) return p_id + " State not Ready";
                 p_eState = eState.Loading;
                 return "OK";
             }
 
-            public string StartUnload()
+            public string StartUnload(InfoTray infoTray, CPoint cpTray)
             {
-                if (p_infoChip == null) return p_id + " Has not InfoChip";
+                m_infoTray = infoTray;
+                m_cpTray = cpTray;
+                if (p_eResult == eResult.Empty) return p_id + " Has not InfoChip";
                 if (p_eState != eState.Load) return p_id + " State not Load";
                 p_eState = eState.Unloading;
                 return "OK";
@@ -110,21 +113,43 @@ namespace Root_JEDI_Sorter.Module
                     Thread.Sleep(10);
                     switch (p_eState)
                     {
-                        case eState.Loading: p_eState = (RunPicker(true) == "OK") ? eState.Load : eState.LoadFail; break;
-                        case eState.Unloading: p_eState = (RunPicker(false) == "OK") ? eState.Ready : eState.UnloadFail; break;
+                        case eState.Loading: p_eState = (RunLoadPicker() == "OK") ? eState.Load : eState.LoadFail; break;
+                        case eState.Unloading: p_eState = (RunUnloadPicker() == "OK") ? eState.Ready : eState.UnloadFail; break;
                     }
                 }
             }
 
-            string RunPicker(bool bLoading)
+            InfoTray m_infoTray;
+            CPoint m_cpTray = new CPoint();  
+            string RunLoadPicker()
             {
                 try
                 {
                     if (Run(RunUpDown(true))) return m_sInfo;
-                    if (Run(RunVacuum(bLoading))) return m_sInfo;
+                    if (Run(RunVacuum(true))) return m_sInfo;
                     if (Run(RunUpDown(false))) return m_sInfo;
+                    p_eResult = m_infoTray.m_aChip[m_cpTray.Y][m_cpTray.X];
+                    m_infoTray.m_aChip[m_cpTray.Y][m_cpTray.X] = eResult.Empty;
                 }
                 finally { m_doDown.Write(false); }
+                return "OK";
+            }
+
+            string RunUnloadPicker()
+            {
+                try
+                {
+                    if (Run(RunUpDown(true))) return m_sInfo;
+                    if (Run(RunVacuum(false))) return m_sInfo;
+                    if (Run(RunUpDown(false))) return m_sInfo;
+                    m_infoTray.m_aChip[m_cpTray.Y][m_cpTray.X] = p_eResult;
+                    p_eResult = eResult.Empty;
+                }
+                finally 
+                { 
+                    m_doDown.Write(false);
+                    p_eResult = eResult.Empty;
+                }
                 return "OK";
             }
 
@@ -211,20 +236,24 @@ namespace Root_JEDI_Sorter.Module
         #endregion
 
         #region Run Picker
-        public string PickerWaitDone()
+        public string PickerWaitDone(InfoTray infoTray)
         {
-            while (IsPickerDone() == false)
+            try
             {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return "EQ Stop";
+                while (IsPickerDone() == false)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                string sRun = "OK";
+                foreach (Picker picker in m_picker)
+                {
+                    string sInfo = picker.CheckDone();
+                    if ((sInfo != "OK") && (sRun == "OK")) sRun = sInfo;
+                }
+                return sRun;
             }
-            string sRun = "OK";
-            foreach (Picker picker in m_picker)
-            {
-                string sInfo = picker.CheckDone();
-                if ((sInfo != "OK") && (sRun == "OK")) sRun = sInfo;
-            }
-            return sRun;
+            finally { infoTray.CalcCount(); }
         }
 
         bool IsPickerDone()
@@ -239,7 +268,7 @@ namespace Root_JEDI_Sorter.Module
 
         #region ToolBox
         Axis m_axisWidth;
-        AxisXY m_axis;
+        AxisXZ m_axis;
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetAxis(ref m_axisWidth, this, "Width");
@@ -258,19 +287,44 @@ namespace Root_JEDI_Sorter.Module
         #region Axis Width
         public enum eWidth
         {
-            mm75,
-            mm95,
+            Min,
+            Max,
+        }
+        Dictionary<eWidth, double> m_width = new Dictionary<eWidth, double>(); 
+        void InitWidth()
+        {
+            m_width.Add(eWidth.Min, 10);
+            m_width.Add(eWidth.Max, 20);
         }
 
-        double m_dPos = 0;
-        public string RunWidth(double fWidth, bool bWait = true)
+        double m_fWidth = 10; 
+        public string ChangeWidth(double fWidth, bool bWait = true)
         {
-            double f75 = m_axisWidth.GetPosValue(eWidth.mm75);
-            double f95 = m_axisWidth.GetPosValue(eWidth.mm95);
-            double dPos = (f95 - f75) * (fWidth - 75) / 20 + f75;
-            m_dPos = dPos;
+            m_fWidth = fWidth; 
+            double pulseMin = m_axisWidth.GetPosValue(eWidth.Min);
+            double pulseMax = m_axisWidth.GetPosValue(eWidth.Max);
+            double dmm = m_width[eWidth.Max] - m_width[eWidth.Min]; 
+            double dPos = (pulseMax - pulseMin) * (fWidth - m_width[eWidth.Min]) / dmm + pulseMin;
             m_axisWidth.StartMove(dPos);
             return bWait ? m_axisWidth.WaitReady() : "OK";
+        }
+
+        int m_incChip = 1;
+        int m_incPicker = 1; 
+        public string RunWidth()
+        {
+            double xDistance = Tray.m_distanceChip.X; 
+            m_incChip = 1;
+            while (m_width[eWidth.Min] > (m_incChip * xDistance)) m_incChip++; 
+            m_incPicker = 1;
+            while ((m_incPicker * m_width[eWidth.Min]) > xDistance) m_incPicker++;
+            return ChangeWidth(m_incChip * xDistance / m_incPicker); 
+        }
+
+        void RunTreeWidth(Tree tree)
+        {
+            m_width[eWidth.Min] = tree.Set(m_width[eWidth.Min], m_width[eWidth.Min], "Min", "Picker Width (mm)");
+            m_width[eWidth.Max] = tree.Set(m_width[eWidth.Max], m_width[eWidth.Max], "Max", "Picker Width (mm)");
         }
         #endregion
 
@@ -283,44 +337,213 @@ namespace Root_JEDI_Sorter.Module
             Rework
         }
 
-        public string RunMoveX(ePos ePos, double fOffset, bool bWait = true)
+        public string StartMoveX(ePos ePos, double fOffset)
         {
             m_axis.p_axisX.StartMove(ePos, fOffset);
-            return bWait ? m_axis.p_axisX.WaitReady() : "OK"; 
+            return "OK"; 
         }
 
-        public string RunMoveZ(ePos ePos, bool bWait = true)
+        public string StartMoveZ(ePos ePos)
         {
-            m_axis.p_axisY.StartMove(ePos);
-            return bWait ? m_axis.p_axisY.WaitReady() : "OK";
+            m_axis.p_axisZ.StartMove(ePos);
+            return "OK";
         }
         #endregion
 
         #region Run Pick
-        public string StartPick(Good.eGood eGood, Good.eStage eStage, eResult eResult)
+        public string StartPick(Good.eGood eGood, Good.eStage eStage, eResult eResult, int maxPick)
         {
             Run_Pick run = (Run_Pick)m_runPick.Clone();
             run.m_eGood = eGood;
             run.m_eStage = eStage;
             run.m_eResult = eResult;
+            run.m_maxPick = maxPick; 
             return StartRun(run); 
         }
 
-        public string RunPick(Good.eGood eGood, Good.eStage eStage, eResult eResult)
+        Good.eGood m_ePick = Good.eGood.GoodA; 
+        public string RunPick(Good.eGood eGood, Good.eStage eStage, eResult eResult, int maxPick)
         {
+            m_ePick = eGood; 
             Good good = m_handler.m_good[eGood];
             InfoTray infoTray = good.m_stage[eStage].p_infoTray;
             CPoint cpTray = infoTray.FindChip(eResult); 
-            if (cpTray.Y < 0) return "Can not Found " + eResult.ToString() + " in InfoTray";
-            //forget
-            return "OK";
+            if (cpTray.X < 0) return "Can not Found " + eResult.ToString() + " in InfoTray";
+            int iPicker = GetEmptyPicker();
+            if (iPicker < 0) return "No Empty Picker";
+            if (Run(StartMovePicker(eGood, iPicker, cpTray.X))) return p_sInfo;
+            if (Run(good.MovePicker(eStage, 1000 * Tray.GetChipPosX(cpTray.Y)))) return p_sInfo; 
+            if (Run(m_axis.WaitReady())) return p_sInfo; 
+            for (int i = iPicker; i < c_lPicker; i += m_incPicker, cpTray.X += m_incChip) AddPick(i, infoTray, cpTray, eResult, ref maxPick);
+            return PickerWaitDone(infoTray); 
+        }
+
+        int GetEmptyPicker()
+        {
+            for (int i = 0; i < c_lPicker; i += m_incPicker)
+            {
+                if (m_picker[i].p_eResult == eResult.Empty) return i; 
+            }
+            return -1; 
+        }
+
+        string StartMovePicker(Good.eGood eGood, int iPicker, int xChip)
+        {
+            double mmOffset = Tray.GetChipPosX(xChip) - m_fWidth * iPicker;
+            ePos ePos = (eGood == Good.eGood.GoodA) ? ePos.GoodA : ePos.GoodB; 
+            if (Run(StartMoveX(ePos, 1000 * mmOffset))) return p_sInfo;
+            return StartMoveZ(ePos); 
+        }
+
+        void AddPick(int iPicker, InfoTray infoTray, CPoint cpTray, eResult eResult, ref int maxPick)
+        {
+            if (infoTray.m_aChip[cpTray.Y][cpTray.X] != eResult) return;
+            if (maxPick <= 0) return; 
+            m_picker[iPicker].StartLoad(infoTray, cpTray);
+            maxPick--;  
+        }
+        #endregion
+
+        #region Run Place
+        public string StartPlace()
+        {
+            Run_Place run = (Run_Place)m_runPlace.Clone();
+            return StartRun(run);
+        }
+
+        public string RunPlace()
+        {
+            eResult eResult = GetPickerResult(); 
+            switch (eResult)
+            {
+                case eResult.Empty: return "All Picker Empty";
+                case eResult.Good: return RunPlaceGood();
+                default: return RunPlaceBad(eResult); 
+            }
+        }
+
+        eResult GetPickerResult()
+        {
+            for (int n = 0; n < c_lPicker; n++)
+            {
+                if (m_picker[n].p_eResult != eResult.Empty) return m_picker[n].p_eResult; 
+            }
+            return eResult.Empty; 
+        }
+
+        string RunPlaceGood()
+        {
+            Good good = m_handler.m_good[m_ePick];
+            InfoTray infoTray = good.m_stage[Good.eStage.Taker].p_infoTray;
+            CPoint cpTray = infoTray.FindChip(eResult.Empty);
+            if (cpTray.X < 0) return "Can not Found Empty in InfoTray";
+            int iPicker = GetHoldPicker();
+            if (iPicker < 0) return "No Hold Picker";
+            if (Run(StartMovePicker(m_ePick, iPicker, cpTray.X))) return p_sInfo;
+            if (Run(good.MovePicker(Good.eStage.Taker, 1000 * Tray.GetChipPosX(cpTray.Y)))) return p_sInfo;
+            if (Run(m_axis.WaitReady())) return p_sInfo;
+            for (int i = iPicker; i < c_lPicker; i += m_incPicker, cpTray.X += m_incChip) AddPlace(i, infoTray, cpTray);
+            return PickerWaitDone(infoTray);
+        }
+
+        string RunPlaceBad(eResult eResult)
+        {
+            Bad bad = m_handler.m_bad[(eResult == eResult.Reject) ? Bad.eBad.Reject : Bad.eBad.Rework];
+            InfoTray infoTray = bad.m_stage.p_infoTray;
+            CPoint cpTray = infoTray.FindChip(eResult.Empty);
+            if (cpTray.X < 0) return "Can not Found Empty in InfoTray";
+            int iPicker = GetHoldPicker();
+            if (iPicker < 0) return "No Hold Picker";
+            if (Run(StartMovePicker(m_ePick, iPicker, cpTray.X))) return p_sInfo;
+            if (Run(bad.MoveStage(Bad.ePos.Picker, 1000 * Tray.GetChipPosX(cpTray.Y)))) return p_sInfo;
+            if (Run(m_axis.WaitReady())) return p_sInfo;
+            for (int i = iPicker; i < c_lPicker; i += m_incPicker, cpTray.X += m_incChip) AddPlace(i, infoTray, cpTray);
+            return PickerWaitDone(infoTray);
+        }
+
+        int GetHoldPicker()
+        {
+            for (int i = 0; i < c_lPicker; i += m_incPicker)
+            {
+                if (m_picker[i].p_eResult != eResult.Empty) return i;
+            }
+            return -1;
+        }
+
+        void AddPlace(int iPicker, InfoTray infoTray, CPoint cpTray)
+        {
+            if (infoTray.m_aChip[cpTray.Y][cpTray.X] != eResult.Empty) return;
+            m_picker[iPicker].StartUnload(infoTray, cpTray);
         }
         #endregion
 
         #region override
         public override void RunTree(Tree tree)
         {
+            RunTreeWidth(tree.GetTree("Width")); 
             foreach (Picker picker in m_picker) picker.RunTree(tree.GetTree(picker.p_id));
+        }
+
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            string sHome = StateHome(m_axis.p_axisZ, m_axisWidth);
+            if (sHome != "OK") return sHome;
+            sHome = StateHome(m_axis.p_axisX);
+            if (sHome == "OK") p_eState = eState.Ready;
+            return sHome;
+        }
+
+        public Good.eGood m_eGoodRun = Good.eGood.GoodA; 
+        public override string StateReady()
+        {
+            if (EQ.p_eState != EQ.eState.Run) return "OK";
+            Good.eGood eGood = m_eGoodRun;
+            Good good = m_handler.m_good[eGood];
+            int iPicker = GetHoldPicker(); 
+            if (IsPlaceReady(iPicker, good.p_eStep)) return StartPlace();
+            switch (good.p_eStep)
+            {
+                case Good.eStep.Tansfer: break;
+                case Good.eStep.Reject:
+                    int nReject = m_handler.m_bad[Bad.eBad.Reject].GetEmptyCount();
+                    if (nReject <= 0) break;
+                    if (good.GetCount(Good.eStage.Taker, eResult.Reject) > 0) return StartPick(eGood, Good.eStage.Taker, eResult.Reject, nReject);
+                    if (good.GetCount(Good.eStage.Giver, eResult.Reject) > 0) return StartPick(eGood, Good.eStage.Giver, eResult.Reject, nReject);
+                    good.p_eStep = Good.eStep.Rework; 
+                    break;
+                case Good.eStep.Rework:
+                    int nRework = m_handler.m_bad[Bad.eBad.Rework].GetEmptyCount();
+                    if (nRework <= 0) break;
+                    if (good.GetCount(Good.eStage.Taker, eResult.Rework) > 0) return StartPick(eGood, Good.eStage.Taker, eResult.Rework, nRework);
+                    if (good.GetCount(Good.eStage.Giver, eResult.Rework) > 0) return StartPick(eGood, Good.eStage.Giver, eResult.Rework, nRework);
+                    good.p_eStep = Good.eStep.Good;
+                    break;
+                case Good.eStep.Good:
+                    int nTaker = good.GetCount(Good.eStage.Taker, eResult.Empty);
+                    if (nTaker <= 0) { break; }
+                    if ((good.GetCount(Good.eStage.Giver, eResult.Good) > 0) && (nTaker > 0)) return StartPick(eGood, Good.eStage.Giver, eResult.Good, nTaker);
+                    good.p_eStep = Good.eStep.Tansfer;
+                    break;
+            }
+            m_eGoodRun = 1 - m_eGoodRun;
+            return "OK";
+        }
+
+        bool IsPlaceReady(int iPicker, Good.eStep eStep)
+        {
+            if (iPicker < 0) return false; 
+            switch (m_picker[iPicker].p_eResult)
+            {
+                case eResult.Reject: return eStep != Good.eStep.Reject;
+                case eResult.Rework: return eStep != Good.eStep.Rework;
+                case eResult.Good: return eStep != Good.eStep.Good;
+            }
+            return true; 
         }
         #endregion
 
@@ -329,6 +552,7 @@ namespace Root_JEDI_Sorter.Module
         {
             m_handler = (JEDI_Sorter_Handler)engineer.ClassHandler();
             InitPickers();
+            InitWidth(); 
             base.InitBase(id, engineer);
         }
 
@@ -340,10 +564,13 @@ namespace Root_JEDI_Sorter.Module
 
         #region ModuleRun
         ModuleRunBase m_runPick;
+        ModuleRunBase m_runPlace;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+            AddModuleRunList(new Run_ChangeWidth(this), true, "Change Picker Width");
             m_runPick = AddModuleRunList(new Run_Pick(this), true, "Run Pick Chip from Tray");
+            m_runPlace = AddModuleRunList(new Run_Place(this), true, "Run Place Chip to Tray");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -375,6 +602,34 @@ namespace Root_JEDI_Sorter.Module
             }
         }
 
+        public class Run_ChangeWidth : ModuleRunBase
+        {
+            Loader m_module;
+            public Run_ChangeWidth(Loader module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            double m_fWidth = 10;
+            public override ModuleRunBase Clone()
+            {
+                Run_ChangeWidth run = new Run_ChangeWidth(m_module);
+                run.m_fWidth = m_fWidth;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_fWidth = tree.Set(m_fWidth, m_fWidth, "Width", "Picker Width (mm)", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.ChangeWidth(m_fWidth);
+            }
+        }
+
         public class Run_Pick : ModuleRunBase
         {
             Loader m_module;
@@ -386,13 +641,15 @@ namespace Root_JEDI_Sorter.Module
 
             public Good.eGood m_eGood = Good.eGood.GoodA;
             public Good.eStage m_eStage = Good.eStage.Giver;
-            public eResult m_eResult = eResult.Good; 
+            public eResult m_eResult = eResult.Good;
+            public int m_maxPick = c_lPicker; 
             public override ModuleRunBase Clone()
             {
                 Run_Pick run = new Run_Pick(m_module);
                 run.m_eGood = m_eGood;
                 run.m_eStage = m_eStage;
-                run.m_eResult = m_eResult; 
+                run.m_eResult = m_eResult;
+                run.m_maxPick = m_maxPick; 
                 return run;
             }
 
@@ -401,11 +658,37 @@ namespace Root_JEDI_Sorter.Module
                 m_eGood = (Good.eGood)tree.Set(m_eGood, m_eGood, "Boat", "Select Boat", bVisible);
                 m_eStage = (Good.eStage)tree.Set(m_eStage, m_eStage, "Stage", "Select Boat", bVisible);
                 m_eResult = (eResult)tree.Set(m_eResult, m_eResult, "Result", "Select Result", bVisible);
+                m_maxPick = tree.Set(m_maxPick, m_maxPick, "Max Pick", "Max Pick Count", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunPick(m_eGood, m_eStage, m_eResult);
+                return m_module.RunPick(m_eGood, m_eStage, m_eResult, m_maxPick);
+            }
+        }
+
+        public class Run_Place : ModuleRunBase
+        {
+            Loader m_module;
+            public Run_Place(Loader module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Pick run = new Run_Pick(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunPlace();
             }
         }
         #endregion

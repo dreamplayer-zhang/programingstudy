@@ -19,8 +19,10 @@ namespace RootTools_Vision
         #region [Member variables]
 
         byte[] GoldenImage = null;
-        float[] scaleMap = null;
-        float[] histWeightMap = null;
+        float[] ScaleMap = null;
+        float[] HistWeightMap = null;
+        bool InitFail = false;
+        UpdateFreq RefUpdateFreq;
 
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
@@ -42,12 +44,12 @@ namespace RootTools_Vision
         {
             if (this.currentWorkplace == null) return false;
 
-            if(this.parameterD2D == null || this.recipeD2D == null)
+            if (this.parameterD2D == null || this.recipeD2D == null)
             {
                 this.parameterD2D = (D2DParameter)this.parameter;
                 this.recipeD2D = this.recipe.GetItem<D2DRecipe>();
             }
-            
+
 
             if (this.currentWorkplace.Index == 0)
             {
@@ -56,105 +58,84 @@ namespace RootTools_Vision
 
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterD2D.IndexChannel);
 
-            if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP) == true &&
-                this.workplaceBundle.CheckStateLine(this.currentWorkplace.MapIndexX, WORK_TYPE.ALIGNMENT) &&
-                this.IsPreworkDone == false)
+            if (this.IsPreworkDone == false)
             {
-                if (parameterD2D.RefImageUpdate == RefImageUpdateFreq.Line) // Line 별로 GoldenImage를 만들 경우
-                {
-                    CreateGoldenImage();
-
-                    // Golden Image 해당라인 Workplace에 복사
+                if(RefUpdateFreq != UpdateFreq.PreCreate) // 현재 Line에 Chip 개수가 부족할 경우 정상적인 검사를 할 수 없으므로 Method 변경
+                { 
+                    RefUpdateFreq = parameterD2D.RefImageUpdateFreq;
+                    int chipNumCounter = 0;
                     foreach (Workplace wp in this.workplaceBundle)
-                    {
                         if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
-                        {
-                            wp.SetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE, (object)(GoldenImage) /*Tools.ByteArrayToObject(GoldenImage)*/);
-                        }
-                    }
+                            chipNumCounter++;
+
+                    if (chipNumCounter <= 2)
+                        RefUpdateFreq = UpdateFreq.PreCreate;
                 }
-                // Chip_trigger mode에서는 golden image를 생성하지 않으므로 첫 chip에서 golden image를 임시로 생성 후 scale map을 만들어줍니다.
-                else if((parameterD2D.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) && (parameterD2D.ScaleMap == true))
-                {
-                    if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) == null)
-                    { 
-                        // 미리 생성해둔 Golden Image가 있으면 불러와서 Scale Map 생성
-                        if (recipeD2D.PreGoldenW == this.currentWorkplace.Width && recipeD2D.PreGoldenH == this.currentWorkplace.Height)
-                        {
-                            GoldenImage = recipeD2D.PreGolden[(int)parameterD2D.IndexChannel];
-                        }
-                        // 미리 생성해둔 Golden Image가 없으면 임시로 생성
-                        else
-                        { 
-                            CreateGoldenImage();
-                        }
 
-                        if (scaleMap == null)
-                            scaleMap = new float[this.currentWorkplace.Width * this.currentWorkplace.Height];
-
-                        CLR_IP.Cpp_CreateDiffScaleMap(GoldenImage, scaleMap, this.currentWorkplace.Width, this.currentWorkplace.Height, 10, 10);
-
-                        foreach (Workplace wp in this.workplaceBundle)
-                            wp.SetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP, (object)(scaleMap));
-                    }
-                }
-                else if(parameterD2D.RefImageUpdate == RefImageUpdateFreq.PreCreate)
+                if (RefUpdateFreq == UpdateFreq.PreCreate) // 동일 Line Position 기다릴 필요 없음
                 {
                     if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) == null)
                     {
-                        // 미리 생성해둔 Golden Image가 있으면 불러와서 Scale Map 생성
                         if (recipeD2D.PreGoldenW == this.currentWorkplace.Width && recipeD2D.PreGoldenH == this.currentWorkplace.Height)
                         {
-                            GoldenImage = recipeD2D.PreGolden[(int)parameterD2D.IndexChannel];
+                            this.GoldenImage = recipeD2D.PreGolden[(int)parameterD2D.IndexChannel]; // 미리 생성해둔 Golden Image가 있으면 불러와서 Scale Map 생성
+
+                            foreach (Workplace wp in this.workplaceBundle) // 각 Workplace에 Golden Image 복사
+                                wp.SetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE, (object)(GoldenImage));
                         }
-                        // 미리 생성해둔 Golden Image가 반드시 있어야하는데 없으면 임시로 생성 (검사 잘 안될듯)
                         else
                         {
+                            InitFail = true; // DoInspection()에서 예외처리됨
+                        }
+                    }
+
+                    if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) != null)
+                    {
+                        this.GoldenImage = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) as byte[];
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP) == true &&
+                        this.workplaceBundle.CheckStateLine(this.currentWorkplace.MapIndexX, WORK_TYPE.ALIGNMENT)) // Golden Image 생성을 위해 Line Position 완료될 때까지 대기
+                    {
+                        if (RefUpdateFreq == UpdateFreq.Line) // Line 별로 GoldenImage 생성
+                        {
                             CreateGoldenImage();
+
+                            foreach (Workplace wp in this.workplaceBundle) // Golden Image 해당라인 Workplace에 복사
+                            {
+                                if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
+                                {
+                                    wp.SetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE, (object)(GoldenImage));
+                                }
+                            }
                         }
 
-                        // Golden Image 해당라인 Workplace에 복사
-                        foreach (Workplace wp in this.workplaceBundle)
-                            wp.SetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE, (object)(GoldenImage) /*Tools.ByteArrayToObject(GoldenImage)*/);
+                        else if (RefUpdateFreq == UpdateFreq.None) // Golden Image 생성 X
+                        {
+                            if (!parameterD2D.UseMC && (RefUpdateFreq == UpdateFreq.None))
+                            {
+                                InitFail = true; // DoInspection()에서 예외처리됨
+                            }
+                        }
+
+                        return true;
                     }
-                     
+
+                    else if (!this.workplaceBundle.CheckStateLine(this.currentWorkplace.MapIndexX, WORK_TYPE.ALIGNMENT))
+                    {
+                        return false;
+                    }
                 }
-                else
-                {
-                    return true;
-                }
-            }
-            else if(!this.workplaceBundle.CheckStateLine(this.currentWorkplace.MapIndexX, WORK_TYPE.ALIGNMENT) &&
-                this.IsPreworkDone == false)
-            {
-                return false;
             }
 
-            if (parameterD2D.RefImageUpdate == RefImageUpdateFreq.Line)
-            {
-                if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) != null)
-                {
-                    this.GoldenImage = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) as byte[];
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else if ((parameterD2D.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) && (parameterD2D.ScaleMap == true))
-            {
-                if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) != null)
-                {
-                    this.scaleMap = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) as float[];
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else if (parameterD2D.RefImageUpdate == RefImageUpdateFreq.PreCreate)
+            if (RefUpdateFreq == UpdateFreq.Line)
             {
                 if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) != null)
                 {
@@ -192,20 +173,6 @@ namespace RootTools_Vision
             int startY;
             int endY;
 
-            bool isRefNotEnough = false;
-            if (mapYIdx.Count() <= 2) 
-            {
-                // PreCreate Golden Image가 있으면 대신 사용
-                if (recipeD2D.PreGoldenW == this.currentWorkplace.Width && recipeD2D.PreGoldenH == this.currentWorkplace.Height)
-                {
-                    GoldenImage = recipeD2D.PreGolden[(int)parameterD2D.IndexChannel];
-                    return;
-                }
-
-                // Line에 Ref Chip이 한개면 Golden Image 생성시 현재 칩까지 넣어서 average로 만듦 
-                isRefNotEnough = true;
-            }
-
             if (mapYIdx.Count() < 5)
             {
                 startY = mapYIdx[0];
@@ -240,18 +207,15 @@ namespace RootTools_Vision
                         if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY) && wp.MapIndexY != this.currentWorkplace.MapIndexY)
                             wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
 
-            if(isRefNotEnough) // Golden Image Method들은 칩 개수가 부족할 경우 모두 Average로 동작
-                wpROIData.Add(new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY));
-
             unsafe
             {
                 //lock (this.lockObj)
-                { 
+                {
                     switch (parameterD2D.CreateRefImage)
                     {
                         case CreateRefImageMethod.Average:
-                            CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count, 
-                                this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,  
+                            CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
+                                this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
                                 wpROIData, this.currentWorkplace.Width, this.currentWorkplace.Height);
                             break;
                         case CreateRefImageMethod.MedianAverage:
@@ -331,7 +295,7 @@ namespace RootTools_Vision
             d2d.GoldenImage = null;
             return d2d;
         }
-        
+
         public void DoInspection()
         {
             if (this.currentWorkplace.Index == 0)
@@ -349,101 +313,118 @@ namespace RootTools_Vision
             int memW = this.currentWorkplace.SharedBufferInfo.Width;
 
             // Recipe
-            int chipH = this.currentWorkplace.Height; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
+            int chipH = this.currentWorkplace.Height;
             int chipW = this.currentWorkplace.Width;
 
             byte[] binImg = new byte[chipW * chipH];
             byte[] diffImg = new byte[chipW * chipH];
 
-            RefImageUpdateFreq refUpdateFreq = parameterD2D.RefImageUpdate;
-            CreateDiffMethod diffMethod = parameterD2D.CreateDiffMethod;
-
-            if (refUpdateFreq == RefImageUpdateFreq.Chip_Trigger) // D2D 4.0 Algorithm 
+            if (InitFail)
             {
-                unsafe
-                {
-                    List<Cpp_Point> wpROIData = TriggerDiffImage();
+                D2DInspectionFail();
+                return;
+            }
 
-                    if (wpROIData. Count <= 2)
+            unsafe
+            {
+                if (RefUpdateFreq == UpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
+                {
+                    if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) == null)
+                        this.GoldenImage = new byte[chipW * chipH];
+
+                    SetGoldenImage();
+                }
+
+                if (parameterD2D.UseMC)
+                {
+                    if (RefUpdateFreq == UpdateFreq.None)
                     {
-                        // D2D 4.0은 Ref칩 개수가 1개일 경우 정상동작하지 않음. -> Golden Image Average로 생성
-                        refUpdateFreq = RefImageUpdateFreq.Chip;
+                        List<Cpp_Point> wpROIData = TriggerDiffImage();
+
+                        switch (parameterD2D.CreateDiffMethod)
+                        {
+                            case CreateDiffMethod.Absolute:
+                                CLR_IP.Cpp_SubtractAbs_MotionEstimation((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
+                                    memW, memH, wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
+                                    , parameterD2D.WindowSize_ME, chipW, chipH);
+                                break;
+                            case CreateDiffMethod.Bright:
+                                CLR_IP.Cpp_Subtract_MotionEstimation((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
+                                    memW, memH, wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
+                                    , parameterD2D.WindowSize_ME, chipW, chipH, false);
+                                break;
+                            case CreateDiffMethod.Dark:
+                                CLR_IP.Cpp_Subtract_MotionEstimation((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
+                                    memW, memH, wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
+                                    , parameterD2D.WindowSize_ME, chipW, chipH, true);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     else
                     {
-                        if (diffMethod == CreateDiffMethod.Absolute)
-                        { 
-                            CLR_IP.Cpp_SelectAbsMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
-                                            this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
-                                            wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
-                                            , 1, this.currentWorkplace.Width, this.currentWorkplace.Height);
-                        }
-                        else if(diffMethod == CreateDiffMethod.Bright)
+                        switch (parameterD2D.CreateDiffMethod)
                         {
-                            CLR_IP.Cpp_SelectMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
-                                            this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
-                                            wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
-                                            , 1, this.currentWorkplace.Width, this.currentWorkplace.Height, false);
+                            case CreateDiffMethod.Absolute:
+                                CLR_IP.Cpp_SubtractAbs_MotionEstimation(inspectionWorkBuffer, GoldenImage, diffImg, chipW, chipH, parameterD2D.WindowSize_ME);
+                                break;
+                            case CreateDiffMethod.Bright:
+                                CLR_IP.Cpp_Subtract_MotionEstimation(inspectionWorkBuffer, GoldenImage, diffImg, chipW, chipH, parameterD2D.WindowSize_ME, false);
+                                break;
+                            case CreateDiffMethod.Dark:
+                                CLR_IP.Cpp_Subtract_MotionEstimation(inspectionWorkBuffer, GoldenImage, diffImg, chipW, chipH, parameterD2D.WindowSize_ME, true);
+                                break;
+                            default:
+                                break;
                         }
-                        else
-                        {
-                            CLR_IP.Cpp_SelectMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
-                                            this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
-                                            wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
-                                            , 1, this.currentWorkplace.Width, this.currentWorkplace.Height, true);
-                        }
-
-                        if (parameterD2D.ScaleMap) // ScaleMap Option
-                        { 
-                            CLR_IP.Cpp_Multiply(diffImg, scaleMap, diffImg, chipW, chipH);
-                        }
+                    }
+                }
+                else
+                {
+                    switch (parameterD2D.CreateDiffMethod)
+                    {
+                        case CreateDiffMethod.Absolute:
+                            CLR_IP.Cpp_SubtractAbs(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
+                            break;
+                        case CreateDiffMethod.Bright:
+                            CLR_IP.Cpp_Subtract(inspectionWorkBuffer, GoldenImage, diffImg, chipW, chipH);
+                            break;
+                        case CreateDiffMethod.Dark:
+                            CLR_IP.Cpp_Subtract(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
 
-            if(refUpdateFreq != RefImageUpdateFreq.Chip_Trigger)
+            if (parameterD2D.UseScaleMap) // ScaleMap Option
             {
-                if (refUpdateFreq == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
+                if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) != null)
                 {
-                    if(this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) == null)
-                        this.GoldenImage = new byte[this.currentWorkplace.Width * this.currentWorkplace.Height];
-                    SetGoldenImage();
+                    this.ScaleMap = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) as float[];
                 }
-                // Diff Image 계산
-                if(diffMethod == CreateDiffMethod.Absolute)
-                    CLR_IP.Cpp_SubtractAbs(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
-                else if(diffMethod == CreateDiffMethod.Bright)
-                    CLR_IP.Cpp_Subtract(inspectionWorkBuffer, GoldenImage, diffImg, chipW, chipH);
                 else
-                    CLR_IP.Cpp_Subtract(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
-
-                if (parameterD2D.ScaleMap) // ScaleMap Option
                 {
-                    if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) != null)
-                    {
-                        this.scaleMap = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) as float[];
-                    }
+                    if (ScaleMap == null)
+                        ScaleMap = new float[chipW * chipH];
 
-                    else
-                    {
-                        if (scaleMap == null)
-                            scaleMap = new float[chipW * chipH];
+                    CLR_IP.Cpp_CreateDiffScaleMap(GoldenImage, ScaleMap, chipW, chipH, 10, 10);
 
-                        CLR_IP.Cpp_CreateDiffScaleMap(GoldenImage, scaleMap, chipW, chipH, 10, 10);
-
-                        foreach (Workplace wp in this.workplaceBundle)
-                            wp.SetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP, (object)(scaleMap));
-                    }
-
-                    CLR_IP.Cpp_Multiply(diffImg, scaleMap, diffImg, chipW, chipH);
+                    foreach (Workplace wp in this.workplaceBundle)
+                        wp.SetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP, (object)(ScaleMap));
                 }
+                CLR_IP.Cpp_Multiply(diffImg, ScaleMap, diffImg, chipW, chipH);
+            }
 
-                if (parameterD2D.HistWeightMap) // Histogram WeightMap
-                {
-                    histWeightMap = new float[chipW * chipH];
-                    CLR_IP.Cpp_CreateHistogramWeightMap(inspectionWorkBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);
-                    CLR_IP.Cpp_Multiply(diffImg, histWeightMap, diffImg, chipW, chipH);
-                }
+            if (parameterD2D.UseHistWeightMap) // Histogram WeightMap
+            {
+                if (HistWeightMap == null)
+                    this.HistWeightMap = new float[chipW * chipH];
+
+                CLR_IP.Cpp_CreateHistogramWeightMap(inspectionWorkBuffer, GoldenImage, this.HistWeightMap, chipW, chipH, 5);
+                CLR_IP.Cpp_Multiply(diffImg, this.HistWeightMap, diffImg, chipW, chipH);
             }
 
             // Filter
@@ -466,8 +447,8 @@ namespace RootTools_Vision
             }
 
             // Threshold 값으로 Defect 탐색
-            CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, parameterD2D.Intensity);
-            
+            CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, parameterD2D.Sensitivity);
+
             // Mask
             MaskRecipe mask = this.recipe.GetItem<MaskRecipe>();
 
@@ -475,7 +456,7 @@ namespace RootTools_Vision
             int[] maskLength = new int[mask.MaskList[this.parameterD2D.MaskIndex].PointLines.Count];
 
             Cpp_Point tempPt = new Cpp_Point();
-            for(int i = 0; i < mask.MaskList[this.parameterD2D.MaskIndex].PointLines.Count; i++)
+            for (int i = 0; i < mask.MaskList[this.parameterD2D.MaskIndex].PointLines.Count; i++)
             {
                 maskStartPoint[i] = new Cpp_Point();
                 maskStartPoint[i].x = mask.MaskList[this.parameterD2D.MaskIndex].PointLines[i].StartPoint.X;
@@ -489,16 +470,21 @@ namespace RootTools_Vision
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
+            int defectCount = 0;
             //Add Defect
             for (int i = 0; i < Label.Length; i++)
             {
-                if (Label[i].area > parameterD2D.Size)
+                if (Label[i].area > this.parameterD2D.Size)
                 {
-                    if (parameterD2D.SizeLimit > 0)
+                    if (this.parameterD2D.USL > 0)
                     {
-                        if (parameterD2D.SizeLimit < Label[i].area)
+                        if (this.parameterD2D.USL < Label[i].area)
                             continue;
                     }
+                    if (this.parameterD2D.DefectMaxNum < defectCount)
+                        break;
+
+                    defectCount++;
 
                     this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
 
@@ -520,7 +506,7 @@ namespace RootTools_Vision
 
         public void CreateGoldenImage()
         {
-            if(GoldenImage == null)
+            if (GoldenImage == null)
                 GoldenImage = new byte[this.currentWorkplace.Width * this.currentWorkplace.Height];
 
             // Index 계산
@@ -533,20 +519,6 @@ namespace RootTools_Vision
 
             int startY = 0;
             int endY = 0;
-
-            bool isRefNotEnough = false;
-            if (mapYIdx.Count() <= 2) // Line에 Ref Chip이 한개면 Golden Image 생성시 현재 칩까지 넣어서 average로 만듦 
-            {
-                // PreCreate Golden Image가 있으면 대신 사용
-                if (recipeD2D.PreGoldenW == this.currentWorkplace.Width && recipeD2D.PreGoldenH == this.currentWorkplace.Height)
-                {
-                    GoldenImage = recipeD2D.PreGolden[(int)parameterD2D.IndexChannel];
-                    return;
-                }
-
-                // Line에 Ref Chip이 한개면 Golden Image 생성시 현재 칩까지 넣어서 average로 만듦 
-                isRefNotEnough = true;
-            }
 
             if (mapYIdx.Count() < 5)
             {
@@ -570,9 +542,6 @@ namespace RootTools_Vision
                     if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
                         if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY))
                             wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
-
-            if (isRefNotEnough) // Golden Image Method들은 칩 개수가 부족할 경우 모두 Average로 동작
-                wpROIData.Add(new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY));
 
             unsafe
             {
@@ -600,6 +569,18 @@ namespace RootTools_Vision
                         break;
                 }
             }
+        }
+
+        public void D2DInspectionFail()
+        {
+            InitFail = true;
+            this.currentWorkplace.AddDefect(DatabaseManager.Instance.GetInspectionID(),
+                        22000 + (int)this.parameterD2D.IndexChannel * 100 + this.parameterD2D.MaskIndex + 1,
+                        1, 1, this.currentWorkplace.PositionX, this.currentWorkplace.PositionY,
+                        this.currentWorkplace.Width, this.currentWorkplace.Height, this.currentWorkplace.MapIndexX, this.currentWorkplace.MapIndexY);
+
+            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), this.currentWorkplace)); // 나중에 ProcessDefect쪽 EVENT로...
+            return;
         }
     }
 }

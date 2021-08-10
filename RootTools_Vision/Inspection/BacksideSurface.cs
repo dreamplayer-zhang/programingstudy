@@ -52,6 +52,12 @@ namespace RootTools_Vision
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterBackside.IndexChannel);
             byte[] workplaceBuffer = GetWorkplaceBufferByColorChannel(this.parameterBackside.IndexChannel);
 
+
+            //Tools.SaveRawdataToBitmap(@"D:\test\buffer\workplace_" + string.Format("{0}_{1}.bmp", currentWorkplace.MapIndexY, currentWorkplace.MapIndexX),
+            //    workplaceBuffer,
+            //    currentWorkplace.Width, currentWorkplace.Height, 1);
+            
+
             // Inspection Param
             bool isDarkInsp = !parameterBackside.IsBright; // Option
             int nGrayLevel = parameterBackside.Intensity; // Option
@@ -83,16 +89,16 @@ namespace RootTools_Vision
             {
                 // 비검사 영역을 255로 만들어 Threhosld에 걸리지 않게 해줌
                 CLR_IP.Cpp_Bitwise_NOT(arrBinImg, arrBinImg, chipW, chipH);
-                CLR_IP.Cpp_Bitwise_OR(workplaceBuffer, arrBinImg, workplaceBuffer, chipW, chipH);
+                CLR_IP.Cpp_Bitwise_OR(workplaceBuffer, arrBinImg, arrBinImg, chipW, chipH);
             }
             else
             {
                 // 비검사 영역을 0으로 만들어 Threshold에 걸리지 않게 해줌
-                CLR_IP.Cpp_Bitwise_AND(workplaceBuffer, arrBinImg, workplaceBuffer, chipW, chipH);
+                CLR_IP.Cpp_Bitwise_AND(workplaceBuffer, arrBinImg, arrBinImg, chipW, chipH);
             }
 
             // Dark
-            CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
+            CLR_IP.Cpp_Threshold(arrBinImg, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
 
             // Filter
             switch (parameterBackside.DiffFilter)

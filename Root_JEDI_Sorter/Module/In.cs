@@ -14,6 +14,7 @@ namespace Root_JEDI_Sorter.Module
             InA,
             InB
         }
+
         #region ToolBox
         Axis m_axis; 
         public override void GetTools(bool bInit)
@@ -42,7 +43,7 @@ namespace Root_JEDI_Sorter.Module
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
-        public bool IsLoadPosition()
+        public bool IsTransferPos()
         {
             return (Math.Abs(m_axis.p_posCommand - m_axis.GetPosValue(ePos.Transfer)) < 1); 
         }

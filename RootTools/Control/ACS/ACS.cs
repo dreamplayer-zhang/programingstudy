@@ -192,6 +192,11 @@ namespace RootTools.Control.ACS
             return m_listAxis.GetAxisXY(id, log);
         }
 
+        public AxisXZ GetAxisXZ(string id, Log log)
+        {
+            return m_listAxis.GetAxisXZ(id, log);
+        }
+
         public Axis3D GetAxis3D(string id, Log log)
         {
             return m_listAxis.GetAxis3D(id, log);
@@ -250,9 +255,18 @@ namespace RootTools.Control.ACS
             p_bConnect = true; 
             InitThread();
 
-            // 모션 종료 시 이벤트 설정 및 콜백함수 등록
-            m_channel.LOGICALMOTIONEND += P_channel_LOGICALMOTIONEND;
-            m_channel.EnableEvent(m_channel.ACSC_INTR_LOGICAL_MOTION_END);
+            if(p_bConnect)
+            {
+                try
+                {
+                    // 모션 종료 시 이벤트 설정 및 콜백함수 등록
+                    m_channel.LOGICALMOTIONEND += P_channel_LOGICALMOTIONEND;
+                    m_channel.EnableEvent(m_channel.ACSC_INTR_LOGICAL_MOTION_END);
+                }
+                catch(Exception e)
+                {
+                }
+            }
         }
 
         public void ThreadStop()

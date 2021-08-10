@@ -183,7 +183,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\BufferTray.cs" />
     <Compile Include="Module\JEDI.cs" />
+    <Compile Include="Module\TrayIn.cs" />
+    <Compile Include="Module\TrayOut.cs" />
     <Compile Include="Module\TrayStack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

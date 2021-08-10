@@ -213,6 +213,7 @@ namespace RootTools.Camera.Matrox
         void RunSetTree(Tree tree)
         {
             p_CamInfo.p_sFile = tree.SetFile(p_CamInfo.p_sFile, p_CamInfo.p_sFile, "dcf", "CamFile", "Cam File");
+            p_CamInfo.p_nSystemNum = tree.Set(p_CamInfo.p_nSystemNum, p_CamInfo.p_nSystemNum, "System Number", "System Number");
         }
 
         void RunImageRoiTree(Tree tree)
@@ -281,8 +282,8 @@ namespace RootTools.Camera.Matrox
                 MIL.MappAlloc(MIL.M_NULL, MIL.M_DEFAULT, ref m_MilApplication);
             // System
             if (m_MilSystem == MIL.M_NULL)
-                MIL.MsysAlloc(MIL.M_DEFAULT, "M_SYSTEM_RAPIXOCXP", MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입
-         
+                MIL.MsysAlloc(MIL.M_DEFAULT, "M_SYSTEM_RAPIXOCXP", p_CamInfo.p_nSystemNum, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입
+            //MIL.MsysAlloc(MIL.M_DEFAULT, "M_SYSTEM_RAPIXOCXP", MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입
 
             //MIL.MsysAlloc(MIL.M_DEFAULT, MIL.M_SYSTEM_SOLIOS, MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입
             //MIL.MsysAlloc(MIL.M_DEFAULT, MIL.M_SYSTEM_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입

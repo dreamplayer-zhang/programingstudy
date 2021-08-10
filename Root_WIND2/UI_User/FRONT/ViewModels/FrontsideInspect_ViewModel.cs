@@ -541,7 +541,10 @@ namespace Root_WIND2.UI_User
         }
         public void DrawRectDefect(List<CRect> rectList, List<String> text)
         {
-            ImageViewerVM.AddDrawRectList(rectList, ImageViewerColorDefines.Defect, "defect");
+            Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                ImageViewerVM.AddDrawRectList(rectList, ImageViewerColorDefines.Defect, "defect");
+            });
         }
             #endregion
     }

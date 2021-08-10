@@ -39,7 +39,7 @@ namespace Root_JEDI_Sorter.Module
             m_axis.AddPos(Enum.GetNames(typeof(ePos)));
         }
 
-        public string MoveStage(ePos ePos, double fOffset, bool bWait)
+        public string MoveStage(ePos ePos, double fOffset, bool bWait = true)
         {
             m_axis.StartMove(ePos, fOffset);
             return bWait ? m_axis.WaitReady() : "OK";
@@ -89,6 +89,14 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
+        #region public function
+        public int GetEmptyCount()
+        {
+            InfoTray infoTray = m_stage.p_infoTray;
+            return (infoTray == null) ? 0 : infoTray.m_aCount[eResult.Empty];
+        }
+        #endregion
+
         #region override
         public override string StateHome()
         {
@@ -130,6 +138,7 @@ namespace Root_JEDI_Sorter.Module
             string id = eBad.ToString(); 
             m_unloadEV = new UnloadEV(id + ".UnloadEV");
             m_stage = new Stage(id + ".Stage");
+            m_stage.p_infoTray = new InfoTray(id); 
             base.InitBase(id, engineer);
         }
 

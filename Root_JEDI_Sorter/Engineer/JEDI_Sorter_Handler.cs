@@ -4,7 +4,6 @@ using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Windows.Controls;
@@ -67,7 +66,8 @@ namespace Root_JEDI_Sorter.Engineer
         public Dictionary<In.eIn, In> m_in = new Dictionary<In.eIn, In>();
         public Dictionary<Good.eGood, Good> m_good = new Dictionary<Good.eGood, Good>();
         public Dictionary<Bad.eBad, Bad> m_bad = new Dictionary<Bad.eBad, Bad>();
-        public Transfer m_transfer; 
+        public Transfer m_transfer;
+        public Loader m_loader; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -79,6 +79,7 @@ namespace Root_JEDI_Sorter.Engineer
             InitBad(Bad.eBad.Reject);
             InitBad(Bad.eBad.Rework);
             InitModule(m_transfer = new Transfer("Transfer", m_engineer));
+            InitModule(m_loader = new Loader("Loader", m_engineer));
         }
 
         void InitIn(In.eIn eIn)

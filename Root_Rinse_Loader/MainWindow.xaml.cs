@@ -151,6 +151,8 @@ namespace Root_Rinse_Loader
             gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.SeaGreen : Brushes.DarkGreen;
 
             //textBolckUnloadState.Foreground = rinse.m_tcpip.p_bConnect ? Brushes.Black : Brushes.Gray; 
+            groupBoxRinse.Foreground = rinse.m_diRinseRun.p_bIn ? Brushes.Black : Brushes.Red; 
+            groupBoxUnload.Foreground = rinse.m_diRinseUnloader.p_bIn ? Brushes.Black : Brushes.Red;
         }
         #endregion
 

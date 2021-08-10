@@ -3,6 +3,7 @@ using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -216,7 +217,7 @@ namespace Root_WIND2.UI_User
 
         private CPoint boxFirstPoint = new CPoint();
 
-        public override void PreviewMouseDown(object sender, MouseEventArgs e)
+        public async override void PreviewMouseDown(object sender, MouseEventArgs e)
         {
             base.PreviewMouseDown(sender, e);
 
@@ -323,6 +324,7 @@ namespace Root_WIND2.UI_User
             }
 
             RedrawShapes();
+            //Task.Factory.StartNew(RedrawShapes);
         }
         public override void MouseMove(object sender, MouseEventArgs e)
         {
@@ -363,12 +365,12 @@ namespace Root_WIND2.UI_User
                 Canvas.SetLeft(rt, canvasLeftTop.X < canvasRightBottom.X ? canvasLeftTop.X : canvasRightBottom.X);
                 Canvas.SetTop(rt, canvasLeftTop.Y < canvasRightBottom.Y ? canvasLeftTop.Y : canvasRightBottom.Y);
 
-
                 
+                //Task.Factory.StartNew(RedrawShapes);
             }
+
             //if(m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
                 RedrawShapes();
-
         }
         public override void PreviewMouseUp(object sender, MouseEventArgs e)
         {
@@ -377,17 +379,18 @@ namespace Root_WIND2.UI_User
         }
 
 
-        public override void SetRoiRect()
+        public async override void SetRoiRect()
         {
             base.SetRoiRect();
             RedrawShapes();
+            //Task.Factory.StartNew(RedrawShapes);
         }
 
         #endregion
 
         #region [Draw Method]
 
-        public void AddDrawRect(CRect rect, SolidColorBrush color = null, string tag = "")
+        public async void AddDrawRect(CRect rect, SolidColorBrush color = null, string tag = "")
         {
             if(color == null)
             {
@@ -422,7 +425,7 @@ namespace Root_WIND2.UI_User
                 p_DrawElement.Add(rt);
         }
 
-        public void AddDrawRectList(List<CRect> rectList, SolidColorBrush color = null, string tag = "")
+        public async void AddDrawRectList(List<CRect> rectList, SolidColorBrush color = null, string tag = "")
         {
             foreach(CRect rect in rectList)
             {
@@ -430,7 +433,7 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        public void AddDrawRect(CPoint leftTop, CPoint rightBottom, SolidColorBrush color = null, string tag = "")
+        public async void AddDrawRect(CPoint leftTop, CPoint rightBottom, SolidColorBrush color = null, string tag = "")
         {
             if (color == null)
             {
@@ -466,7 +469,7 @@ namespace Root_WIND2.UI_User
         }
 
 
-        public void AddDrawText(CRect rect, string text, SolidColorBrush color = null, string tag = "")
+        public async void AddDrawText(CRect rect, string text, SolidColorBrush color = null, string tag = "")
         {
             Grid grid = new Grid();
             TextBlock tb = new TextBlock();
@@ -490,7 +493,7 @@ namespace Root_WIND2.UI_User
                 p_DrawElement.Add(grid);
         }
 
-        public void AddDrawText(CPoint leftTop, CPoint rightBottom, string text, SolidColorBrush color = null)
+        public async void AddDrawText(CPoint leftTop, CPoint rightBottom, string text, SolidColorBrush color = null)
         {
             Grid grid = new Grid();
             TextBlock tb = new TextBlock();
@@ -524,52 +527,62 @@ namespace Root_WIND2.UI_User
         }
 
         bool isRedrawing = false;
-        private void RedrawShapes()
+
+        private object lockObj = new object();
+        
+        private async void RedrawShapes()
         {
             if (isRedrawing)
                 return;
-            isRedrawing = true;
-            if (this.IsDefectChecked)
+
+            lock(lockObj) isRedrawing = true;
+
+            //lock(lockObj) 
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                foreach (TRect rt in rectList)
+                if (this.IsDefectChecked)
                 {
-                    if (InViewRect(rt) && p_DrawElement.Contains(rt.UIElement) == true)
+                    foreach (TRect rt in rectList)
                     {
-                        rt.UIElement.Visibility = Visibility.Visible;
+                        if (InViewRect(rt) && p_DrawElement.Contains(rt.UIElement) == true)
+                        {
+                            rt.UIElement.Visibility = Visibility.Visible;
+                            Rectangle rectangle = rt.UIElement as Rectangle;
+                            CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+                            CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+
+                            rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
+                            rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                            Canvas.SetLeft(rectangle, canvasLeftTop.X);
+                            Canvas.SetTop(rectangle, canvasLeftTop.Y);
+                        }
+                        else
+                        {
+                            rt.UIElement.Visibility = Visibility.Hidden;
+                        }
+                    }
+                }
+                foreach (TRect rt in boxList)
+                {
+                    if (InViewRect(rt) && p_UIElement.Contains(rt.UIElement) == true)
+                    {
                         Rectangle rectangle = rt.UIElement as Rectangle;
                         CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
                         CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
 
-                        rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
-                        rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+                        rectangle.Width = Math.Abs(canvasRightBottom.X - canvasLeftTop.X);
+                        rectangle.Height = Math.Abs(canvasRightBottom.Y - canvasLeftTop.Y);
 
                         Canvas.SetLeft(rectangle, canvasLeftTop.X);
                         Canvas.SetTop(rectangle, canvasLeftTop.Y);
                     }
-                    else
-                    {
-                        rt.UIElement.Visibility = Visibility.Hidden;
-                    }
                 }
-            }
-            foreach (TRect rt in boxList)
-            {
-                if (InViewRect(rt) && p_UIElement.Contains(rt.UIElement) == true)
-                {
-                    Rectangle rectangle = rt.UIElement as Rectangle;
-                    CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
-                    CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+            });
 
-                    rectangle.Width = Math.Abs(canvasRightBottom.X - canvasLeftTop.X);
-                    rectangle.Height = Math.Abs(canvasRightBottom.Y - canvasLeftTop.Y);
-
-                    Canvas.SetLeft(rectangle, canvasLeftTop.X);
-                    Canvas.SetTop(rectangle, canvasLeftTop.Y);
-                }
-            }
-            isRedrawing = false;
+            lock (lockObj) isRedrawing = false;
         }
-        public void UpdateImageViewer()
+        public async void UpdateImageViewer()
         {
             foreach (TRect rt in rectList)
             {

@@ -31,13 +31,18 @@ namespace RootTools_Vision
         Bright,
         Dark,
     }
-    public enum RefImageUpdateFreq
+
+    [TypeConverter(typeof(GridConverterEnum))]
+    public enum UpdateFreq
     {
         Chip = 0,
-        Chip_Trigger,
         Line,
+        [Description("Pre-Created Image")]
         PreCreate,
+        [Description("None [MC Mode Only]")]
+        None, // D2D 4.0 Only
     }
+
     public class D2DParameter : ParameterBase, IMaskInspection, IColorInspection, IDisplaySpecSummary, IFrontsideInspection
     {
         public  D2DParameter() : base(typeof(D2D))
@@ -49,48 +54,76 @@ namespace RootTools_Vision
 
 
         #region [Parameters]
-        private int intensity = 0;
-        private int size = 0;
-        private int sizeLimit = 0;
+
+        // Inspection Parameter
+        private int sensitivity = 0;
+        private int lsl = 0;
+        private int usl = 0;
+        private int defectMaxNum = 100;
+
+        //Create Diff Image Option
         private CreateDiffMethod createDiffMethod = CreateDiffMethod.Absolute;
-        private bool scaleMap = false;
-        private bool histWeightMap = false;
-        private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
-        private CreateRefImageMethod createRefImage = CreateRefImageMethod.Average;
-        private RefImageUpdateFreq refImageUpdateFreq = RefImageUpdateFreq.Chip;
+        private bool useScaleMap = false;
+        private bool useHistWeightMap = false;
+        private DiffFilterMethod diffFilter = DiffFilterMethod.Median;
+
+        // Create Golden Image Option
+        private CreateRefImageMethod createRefImage = CreateRefImageMethod.MedianAverage;
+        private UpdateFreq refImageUpdateFreq = UpdateFreq.Chip;
+
+        // MC Method
+        private bool useMC = false;
+        private int windowSize_ME = 1;
         #endregion
 
         #region [Getter Setter]
+
         [Category("Parameter")]
-        public int Intensity
+        [DisplayName("Sensitivity")]
+        public int Sensitivity
         {
-            get => this.intensity;
+            get => this.sensitivity;
             set
             {
-                SetProperty<int>(ref this.intensity, value);
-                Value = this.intensity;
+                SetProperty<int>(ref this.sensitivity, value);
+                Value = this.sensitivity;
             }
         }
+
         [Category("Parameter")]
-        public int Size
+        [DisplayName("LSL(Lower Specification Limit)")]
+        public int LSL
         {
-            get => this.size;
+            get => this.lsl;
             set
             {
-                SetProperty<int>(ref this.size, value);
+                SetProperty<int>(ref this.lsl, value);
             }
         }
+
         [Category("Parameter")]
-        [DisplayName("Size Limit")]
-        public int SizeLimit
+        [DisplayName("USL(Upper Specification Limit)")]
+        public int USL
         {
-            get => this.sizeLimit;
+            get => this.usl;
             set
             {
-                SetProperty<int>(ref this.sizeLimit, value);
+                SetProperty<int>(ref this.usl, value);
             }
         }
-        [Category("Option")]
+
+        [Category("Parameter")]
+        [DisplayName("Maximum Defect Num (Chip)")]
+        public int DefectMaxNum
+        {
+            get => this.defectMaxNum;
+            set
+            {
+                SetProperty<int>(ref this.defectMaxNum, value);
+            }
+        }
+        [Category("Diff Image Option")]
+        [DisplayName("Create Method")]
         public CreateDiffMethod CreateDiffMethod
         {
             get => this.createDiffMethod;
@@ -99,27 +132,28 @@ namespace RootTools_Vision
                 SetProperty<CreateDiffMethod>(ref this.createDiffMethod, value);
             }
         }
-        [Category("Option")]
-        public bool ScaleMap
+        [Category("Diff Image Option")]
+        [DisplayName("Use Scale Map")]
+        public bool UseScaleMap
         {
-            get => this.scaleMap;
+            get => this.useScaleMap;
             set
             {
-                SetProperty<bool>(ref this.scaleMap, value);
+                SetProperty<bool>(ref this.useScaleMap, value);
             }
         }
-        [Category("Option")]
+        [Category("Diff Image Option")]
         [DisplayName("Use Weight Map")]
-        public bool HistWeightMap
+        public bool UseHistWeightMap
         {
-            get => this.histWeightMap;
+            get => this.useHistWeightMap;
             set
             {
-                SetProperty<bool>(ref this.histWeightMap, value);
+                SetProperty<bool>(ref this.useHistWeightMap, value);
             }
         }
-        [Category("Option")]
-        [DisplayName("Diff Filter")]
+        [Category("Diff Image Option")]
+        [DisplayName("Filter")]
         public DiffFilterMethod DiffFilter
         {
             get => this.diffFilter;
@@ -128,7 +162,8 @@ namespace RootTools_Vision
                 SetProperty<DiffFilterMethod>(ref this.diffFilter, value);
             }
         }
-        [Category("Option")]
+        [Category("Golden Image Option")]
+        [DisplayName("Create Method")]
         public CreateRefImageMethod CreateRefImage
         {
             get => this.createRefImage;
@@ -137,17 +172,37 @@ namespace RootTools_Vision
                 SetProperty<CreateRefImageMethod>(ref this.createRefImage, value);
             }
         }
-        [Category("Option")]
-        public RefImageUpdateFreq RefImageUpdate
+        [Category("Golden Image Option")]
+        [DisplayName("Update Frequency")]
+        public UpdateFreq RefImageUpdateFreq
         {
             get => this.refImageUpdateFreq;
             set
             {
-                SetProperty<RefImageUpdateFreq>(ref this.refImageUpdateFreq, value);
+                SetProperty<UpdateFreq>(ref this.refImageUpdateFreq, value);
+            }
+        }
+        [Category("Motion Compensation Option")]
+        [DisplayName("Use Motion Compensation")]
+        public bool UseMC
+        {
+            get => useMC;
+            set
+            {
+                SetProperty<bool>(ref this.useMC, value);
             }
         }
 
-
+        [Category("Motion Compensation Option")]
+        [DisplayName("Window Size")]
+        public int WindowSize_ME
+        {
+            get => this.windowSize_ME;
+            set
+            {
+                SetProperty<int>(ref this.windowSize_ME, value);
+            }
+        }
         // ROI
         [Browsable(false)]
         public int MaskIndex 
@@ -166,10 +221,20 @@ namespace RootTools_Vision
         [Browsable(false)]
         public int Value 
         {
-            get { return this.intensity; }
+            get { return this.sensitivity; }
             set
             {
                 RaisePropertyChanged("Value");
+            }
+        }
+
+        [Browsable(false)]
+        public int Size
+        {
+            get { return this.lsl; }
+            set
+            {
+                RaisePropertyChanged("Size");
             }
         }
         #endregion
@@ -190,5 +255,27 @@ namespace RootTools_Vision
         //    // 현재 타입의 클래스를 생성해서 새로 값(객체)을 할당해주어야합니다.
         //    return this.MemberwiseClone();
         //}
+    }
+
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+    public class EnumDisplayNameAttribute : Attribute
+    {
+        public EnumDisplayNameAttribute(string displayName)
+        {
+            DisplayName = displayName;
+        }
+
+        public string DisplayName { get; set; }
+    }
+    public class EnumMapper
+    {
+        public EnumMapper(object enumValue, string enumDescription)
+        {
+            Enum = enumValue;
+            Description = enumDescription;
+        }
+
+        public object Enum { get; private set; }
+        public string Description { get; private set; }
     }
 }

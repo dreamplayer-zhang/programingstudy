@@ -98,18 +98,43 @@ namespace Root_JEDI.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         public JEDI m_JEDI;
-        public TrayStack m_stackMetal;
-        public TrayStack m_stackTray;
+        public Dictionary<TrayIn.eIn, TrayIn> m_trayIn = new Dictionary<TrayIn.eIn, TrayIn>();
+        public Dictionary<TrayStack.eStack, TrayStack> m_stack = new Dictionary<TrayStack.eStack, TrayStack>();
+        public Dictionary<TrayOut.eOut, TrayOut> m_trayOut = new Dictionary<TrayOut.eOut, TrayOut>();
+        public BufferTray m_buffer; 
         public Dictionary<eVision, IVision> m_vision = new Dictionary<eVision, IVision>(); 
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             InitModule(m_JEDI = new JEDI("JEDI", m_engineer));
-            InitModule(m_stackTray = new TrayStack("MetalStack", m_engineer));
-            InitModule(m_stackMetal = new TrayStack("TrayStack", m_engineer));
+            InitTrayOut(TrayOut.eOut.TrayOutL);
+            InitTrayOut(TrayOut.eOut.TrayOutR);
+            InitStack(TrayStack.eStack.Metal);
+            InitModule(m_buffer = new BufferTray("BufferTray", m_engineer));
+            InitStack(TrayStack.eStack.Empty);
+            InitTrayIn(TrayIn.eIn.TrayInL);
+            InitTrayIn(TrayIn.eIn.TrayInR);
             InitVision(eVision.Top2D, new Vision2D(eVision.Top2D, m_engineer, ModuleBase.eRemote.Client));
             InitVision(eVision.Bottom, new Vision2D(eVision.Bottom, m_engineer, ModuleBase.eRemote.Client));
+        }
+
+        void InitTrayIn(TrayIn.eIn eIn)
+        {
+            m_trayIn.Add(eIn, new TrayIn(eIn, m_engineer));
+            InitModule(m_trayIn[eIn]);
+        }
+
+        void InitStack(TrayStack.eStack eStack)
+        {
+            m_stack.Add(eStack, new TrayStack(eStack, m_engineer));
+            InitModule(m_stack[eStack]);
+        }
+
+        void InitTrayOut(TrayOut.eOut eOut)
+        {
+            m_trayOut.Add(eOut, new TrayOut(eOut, m_engineer));
+            InitModule(m_trayOut[eOut]);
         }
 
         void InitVision(eVision eVision, IVision vision)

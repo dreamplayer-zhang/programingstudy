@@ -313,7 +313,8 @@ namespace RootTools_CLR
 		pSrc = nullptr;
 		pTarget = nullptr;
 	}
-	void CLR_IP::Cpp_SelectAbsMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH)
+
+	void CLR_IP::Cpp_SubtractAbs_MotionEstimation(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pDst = &pDstImg[0];
@@ -323,13 +324,26 @@ namespace RootTools_CLR
 		for (int i = 0; i < RefROILT->Count; i++)
 			vtPoint.push_back(Point(RefROILT[i]->x, RefROILT[i]->y));
 
-		IP::SelectAbsMinDiffinArea(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, Point(CurROILT->x, CurROILT->y), stride, nROIW, nROIH);
+		IP::SubtractAbs_MotionEstimation(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, Point(CurROILT->x, CurROILT->y), stride, nROIW, nROIH);
 
 		pSrc = nullptr;
 		pDst = nullptr;
 	}
 
-	void CLR_IP::Cpp_SelectMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH, bool isDark)
+	void CLR_IP::Cpp_SubtractAbs_MotionEstimation(array<byte>^ pSrcImg, array<byte>^ pRefImg, array<byte>^ pDstImg, int nChipW, int nChipH, int nStride)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pRef = &pRefImg[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::SubtractAbs_MotionEstimation(pSrc, pRef, pDst, nChipW, nChipH, nStride);
+
+		pSrc = nullptr;
+		pRef = nullptr;
+		pDst = nullptr;
+	}
+
+	void CLR_IP::Cpp_Subtract_MotionEstimation(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH, bool isDark)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pDst = &pDstImg[0];
@@ -339,12 +353,27 @@ namespace RootTools_CLR
 		for (int i = 0; i < RefROILT->Count; i++)
 			vtPoint.push_back(Point(RefROILT[i]->x, RefROILT[i]->y));
 
-		IP::SelectMinDiffinArea(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, Point(CurROILT->x, CurROILT->y), stride, nROIW, nROIH, isDark);
+		IP::Subtract_MotionEstimation(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, Point(CurROILT->x, CurROILT->y), stride, nROIW, nROIH, isDark);
 
 		pSrc = nullptr;
 		pDst = nullptr;
 
 	}
+
+	void CLR_IP::Cpp_Subtract_MotionEstimation(array<byte>^ pSrcImg, array<byte>^ pRefImg, array<byte>^ pDstImg, int nChipW, int nChipH, int nStride, bool isDark)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pRef = &pRefImg[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Subtract_MotionEstimation(pSrc, pRef, pDst, nChipW, nChipH, nStride, isDark);
+
+		pSrc = nullptr;
+		pRef = nullptr;
+		pDst = nullptr;
+
+	}
+
 	void CLR_IP::Cpp_CreateGoldenImage_Avg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];

@@ -123,6 +123,32 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
+        #region eStep
+        public enum eStep
+        {
+            Tansfer,
+            Reject,
+            Rework,
+            Good,
+        }
+        eStep _eStep = eStep.Tansfer; 
+        public eStep p_eStep
+        {
+            get { return _eStep; }
+            set
+            {
+                _eStep = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        public int GetCount(eStage eStage, eResult eResult)
+        {
+            InfoTray infoTray = m_stage[eStage].p_infoTray;
+            return (infoTray == null) ? 0 : infoTray.m_aCount[eResult]; 
+        }
+        #endregion
+
         #region override
         public override string StateHome()
         {
