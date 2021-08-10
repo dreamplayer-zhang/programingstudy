@@ -220,7 +220,7 @@ namespace Root_JEDI_Sorter.Module
             Stage stage = In.m_stage;
             if (stage.p_infoTray == null) return "InfoTray == null at " + eIn.ToString(); 
             if (stage.IsCheck(true) == false) return "Tray Check Sensor Error at " + eIn.ToString();
-            if (In.IsLoadPosition() == false) return eIn.ToString() + " Stage Position not Ready"; 
+            if (In.IsTransferPos() == false) return eIn.ToString() + " Stage Position not Ready"; 
             ePosIn ePosIn = (eIn == In.eIn.InA) ? ePosIn.InA : ePosIn.InB;
             if (Run(stage.RunAlign(false, false))) return p_sInfo;
             if (Run(MoveIn(ePosIn))) return p_sInfo;

@@ -57,7 +57,7 @@ namespace Root_JEDI_Sorter.Module
             for (int y = 0; y < Tray.m_countChip.Y; y++)
             {
                 while (m_aChip[y].Count > Tray.m_countChip.X) m_aChip[y].RemoveAt(m_aChip[y].Count - 1);
-                while (m_aChip[y].Count > Tray.m_countChip.X) m_aChip[y].Add(eResult.Good); 
+                while (m_aChip[y].Count < Tray.m_countChip.X) m_aChip[y].Add(eResult.Empty); 
             }
             CalcCount();
         }
@@ -87,18 +87,9 @@ namespace Root_JEDI_Sorter.Module
             }
             return new CPoint(-1, -1); 
         }
-
-        public void SetEmpty()
-        {
-            InitChip(); 
-            for (int y = 0; y < Tray.m_countChip.Y; y++)
-            {
-                for (int x = 0; x < Tray.m_countChip.X; x++) m_aChip[y][x] = eResult.Empty;
-            }
-        }
         #endregion
 
-            #region Chip Count
+        #region Chip Count
         public Dictionary<eResult, int> m_aCount = new Dictionary<eResult, int>(); 
         void InitCount()
         {
@@ -123,8 +114,8 @@ namespace Root_JEDI_Sorter.Module
             p_id = id;
             m_sTrayIn = id; 
             InitInspect();
+            InitCount();
             InitChip(); 
-            InitCount(); 
         }
     }
 

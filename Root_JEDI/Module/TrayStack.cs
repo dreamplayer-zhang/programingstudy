@@ -10,6 +10,12 @@ namespace Root_JEDI.Module
 {
     public class TrayStack : ModuleBase
     {
+        public enum eStack
+        {
+            Metal,
+            Empty
+        }
+
         #region ToolBox
         public DIO_I4O m_dioAlignY;
         public DIO_I2O m_dioAlignX;
@@ -90,8 +96,11 @@ namespace Root_JEDI.Module
         }
         #endregion
 
-        public TrayStack(string id, IEngineer engineer)
+        eStack m_eStack = eStack.Empty; 
+        public TrayStack(eStack eStack, IEngineer engineer)
         {
+            m_eStack = eStack;
+            string id = eStack.ToString() + "Stack"; 
             base.InitBase(id, engineer);
             InitMetalTray(); 
         }
