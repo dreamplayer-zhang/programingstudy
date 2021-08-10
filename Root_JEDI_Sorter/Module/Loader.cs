@@ -236,20 +236,24 @@ namespace Root_JEDI_Sorter.Module
         #endregion
 
         #region Run Picker
-        public string PickerWaitDone()
+        public string PickerWaitDone(InfoTray infoTray)
         {
-            while (IsPickerDone() == false)
+            try
             {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return "EQ Stop";
+                while (IsPickerDone() == false)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                string sRun = "OK";
+                foreach (Picker picker in m_picker)
+                {
+                    string sInfo = picker.CheckDone();
+                    if ((sInfo != "OK") && (sRun == "OK")) sRun = sInfo;
+                }
+                return sRun;
             }
-            string sRun = "OK";
-            foreach (Picker picker in m_picker)
-            {
-                string sInfo = picker.CheckDone();
-                if ((sInfo != "OK") && (sRun == "OK")) sRun = sInfo;
-            }
-            return sRun;
+            finally { infoTray.CalcCount(); }
         }
 
         bool IsPickerDone()
@@ -371,7 +375,7 @@ namespace Root_JEDI_Sorter.Module
             if (Run(good.MovePicker(eStage, 1000 * Tray.GetChipPosX(cpTray.Y)))) return p_sInfo; 
             if (Run(m_axis.WaitReady())) return p_sInfo; 
             for (int i = iPicker; i < c_lPicker; i += m_incPicker, cpTray.X += m_incChip) AddPick(i, infoTray, cpTray, eResult, ref maxPick);
-            return PickerWaitDone(); 
+            return PickerWaitDone(infoTray); 
         }
 
         int GetEmptyPicker()
@@ -439,7 +443,7 @@ namespace Root_JEDI_Sorter.Module
             if (Run(good.MovePicker(Good.eStage.Taker, 1000 * Tray.GetChipPosX(cpTray.Y)))) return p_sInfo;
             if (Run(m_axis.WaitReady())) return p_sInfo;
             for (int i = iPicker; i < c_lPicker; i += m_incPicker, cpTray.X += m_incChip) AddPlace(i, infoTray, cpTray);
-            return PickerWaitDone();
+            return PickerWaitDone(infoTray);
         }
 
         string RunPlaceBad(eResult eResult)
@@ -454,7 +458,7 @@ namespace Root_JEDI_Sorter.Module
             if (Run(bad.MoveStage(Bad.ePos.Picker, 1000 * Tray.GetChipPosX(cpTray.Y)))) return p_sInfo;
             if (Run(m_axis.WaitReady())) return p_sInfo;
             for (int i = iPicker; i < c_lPicker; i += m_incPicker, cpTray.X += m_incChip) AddPlace(i, infoTray, cpTray);
-            return PickerWaitDone();
+            return PickerWaitDone(infoTray);
         }
 
         int GetHoldPicker()
@@ -494,34 +498,52 @@ namespace Root_JEDI_Sorter.Module
             return sHome;
         }
 
-        public bool m_bBusy = false; 
         public Good.eGood m_eGoodRun = Good.eGood.GoodA; 
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
-            int iPicker = GetHoldPicker(); 
-            if (iPicker >= 0) return StartPlace();
             Good.eGood eGood = m_eGoodRun;
             Good good = m_handler.m_good[eGood];
-            if (m_bBusy == false) return "OK";
-            InfoTray infoGiver = good.m_stage[Good.eStage.Giver].p_infoTray.CalcCount();
-            InfoTray infoTaker = good.m_stage[Good.eStage.Taker].p_infoTray.CalcCount();
-            int nTaker = GetChip(infoTaker, eResult.Empty);
-            int nReject = GetChip(m_handler.m_bad[Bad.eBad.Reject].m_stage.p_infoTray.CalcCount(), eResult.Empty);
-            int nRework = GetChip(m_handler.m_bad[Bad.eBad.Rework].m_stage.p_infoTray.CalcCount(), eResult.Empty);
-            if ((GetChip(infoTaker, eResult.Reject) > 0) && (nReject > 0)) return StartPick(eGood, Good.eStage.Taker, eResult.Reject, nReject);
-            if ((GetChip(infoTaker, eResult.Rework) > 0) && (nRework > 0)) return StartPick(eGood, Good.eStage.Taker, eResult.Rework, nRework);
-            if ((GetChip(infoGiver, eResult.Reject) > 0) && (nReject > 0)) return StartPick(eGood, Good.eStage.Giver, eResult.Reject, nReject);
-            if ((GetChip(infoGiver, eResult.Rework) > 0) && (nRework > 0)) return StartPick(eGood, Good.eStage.Giver, eResult.Rework, nRework);
-            if ((GetChip(infoGiver, eResult.Good) > 0) && (nTaker > 0)) return StartPick(eGood, Good.eStage.Giver, eResult.Good, nTaker);
-            m_bBusy = false; 
+            int iPicker = GetHoldPicker(); 
+            if (IsPlaceReady(iPicker, good.p_eStep)) return StartPlace();
+            switch (good.p_eStep)
+            {
+                case Good.eStep.Tansfer: break;
+                case Good.eStep.Reject:
+                    int nReject = m_handler.m_bad[Bad.eBad.Reject].GetEmptyCount();
+                    if (nReject <= 0) break;
+                    if (good.GetCount(Good.eStage.Taker, eResult.Reject) > 0) return StartPick(eGood, Good.eStage.Taker, eResult.Reject, nReject);
+                    if (good.GetCount(Good.eStage.Giver, eResult.Reject) > 0) return StartPick(eGood, Good.eStage.Giver, eResult.Reject, nReject);
+                    good.p_eStep = Good.eStep.Rework; 
+                    break;
+                case Good.eStep.Rework:
+                    int nRework = m_handler.m_bad[Bad.eBad.Rework].GetEmptyCount();
+                    if (nRework <= 0) break;
+                    if (good.GetCount(Good.eStage.Taker, eResult.Rework) > 0) return StartPick(eGood, Good.eStage.Taker, eResult.Rework, nRework);
+                    if (good.GetCount(Good.eStage.Giver, eResult.Rework) > 0) return StartPick(eGood, Good.eStage.Giver, eResult.Rework, nRework);
+                    good.p_eStep = Good.eStep.Good;
+                    break;
+                case Good.eStep.Good:
+                    int nTaker = good.GetCount(Good.eStage.Taker, eResult.Empty);
+                    if (nTaker <= 0) { break; }
+                    if ((good.GetCount(Good.eStage.Giver, eResult.Good) > 0) && (nTaker > 0)) return StartPick(eGood, Good.eStage.Giver, eResult.Good, nTaker);
+                    good.p_eStep = Good.eStep.Tansfer;
+                    break;
+            }
+            m_eGoodRun = 1 - m_eGoodRun;
             return "OK";
         }
 
-        int GetChip(InfoTray infoTray, eResult eResult)
+        bool IsPlaceReady(int iPicker, Good.eStep eStep)
         {
-            if (infoTray == null) return 0;
-            return infoTray.m_aCount[eResult]; 
+            if (iPicker < 0) return false; 
+            switch (m_picker[iPicker].p_eResult)
+            {
+                case eResult.Reject: return eStep != Good.eStep.Reject;
+                case eResult.Rework: return eStep != Good.eStep.Rework;
+                case eResult.Good: return eStep != Good.eStep.Good;
+            }
+            return true; 
         }
         #endregion
 

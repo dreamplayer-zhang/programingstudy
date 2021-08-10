@@ -89,6 +89,14 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
+        #region public function
+        public int GetEmptyCount()
+        {
+            InfoTray infoTray = m_stage.p_infoTray;
+            return (infoTray == null) ? 0 : infoTray.m_aCount[eResult.Empty];
+        }
+        #endregion
+
         #region override
         public override string StateHome()
         {
@@ -130,6 +138,7 @@ namespace Root_JEDI_Sorter.Module
             string id = eBad.ToString(); 
             m_unloadEV = new UnloadEV(id + ".UnloadEV");
             m_stage = new Stage(id + ".Stage");
+            m_stage.SetEmpty(id); 
             base.InitBase(id, engineer);
         }
 

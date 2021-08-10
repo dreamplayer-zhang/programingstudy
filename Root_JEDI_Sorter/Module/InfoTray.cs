@@ -59,6 +59,7 @@ namespace Root_JEDI_Sorter.Module
                 while (m_aChip[y].Count > Tray.m_countChip.X) m_aChip[y].RemoveAt(m_aChip[y].Count - 1);
                 while (m_aChip[y].Count > Tray.m_countChip.X) m_aChip[y].Add(eResult.Good); 
             }
+            CalcCount();
         }
 
         public void FlipTray()
@@ -86,29 +87,31 @@ namespace Root_JEDI_Sorter.Module
             }
             return new CPoint(-1, -1); 
         }
+
+        public void SetEmpty()
+        {
+            InitChip(); 
+            for (int y = 0; y < Tray.m_countChip.Y; y++)
+            {
+                for (int x = 0; x < Tray.m_countChip.X; x++) m_aChip[y][x] = eResult.Empty;
+            }
+        }
         #endregion
 
-        #region Chip Count
+            #region Chip Count
         public Dictionary<eResult, int> m_aCount = new Dictionary<eResult, int>(); 
         void InitCount()
         {
             foreach (eResult eResult in Enum.GetValues(typeof(eResult))) m_aCount.Add(eResult, 0); 
         }
 
-        public InfoTray CalcCount()
+        public void CalcCount()
         {
             foreach (eResult eResult in Enum.GetValues(typeof(eResult))) m_aCount[eResult] = 0;
             for (int y = 0; y < Tray.m_countChip.Y; y++)
             {
                 foreach (eResult eResult in m_aChip[y]) m_aCount[eResult]++; 
             }
-            return this; 
-        }
-
-        public int GetChipCount()
-        {
-            CalcCount(); 
-            return m_aCount[eResult.Good] + m_aCount[eResult.Reject] + m_aCount[eResult.Rework]; 
         }
         #endregion
 

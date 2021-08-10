@@ -61,6 +61,12 @@ namespace Root_JEDI_Sorter.Module
                 OnPropertyChanged();
             }
         }
+
+        public void SetEmpty(string sID)
+        {
+            p_infoTray = new InfoTray(sID);
+            p_infoTray.SetEmpty(); 
+        }
         #endregion
 
         public void Reset()
