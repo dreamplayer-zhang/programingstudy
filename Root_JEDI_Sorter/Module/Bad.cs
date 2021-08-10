@@ -138,7 +138,7 @@ namespace Root_JEDI_Sorter.Module
             string id = eBad.ToString(); 
             m_unloadEV = new UnloadEV(id + ".UnloadEV");
             m_stage = new Stage(id + ".Stage");
-            m_stage.p_infoTray = new InfoTray(id); 
+            m_stage.p_infoTray = new InfoTray(InfoTray.eTray.Work); 
             base.InitBase(id, engineer);
         }
 

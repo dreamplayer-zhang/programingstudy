@@ -50,17 +50,17 @@ namespace Root_JEDI.Module
             return true;
         }
 
-        public string CheckTrayCount(ref int nTray)
+        public int CheckTrayCount()
         {
-            nTray = 0; 
+            int nTray = 0; 
             for (int n = 0; n < m_maxStack; n++)
             {
                 bool bOn0 = m_diCheck[n].ReadDI(0);
                 bool bOn1 = m_diCheck[n].ReadDI(1); 
-                if (bOn0 != bOn1) return "Check Tray Sensor";
+                if (bOn0 != bOn1) return -1;
                 if (bOn0) nTray++;
             }
-            return "OK";
+            return nTray;
         }
         #endregion
 
@@ -70,10 +70,9 @@ namespace Root_JEDI.Module
 
         public string InitMetalTray()
         {
-            int nTray = 0;
-            string sCheck = CheckTrayCount(ref nTray);
-            if (sCheck != "OK") return sCheck;
-            while (m_stackTray.Count < nTray) m_stackTray.Push(new InfoTray("Metal"));
+            int nTray = CheckTrayCount();
+            if (nTray < 0) return "Check Sensor Error";
+            while (m_stackTray.Count < nTray) m_stackTray.Push(new InfoTray(InfoTray.eTray.Metal));
             while (m_stackTray.Count > nTray) m_stackTray.Pop(); 
             return "OK";
         }

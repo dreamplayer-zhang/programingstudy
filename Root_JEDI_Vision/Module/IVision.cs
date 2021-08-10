@@ -103,7 +103,7 @@ namespace Root_JEDI_Vision.Module
 
         public SortInfo(InfoTray infoTray)
         {
-            m_sTrayIn = infoTray.m_sTrayIn;
+            m_sTrayIn = infoTray.m_sTrayIn; 
             m_sTrayOut = infoTray.m_sTrayOut;
         }
     }

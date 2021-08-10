@@ -106,13 +106,29 @@ namespace Root_JEDI_Sorter.Module
         }
         #endregion
 
-        public string m_sTrayIn = "";
-        public string m_sTrayOut = "";
-        public string p_id { get; set; }
-        public InfoTray(string id)
+        public enum eTray
         {
-            p_id = id;
-            m_sTrayIn = id; 
+            Metal,
+            Work
+        }
+        eTray _eTray = eTray.Work;
+        public eTray p_eTray
+        {
+            get { return _eTray; }
+            set
+            {
+                _eTray = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        public string p_id { get; set; }
+        public string m_sTrayIn = "";
+        public string m_sTrayOut = ""; 
+        public InfoTray(eTray eTray)
+        {
+            p_eTray = eTray; 
+            p_id = eTray.ToString(); 
             InitInspect();
             InitCount();
             InitChip(); 

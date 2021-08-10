@@ -130,7 +130,6 @@ namespace Root_JEDI_Sorter.Module
 
         public void ThreadStop()
         {
-
         }
     }
 }
