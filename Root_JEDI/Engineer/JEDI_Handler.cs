@@ -101,7 +101,9 @@ namespace Root_JEDI.Engineer
         public Dictionary<TrayIn.eIn, TrayIn> m_trayIn = new Dictionary<TrayIn.eIn, TrayIn>();
         public Dictionary<TrayStack.eStack, TrayStack> m_stack = new Dictionary<TrayStack.eStack, TrayStack>();
         public Dictionary<TrayOut.eOut, TrayOut> m_trayOut = new Dictionary<TrayOut.eOut, TrayOut>();
-        public BufferTray m_buffer; 
+        public BufferTray m_buffer;
+        public FlipperOut m_flipperOut;
+        public FlipperIn m_flipperIn;
         public Dictionary<eVision, IVision> m_vision = new Dictionary<eVision, IVision>(); 
 
         void InitModule()
@@ -115,6 +117,8 @@ namespace Root_JEDI.Engineer
             InitStack(TrayStack.eStack.Empty);
             InitTrayIn(TrayIn.eIn.TrayInL);
             InitTrayIn(TrayIn.eIn.TrayInR);
+            InitModule(m_flipperOut = new FlipperOut("FlipperOut", m_engineer));
+            InitModule(m_flipperIn = new FlipperIn("FlipperIn", m_engineer));
             InitVision(eVision.Top2D, new Vision2D(eVision.Top2D, m_engineer, ModuleBase.eRemote.Client));
             InitVision(eVision.Bottom, new Vision2D(eVision.Bottom, m_engineer, ModuleBase.eRemote.Client));
         }

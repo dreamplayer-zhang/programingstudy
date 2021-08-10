@@ -184,6 +184,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Module\BufferTray.cs" />
+    <Compile Include="Module\Flipper.cs" />
+    <Compile Include="Module\FlipperIn.cs" />
+    <Compile Include="Module\FlipperOut.cs" />
     <Compile Include="Module\JEDI.cs" />
     <Compile Include="Module\TrayIn.cs" />
     <Compile Include="Module\TrayOut.cs" />

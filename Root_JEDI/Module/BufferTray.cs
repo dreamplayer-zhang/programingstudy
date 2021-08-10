@@ -71,7 +71,7 @@ namespace Root_JEDI.Module
         public BufferTray(string id, IEngineer engineer)
         {
             m_stage = new Stage(id + ".Stage");
-            m_stage.p_infoTray = new InfoTray(id); 
+            m_stage.p_infoTray = new InfoTray(InfoTray.eTray.Metal); 
             base.InitBase(id, engineer);
         }
 

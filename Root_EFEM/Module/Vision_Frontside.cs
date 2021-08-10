@@ -12,6 +12,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision.Utility;
 using RootTools.RADS;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -139,6 +140,24 @@ namespace Root_EFEM
         public RADSControl RADSControl { get => m_RADSControl; private set => m_RADSControl = value; }
         #endregion
 
+        #region AxisXY
+        public enum ePosXY
+        {
+            Pusher
+        }
+
+        void InitPosXY()
+        {
+            m_axisXY.AddPos(Enum.GetNames(typeof(ePosXY)));
+        }
+
+        public string RunMoveXY(ePosXY ePosXY, RPoint fOffset)
+        {
+            m_axisXY.StartMove(ePosXY, fOffset);
+            return m_axisXY.WaitReady();
+        }
+        #endregion
+
         public override void GetTools(bool bInit)
         {
             if (p_eRemote != eRemote.Client)
@@ -170,6 +189,11 @@ namespace Root_EFEM
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
             m_remote.GetTools(bInit);
+
+            if (bInit)
+            {
+                InitPosXY();
+            }
         }
         #endregion
 

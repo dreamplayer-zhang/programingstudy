@@ -87,7 +87,7 @@ namespace Root_JEDI.Module
                 if (Run(MoveStage(ePos.Flipper, true))) return p_sInfo;
                 if (Run(m_loadEV.RunMove(LoadEV.ePos.Grip, false))) return p_sInfo;
                 if (Run(m_stage.RunAlign(false))) return p_sInfo;
-                m_stage.p_infoTray = new InfoTray("Test"); //forget
+                m_stage.p_infoTray = new InfoTray(InfoTray.eTray.Metal); //forget
                 if (Run(m_loadEV.RunMove(LoadEV.ePos.Grip))) return p_sInfo;
             }
             finally { m_loadEV.RunMove(LoadEV.ePos.Grip); }

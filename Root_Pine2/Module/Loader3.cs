@@ -107,7 +107,7 @@ namespace Root_Pine2.Module
         {
             Axis axisX = p_loader0.m_axis.p_axisX;
             double fPos = m_axis.p_axisX.GetPosValue(sPos) + xOffset;
-            while ((fPos + axisX.m_posDst) > Loader0.c_lAxisX)
+            while ((fPos + axisX.m_posDst) > p_loader0.c_lAxisX)
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop";
@@ -123,7 +123,7 @@ namespace Root_Pine2.Module
         public string StartAvoidX(double fPos)
         {
             Run_AvoidX run = (Run_AvoidX)m_runAvoidX.Clone();
-            run.m_fPos = Loader0.c_lAxisX - fPos;
+            run.m_fPos = p_loader0.c_lAxisX - fPos;
             return StartRun(run); 
         }
 
