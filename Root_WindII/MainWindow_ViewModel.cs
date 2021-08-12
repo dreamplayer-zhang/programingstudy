@@ -15,6 +15,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using RootTools.Database;
 using RootTools.Gem.XGem;
+using System.Threading;
 
 namespace Root_WindII
 {
@@ -282,14 +283,23 @@ namespace Root_WindII
 
         public MainWindow_ViewModel()
         {
+            SplashScreenHelper.ShowText("Init......", timer:500);
             Init();
-
+            SplashScreenHelper.ShowText("Init Done!!", timer: 500);
+            SplashScreenHelper.ShowText("Setup ViewModel.....", timer: 500);
             this.SetupVM = new Setup_ViewModel();
-			this.MaintVM = new MaintenancePanel_ViewModel();
-
-            warnui = new Warning_UI();
+            SplashScreenHelper.ShowText("Setup ViewModel Done!!", timer: 500);
+            SplashScreenHelper.ShowText("MaintenancePanel ViewModel....", timer: 500);
+            this.MaintVM = new MaintenancePanel_ViewModel();
+            SplashScreenHelper.ShowText("MaintenancePanel ViewModel Done!!", timer: 500);
+            SplashScreenHelper.ShowText("Setup Warning_UI......", timer: 500);
+            warnui = new Warning_UI();           
             p_CurrentSubPanel = warnui;
-            p_CurrentSubPanel.DataContext = GlobalObjects.Instance.Get<WindII_Warning>();
+            p_CurrentSubPanel.DataContext = GlobalObjects.Instance.Get<WindII_Warning>();       
+            SplashScreenHelper.ShowText("Setup Warning_UI Done!!", timer: 500);
+            SplashScreenHelper.ShowText("Every Setup Done!! Thank you", timer: 500);
+            SplashScreenHelper.Hide();
+
         }
 
         private void ThreadStop()
@@ -305,7 +315,7 @@ namespace Root_WindII
 
             if (RegisterGlobalObjects() == false)
             {
-                MessageBox.Show("Program Initialization fail");
+                SplashScreenHelper.ShowText("Program Initalization fail", SplashScreenHelper.CurrentState.Error, timer: 5000);
                 return;
             }
 
@@ -318,19 +328,23 @@ namespace Root_WindII
             //// WPF 파라매터 연결
             //UIManager.Instance.MainPanel = this.MainPanel;
             //UIManager.Instance.ChangeUIMode();
-
+            SplashScreenHelper.ShowText("Set Database.....", timer: 500);
             SettingItem_Database frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_Database>();
             DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
             DatabaseManager.Instance.ValidateDatabase();
+            SplashScreenHelper.ShowText("Ser Database Done!!", timer: 500);
+            SplashScreenHelper.ShowText("Setup OperationUI.....", timer: 500);
             OperationUI = new Operation_UI();
             OperationVM.Init();
+            SplashScreenHelper.ShowText("Setup OperationUI Done!!", timer: 500);
 
             //logView.Init(LogView._logView);
             //InitTimer();
-    }
+        }
 
     private void CreateGlobalPaths()
         {
+            SplashScreenHelper.ShowText("Read RootDirectory Fields...(c:/Root)", timer: 500);
             Type t = typeof(Constants.RootPath);
             FieldInfo[] fields = t.GetFields(BindingFlags.Static | BindingFlags.Public);
             foreach (FieldInfo field in fields)
@@ -361,6 +375,7 @@ namespace Root_WindII
         {
             try
             {
+                SplashScreenHelper.ShowText("RegisterGlobalObjects.....",  timer: 500);
                 // Settings
                 Settings settings = GlobalObjects.Instance.Register<Settings>();
 
@@ -369,7 +384,6 @@ namespace Root_WindII
                 DialogService dialogService = GlobalObjects.Instance.Get<DialogService>();
                 WindII_Warning warning = GlobalObjects.Instance.Register<WindII_Warning>();
                 engineer.Init("WIND2F");
-
                 MemoryTool memoryTool = engineer.ClassMemoryTool();
                 ImageData frontImage;
                 ImageData maskLayer;
@@ -508,6 +522,7 @@ namespace Root_WindII
                 MessageBox.Show(ex.Message);
                 return false;
             }
+            SplashScreenHelper.ShowText("RegisterGlobalObjects Done!!",  timer: 500);
             return true;
         }
     }

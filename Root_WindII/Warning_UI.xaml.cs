@@ -26,7 +26,7 @@ namespace Root_WindII
         }
 
         public void Init(WindII_Warning warn)
-        {   
+        {
             DataContext = warn;
         }
 

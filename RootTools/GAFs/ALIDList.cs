@@ -98,6 +98,7 @@ namespace RootTools.GAFs
         public void ShowPopup()
         {
             if (m_bEnableShowPopup == false) return; 
+            
             if (ALIDList_PopupUI.m_bShow)
             {
                 alidPopup.Init(this, m_engineer);

@@ -4,6 +4,7 @@ using RootTools_Vision;
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -22,9 +23,13 @@ namespace Root_WindII
 
 		}
 
-        //WindII_Engineer m_engineer = new WindII_Engineer();
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+		//CAMELLIA_Engineer m_engineer;
+		//CAMELLIA_Handler m_handler;
+		//OHTs_UI dlgOHT;
+		//WindII_Engineer m_engineer = new WindII_Engineer();
+		private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+
 			//if (!Directory.Exists(@"C:\Recipe\Wind2")) Directory.CreateDirectory(@"C:\Recipe\Wind2");
 			//m_engineer.Init("Wind2");
 			//engineerUI.Init(m_engineer);
@@ -49,9 +54,9 @@ namespace Root_WindII
 		{
 			string strControlState = "NULL";
 
-			if (GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem() != null)
-				strControlState = GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eControl.ToString();
-			
+				if (GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem() != null)
+					strControlState = GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eControl.ToString();
+
 			if (strControlState == "NULL")
 			{
 				strControlState = "OFFLINE";

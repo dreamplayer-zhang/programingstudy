@@ -14,6 +14,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>게시\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,7 +27,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -242,7 +242,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BaseDefine.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Control\Icon\AtiLogo.xaml.cs">
+      <DependentUpon>AtiLogo.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converter\AxisBoolToBrushConverter.cs" />
     <Compile Include="Converter\AxisStateToLoadingOpacityConverter.cs" />
     <Compile Include="Converter\AxisStateToOpacityConverter.cs" />
@@ -262,6 +266,10 @@
     <Compile Include="ManualJobSchedule_UI.xaml.cs">
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Dialog\Dlg_SplashScreen.xaml.cs">
+      <DependentUpon>Dlg_SplashScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Dialog\Dlg_SplashScreen_ViewModel.cs" />
     <Compile Include="UI\OPERATION\Loadport_UI.xaml.cs">
       <DependentUpon>Loadport_UI.xaml</DependentUpon>
     </Compile>
@@ -459,11 +467,16 @@
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\WpfPropertyGrid.cs" />
+    <Compile Include="Util\SplashScreenHelper.cs" />
     <Compile Include="Warning_UI.xaml.cs">
       <DependentUpon>Warning_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\XMLData.cs" />
     <Compile Include="Tools\XMLParser.cs" />
+    <Page Include="Control\Icon\AtiLogo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Engineer\WindII_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -479,6 +492,10 @@
     <Page Include="ManualJobSchedule_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Dialog\Dlg_SplashScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\OPERATION\Loadport_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -754,7 +771,12 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resource\wafer.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\wind.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"

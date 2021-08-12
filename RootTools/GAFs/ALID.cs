@@ -10,6 +10,7 @@ namespace RootTools.GAFs
 {
     public class ALID : NotifyProperty
     {
+        
         #region Property
         public string p_sModule { get; set; }
 
@@ -149,6 +150,7 @@ namespace RootTools.GAFs
                 OnPropertyChanged(); 
             }
         }
+
 
         ModuleBase m_module;
         ALIDList m_listALID;

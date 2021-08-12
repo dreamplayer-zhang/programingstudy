@@ -17,6 +17,8 @@
             <TextBlock Text="{Binding}" Foreground="Black" Margin="3,0,0,0"/>
         </DataTemplate>
     </Window.Resources>
+    
+    
     <Grid Background="Crimson">
         <Grid.Style>
             <Style TargetType="Grid">

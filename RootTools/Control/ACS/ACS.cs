@@ -8,6 +8,7 @@ namespace RootTools.Control.ACS
 {
     public class ACS : IToolSet, IControl
     {
+        
         #region Axis
         void GetAxisCount()
         {

@@ -67,8 +67,10 @@ namespace Root_CAMELLIA
             thread.IsBackground = true;
             thread.Start();
 
+
             Task.Factory.StartNew(() =>
             {
+
                 //simulate some work being done
                 //System.Threading.Thread.Sleep(3000);
 
@@ -85,6 +87,7 @@ namespace Root_CAMELLIA
                     SplashScreenHelper.Hide();
                 });
             });
+
 
             //thread.Join();
         }
