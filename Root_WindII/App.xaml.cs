@@ -50,7 +50,8 @@ namespace Root_WindII
                     {
                         SplashScreenHelper.SplashScreen = new Dlg_SplashScreen(); //로딩창을 만든다.
                         SplashScreenHelper.Show(); // 만들어진 로딩창을 화면에 띄운다.
-                        System.Windows.Threading.Dispatcher.Run(); //
+                        System.Windows.Threading.Dispatcher.Run(); //Dispatcher의 pushframe을 호출한다. pushframe은 메세지펌프(GetMessage,PeekMessage등으로 구성되는
+                                                                   //메세지 펌프)
                     }
                 ));
             thread.SetApartmentState(ApartmentState.STA);
@@ -58,38 +59,63 @@ namespace Root_WindII
             thread.Start();
             Thread.Sleep(10);
 
-            Task.Factory.StartNew(() =>
-            {
-                //simulate some work being done
-                //System.Threading.Thread.Sleep(3000);
+            Thread thread2 = new Thread(
+                new ThreadStart(
+                    delegate ()
+                    {
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            //initialize the main window, set it as the application main window
+                            //and close the splash screen
 
-                //since we're not on the UI thread
-                //once we're done we need to use the Dispatcher
-                //to create and show the main window
+                            MainWindow mainWindow = new MainWindow();
 
-                this.Dispatcher.Invoke
-                (() =>
-                {
-                    //initialize the main window, set it as the application main window
-                    //and close the splash screen
-                    
-                    MainWindow mainWindow = new MainWindow();
-                    
-                    var viewModel = new MainWindow_ViewModel(); //이코드가 끝나면 로딩창 사라짐
-                    
-                    mainWindow.DataContext = viewModel;
-                    
-                    this.MainWindow = mainWindow;
-                                       
-                    mainWindow.Show();
-                    
+                            var viewModel = new MainWindow_ViewModel(); //이코드가 끝나면 로딩창 사라짐
+                            mainWindow.DataContext = viewModel;
 
-                    //SplashScreenHelper.Hide();
-                }
-                );
-            });
+                            this.MainWindow = mainWindow;
+
+                            mainWindow.Show();
+                        }
+                        );
+                    }
+                    ));
+            thread2.Start();
+
+
+
+
+
+
+            //Task.Factory.StartNew(() =>
+            //{
+            //    //simulate some work being done
+            //    //System.Threading.Thread.Sleep(3000);
+
+            //    //since we're not on the UI thread
+            //    //once we're done we need to use the Dispatcher
+            //    //to create and show the main window
+
+            //    this.Dispatcher.Invoke
+            //    (() =>
+            //    {
+            //        //initialize the main window, set it as the application main window
+            //        //and close the splash screen
+
+            //        MainWindow mainWindow = new MainWindow();
+
+            //        var viewModel = new MainWindow_ViewModel(); //이코드가 끝나면 로딩창 사라짐
+            //        mainWindow.DataContext = viewModel;
+
+            //        this.MainWindow = mainWindow;
+
+            //        mainWindow.Show();
+            //    }
+            //    );
+            //});
 
             //thread.Join();
+
         }
     }
 }

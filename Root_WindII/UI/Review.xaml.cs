@@ -13,17 +13,18 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_WIND2.UI_User
-{ 
+namespace Root_WindII
+{
     /// <summary>
-    /// RecipeWizardPanel.xaml에 대한 상호 작용 논리
+    /// Review.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class RecipeWizardPanel : UserControl
+    public partial class Review : UserControl
     {
-        public RecipeWizardPanel()
+        public Review()
         {
             InitializeComponent();
         }
+
 
 
     }

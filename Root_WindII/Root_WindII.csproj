@@ -270,6 +270,7 @@
       <DependentUpon>Dlg_SplashScreen.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Dialog\Dlg_SplashScreen_ViewModel.cs" />
+    <Compile Include="UI\Dummy.cs" />
     <Compile Include="UI\OPERATION\Loadport_UI.xaml.cs">
       <DependentUpon>Loadport_UI.xaml</DependentUpon>
     </Compile>
@@ -306,6 +307,9 @@
       <DependentUpon>Operation_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\OPERATION\OperationUI_ViewModel.cs" />
+    <Compile Include="UI\Review.xaml.cs">
+      <DependentUpon>Review.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
@@ -537,6 +541,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\OPERATION\Operation_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Review.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -776,6 +784,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\wind.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\bevelmap.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\bevelmap2.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\EBR.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\ChartEBR.PNG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

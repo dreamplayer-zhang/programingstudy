@@ -14,18 +14,22 @@
     <Window.Resources>
         <!-- SelectMode -->
         <ControlTemplate x:Key="selectmode">
-            <local:SelectMode />
+            <local:SelectMode/>
         </ControlTemplate>
         <!-- Setup -->
         <ControlTemplate x:Key="setup">
             <local:Setup DataContext="{Binding SetupVM}"/>
+        </ControlTemplate>
+        <!--Review-->
+        <ControlTemplate x:Key="review">
+            <local:Review/>
         </ControlTemplate>
         <!-- Engineer -->
         <!--<ControlTemplate x:Key="engineer">
             <local:MaintenancePanel DataContext="{Binding MaintVM}"/>
         </ControlTemplate>-->
     </Window.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="28"/>
@@ -156,16 +160,20 @@
                 <Menu HorizontalAlignment="Right" Background="{StaticResource main_background}">
                     <MenuItem Width="120" Height="30" Padding="0" HorizontalAlignment="Right" IsEnabled="False">
                         <MenuItem.Header>
-                        <Grid Width="120">
+                            <Grid Width="120">
                                 <TextBlock Name="GemControlState" Text="OFFLINE" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
-                        </Grid>
+                            </Grid>
                         </MenuItem.Header>
                     </MenuItem>
                 </Menu>
             </Grid>
         </Border>
         <Grid Grid.Row="1">
-            <ContentControl Content="{Binding p_CurrentPanel}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="23*"/>
+                <ColumnDefinition Width="21*"/>
+            </Grid.ColumnDefinitions>
+            <ContentControl Content="{Binding p_CurrentPanel}" Grid.ColumnSpan="2">
                 <ContentControl.Style>
                     <Style TargetType="ContentControl">
                         <Style.Triggers>
@@ -173,17 +181,19 @@
                             <DataTrigger Binding="{Binding ElementName=mode_main, Path=IsChecked}"
                                     Value="true">
                                 <Setter Property="Template" Value="{StaticResource selectmode}" />
+                                <!--ControlTemplate selctmode-->
                             </DataTrigger>
                             <!--Setup-->
                             <DataTrigger Binding="{Binding ElementName=mode_setup, Path=IsChecked}"
                                     Value="true">
                                 <Setter Property="Template" Value="{StaticResource setup}" />
+                                <!--ControlTemplate setup-->
                             </DataTrigger>
                             <!--Setup-->
-                            <!--<DataTrigger Binding="{Binding ElementName=mode_review, Path=IsChecked}"
+                            <DataTrigger Binding="{Binding ElementName=mode_review, Path=IsChecked}"
                                          Value="true">
                                 <Setter Property="Template" Value="{StaticResource review}"/>
-                            </DataTrigger>-->
+                            </DataTrigger>
                             <!-- Engineer -->
                             <!--<DataTrigger Binding="{Binding ElementName=mode_engineer, Path=IsChecked}"
                                          Value="true">

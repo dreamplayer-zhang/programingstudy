@@ -619,6 +619,7 @@ namespace RootTools
 					_View_Rect.Height += 1;
 				SetImageSource();
 				InspectionManager.RefreshDefectDraw();
+
 			}
 		}
 		public void SetThumbNailSize(int width, int height)

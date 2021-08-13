@@ -29,7 +29,7 @@ namespace RootTools
         public void init(ImageData image = null, IDialogService dialogService = null)
         {
             if (image != null)
-            {
+            {  
                 p_ImageData = image;
                 image.OnCreateNewImage += image_NewImage;
                 image.OnUpdateImage += image_OnUpdateImage;

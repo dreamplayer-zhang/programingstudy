@@ -139,22 +139,22 @@ namespace Root_WIND2.UI_User
             get => this.selectedGrabModeIndex;
             set
             {
-                GrabModeBase mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision.m_aGrabMode[value];
-                this.CamResolutionX = mode.m_dTargetResX_um;
-                this.CamResolutionY = mode.m_dTargetResY_um;
-                this.WaferSize = mode.m_nWaferSize_mm;
+                //GrabModeBase mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision.m_aGrabMode[value];
+                //this.CamResolutionX = mode.m_dTargetResX_um;
+                //this.CamResolutionY = mode.m_dTargetResY_um;
+                //this.WaferSize = mode.m_nWaferSize_mm;
 
-                WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
-                RecipeFront recipeFront = GlobalObjects.Instance.Get<RecipeFront>();
+                //WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+                //RecipeFront recipeFront = GlobalObjects.Instance.Get<RecipeFront>();
 
-                recipeFront.CameraInfoIndex = value;
+                //recipeFront.CameraInfoIndex = value;
 
-                CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
+                //CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
 
-                this.CamInfoDataListVM.Init(camInfo);
+                //this.CamInfoDataListVM.Init(camInfo);
 
 
-                SetProperty<int>(ref this.selectedGrabModeIndex, value);
+                //SetProperty<int>(ref this.selectedGrabModeIndex, value);
             }
         }
 

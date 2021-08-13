@@ -143,7 +143,7 @@
                         Margin="0,0,0,15"
                         Value="{Binding p_Zoom, Converter={StaticResource ZoomConverters}, Mode=TwoWay}" 
                         Minimum="1" Maximum="1000"
-                        SmallChange="10" LargeChange="100" Focusable="False">
+                        SmallChange="10" LargeChange="100" Focusable="False" >
                     <Slider.Style>
                         <Style>
                             <Style.Triggers>

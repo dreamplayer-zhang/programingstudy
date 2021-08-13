@@ -16,7 +16,7 @@
     <Deterministic>true</Deterministic>
     <PublishUrl>게시\</PublishUrl>
     <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
+    <InstallFrom>Disk</InstallFrom>>("FrontImage")
     <UpdateEnabled>false</UpdateEnabled>
     <UpdateMode>Foreground</UpdateMode>
     <UpdateInterval>7</UpdateInterval>

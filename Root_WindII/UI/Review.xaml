@@ -1,0 +1,961 @@
+﻿<UserControl x:Class="Root_WindII.Review"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:local="clr-namespace:Root_WindII"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             mc:Ignorable="d" 
+             d:DesignHeight="888" d:DesignWidth="1912"
+             Background="{StaticResource PanelBackGround}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <!--Menu-->
+        <Border Grid.Row="0"
+                Background="{StaticResource ControlBackGround}"
+                BorderBrush="DimGray"
+                BorderThickness="0,0,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Menu>
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                              BorderBrush="#FF707070"
+                              Command="{Binding btnMode}"
+                              BorderThickness="0,0,0,0">
+                        <MenuItem.Header>
+                            <Grid Width="70"
+                                  Height="25">
+                                <TextBlock Text="Mode"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                              BorderBrush="#FF707070"
+                              BorderThickness="0,0,0,0">
+                        <MenuItem.Header>
+                            <Grid Width="70"
+                                  Height="25">
+                                <TextBlock Text="Tuning"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                              BorderBrush="#FF707070"
+                              Command="{Binding}"
+                              BorderThickness="0,0,0,0">
+                        <MenuItem.Header>
+                            <Grid Width="70"
+                                  Height="25">
+                                <TextBlock Text="Option"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="Color Option" />
+                    </MenuItem>
+                </Menu>
+            </StackPanel>
+        </Border>
+        <!--End Menu-->
+
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Disabled">
+            <StackPanel>
+                <Grid Height="863">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="20*" />
+                        <ColumnDefinition Width="55*" />
+                        <ColumnDefinition Width="25*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <GroupBox Grid.Row="1"
+                                  Header="Result">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition Height="3*" />
+                                </Grid.RowDefinitions>
+                                <GroupBox Grid.Row="0">
+                                    <GroupBox.Header>
+                                        <TextBlock Text="Search Option" />
+                                    </GroupBox.Header>
+                                    <Grid Grid.Row="1">
+                                        <StackPanel Margin="10,0,10,0">
+                                            <StackPanel>
+                                                <CheckBox Content="Start Date"
+                                                          VerticalAlignment="Center"
+                                                          Margin="0,5,0,0"
+                                                          FontSize="12"
+                                                          x:Name="cbStart"
+                                                          IsChecked="{Binding Path=CheckedStartDatetime}" />
+                                                <DatePicker IsEnabled="{Binding ElementName=cbStart, Path=IsChecked}"
+                                                            Background="#FFFBFBFB"
+                                                            SelectedDate ="{Binding SelectedStartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                                            IsTodayHighlighted="True" />
+                                                <CheckBox Content="End Date"
+                                                          VerticalAlignment="Center"
+                                                          Margin="0,5,0,0"
+                                                          FontSize="12"
+                                                          x:Name="cbEnd"
+                                                          IsChecked="{Binding Path=CheckedEndDatetime}" />
+                                                <DatePicker IsEnabled="{Binding ElementName=cbEnd, Path=IsChecked}"
+                                                            Background="#FFFBFBFB"
+                                                            SelectedDate ="{Binding SelectedEndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                                            IsTodayHighlighted="True" />
+                                                <Grid Margin="0,8,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="1.5*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <CheckBox Content="Wafer ID"
+                                                              VerticalAlignment="Center"
+                                                              x:Name="cbWafer" />
+                                                    <TextBox Grid.Column="1"
+                                                             IsEnabled="{Binding ElementName=cbWafer, Path=IsChecked}" />
+                                                </Grid>
+                                                <Grid Margin="0,8,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="1.5*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <CheckBox Content="Recipe Name"
+                                                              VerticalAlignment="Center"
+                                                              x:Name="cbRecipe" />
+                                                    <TextBox Grid.Column="1"
+                                                             IsEnabled="{Binding ElementName=cbRecipe, Path=IsChecked}" />
+                                                </Grid>
+                                                <Button Content="Search"
+                                                        Margin="0,12,0,0"
+                                                        Height="30"
+                                                        Command="{Binding btnSearch}"
+                                                        Style="{StaticResource PanelBtn}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </GroupBox>
+
+                                <!--<tools:Database_DataView 
+                                    DataContext="{Binding p_DataViewer_Lotinfo}" 
+                                    Margin="0,5,0,0" 
+                                    Grid.Row="1"
+                                    >
+                                </tools:Database_DataView>-->
+                                <DataGrid Name="Lotinfo_Viewer"
+                                          ItemsSource="{Binding pLotinfo_Datatable}"
+                                          SelectedItem="{Binding pSelected_Lotinfo, Mode=TwoWay}"
+                                          SelectionMode="Extended"
+                                          IsReadOnly="True"
+                                          EnableColumnVirtualization="True"
+                                          EnableRowVirtualization="True"
+                                          ScrollViewer.CanContentScroll="True"
+                                          AutoGenerateColumns="True"
+                                          Grid.Row="1"
+                                          Margin="2">
+                                    <DataGrid.Resources>
+                                        <Style TargetType="DataGridColumnHeader">
+                                            <Setter Property="HorizontalAlignment"
+                                                    Value="Stretch" />
+                                            <Setter Property="HorizontalContentAlignment"
+                                                    Value="Center" />
+                                        </Style>
+                                    </DataGrid.Resources>
+                                </DataGrid>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="2*" />
+                            <RowDefinition Height="1*" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="65*" />
+                                <ColumnDefinition Width="35*" />
+                            </Grid.ColumnDefinitions>
+                            <ItemsControl ItemsSource="{Binding p_Element}" Grid.Column="0"/>
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="1.5*" />
+                                </Grid.RowDefinitions>
+                                <GroupBox Grid.Row="0"
+                                          Header="Defect Image">
+                                    <Grid Background="Black">
+                                        <Image Source="{Binding p_DefectImage}">
+                                        </Image>
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Grid.Row="1"
+                                          Header="Defect List">
+                                    <DataGrid Name="Defect_Viewer"
+                                              ItemsSource="{Binding pDefect_Datatable}"
+                                              SelectedItem="{Binding pSelected_Defect, Mode=TwoWay}"
+                                              SelectionMode="Single"
+                                              EnableColumnVirtualization="True"
+                                              EnableRowVirtualization="True"
+                                              VirtualizingPanel.VirtualizationMode="Recycling"
+                                              ScrollViewer.CanContentScroll="True"
+                                              IsReadOnly="True"
+                                              AutoGenerateColumns="True"
+                                              Grid.Row="1">
+                                        <DataGrid.Resources>
+                                            <Style TargetType="DataGridColumnHeader">
+                                                <Setter Property="HorizontalAlignment"
+                                                        Value="Stretch" />
+                                                <Setter Property="HorizontalContentAlignment"
+                                                        Value="Center" />
+                                            </Style>
+                                        </DataGrid.Resources>
+                                    </DataGrid>
+                                </GroupBox>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Grid.Column="0"
+                                      Header="Defect Intensity Distribution">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="25" />
+                                        <RowDefinition Height="9*" />
+                                        <RowDefinition Height="1*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0"
+                                          HorizontalAlignment="Left">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1*" />
+                                            <ColumnDefinition Width="1*" />
+                                            <ColumnDefinition Width="1*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="0"
+                                              Margin="0,0,10,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left">
+                                            <RadioButton Name="All"
+                                                         GroupName="GVHistogramMode"
+                                                         IsChecked="{Binding Check_GVHistogramAll}">All</RadioButton>
+                                        </Grid>
+                                        <Grid Grid.Column="1"
+                                              Margin="10,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left">
+                                            <RadioButton Name="Dark"
+                                                         GroupName="GVHistogramMode"
+                                                         IsChecked="{Binding Check_GVHistogramDark}">Dark</RadioButton>
+
+                                        </Grid>
+                                        <Grid Grid.Column="2"
+                                              Margin="10,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left">
+                                            <RadioButton Name="Bright"
+                                                         GroupName="GVHistogramMode"
+                                                         IsChecked="{Binding Check_GVHistogramBright}">Bright</RadioButton>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid Grid.Row="1"
+                                          Background="White">
+                                        <lvc:CartesianChart Series="{Binding DefectGVHistogram}"
+                                                            LegendLocation="Top"
+                                                            DisableAnimations="true">
+                                            <lvc:CartesianChart.AxisX>
+                                                <lvc:Axis Title="{Binding GVXTitle}"
+                                                          Labels="{Binding GVXLabel}"
+                                                          MinValue="{Binding GVFrom}"
+                                                          MaxValue="{Binding GVTo}"
+                                                          Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
+                                                </lvc:Axis>
+                                            </lvc:CartesianChart.AxisX>
+                                            <lvc:CartesianChart.AxisY>
+                                                <lvc:Axis Title="{Binding GVYTitle}"
+                                                          MinValue="0"
+                                                          LabelFormatter="{Binding GVYLabel}"
+                                                          MaxValue="{Binding GVYMaxVal}"></lvc:Axis>
+                                            </lvc:CartesianChart.AxisY>
+                                        </lvc:CartesianChart>
+                                    </Grid>
+                                    <Grid Grid.Row="2"
+                                          Margin="5,0">
+                                        <Slider Maximum="28"
+                                                VerticalAlignment="Center"
+                                                TickPlacement="BottomRight"
+                                                Value="{Binding Slider_GV, Mode=TwoWay}"
+                                                TickFrequency="1"
+                                                IsSnapToTickEnabled="True"
+                                                Margin="0,10,0,0">
+                                        </Slider>
+                                    </Grid>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Grid.Column="1"
+                                      Header="Defect Size Distribution">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="25" />
+                                        <RowDefinition Height="9*" />
+                                        <RowDefinition Height="1*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0"
+                                          HorizontalAlignment="Left"
+                                          VerticalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1*" />
+                                            <ColumnDefinition Width="1*" />
+                                            <ColumnDefinition Width="1*" />
+                                            <ColumnDefinition Width="1*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="0"
+                                              Margin="5,0,10,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left">
+
+                                            <RadioButton Name="Normal"
+                                                         GroupName="SizeHistogramMode"
+                                                         IsChecked="{Binding Check_SizeHistogramAll}">All</RadioButton>
+                                        </Grid>
+                                        <Grid Grid.Column="1"
+                                              Margin="10,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left">
+                                            <RadioButton Name="Small"
+                                                         GroupName="SizeHistogramMode"
+                                                         IsChecked="{Binding Check_SizeHistogramSmall}">Small</RadioButton>
+                                        </Grid>
+                                        <Grid Grid.Column="2"
+                                              Margin="10,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left">
+                                            <RadioButton Name="Medium"
+                                                         GroupName="SizeHistogramMode"
+                                                         IsChecked="{Binding Check_SizeHistogramMedium}">Medium</RadioButton>
+                                        </Grid>
+                                        <Grid Grid.Column="3"
+                                              Margin="10,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left">
+                                            <RadioButton Name="Large"
+                                                         GroupName="SizeHistogramMode"
+                                                         IsChecked="{Binding Check_SizeHistogramLarge}">Large</RadioButton>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid Grid.Row="1"
+                                          Background="White">
+                                        <lvc:CartesianChart Series="{Binding DefectSizeHistogram}"
+                                                            LegendLocation="Top"
+                                                            DisableAnimations="true">
+                                            <lvc:CartesianChart.AxisX>
+                                                <lvc:Axis Title="{Binding SizeXTitle}"
+                                                          Labels="{Binding SizeXLabel}"
+                                                          MinValue="{Binding SizeFrom}"
+                                                          MaxValue="{Binding SizeTo}"
+                                                          Separator="{x:Static lvc:DefaultAxes.CleanSeparator}"></lvc:Axis>
+                                            </lvc:CartesianChart.AxisX>
+                                            <lvc:CartesianChart.AxisY>
+                                                <lvc:Axis Title="{Binding SizeYTitle}"
+                                                          MinValue="0"
+                                                          LabelFormatter="{Binding SizeYLabel}"
+                                                          MaxValue="{Binding SizeYMaxVal}"></lvc:Axis>
+                                            </lvc:CartesianChart.AxisY>
+                                        </lvc:CartesianChart>
+                                    </Grid>
+                                    <Grid Grid.Row="2"
+                                          Margin="5,0">
+                                        <Slider Maximum="100"
+                                                TickPlacement="BottomRight"
+                                                Value="{Binding Slider_Size}"
+                                                TickFrequency="2"
+                                                IsSnapToTickEnabled="True"
+                                                Margin="0,10,0,0">
+                                        </Slider>
+                                    </Grid>
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
+                    </Grid>
+                    <GroupBox Header="Application" Grid.Column="2">
+                        <TabControl Background="{StaticResource PanelBackGround}"
+                                    BorderThickness="1">
+                            <TabItem Header="Bevel">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="1*" />
+                                        <RowDefinition Height="1*" />
+                                        <RowDefinition Height="1*" />
+                                    </Grid.RowDefinitions>
+                                    <GroupBox Grid.Row="0"
+                                              Header="Bevel Map">
+                                        <Grid Margin="5"
+                                              Background="Black">
+                                            <Image Source="/Root_WindII;component/Resource/bevelmap2.bmp"
+                                                   Margin="15" />
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Grid.Row="1"
+                                              Header="Bevel Panorama">
+                                        <Grid Margin="5,10">
+                                            <Image Source="/Root_WindII;component/Resource/bevelmap.bmp"
+                                                   Stretch="Fill" />
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Grid.Row="2"
+                                              Header="Bevel Graph">
+                                        <Grid Margin="5,10">
+                                            <Image Source="/Root_WindII;component/Resource/EBR.PNG"
+                                                   Stretch="Fill" />
+                                        </Grid>
+                                    </GroupBox>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Golden Image Trend"
+                                     IsEnabled="true">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="3*" />
+                                        <RowDefinition Height="40" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0"
+                                          Margin="10"
+                                          Background="Black">
+                                        <Image Source="{Binding GoldenImage}" />
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Right">
+                                            <Button Width="100"
+                                                    Margin="0,0,5,5"
+                                                    Content="Image Load"
+                                                    HorizontalAlignment="Right"
+                                                    Command="{Binding btnLoadImage}"></Button>
+                                            <Button Width="100"
+                                                    Margin="0,0,5,5"
+                                                    Content="Show Trend"
+                                                    HorizontalAlignment="Right"
+                                                    Command="{Binding btnShowTrend}"></Button>
+                                            <Button Width="100"
+                                                    Margin="0,0,5,5"
+                                                    Content="Save Image"
+                                                    HorizontalAlignment="Right"
+                                                    Command="{Binding btnSaveTrend}"></Button>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <ListView x:Name="GoldenImagelist"
+                                              Margin="10"
+                                              Grid.Row="2"
+                                              ItemsSource="{Binding GoldenImageList, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                              SelectedIndex="{Binding ListViewIdx}"
+                                              ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                                        <ListView.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ListView.ItemsPanel>
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Vertical"
+                                                            VerticalAlignment="Stretch">
+                                                    <Image Source="{Binding GoldenImgData, UpdateSourceTrigger=PropertyChanged}"
+                                                           Width="100"
+                                                           Height="100"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Top" />
+                                                    <TextBlock Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Bottom" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectionChanged">
+                                                <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=GoldenImagelist, Mode=OneWay}"
+                                                                    MethodName="GoldenImagelist_SelectionChanged" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ListView>
+
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Metrology">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="2*"/>
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1.2*" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <GroupBox Grid.Column="0">
+                                        <GroupBox.Header>
+                                            <TextBlock Text="Data" />
+                                        </GroupBox.Header>
+                                        <DataGrid IsReadOnly="True"
+                                                  Grid.Row="1">
+                                            <DataGrid.Resources>
+                                                <Style TargetType="DataGridColumnHeader">
+                                                    <Setter Property="HorizontalAlignment"
+                                                            Value="Stretch" />
+                                                    <Setter Property="HorizontalContentAlignment"
+                                                            Value="Center" />
+                                                </Style>
+                                            </DataGrid.Resources>
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="No."
+                                                                    Binding="{Binding Path=no}"
+                                                                    Width="0.5*" />
+                                                <DataGridTextColumn Header="Insp"
+                                                                    Binding="{Binding Path=mode}"
+                                                                    Width="0.7*" />
+                                                <DataGridTextColumn Header="Chip"
+                                                                    Binding="{Binding Path=chip}"
+                                                                    Width="0.8*" />
+                                                <DataGridTextColumn Header="Location"
+                                                                    Binding="{Binding Path=xy}"
+                                                                    Width="1.5*" />
+                                                <DataGridTextColumn Header="Gv"
+                                                                    Binding="{Binding Path=gv}"
+                                                                    Width="0.5*" />
+                                                <DataGridTextColumn Header="Size"
+                                                                    Binding="{Binding Path=size}"
+                                                                    Width="*" />
+                                                <DataGridTextColumn Header="Code"
+                                                                    Binding="{Binding Path=dc}"
+                                                                    Width="*" />
+                                            </DataGrid.Columns>
+
+                                            <local:DummyResult no="0"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="1"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="2"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="3"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="4"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="5"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="6"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="7"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="8"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="9"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="0"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="1"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="2"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="3"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="4"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="5"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="6"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="7"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="8"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="9"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="0"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="1"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="2"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="3"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="4"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="5"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="6"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="7"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="8"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="9"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="0"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="1"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="2"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="3"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="4"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="5"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="6"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="7"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="8"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="9"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="0"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="1"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="2"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="3"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="4"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="5"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="6"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="7"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="8"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="9"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                        </DataGrid>
+                                    </GroupBox>
+                                    <Grid Grid.Column="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <GroupBox Grid.Row="0">
+                                            <GroupBox.Header>
+                                                <TextBlock Text="Image" />
+                                            </GroupBox.Header>
+                                            <Grid Background="Black">
+                                                <TextBlock Text="Defect Image"
+                                                           Foreground="White"
+                                                           VerticalAlignment="Center"
+                                                           HorizontalAlignment="Center" />
+                                            </Grid>
+                                        </GroupBox>
+                                        <GroupBox Grid.Row="1">
+                                            <GroupBox.Header>
+                                                <TextBlock Text="Map" />
+                                            </GroupBox.Header>
+                                            <Grid>
+                                                <Viewbox Margin="10">
+                                                    <Ellipse VerticalAlignment="Stretch"
+                                                             HorizontalAlignment="Stretch"
+                                                             Width="100"
+                                                             Height="100"
+                                                             Fill="Gainsboro" />
+
+                                                </Viewbox>
+                                                <Viewbox Margin="25">
+                                                    <Ellipse VerticalAlignment="Stretch"
+                                                             HorizontalAlignment="Stretch"
+                                                             Width="100"
+                                                             Height="100"
+                                                             Fill="SteelBlue" />
+
+                                                </Viewbox>
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
+                                    <GroupBox Grid.Row="1"
+                                              Grid.ColumnSpan="2">
+                                        <GroupBox.Header>
+                                            <TextBlock Text="Measurement Data" />
+                                        </GroupBox.Header>
+
+                                        <Image Source="/Root_WindII;component/Resource/ChartEBR.PNG"
+                                               Stretch="Fill" />
+                                    </GroupBox>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+                    </GroupBox>
+
+
+
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
+</UserControl>

@@ -25,6 +25,10 @@ namespace RootTools
             InitializeComponent();
         }
 
+  
+
+
+
         //public List<Rect> rectList = new List<Rect>();
 
         //protected override void OnRender(DrawingContext drawingContext)
