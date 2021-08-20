@@ -45,7 +45,6 @@
                     <Button Content="BOX" Command="{Binding btnViewBoxCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                 </StackPanel>
                 <Grid Grid.Row="1" >
-
                     <tools:RootViewer />
                 </Grid>
             </Grid>

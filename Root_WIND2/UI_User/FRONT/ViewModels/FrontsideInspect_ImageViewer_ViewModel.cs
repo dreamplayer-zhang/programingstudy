@@ -364,13 +364,13 @@ namespace Root_WIND2.UI_User
 
                 Canvas.SetLeft(rt, canvasLeftTop.X < canvasRightBottom.X ? canvasLeftTop.X : canvasRightBottom.X);
                 Canvas.SetTop(rt, canvasLeftTop.Y < canvasRightBottom.Y ? canvasLeftTop.Y : canvasRightBottom.Y);
-
-                
+              
                 //Task.Factory.StartNew(RedrawShapes);
             }
 
             //if(m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
                 RedrawShapes();
+
         }
         public override void PreviewMouseUp(object sender, MouseEventArgs e)
         {

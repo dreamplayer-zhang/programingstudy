@@ -38,7 +38,7 @@ namespace RootTools.Memory
 
         public void ClearBuffer()
         {
-         //   Array.Clear(Buffer, 0, BufferSize);
+        //Array.Clear(Buffer, 0, BufferSize);
         }
     }
     public class MemServer
@@ -96,8 +96,7 @@ namespace RootTools.Memory
         {
             try
             {
-                mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
-
+                mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 IPEndPoint serverEP = new IPEndPoint(IPAddress.Any, m_port);
                 mainSock.Bind(serverEP);
                 mainSock.Listen(10);
@@ -131,7 +130,7 @@ namespace RootTools.Memory
             return (connectedClients.Count > 0);
         }
         List<Socket> connectedClients = new List<Socket>();
-        void AcceptCallback(IAsyncResult ar)
+        void AcceptCallback(IAsyncResult ar)//무한루프
         {
             try
             {
@@ -139,181 +138,8 @@ namespace RootTools.Memory
 
                 Socket client = mainSock.EndAccept(ar);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 // 또 다른 클라이언트의 연결을 대기한다.
-                mainSock.BeginAccept(AcceptCallback, null);
+                mainSock.BeginAccept(AcceptCallback, null); 
 
                 AsyncObject obj = new AsyncObject(nSize);
                 obj.WorkingSocket = client;
@@ -324,7 +150,7 @@ namespace RootTools.Memory
                 connectedClients.Add(client);
 
                 // 클라이언트의 데이터를 받는다.
-                client.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj);
+                client.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj); //obj,Buffer로 데이터를 받는다 (0~nsize 만큼) ,작업이 완료되면 DataReceived를 호출
             }
             catch(Exception e)
             {
@@ -332,7 +158,7 @@ namespace RootTools.Memory
             }
             
         }
-        void DataReceived(IAsyncResult ar)
+        void DataReceived(IAsyncResult ar)//수신을 하면 이 메소드가 실행
         {          
             AsyncObject obj = (AsyncObject)ar.AsyncState;
 
@@ -350,17 +176,31 @@ namespace RootTools.Memory
                 if (received <= 0)
                 {
                     connectedClients.Remove(obj.WorkingSocket);
-
                     m_log.Warn("Server : Received nothing from the client");
                     obj.WorkingSocket.Close();
                     return;
                 }
 
+                //obj.buffer의 압축을 풀어냅니다.
+                using (MemoryStream ms = new MemoryStream(obj.Buffer))
+                {
+                    MemoryStream deCompressedByte = new MemoryStream();
+                    using (DeflateStream ds = new DeflateStream(ms, CompressionMode.Decompress))
+                    {
+                        ds.CopyTo(deCompressedByte);
+                        ds.Close();
+                    }
+                    deCompressedByte.Position = 0;
+                    deCompressedByte.ToArray().CopyTo(obj.Buffer,0);
+                    deCompressedByte.Dispose();
+                }
+
+
                 EventReciveData(obj.Buffer, received);
 
                 obj.ClearBuffer();
 
-                obj.WorkingSocket.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj);
+                obj.WorkingSocket.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj);//타 pc에서 send하면 그 데이터를 받고 재귀함수처럼 계속 자신을 호출한다.
             }
             catch (Exception e)
             {
@@ -473,7 +313,7 @@ namespace RootTools.Memory
             try
             {
                 if(mainSock == null)
-                    mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+                    mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
                 IPEndPoint clientEP = new IPEndPoint(serverAddr, m_port);
                 mainSock.BeginConnect(clientEP, new AsyncCallback(ConnectCallback), mainSock);
@@ -983,29 +823,26 @@ namespace RootTools.Memory
         bool _bRecieve = false;
         byte[] m_abuf;
         public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem, int nByte, int nCount)
-        {  
+        {
             Stopwatch watch = new Stopwatch();
             watch.Start();
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte + Splitter + nCount;
-           
             _bRecieve = true;
             if (m_Server == null)
                 return m_abuf;
-
-            if(m_Server.IsConnected())
+            if (m_Server.IsConnected())
                 m_Server.Send(str);
             else
                 return m_abuf;
-        
             while (_bRecieve)
             {
-                if (!m_Server.IsConnected())
+                if (!m_Server.IsConnected())               
                     break;
-
-                Thread.Sleep(5);
+                
                 if (watch.ElapsedMilliseconds > 10000)
-                    return m_abuf;
+                    return m_abuf;               
             }
+
             _bRecieve = false;
             m_log.Warn(watch.ElapsedMilliseconds.ToString());
             return m_abuf;

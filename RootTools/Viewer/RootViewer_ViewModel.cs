@@ -795,7 +795,8 @@ namespace RootTools
 							{
 								Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
 								byte[,,] viewptr = view.Data;
-								byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+								byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight); //이거 할 때마다 계속 다른pc에서 메모리를 가져옴
+
 								int nTerm = p_CanvasWidth * p_CanvasHeight;
 								if (image != null)
 									Parallel.For(0, p_CanvasHeight, (yy) =>
@@ -974,6 +975,7 @@ namespace RootTools
                                     sw.Stop();
                                     System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
 
+                                    
                                     p_ImgSource = ImageHelper.ToBitmapSource(view);
 
 									p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
@@ -2054,9 +2056,10 @@ namespace RootTools
             if (m_KeyEvent == null)
                 return;
             if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
-                if (e.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > 0)
+                if (e.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > 20)
                 {
                     CanvasMovePoint_Ref(m_ptViewBuffer, m_ptMouseBuffer.X - p_MouseX, m_ptMouseBuffer.Y - p_MouseY);
+                    m_swMouse.Restart();
                     return;
                 }
 
@@ -2067,12 +2070,17 @@ namespace RootTools
         }
         public virtual void MouseWheel(object sender, MouseWheelEventArgs e)
         {
+            
+                
             if (m_KeyEvent == null)
                 return;
+            bool pass = false;
             var viewer = sender as Grid;
             viewer.Focus();
+            if (p_Zoom == 1)
+                pass = true;
 
-            if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
+                if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown && (m_swMouse.ElapsedMilliseconds > 1 || pass)    )
             {
                 try
                 {
@@ -2104,6 +2112,7 @@ namespace RootTools
                     TempLogger.Write("RootViewer", ex);
                     //System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }
+                m_swMouse.Restart();
             }
         }
 

@@ -182,9 +182,13 @@
                               Cursor="Hand">
                         <GroupBox.Header>
                             <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="221*"/>
+                                    <ColumnDefinition Width="250*"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Text="SETUP" 
                                        FontSize="35"
-                                       FontWeight="Bold"/>
+                                       FontWeight="Bold" Grid.ColumnSpan="2"/>
                             </Grid>
                         </GroupBox.Header>
                         <Grid>

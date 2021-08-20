@@ -80,7 +80,7 @@
                         <i:CallMethodAction TargetObject="{Binding}" MethodName="PreviewMouseUp"/>
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseMove">
-                        <i:CallMethodAction TargetObject="{Binding}" MethodName="MouseMove"/>
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="MouseMove" />
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseWheel">
                         <i:CallMethodAction TargetObject="{Binding}" MethodName="MouseWheel"/>
@@ -99,7 +99,7 @@
                            Canvas.Left="{Binding p_LayerCanvasOffsetX}"
                            Canvas.Top="{Binding p_LayerCanvasOffsetY}"
                            Opacity="0.5"
-                           Grid.Column="1" />
+                           Grid.Column="1"/>
                 </Canvas>
                 <ItemsControl ItemsSource="{Binding p_ViewElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
